@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laevo", "Laevo.csproj", "{7FB51AF3-6B7D-4BA1-B02C-CBBE753F60E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.Laevo", "Whathecode.Laevo\Whathecode.Laevo.csproj", "{EE753682-D3BD-45EE-9B42-9B8F1902D250}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7FB51AF3-6B7D-4BA1-B02C-CBBE753F60E5}.Debug|x86.ActiveCfg = Debug|x86
-		{7FB51AF3-6B7D-4BA1-B02C-CBBE753F60E5}.Debug|x86.Build.0 = Debug|x86
-		{7FB51AF3-6B7D-4BA1-B02C-CBBE753F60E5}.Release|x86.ActiveCfg = Release|x86
-		{7FB51AF3-6B7D-4BA1-B02C-CBBE753F60E5}.Release|x86.Build.0 = Release|x86
+		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Debug|x86.ActiveCfg = Debug|x86
+		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Debug|x86.Build.0 = Debug|x86
+		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Release|x86.ActiveCfg = Release|x86
+		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
