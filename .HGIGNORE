@@ -1,0 +1,4 @@
+syntax: glob
+Laevo/bin/*
+Laevo/Laevo.suo
+Laevo/obj/*
