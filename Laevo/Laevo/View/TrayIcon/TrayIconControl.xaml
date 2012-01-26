@@ -1,0 +1,19 @@
+﻿<UserControl 
+	x:Class="Laevo.View.TrayIcon.TrayIconControl"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:tb="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification">
+
+	<tb:TaskbarIcon
+		IconSource="/View/TrayIcon/Standby.ico"
+		ToolTipText="Laevo">
+		
+		<tb:TaskbarIcon.ContextMenu>
+			<ContextMenu>
+				<MenuItem Header="Exit" />
+			</ContextMenu>
+		</tb:TaskbarIcon.ContextMenu>
+		
+	</tb:TaskbarIcon>
+	
+</UserControl>
