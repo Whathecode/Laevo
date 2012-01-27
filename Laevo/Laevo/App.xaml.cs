@@ -1,29 +1,25 @@
-﻿using System;
-using System.Windows;
-using Hardcodet.Wpf.TaskbarNotification;
-using Laevo.View.TrayIcon;
-
+﻿using System.Windows;
+using Laevo.View.Main;
+using Laevo.ViewModel.Main;
 
 namespace Laevo
 {
 	/// <summary>
-	/// Interaction logic for App.xaml
+	///   Interaction logic for App.xaml
 	/// </summary>
 	public partial class App
 	{
-		private TrayIconControl _trayIcon;
-
-
-		protected override void OnStartup( StartupEventArgs e )
+		protected override void OnStartup(StartupEventArgs e)
 		{
-			base.OnStartup( e );
+			base.OnStartup(e);
 
 			// TODO: Create Model.
 
-			// TODO: Create ViewModel.
+			// Create ViewModel.
+			MainViewModel mainViewModel = new MainViewModel();
 
 			// Create View.
-			_trayIcon = new TrayIconControl();
+			new TrayIconControl { DataContext = mainViewModel };
 		}
 	}
 }
