@@ -22,7 +22,9 @@ namespace Laevo.View.Main
 
 		protected override object ProvideValue( object dataContext )
 		{
-			return _skipFirst.TryEnter() ? base.ProvideValue( dataContext ) : null;
+			return _skipFirst.TryEnter()
+				? base.ProvideValue( dataContext )
+				: null;
 		}
 	}
 }

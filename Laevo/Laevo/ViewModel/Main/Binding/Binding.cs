@@ -4,6 +4,7 @@
 
 	public enum Commands
 	{
-		Exit
+		Exit,
+		OpenTimeLine
 	}
 }

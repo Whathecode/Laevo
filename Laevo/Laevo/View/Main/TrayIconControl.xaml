@@ -8,7 +8,6 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Main.Binding">
 
 	<tb:TaskbarIcon
-		x:Name="TrayIcon"
 		IconSource="/View/Main/Standby.ico"
 		ToolTipText="Laevo"
 		DataContext="{Binding ElementName=Control, Path=DataContext, Mode=OneWay}">

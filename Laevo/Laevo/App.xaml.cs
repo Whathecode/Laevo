@@ -9,7 +9,7 @@ namespace Laevo
 	/// </summary>
 	public partial class App
 	{
-		protected override void OnStartup(StartupEventArgs e)
+		protected override void OnStartup( StartupEventArgs e )
 		{
 			base.OnStartup(e);
 
