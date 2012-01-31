@@ -12,11 +12,12 @@ namespace Laevo
 		protected override void OnStartup( StartupEventArgs e )
 		{
 			base.OnStartup(e);
+			ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
 			// TODO: Create Model.
 
 			// Create ViewModel.
-			MainViewModel mainViewModel = new MainViewModel();
+			var mainViewModel = new MainViewModel();
 
 			// Create View.
 			new TrayIconControl { DataContext = mainViewModel };

@@ -12,16 +12,13 @@ namespace Laevo.ViewModel.Main
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class MainViewModel
 	{
-		readonly ActivityOverviewWindow _activityOverview;
+		ActivityOverviewWindow _activityOverview;
+		ActivityOverviewViewModel _activityOverviewViewModel;
 
 
 		public MainViewModel()
 		{
-			var activityOverviewViewModel = new ActivityOverviewViewModel();
-			_activityOverview = new ActivityOverviewWindow
-			{
-			    DataContext = activityOverviewViewModel
-			};
+			EnsureActivityOverview();
 		}
 
 
@@ -31,17 +28,33 @@ namespace Laevo.ViewModel.Main
 			Application.Current.Shutdown();
 		}
 
-		[CommandExecute( Commands.OpenTimeLine )]
-		public void OpenTimeLine()
+		[CommandExecute( Commands.ShowActivityOverview )]
+		public void ShowActivityOverview()
 		{
+			EnsureActivityOverview();
+
 			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
-			{
+			{				
 				_activityOverview.Show();
 			}
 			else
 			{
 				_activityOverview.Hide();
 			}
+		}
+
+		void EnsureActivityOverview()
+		{
+			if ( _activityOverview != null && _activityOverview.IsLoaded )
+			{
+				return;
+			}
+
+			_activityOverviewViewModel = new ActivityOverviewViewModel();
+			_activityOverview = new ActivityOverviewWindow
+			{
+				DataContext = _activityOverviewViewModel
+			};
 		}
 	}
 }

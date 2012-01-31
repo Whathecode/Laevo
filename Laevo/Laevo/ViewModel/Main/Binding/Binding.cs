@@ -5,6 +5,6 @@
 	public enum Commands
 	{
 		Exit,
-		OpenTimeLine
+		ShowActivityOverview
 	}
 }
