@@ -31,6 +31,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.ShowActivityOverview )]
 		public void ShowActivityOverview()
 		{
+			// TODO: Split into Show() and Hide().
 			EnsureActivityOverview();
 
 			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
@@ -43,6 +44,9 @@ namespace Laevo.ViewModel.Main
 			}
 		}
 
+		/// <summary>
+		///   Ensure that the activity overview window is created.
+		/// </summary>
 		void EnsureActivityOverview()
 		{
 			if ( _activityOverview != null && _activityOverview.IsLoaded )
@@ -51,6 +55,7 @@ namespace Laevo.ViewModel.Main
 			}
 
 			_activityOverviewViewModel = new ActivityOverviewViewModel();
+			_activityOverviewViewModel.OpenedActivityEvent += ShowActivityOverview;
 			_activityOverview = new ActivityOverviewWindow
 			{
 				DataContext = _activityOverviewViewModel

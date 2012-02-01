@@ -2,5 +2,8 @@
 {
 	public enum Properties { }
 
-	public enum Commands { }
+	public enum Commands
+	{
+		OpenActivity
+	}
 }

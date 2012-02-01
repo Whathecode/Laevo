@@ -2,13 +2,43 @@
 	x:Class="Laevo.View.ActivityOverview.ActivityOverviewWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	Title="Laevo Activity Time Line"
+	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+    xmlns:Binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
+    Title="Laevo Activity Time Line"
 	WindowStyle="None"
-	WindowState="Maximized">
+	WindowState="Maximized"
+	Topmost="True">
 	
-	<!-- TODO: Remove temporary buttons. -->
 	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
 		
+		<Button
+			Grid.Column="0" Grid.Row="0"
+			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
+			CommandParameter="1"
+			Content="Desktop 1" />
+		<Button
+			Grid.Column="1" Grid.Row="0"
+			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
+			CommandParameter="2"
+			Content="Desktop 2" />
+		<Button
+			Grid.Column="0" Grid.Row="1"
+			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
+			CommandParameter="3"
+			Content="Desktop 3" />
+		<Button
+			Grid.Column="1" Grid.Row="1"
+			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
+			CommandParameter="4"
+			Content="Desktop 4" />		
 	</Grid>
 	
 </Window>

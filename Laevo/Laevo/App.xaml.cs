@@ -2,6 +2,7 @@
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
 
+
 namespace Laevo
 {
 	/// <summary>
