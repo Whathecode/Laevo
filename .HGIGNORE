@@ -18,3 +18,5 @@ wpf-notifyicon/WindowsFormsSample/obj/*
 Framework Class Library Extension/*
 Laevo/Libraries/MouseKeyboardActivityMonitor/x64/MouseKeyboardActivityMonitor.Demo.exe
 Laevo/Libraries/MouseKeyboardActivityMonitor/x86/MouseKeyboardActivityMonitor.Demo.exe
+Laevo/VirtualDesktopManager/bin/*
+Laevo/VirtualDesktopManager/obj/*
