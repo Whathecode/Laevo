@@ -5,6 +5,7 @@
 	public enum Commands
 	{
 		Exit,
-		ShowActivityOverview
+		ShowActivityOverview,
+		HideActivityOverview
 	}
 }
