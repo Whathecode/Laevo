@@ -40,7 +40,10 @@ namespace Laevo.View.Main
 			// Add triggers for desired system-wide commands.
 			_keyStates[ Keys.CapsLock ] = false;
 			KeyInputCondition capsLockUp = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
-			_inputController.AddTrigger( new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.ShowActivityOverview ) );
+			var activityOverviewTrigger = new SequenceTrigger(
+				new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.ShowActivityOverview ),
+				new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.HideActivityOverview ) );
+			_inputController.AddTrigger( activityOverviewTrigger );
 		}
 
 		~TrayIconControl()

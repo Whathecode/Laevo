@@ -2,7 +2,6 @@
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.Main.Binding;
-using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
@@ -31,17 +30,15 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.ShowActivityOverview )]
 		public void ShowActivityOverview()
 		{
-			// TODO: Split into Show() and Hide().
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
-			{				
-				_activityOverview.Show();
-			}
-			else
-			{
-				_activityOverview.Hide();
-			}
+			_activityOverview.Show();
+		}
+
+		[CommandExecute( Commands.HideActivityOverview )]
+		public void HideActivityOverview()
+		{
+			_activityOverview.Hide();
 		}
 
 		/// <summary>
