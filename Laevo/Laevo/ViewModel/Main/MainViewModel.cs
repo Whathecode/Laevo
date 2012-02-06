@@ -2,6 +2,7 @@
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.Main.Binding;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
@@ -41,6 +42,19 @@ namespace Laevo.ViewModel.Main
 			_activityOverview.Hide();
 		}
 
+		[CommandExecute( Commands.SwitchActivityOverview )]
+		public void SwitchActivityOverview()
+		{
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
+			{
+				ShowActivityOverview();
+			}
+			else
+			{
+				HideActivityOverview();
+			}
+		}
+
 		/// <summary>
 		///   Ensure that the activity overview window is created.
 		/// </summary>
@@ -52,7 +66,7 @@ namespace Laevo.ViewModel.Main
 			}
 
 			_activityOverviewViewModel = new ActivityOverviewViewModel();
-			_activityOverviewViewModel.OpenedActivityEvent += ShowActivityOverview;
+			_activityOverviewViewModel.OpenedActivityEvent += HideActivityOverview;
 			_activityOverview = new ActivityOverviewWindow
 			{
 				DataContext = _activityOverviewViewModel

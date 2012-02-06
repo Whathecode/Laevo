@@ -38,11 +38,9 @@ namespace Laevo.View.Main
 			_updateLoop.Start();
 
 			// Add triggers for desired system-wide commands.
-			_keyStates[ Keys.CapsLock ] = false;
+			_keyStates[ Keys.CapsLock ] = false;	// Prevent exception when looking up a non-existent key.
 			KeyInputCondition capsLockUp = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
-			var activityOverviewTrigger = new SequenceTrigger(
-				new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.ShowActivityOverview ),
-				new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.HideActivityOverview ) );
+			var activityOverviewTrigger = new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.SwitchActivityOverview );
 			_inputController.AddTrigger( activityOverviewTrigger );
 		}
 
