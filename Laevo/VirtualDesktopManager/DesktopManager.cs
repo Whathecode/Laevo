@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Whathecode.System.Windows.Interop;
+using System.Diagnostics;
 
 
 namespace VirtualDesktopManager
@@ -31,6 +32,11 @@ namespace VirtualDesktopManager
 		{
 			IEnumerable<WindowInfo> oldWindows = CurrentDesktop.Windows;
 			List<WindowInfo> currentWindows = WindowManager.GetWindows();
+
+			foreach ( var window in currentWindows )
+			{
+				Debug.WriteLine( window.GetTitle() + ": " + window.GetWindowState() );
+			}
 
 			CurrentDesktop = desktop;
 		}

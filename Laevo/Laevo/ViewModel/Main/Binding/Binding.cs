@@ -6,6 +6,7 @@
 	{
 		Exit,
 		ShowActivityOverview,
-		HideActivityOverview
+		HideActivityOverview,
+		SwitchActivityOverview
 	}
 }
