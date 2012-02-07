@@ -30,6 +30,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			_desktop4 = _desktopManager.CreateEmptyDesktop();		
 		}
 
+		~ActivityOverviewViewModel()
+		{
+			_desktopManager.Close();
+		}
+
 
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity( string desktopId )
