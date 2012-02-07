@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Whathecode.System.Windows.Interop;
-using System.Diagnostics;
 
 
 namespace VirtualDesktopManager
@@ -10,18 +10,31 @@ namespace VirtualDesktopManager
 	/// </summary>
 	public class DesktopManager
 	{
+		readonly List<WindowInfo> _ignoreWindows;
+		public List<VirtualDesktop> AvailableDesktops = new List<VirtualDesktop>();
 		public VirtualDesktop CurrentDesktop { get; private set; }
 
 
 		public DesktopManager()
 		{
-			CurrentDesktop = new VirtualDesktop( WindowManager.GetWindows() );
+			// Determine which windows shouldn't be managed by the desktop manager.
+			_ignoreWindows = WindowManager.GetWindows().Where( w => !IsValidWindow( w ) ).ToList();
+
+			CurrentDesktop = new VirtualDesktop( GetOpenWindows() );
+			AvailableDesktops.Add( CurrentDesktop );
 		}
 
 
+		/// <summary>
+		///   Create an empty virtual desktop with no windows assigned to it.
+		/// </summary>
+		/// <returns>The newly created virtual desktop.</returns>
 		public VirtualDesktop CreateEmptyDesktop()
 		{
-			return new VirtualDesktop();
+			var newDesktop = new VirtualDesktop();
+			AvailableDesktops.Add( newDesktop );
+
+			return newDesktop;
 		}
 
 		/// <summary>
@@ -30,15 +43,35 @@ namespace VirtualDesktopManager
 		/// <param name="desktop">The desktop to switch to.</param>
 		public void SwitchToDesktop( VirtualDesktop desktop )
 		{
-			IEnumerable<WindowInfo> oldWindows = CurrentDesktop.Windows;
-			List<WindowInfo> currentWindows = WindowManager.GetWindows();
+			// Update which windows are associated to the current virtual desktop.
+			IEnumerable<WindowInfo> newWindows = GetOpenWindows()
+				.Except( AvailableDesktops.SelectMany( d => d.Windows ) )
+				.Where( IsValidWindow );
+			CurrentDesktop.UpdateWindows( newWindows );
 
-			foreach ( var window in currentWindows )
-			{
-				Debug.WriteLine( window.GetTitle() + ": " + window.GetWindowState() );
-			}
+			// Hide windows and show those from the new desktop.
+			CurrentDesktop.Hide();
+			desktop.Show();
 
 			CurrentDesktop = desktop;
+		}
+
+		/// <summary>
+		///   Closes the virtual desktop manager by restoring all windows.
+		/// </summary>
+		public void Close()
+		{
+			AvailableDesktops.ForEach( d => d.Show() );
+		}
+
+		static bool IsValidWindow( WindowInfo window )
+		{
+			return window.IsVisible();
+		}
+
+		IEnumerable<WindowInfo> GetOpenWindows()
+		{
+			return WindowManager.GetWindows().Except( _ignoreWindows );
 		}
 	}
 }
