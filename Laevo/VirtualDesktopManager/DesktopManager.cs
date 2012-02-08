@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Whathecode.System.Collections.Generic;
 using Whathecode.System.Windows.Interop;
 
 
@@ -10,6 +12,17 @@ namespace VirtualDesktopManager
 	/// </summary>
 	public class DesktopManager
 	{
+		/// <summary>
+		///   A list of processes with associated window classes which should be ignored by the desktop manager.
+		/// </summary>
+		static readonly TupleList<string, string> IgnoreProcesses = new TupleList<string, string>
+		{
+			// Format: { process name, class name }
+			{ "explorer", "Button" },			// Start button.
+			{ "explorer", "Shell_TrayWnd" },	// Start bar.
+			{ "explorer", "Progman" }			// Desktop icons.
+		};
+
 		readonly List<WindowInfo> _ignoreWindows;
 		public List<VirtualDesktop> AvailableDesktops = new List<VirtualDesktop>();
 		public VirtualDesktop CurrentDesktop { get; private set; }
@@ -66,7 +79,9 @@ namespace VirtualDesktopManager
 
 		static bool IsValidWindow( WindowInfo window )
 		{
-			return window.IsVisible();
+			return
+				window.IsVisible() &&
+				!IgnoreProcesses.Contains( new Tuple<string, string>( window.GetProcess().ProcessName, window.GetClassName() ) );
 		}
 
 		IEnumerable<WindowInfo> GetOpenWindows()
