@@ -1,7 +1,11 @@
-﻿using Laevo.ViewModel.ActivityOverview.Binding;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Laevo.ViewModel.ActivityOverview.Binding;
 using VirtualDesktopManager;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Laevo.Model;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -15,19 +19,25 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public event OpenedActivityEventHandler OpenedActivityEvent;
 
+		readonly Model.Laevo _model;
 		readonly DesktopManager _desktopManager = new DesktopManager();
-		readonly VirtualDesktop _initialDesktop;
-		readonly VirtualDesktop _desktop2;
-		readonly VirtualDesktop _desktop3;
-		readonly VirtualDesktop _desktop4;
+		readonly Dictionary<Activity, VirtualDesktop> _desktops = new Dictionary<Activity, VirtualDesktop>();
 
 
-		public ActivityOverviewViewModel()
+		public ActivityOverviewViewModel( Model.Laevo model )
 		{
-			_initialDesktop = _desktopManager.CurrentDesktop;
-			_desktop2 = _desktopManager.CreateEmptyDesktop();
-			_desktop3 = _desktopManager.CreateEmptyDesktop();
-			_desktop4 = _desktopManager.CreateEmptyDesktop();		
+			_model = model;
+
+			// Ensure current acitivity is assigned to the correct desktop.
+			if ( _model.CurrentActivity != null )
+			{
+				_desktops.Add( _model.CurrentActivity, _desktopManager.CurrentDesktop );
+			}
+
+			// Initialize all remaining activities with an empty desktop.
+			_model.Activities
+				.Where( a => a != _model.CurrentActivity )
+				.ForEach( a => _desktops.Add( a, _desktopManager.CreateEmptyDesktop() ) );
 		}
 
 		~ActivityOverviewViewModel()
@@ -39,21 +49,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity( string desktopId )
 		{
-			switch ( int.Parse( desktopId ) )
-			{
-				case 1:
-					_desktopManager.SwitchToDesktop( _initialDesktop );
-					break;
-				case 2:
-					_desktopManager.SwitchToDesktop( _desktop2 );
-					break;
-				case 3:
-					_desktopManager.SwitchToDesktop( _desktop3 );
-					break;
-				case 4:
-					_desktopManager.SwitchToDesktop( _desktop4 );
-					break;
-			}
+			// TODO: Pass proper Activity reference instead.
+			int desktopNumber = int.Parse( desktopId ) - 1;
+			_desktopManager.SwitchToDesktop( _desktops.Values.ElementAt( desktopNumber ) );
 
 			if ( OpenedActivityEvent != null )
 			{

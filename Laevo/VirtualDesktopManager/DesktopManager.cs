@@ -24,7 +24,8 @@ namespace VirtualDesktopManager
 		};
 
 		readonly List<WindowInfo> _ignoreWindows;
-		public List<VirtualDesktop> AvailableDesktops = new List<VirtualDesktop>();
+		readonly List<VirtualDesktop> _availableDesktops = new List<VirtualDesktop>();
+
 		public VirtualDesktop CurrentDesktop { get; private set; }
 
 
@@ -34,7 +35,7 @@ namespace VirtualDesktopManager
 			_ignoreWindows = WindowManager.GetWindows().Where( w => !IsValidWindow( w ) ).ToList();
 
 			CurrentDesktop = new VirtualDesktop( GetOpenWindows() );
-			AvailableDesktops.Add( CurrentDesktop );
+			_availableDesktops.Add( CurrentDesktop );
 		}
 
 
@@ -45,7 +46,7 @@ namespace VirtualDesktopManager
 		public VirtualDesktop CreateEmptyDesktop()
 		{
 			var newDesktop = new VirtualDesktop();
-			AvailableDesktops.Add( newDesktop );
+			_availableDesktops.Add( newDesktop );
 
 			return newDesktop;
 		}
@@ -58,7 +59,7 @@ namespace VirtualDesktopManager
 		{
 			// Update which windows are associated to the current virtual desktop.
 			IEnumerable<WindowInfo> newWindows = GetOpenWindows()
-				.Except( AvailableDesktops.SelectMany( d => d.Windows ) )
+				.Except( _availableDesktops.SelectMany( d => d.Windows ) )
 				.Where( IsValidWindow );
 			CurrentDesktop.UpdateWindows( newWindows );
 
@@ -74,11 +75,18 @@ namespace VirtualDesktopManager
 		/// </summary>
 		public void Close()
 		{
-			AvailableDesktops.ForEach( d => d.Show() );
+			_availableDesktops.ForEach( d => d.Show() );
 		}
 
 		static bool IsValidWindow( WindowInfo window )
 		{
+			// TODO: Remove test stuff.
+			if ( window.GetClassName() == "Progman" )
+			{
+				var childWindows = window.GetChildWindows();
+				var iconsWindow = childWindows.First( w => w.GetClassName() == "SysListView32" );
+			}
+
 			return
 				window.IsVisible() &&
 				!IgnoreProcesses.Contains( new Tuple<string, string>( window.GetProcess().ProcessName, window.GetClassName() ) );

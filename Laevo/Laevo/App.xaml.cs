@@ -15,10 +15,11 @@ namespace Laevo
 			base.OnStartup(e);
 			ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-			// TODO: Create Model.
+			// Create Model.
+			var model = new Model.Laevo();
 
 			// Create ViewModel.
-			var mainViewModel = new MainViewModel();
+			var mainViewModel = new MainViewModel( model );
 
 			// Create View.
 			new TrayIconControl { DataContext = mainViewModel };
