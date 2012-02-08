@@ -12,12 +12,15 @@ namespace Laevo.ViewModel.Main
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class MainViewModel
 	{
+		Model.Laevo _model;
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
 
 
-		public MainViewModel()
+		public MainViewModel( Model.Laevo model )
 		{
+			_model = model;
+
 			EnsureActivityOverview();
 		}
 
@@ -65,7 +68,7 @@ namespace Laevo.ViewModel.Main
 				return;
 			}
 
-			_activityOverviewViewModel = new ActivityOverviewViewModel();
+			_activityOverviewViewModel = new ActivityOverviewViewModel( _model );
 			_activityOverviewViewModel.OpenedActivityEvent += HideActivityOverview;
 			_activityOverview = new ActivityOverviewWindow
 			{

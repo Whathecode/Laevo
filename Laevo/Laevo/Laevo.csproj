@@ -64,6 +64,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Laevo.cs" />
+    <Compile Include="Model\Activity.cs" />
+    <Compile Include="Model\Laevo.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
