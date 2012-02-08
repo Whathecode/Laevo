@@ -57,6 +57,11 @@ namespace VirtualDesktopManager
 		/// <param name="desktop">The desktop to switch to.</param>
 		public void SwitchToDesktop( VirtualDesktop desktop )
 		{
+			if ( CurrentDesktop == desktop )
+			{
+				return;
+			}
+
 			// Update which windows are associated to the current virtual desktop.
 			IEnumerable<WindowInfo> newWindows = GetOpenWindows()
 				.Except( _availableDesktops.SelectMany( d => d.Windows ) )

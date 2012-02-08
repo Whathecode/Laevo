@@ -3,7 +3,7 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
-	xmlns:Binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
+	xmlns:Binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
@@ -20,24 +20,24 @@
 		</Grid.ColumnDefinitions>
 		
 		<Button
+			DataContext="{Binding Activity1}"
 			Grid.Column="0" Grid.Row="0"
 			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
-			CommandParameter="1"
 			Content="Desktop 1" />
 		<Button
+			DataContext="{Binding Activity2}"
 			Grid.Column="1" Grid.Row="0"
 			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
-			CommandParameter="2"
 			Content="Desktop 2" />
 		<Button
+			DataContext="{Binding Activity3}"
 			Grid.Column="0" Grid.Row="1"
 			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
-			CommandParameter="3"
 			Content="Desktop 3" />
 		<Button
+			DataContext="{Binding Activity4}"
 			Grid.Column="1" Grid.Row="1"
 			Command="{wtc:CommandBinding {x:Static Binding:Commands.OpenActivity}}"
-			CommandParameter="4"
 			Content="Desktop 4" />		
 	</Grid>
 	
