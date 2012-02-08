@@ -44,6 +44,12 @@
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack">
+      <HintPath>..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell">
+      <HintPath>..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
     <Reference Include="MouseKeyboardActivityMonitor">
       <HintPath>..\Libraries\MouseKeyboardActivityMonitor\x86\MouseKeyboardActivityMonitor.dll</HintPath>
     </Reference>
@@ -69,6 +75,8 @@
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Binding.cs" />
+    <Compile Include="ViewModel\Activity\Binding\Binding.cs" />
+    <Compile Include="ViewModel\Activity\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
     <Compile Include="View\ActivityOverview\ActivityOverviewWindow.xaml.cs">

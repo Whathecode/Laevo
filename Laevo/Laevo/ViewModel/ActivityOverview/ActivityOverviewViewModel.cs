@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using VirtualDesktopManager;
-using Whathecode.System.Extensions;
+using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
-using Whathecode.System.Windows.Input.CommandFactory.Attributes;
-using Laevo.Model;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -13,31 +11,44 @@ namespace Laevo.ViewModel.ActivityOverview
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class ActivityOverviewViewModel
 	{
-		public delegate void OpenedActivityEventHandler();
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
-		public event OpenedActivityEventHandler OpenedActivityEvent;
+		public event ActivityViewModel.OpenedActivityEventHandler OpenedActivityEvent;
 
 		readonly Model.Laevo _model;
 		readonly DesktopManager _desktopManager = new DesktopManager();
-		readonly Dictionary<Activity, VirtualDesktop> _desktops = new Dictionary<Activity, VirtualDesktop>();
+		readonly List<ActivityViewModel> _desktops = new List<ActivityViewModel>();
+
+		[NotifyProperty( Binding.Properties.Activity1 )]
+		public ActivityViewModel Activity1 { get; private set; }
+		[NotifyProperty( Binding.Properties.Activity2 )]
+		public ActivityViewModel Activity2 { get; private set; }
+		[NotifyProperty( Binding.Properties.Activity3 )]
+		public ActivityViewModel Activity3 { get; private set; }
+		[NotifyProperty( Binding.Properties.Activity4 )]
+		public ActivityViewModel Activity4 { get; private set; }
 
 
 		public ActivityOverviewViewModel( Model.Laevo model )
 		{
-			_model = model;
+			_model = model;			
 
-			// Ensure current acitivity is assigned to the correct desktop.
-			if ( _model.CurrentActivity != null )
+			// Initialize a view model for all activities.
+			foreach ( var activity in _model.Activities )
 			{
-				_desktops.Add( _model.CurrentActivity, _desktopManager.CurrentDesktop );
-			}
+				var viewModel = _model.CurrentActivity != activity	// Ensure current (first) activity is assigned to the correct desktop.
+					? new ActivityViewModel( activity, _desktopManager )
+					: new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop );
+				viewModel.OpenedActivityEvent += OnActivityOpened;
+				_desktops.Add( viewModel );
+			}				
 
-			// Initialize all remaining activities with an empty desktop.
-			_model.Activities
-				.Where( a => a != _model.CurrentActivity )
-				.ForEach( a => _desktops.Add( a, _desktopManager.CreateEmptyDesktop() ) );
+			// TODO: Remove temporary desktops.
+			Activity1 = _desktops[ 0 ];
+			Activity2 = _desktops[ 1 ];
+			Activity3 = _desktops[ 2 ];
+			Activity4 = _desktops[ 3 ];
 		}
 
 		~ActivityOverviewViewModel()
@@ -46,13 +57,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
-		[CommandExecute( Commands.OpenActivity )]
-		public void OpenActivity( string desktopId )
+		void OnActivityOpened()
 		{
-			// TODO: Pass proper Activity reference instead.
-			int desktopNumber = int.Parse( desktopId ) - 1;
-			_desktopManager.SwitchToDesktop( _desktops.Values.ElementAt( desktopNumber ) );
-
 			if ( OpenedActivityEvent != null )
 			{
 				OpenedActivityEvent();
