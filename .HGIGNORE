@@ -20,3 +20,4 @@ Laevo/Libraries/MouseKeyboardActivityMonitor/x64/MouseKeyboardActivityMonitor.De
 Laevo/Libraries/MouseKeyboardActivityMonitor/x86/MouseKeyboardActivityMonitor.Demo.exe
 Laevo/VirtualDesktopManager/bin/*
 Laevo/VirtualDesktopManager/obj/*
+Laevo AppData.lnk

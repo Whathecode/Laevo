@@ -13,8 +13,7 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Activity
 	{
-		// TODO: Use user document path.
-		const string ActivityContextPath = @"C:\Users\Steven\Documents\Whathecode\Laevo\Activities";
+		readonly string _activityContextPath = Path.Combine( Laevo.ProgramData, "Activity" );
 
 
 		/// <summary>
@@ -34,7 +33,7 @@ namespace Laevo.Model
 
 
 		public Activity()
-			: this( String.Format( "{0:s}", DateTime.Now ) ) { }
+			: this( DateTime.Now.ToString( "s" ) ) { }
 
 		public Activity( string name )
 		{
@@ -44,8 +43,8 @@ namespace Laevo.Model
 
 			// Create initial data path.
 			string safeName = PathHelper.ReplaceInvalidChars( name, '-' );
-			string path = Path.Combine( ActivityContextPath, safeName ).MakeUnique( p => !Directory.Exists( p ), "_i" );
-			DirectoryInfo activityDirectory = new DirectoryInfo( path );
+			string path = Path.Combine( _activityContextPath, safeName ).MakeUnique( p => !Directory.Exists( p ), "_i" );
+			var activityDirectory = new DirectoryInfo( path );
 			activityDirectory.Create();
 			DataPaths.Add( new Uri( activityDirectory.FullName ) );
 		}
