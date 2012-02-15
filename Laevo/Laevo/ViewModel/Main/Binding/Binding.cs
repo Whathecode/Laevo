@@ -7,6 +7,7 @@
 		Exit,
 		ShowActivityOverview,
 		HideActivityOverview,
-		SwitchActivityOverview
+		SwitchActivityOverview,
+		OpenCurrentActivityLibrary
 	}
 }

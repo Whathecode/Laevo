@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Laevo.View.ActivityOverview;
+using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.Main.Binding;
 using Whathecode.System.Extensions;
@@ -58,6 +59,12 @@ namespace Laevo.ViewModel.Main
 			}
 		}
 
+		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
+		public void OpenCurrentActivityLibrary()
+		{
+			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
+		}
+
 		/// <summary>
 		///   Ensure that the activity overview window is created.
 		/// </summary>
@@ -69,11 +76,16 @@ namespace Laevo.ViewModel.Main
 			}
 
 			_activityOverviewViewModel = new ActivityOverviewViewModel( _model );
-			_activityOverviewViewModel.OpenedActivityEvent += HideActivityOverview;
+			_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow
 			{
 				DataContext = _activityOverviewViewModel
 			};
+		}
+
+		void OnOpenedActivityEvent( ActivityViewModel viewModel )
+		{
+			HideActivityOverview();
 		}
 	}
 }

@@ -4,6 +4,7 @@
 
 	public enum Commands
 	{
-		OpenActivity
+		OpenActivity,
+		OpenActivityLibrary
 	}
 }
