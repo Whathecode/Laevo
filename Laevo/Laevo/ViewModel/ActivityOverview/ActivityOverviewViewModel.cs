@@ -20,6 +20,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly DesktopManager _desktopManager = new DesktopManager();
 		readonly List<ActivityViewModel> _desktops = new List<ActivityViewModel>();
 
+		public ActivityViewModel CurrentActivityViewModel { get; private set; }
+
 		[NotifyProperty( Binding.Properties.Activity1 )]
 		public ActivityViewModel Activity1 { get; private set; }
 		[NotifyProperty( Binding.Properties.Activity2 )]
@@ -37,9 +39,18 @@ namespace Laevo.ViewModel.ActivityOverview
 			// Initialize a view model for all activities.
 			foreach ( var activity in _model.Activities )
 			{
-				var viewModel = _model.CurrentActivity != activity	// Ensure current (first) activity is assigned to the correct desktop.
-					? new ActivityViewModel( activity, _desktopManager )
-					: new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop );
+				ActivityViewModel viewModel;
+				if ( _model.CurrentActivity == activity )
+				{
+					// Ensure current (first) activity is assigned to the correct desktop.
+					viewModel = new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop );
+					CurrentActivityViewModel = viewModel;
+				}
+				else
+				{
+					viewModel = new ActivityViewModel( activity, _desktopManager );
+				}
+
 				viewModel.OpenedActivityEvent += OnActivityOpened;
 				_desktops.Add( viewModel );
 			}				
@@ -57,11 +68,13 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
-		void OnActivityOpened()
+		void OnActivityOpened( ActivityViewModel viewModel )
 		{
+			CurrentActivityViewModel = viewModel;
+
 			if ( OpenedActivityEvent != null )
 			{
-				OpenedActivityEvent();
+				OpenedActivityEvent( viewModel );
 			}
 		}
 	}

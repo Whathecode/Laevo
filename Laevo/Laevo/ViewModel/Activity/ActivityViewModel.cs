@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using Laevo.ViewModel.Activity.Binding;
 using Microsoft.WindowsAPICodePack.Shell;
 using VirtualDesktopManager;
@@ -11,13 +15,20 @@ namespace Laevo.ViewModel.Activity
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class ActivityViewModel
 	{
+		readonly static object StaticLock = new object();
+
 		/// <summary>
 		///   Path of the folder which contains the file libraries.
 		/// </summary>
-		private const string LibraryName = "Activity Context";
+		const string LibraryName = "Activity Context";
+
+		/// <summary>
+		///   The extension of microsoft libraries.
+		/// </summary>
+		const string LibraryExtension = "library-ms";
 
 
-		public delegate void OpenedActivityEventHandler();
+		public delegate void OpenedActivityEventHandler( ActivityViewModel viewModel );
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
@@ -28,12 +39,6 @@ namespace Laevo.ViewModel.Activity
 		readonly VirtualDesktop _virtualDesktop;
 
 
-		static ActivityViewModel()
-		{
-			// Initialize the library which contains all the context files.
-			new ShellLibrary( LibraryName, true ).Close();
-		}
-
 		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) { }
 
@@ -42,6 +47,8 @@ namespace Laevo.ViewModel.Activity
 			_activity = activity;
 			_desktopManager = desktopManager;
 			_virtualDesktop = virtualDesktop;
+
+			InitializeLibrary();
 		}
 
 
@@ -50,10 +57,38 @@ namespace Laevo.ViewModel.Activity
 		{
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
+			InitializeLibrary();
+
 			if ( OpenedActivityEvent != null )
 			{
-				OpenedActivityEvent();
+				OpenedActivityEvent( this );
 			}
+		}
+
+		[CommandExecute( Commands.OpenActivityLibrary )]
+		public void OpenActivityLibrary()
+		{
+			string folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
+			Process.Start( "explorer.exe", Path.ChangeExtension( folderName, LibraryExtension ) );
+		}
+
+		/// <summary>
+		///   Initialize the library which contains all the context files.
+		/// </summary>
+		void InitializeLibrary()
+		{
+			// Initialize on a separate thread so the UI doesn't lock.		
+			var dataPaths = _activity.DataPaths.Select( p => p.AbsolutePath ).ToArray();
+			Thread initializeShellLibrary = new Thread( () =>
+			{
+				lock ( StaticLock )
+				{
+					ShellLibrary activityContext = new ShellLibrary(LibraryName, true);
+					Array.ForEach(dataPaths, activityContext.Add);
+					activityContext.Close();
+				}
+			} );
+			initializeShellLibrary.Start();
 		}
 	}
 }
