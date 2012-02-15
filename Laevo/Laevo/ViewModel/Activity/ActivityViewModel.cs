@@ -79,12 +79,12 @@ namespace Laevo.ViewModel.Activity
 		{
 			// Initialize on a separate thread so the UI doesn't lock.		
 			var dataPaths = _activity.DataPaths.Select( p => p.AbsolutePath ).ToArray();
-			Thread initializeShellLibrary = new Thread( () =>
+			var initializeShellLibrary = new Thread( () =>
 			{
 				lock ( StaticLock )
 				{
-					ShellLibrary activityContext = new ShellLibrary(LibraryName, true);
-					Array.ForEach(dataPaths, activityContext.Add);
+					var activityContext = new ShellLibrary( LibraryName, true );
+					Array.ForEach( dataPaths, activityContext.Add );
 					activityContext.Close();
 				}
 			} );

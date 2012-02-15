@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.IO;
 
 
 namespace Laevo.Model
@@ -9,6 +11,8 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Laevo
 	{
+		public static readonly string ProgramData = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), "Laevo" );
+
 		readonly ObservableCollection<Activity> _activities;
 		readonly ReadOnlyObservableCollection<Activity> _readOnlyActivities;
 		public ReadOnlyObservableCollection<Activity> Activities
