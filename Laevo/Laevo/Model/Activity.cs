@@ -13,7 +13,7 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Activity
 	{
-		readonly string _activityContextPath = Path.Combine( Laevo.ProgramData, "Activity" );
+		readonly string _activityContextPath = Path.Combine( Laevo.ProgramData, "Activities" );
 
 
 		/// <summary>

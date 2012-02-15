@@ -27,13 +27,6 @@ namespace Laevo.Model
 		{
 			_activities = new ObservableCollection<Activity>();
 			_readOnlyActivities = new ReadOnlyObservableCollection<Activity>( _activities );
-
-			// TODO: Remove temporary activities.
-			CurrentActivity = new Activity();
-			_activities.Add( CurrentActivity );
-			_activities.Add( new Activity() );
-			_activities.Add( new Activity() );
-			_activities.Add( new Activity() );
 		}
 	}
 }

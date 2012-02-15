@@ -2,7 +2,6 @@
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using VirtualDesktopManager;
-using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 
 
@@ -21,15 +20,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly List<ActivityViewModel> _desktops = new List<ActivityViewModel>();
 
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
-
-		[NotifyProperty( Binding.Properties.Activity1 )]
-		public ActivityViewModel Activity1 { get; private set; }
-		[NotifyProperty( Binding.Properties.Activity2 )]
-		public ActivityViewModel Activity2 { get; private set; }
-		[NotifyProperty( Binding.Properties.Activity3 )]
-		public ActivityViewModel Activity3 { get; private set; }
-		[NotifyProperty( Binding.Properties.Activity4 )]
-		public ActivityViewModel Activity4 { get; private set; }
 
 
 		public ActivityOverviewViewModel( Model.Laevo model )
@@ -54,12 +44,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				viewModel.OpenedActivityEvent += OnActivityOpened;
 				_desktops.Add( viewModel );
 			}				
-
-			// TODO: Remove temporary desktops.
-			Activity1 = _desktops[ 0 ];
-			Activity2 = _desktops[ 1 ];
-			Activity3 = _desktops[ 2 ];
-			Activity4 = _desktops[ 3 ];
 		}
 
 		~ActivityOverviewViewModel()
