@@ -86,6 +86,7 @@
     <Compile Include="View\ActivityOverview\TimeLineControl.xaml.cs">
       <DependentUpon>TimeLineControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ActivityOverview\TimeSpanLines.cs" />
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
