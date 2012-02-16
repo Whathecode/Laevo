@@ -24,7 +24,7 @@ namespace Laevo.View.ActivityOverview
 		{
 			VisibleInterval,
 			Children
-		}
+		}		
 
 
 		/// <summary>
@@ -61,6 +61,7 @@ namespace Laevo.View.ActivityOverview
 		/// </summary>
 		public static readonly DependencyProperty OffsetProperty
 			= DependencyProperty.RegisterAttached( "Offset", typeof( double ), typeof( TimeLineControl ) );
+
 		public static double GetOffset( FrameworkElement element )
 		{
 			return (double)element.GetValue( OffsetProperty );
@@ -77,10 +78,26 @@ namespace Laevo.View.ActivityOverview
 		{
 			InitializeComponent();
 
+			VisibleInterval = new Interval<DateTime>( DateTime.Today, DateTime.Today + TimeSpan.FromDays( 1 ) );
+
 			Children = new ObservableCollection<FrameworkElement>();
 			Children.CollectionChanged += OnChildrenChanged;
 		}
 
+
+		/// <summary>
+		///   Move the interval by a specified time span.
+		/// </summary>
+		/// <param name="timeSpan">The amount of time to move the interval.</param>
+		/// <param name="moveForward">True when interval needs to be moved forward, false otherwise.</param>
+		public void MoveInterval( TimeSpan timeSpan, bool moveForward = true )
+		{
+			long ticks = moveForward ? timeSpan.Ticks : -timeSpan.Ticks;
+
+			VisibleInterval = new Interval<DateTime>(
+				new DateTime( VisibleInterval.Start.Ticks + ticks ),
+				new DateTime( VisibleInterval.End.Ticks + ticks ) );
+		}
 
 		void OnChildrenChanged( object sender, NotifyCollectionChangedEventArgs eventArgs )
 		{
@@ -90,20 +107,20 @@ namespace Laevo.View.ActivityOverview
 					eventArgs.NewItems.Cast<FrameworkElement>().ForEach( e =>
 					{
 						// Position horizontally.
-						MultiBinding positionBinding = new MultiBinding();
-						Binding widthBinding = new Binding( "ActualWidth" ) { Source = this };
+						var positionBinding = new MultiBinding();
+						var widthBinding = new Binding( "ActualWidth" ) { Source = this };
 						positionBinding.Bindings.Add( widthBinding );
-						Binding elementWidthBinding = new Binding( "ActualWidth" ) { Source = e };
+						var elementWidthBinding = new Binding( "ActualWidth" ) { Source = e };
 						positionBinding.Bindings.Add( elementWidthBinding );
-						Binding viewportBinding = new Binding( "VisibleInterval" ) { Source = this };
+						var viewportBinding = new Binding( "VisibleInterval" ) { Source = this };
 						positionBinding.Bindings.Add( viewportBinding );
-						Binding occuranceBinding = new Binding { Path = new PropertyPath( OccuranceProperty ), Source = e };
+						var occuranceBinding = new Binding { Path = new PropertyPath( OccuranceProperty ), Source = e };
 						positionBinding.Bindings.Add( occuranceBinding );
 						positionBinding.Converter = new TimeLinePositionConverter();
 						e.SetBinding( Canvas.LeftProperty, positionBinding );
 
 						// Position vertically.
-						Binding bottomBinding = new Binding { Path = new PropertyPath( OffsetProperty ), Source = e };
+						var bottomBinding = new Binding { Path = new PropertyPath( OffsetProperty ), Source = e };
 						e.SetBinding( Canvas.BottomProperty, bottomBinding );
 					} );
 					break;

@@ -51,7 +51,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			_desktopManager.Close();
 		}
 
-
 		void OnActivityOpened( ActivityViewModel viewModel )
 		{
 			CurrentActivityViewModel = viewModel;

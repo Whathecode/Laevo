@@ -3,11 +3,12 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
 	Topmost="True">
-
+	
 	<Window.Resources>
 		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1">
 			<GradientStop Color="#606c88" Offset="0" />
@@ -15,8 +16,20 @@
 		</LinearGradientBrush>
 	</Window.Resources>
 
-	<Grid Background="{StaticResource BackgroundBrush}">
-		<ActivityOverview:TimeLineControl x:Name="TimeLine" VerticalAlignment="Bottom" />
+	<Grid
+		Background="{StaticResource BackgroundBrush}"
+		Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+		MouseWheel="OnMouseWheel"
+		MouseMove="OnMouseMoved">
+
+		<ActivityOverview:TimeLineControl x:Name="TimeLine" VerticalAlignment="Bottom" Focusable="True">
+			<ActivityOverview:TimeLineControl.CommandBindings>
+				<CommandBinding
+					Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
+					Executed="MoveTimeLine" />
+			</ActivityOverview:TimeLineControl.CommandBindings>
+		</ActivityOverview:TimeLineControl>
+
 	</Grid>
 
 </Window>
