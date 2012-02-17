@@ -24,8 +24,14 @@ namespace Laevo.View.ActivityOverview
 		{
 			VisibleInterval,
 			Children
-		}		
+		}
 
+
+		public delegate void VisibleIntervalChangedEventHandler( Interval<DateTime> interval );
+		/// <summary>
+		///   Event which is triggered when the visible interval is changed.
+		/// </summary>
+		public event VisibleIntervalChangedEventHandler VisibleIntervalChangedEvent;
 
 		/// <summary>
 		///   The currently visible interval.
@@ -124,6 +130,16 @@ namespace Laevo.View.ActivityOverview
 						e.SetBinding( Canvas.BottomProperty, bottomBinding );
 					} );
 					break;
+			}
+		}
+
+		[DependencyPropertyChanged( Properties.VisibleInterval )]
+		static void OnVisibleIntervalChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+		{
+			TimeLineControl control = (TimeLineControl)o;
+			if ( control.VisibleIntervalChangedEvent != null )
+			{
+				control.VisibleIntervalChangedEvent( control.VisibleInterval );
 			}
 		}
 	}

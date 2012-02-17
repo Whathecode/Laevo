@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.Xaml.Behaviors;
@@ -19,7 +22,7 @@ namespace Laevo.View.ActivityOverview
 		public static readonly RoutedCommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
 		DateTime _focusedTime = DateTime.Now;
 
-		TimeSpanLabels _hours = new TimeSpanLabels( TimeSpan.FromHours( 1 ) );
+		readonly List<AbstractTimeSpanLabels> _labels = new List<AbstractTimeSpanLabels>();
 
 
 		public ActivityOverviewWindow()
@@ -39,7 +42,20 @@ namespace Laevo.View.ActivityOverview
 			};
 
 			// Add labels.
-			_hours.Labels.ForEach( l => TimeLine.Children.Add( l ) );
+			_labels.Add( new RegularLabels( TimeSpan.FromHours( 1 ), Extensions.DateTimePart.Hour ) );
+			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += (s, e) =>
+			{
+				switch ( e.Action )
+				{
+					case NotifyCollectionChangedAction.Add:
+						e.NewItems.Cast<FrameworkElement>().ForEach( i => TimeLine.Children.Add( i ) );
+						break;
+				}
+			} );
+			Action updatePositions = () => _labels.ForEach( l => l.UpdatePositions( TimeLine.VisibleInterval, TimeLine.ActualWidth ) );
+			TimeLine.VisibleIntervalChangedEvent += i => updatePositions();
+			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
+			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );
 		}
 
 
