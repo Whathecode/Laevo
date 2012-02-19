@@ -91,6 +91,11 @@ namespace Laevo.View.ActivityOverview
 		}
 
 
+		public long GetVisibleTicks()
+		{
+			return (VisibleInterval.End - VisibleInterval.Start).Ticks;
+		}
+
 		/// <summary>
 		///   Move the interval by a specified time span.
 		/// </summary>
