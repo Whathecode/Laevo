@@ -5,7 +5,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Laevo.View.ActivityOverview.Labels;
+using Whathecode.System;
 using Whathecode.System.Arithmetic.Range;
+using Whathecode.System.Collections.Generic;
 using Whathecode.System.Extensions;
 using Whathecode.System.Xaml.Behaviors;
 
@@ -22,7 +25,7 @@ namespace Laevo.View.ActivityOverview
 		public static readonly RoutedCommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
 		DateTime _focusedTime = DateTime.Now;
 
-		readonly List<AbstractTimeSpanLabels> _labels = new List<AbstractTimeSpanLabels>();
+		readonly List<ILabels> _labels = new List<ILabels>();
 
 
 		public ActivityOverviewWindow()
@@ -41,8 +44,33 @@ namespace Laevo.View.ActivityOverview
 				TimeLine.VisibleInterval = new Interval<DateTime>( start, end );
 			};
 
-			// Add labels.
-			_labels.Add( new RegularLabels( TimeSpan.FromHours( 1 ), Extensions.DateTimePart.Hour ) );
+			// Create desired intervals to show.
+			// TODO: This logic seems abstract enough to move to the model.
+			RegularInterval weeks = new RegularInterval(
+				d => d.Round( DateTimePart.Day ) - TimeSpan.FromDays( (int)d.DayOfWeek - 1 ),
+				TimeSpan.FromDays( 7 ) );
+			RegularInterval days = new RegularInterval( 1, DateTimePart.Day );
+			RegularInterval everySixHours = new RegularInterval( 6, DateTimePart.Hour );
+			RegularInterval hours = new RegularInterval( 1, DateTimePart.Hour );
+			RegularInterval quarters = new RegularInterval( 15, DateTimePart.Minute );
+
+			// Create vertical interval lines.			
+			var labelList = new TupleList<RegularInterval, Func<DateTime, bool>>
+			{
+				{ weeks, d => true },
+				{ days, d => d.DayOfWeek != DayOfWeek.Monday },
+				{ everySixHours, d => d.Hour.EqualsAny( 6, 12, 18 ) },
+				{ hours, d => d.Hour != 0 && !d.Hour.EqualsAny( 6, 12, 18 ) },
+				{ quarters, d => d.Minute != 0 }
+			};
+			labelList.ForEach( l => _labels.Add( new RegularIntervalLines( TimeLine, l.Item1, l.Item2 ) ) );
+
+			// TODO: Add variant labels. (months/years)
+
+			// TODO: Add header labels.
+			_labels.Add( new HeaderLabels( TimeLine, weeks, days, everySixHours, hours, quarters ) );
+
+			// Hook up all labels to listen to time line changes.
 			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += (s, e) =>
 			{
 				switch ( e.Action )
@@ -52,10 +80,10 @@ namespace Laevo.View.ActivityOverview
 						break;
 				}
 			} );
-			Action updatePositions = () => _labels.ForEach( l => l.UpdatePositions( TimeLine.VisibleInterval, TimeLine.ActualWidth ) );
+			Action updatePositions = () =>  _labels.ForEach( l => l.UpdatePositions() );
 			TimeLine.VisibleIntervalChangedEvent += i => updatePositions();
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
-			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );
+			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );			
 		}
 
 

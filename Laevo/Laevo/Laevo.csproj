@@ -81,13 +81,31 @@
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
     <Compile Include="View\ActivityOverview\ActivityOverviewWindow.xaml.cs">
       <DependentUpon>ActivityOverviewWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="View\ActivityOverview\HourlyLabels.cs" />
-    <Compile Include="View\ActivityOverview\TimeLineControl.DateTimeToXConverter.cs" />
+    <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\ActivityOverview\Labels\AbstractTimeSpanLabels.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\ActivityOverview\Labels\HeaderLabels.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\ActivityOverview\Labels\ILabels.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\ActivityOverview\Labels\RegularIntervalLines.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\ActivityOverview\RegularInterval.cs" />
+    <Compile Include="View\ActivityOverview\TimeLineControl.DateTimeToXConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="View\ActivityOverview\TimeLineControl.xaml.cs">
       <DependentUpon>TimeLineControl.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="View\ActivityOverview\AbstractTimeSpanLabels.cs" />
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>

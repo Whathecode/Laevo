@@ -22,7 +22,7 @@
 		MouseWheel="OnMouseWheel"
 		MouseMove="OnMouseMoved">
 
-		<ActivityOverview:TimeLineControl x:Name="TimeLine" VerticalAlignment="Bottom" Focusable="True">
+		<ActivityOverview:TimeLineControl x:Name="TimeLine" Focusable="True">
 			<ActivityOverview:TimeLineControl.CommandBindings>
 				<CommandBinding
 					Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
