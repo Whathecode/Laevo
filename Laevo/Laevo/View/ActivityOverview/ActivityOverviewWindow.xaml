@@ -16,6 +16,7 @@
 		</LinearGradientBrush>
 	</Window.Resources>
 
+
 	<Grid
 		Background="{StaticResource BackgroundBrush}"
 		Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"

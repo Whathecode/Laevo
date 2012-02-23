@@ -126,7 +126,9 @@ namespace Laevo.View.ActivityOverview
 						var viewportBinding = new Binding( "VisibleInterval" ) { Source = this };
 						positionBinding.Bindings.Add( viewportBinding );
 						var occuranceBinding = new Binding { Path = new PropertyPath( OccuranceProperty ), Source = e };
-						positionBinding.Bindings.Add( occuranceBinding );
+						positionBinding.Bindings.Add( occuranceBinding );						
+						var alignmentBinding = new Binding( "HorizontalAlignment" ) { Source = e };
+						positionBinding.Bindings.Add( alignmentBinding  );
 						positionBinding.Converter = new TimeLinePositionConverter();
 						e.SetBinding( Canvas.LeftProperty, positionBinding );
 
@@ -141,7 +143,7 @@ namespace Laevo.View.ActivityOverview
 		[DependencyPropertyChanged( Properties.VisibleInterval )]
 		static void OnVisibleIntervalChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
 		{
-			TimeLineControl control = (TimeLineControl)o;
+			var control = (TimeLineControl)o;
 			if ( control.VisibleIntervalChangedEvent != null )
 			{
 				control.VisibleIntervalChangedEvent( control.VisibleInterval );

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Whathecode.System.Arithmetic.Range;
+using System.Windows;
 
 
 namespace Laevo.View.ActivityOverview.Labels
@@ -40,9 +40,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override bool IsVisible( TextBlock label, DateTime occurance )
 		{
-			return _currentDepth != null
-				? _matchLabelsToDepth[ label ] == _currentDepth
-				: false;
+			return _currentDepth != null && _matchLabelsToDepth[ label ] == _currentDepth;
 		}
 
 		bool IsIntervalHigherThanScreen( RegularInterval interval )
@@ -62,10 +60,12 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override TextBlock CreateNewLabel()
 		{
-			return new TextBlock()
+			return new TextBlock
 			{
 				Foreground = Brushes.White,
-				FontSize = 70
+				FontSize = 70,
+				HorizontalAlignment = HorizontalAlignment.Left,
+				Margin = new Thickness( HorizontalLabelOffset, 0, 0, 0 )
 			};
 		}
 
@@ -73,11 +73,10 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			_matchLabelsToDepth[ label ] = _currentDepth;
 
-			label.Text = "Test";
-			label.SetValue( TimeLineControl.OffsetProperty, TimeLine.ActualHeight - label.ActualHeight + VerticalLabelOffset );
-			label.SetValue(
-				FrameworkElement.MarginProperty,
-				new Thickness( (label.ActualWidth / 2) + HorizontalLabelOffset, 0, 0, 0 ) );			
+			var occurance = (DateTime)label.GetValue( TimeLineControl.OccuranceProperty );
+
+			label.Text = _currentDepth.Format( occurance );
+			label.SetValue( TimeLineControl.OffsetProperty, TimeLine.ActualHeight - label.ActualHeight + VerticalLabelOffset );	
 		}
 	}
 }

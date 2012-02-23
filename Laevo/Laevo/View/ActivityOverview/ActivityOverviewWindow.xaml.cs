@@ -46,13 +46,14 @@ namespace Laevo.View.ActivityOverview
 
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
-			RegularInterval weeks = new RegularInterval(
+			var weeks = new RegularInterval(
 				d => d.Round( DateTimePart.Day ) - TimeSpan.FromDays( (int)d.DayOfWeek - 1 ),
-				TimeSpan.FromDays( 7 ) );
-			RegularInterval days = new RegularInterval( 1, DateTimePart.Day );
-			RegularInterval everySixHours = new RegularInterval( 6, DateTimePart.Hour );
-			RegularInterval hours = new RegularInterval( 1, DateTimePart.Hour );
-			RegularInterval quarters = new RegularInterval( 15, DateTimePart.Minute );
+				TimeSpan.FromDays( 7 ),
+				"MMMM d");
+			var days = new RegularInterval( 1, DateTimePart.Day, @"d\t\h" );
+			var everySixHours = new RegularInterval( 6, DateTimePart.Hour, @"H tt" );
+			var hours = new RegularInterval( 1, DateTimePart.Hour, @"H:00" );
+			var quarters = new RegularInterval( 15, DateTimePart.Minute, "HH:mm" );
 
 			// Create vertical interval lines.			
 			var labelList = new TupleList<RegularInterval, Func<DateTime, bool>>

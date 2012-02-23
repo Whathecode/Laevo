@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 using Whathecode.System.Arithmetic.Range;
+using System.Windows;
 
 
 namespace Laevo.View.ActivityOverview
@@ -26,9 +26,20 @@ namespace Laevo.View.ActivityOverview
 				{
 					occuranceTicks = ((DateTime)occurance).Ticks;
 				}
+				var alignment = (HorizontalAlignment)values[ 4 ];
 
 				double position = ticksInterval.GetPercentageFor( occuranceTicks ) * width;
-				return position - (elementWidth / 2);
+				switch ( alignment )
+				{
+					case HorizontalAlignment.Left:
+						return position;
+					case HorizontalAlignment.Center:
+						return position - (elementWidth / 2);
+					case HorizontalAlignment.Right:
+						return position + elementWidth;
+					default:
+						throw new NotSupportedException( alignment + " is not supported by the TimeLineControl." );
+				}				
 			}
 
 			public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
