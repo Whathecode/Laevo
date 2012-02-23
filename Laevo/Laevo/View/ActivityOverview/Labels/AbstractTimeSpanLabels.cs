@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -41,7 +42,8 @@ namespace Laevo.View.ActivityOverview.Labels
 				X2 = 0,
 				Y2 = 500,
 				Stroke = Brushes.White,
-				StrokeThickness = 1
+				StrokeThickness = 1,
+				HorizontalAlignment = HorizontalAlignment.Center
 			};
 		}
 

@@ -9,21 +9,25 @@ namespace Laevo.View.ActivityOverview
 {
 	class RegularInterval
 	{
+		readonly string _formatString;
+
 		public Func<DateTime, DateTime> RoundToStart { get; private set; }
 		public TimeSpan Interval { get; private set; }
 
 
-		public RegularInterval( double every, DateTimePart step )
-		{
+		public RegularInterval( double every, DateTimePart step, string formatString )
+		{			
 			Func<double, TimeSpan> fromUnit = TimeSpanHelper.GetTimeSpanConstructor( step );
 			RoundToStart = d => d.Round( step ) - fromUnit( d.GetDateTimePart( step ) % every );
 			Interval = fromUnit( every );
+			_formatString = formatString;
 		}
 
-		public RegularInterval( Func<DateTime, DateTime> roundToStart, TimeSpan interval )
+		public RegularInterval( Func<DateTime, DateTime> roundToStart, TimeSpan interval, string formatString )
 		{
 			RoundToStart = roundToStart;
 			Interval = interval;
+			_formatString = formatString;
 		}
 
 
@@ -38,6 +42,11 @@ namespace Laevo.View.ActivityOverview
 				yield return current;
 				current += Interval;
 			}			
+		}
+
+		public string Format( DateTime occurance )
+		{
+			return occurance.ToString( _formatString );
 		}
 	}
 }
