@@ -54,6 +54,7 @@ namespace Laevo.View.ActivityOverview
 			var everySixHours = new RegularInterval( 6, DateTimePart.Hour, @"H tt" );
 			var hours = new RegularInterval( 1, DateTimePart.Hour, @"H:00" );
 			var quarters = new RegularInterval( 15, DateTimePart.Minute, "HH:mm" );
+			AbstractInterval[] intervals = { weeks, days, everySixHours, hours, quarters };
 
 			// Create vertical interval lines.			
 			var labelList = new TupleList<RegularInterval, Func<DateTime, bool>>
@@ -68,8 +69,9 @@ namespace Laevo.View.ActivityOverview
 
 			// TODO: Add variant labels. (months/years)
 
-			// TODO: Add header labels.
-			_labels.Add( new HeaderLabels( TimeLine, weeks, days, everySixHours, hours, quarters ) );
+			// Add header labels.
+			_labels.Add( new HeaderLabels( TimeLine, intervals ) );
+			_labels.Add( new BreadcrumbLabels( TimeLine, intervals ) );
 
 			// Hook up all labels to listen to time line changes.
 			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += (s, e) =>

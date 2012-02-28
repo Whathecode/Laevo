@@ -27,7 +27,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override TimeSpan GetMinimumTimeSpan()
 		{
-			return _interval.Interval;
+			return _interval.MinimumInterval;
 		}
 	}
 }

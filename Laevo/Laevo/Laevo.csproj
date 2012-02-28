@@ -83,12 +83,15 @@
       <DependentUpon>ActivityOverviewWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="View\ActivityOverview\AbstractInterval.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="View\ActivityOverview\Labels\AbstractTimeSpanLabels.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="View\ActivityOverview\Labels\AbstractTopLabels.cs" />
+    <Compile Include="View\ActivityOverview\Labels\BreadcrumbLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\HeaderLabels.cs">
       <SubType>Code</SubType>
     </Compile>

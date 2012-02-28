@@ -1,4 +1,7 @@
-﻿namespace Laevo.ViewModel.ActivityOverview.Binding
+﻿using System;
+
+
+namespace Laevo.ViewModel.ActivityOverview.Binding
 {
 	public enum Properties { }
 
