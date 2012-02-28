@@ -47,7 +47,7 @@ namespace Laevo.View.ActivityOverview
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
 			var weeks = new RegularInterval(
-				d => d.Round( DateTimePart.Day ) - TimeSpan.FromDays( (int)d.DayOfWeek - 1 ),
+				d => d.Round( DateTimePart.Day ) - TimeSpan.FromDays( (int)d.DayOfWeek == 0 ? 6 : (int)d.DayOfWeek - 1 ),
 				TimeSpan.FromDays( 7 ),
 				"MMMM d");
 			var days = new RegularInterval( 1, DateTimePart.Day, @"d\t\h" );
