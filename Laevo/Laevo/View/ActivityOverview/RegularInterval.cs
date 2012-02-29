@@ -7,31 +7,35 @@ using Whathecode.System.Extensions;
 
 namespace Laevo.View.ActivityOverview
 {
-	class RegularInterval : AbstractInterval
+	class RegularInterval : IInterval
 	{	
 		public Func<DateTime, DateTime> RoundToStart { get; private set; }
 
+		readonly TimeSpan _minimumInterval;
+		public TimeSpan MinimumInterval
+		{
+			get { return _minimumInterval; }
+		}
 
-		public RegularInterval( double every, DateTimePart step, string formatString )
-			: base( formatString )
+
+		public RegularInterval( double every, DateTimePart step )
 		{			
 			Func<double, TimeSpan> fromUnit = TimeSpanHelper.GetTimeSpanConstructor( step );
 			RoundToStart = d => d.Round( step ) - fromUnit( d.GetDateTimePart( step ) % every );
-			MinimumInterval = fromUnit( every );
+			_minimumInterval = fromUnit( every );
 		}
 
-		public RegularInterval( Func<DateTime, DateTime> roundToStart, TimeSpan interval, string formatString )
-			: base( formatString )
+		public RegularInterval( Func<DateTime, DateTime> roundToStart, TimeSpan interval )
 		{
 			RoundToStart = roundToStart;
-			MinimumInterval = interval;
+			_minimumInterval = interval;
 		}
 
 
 		/// <summary>
 		///   Returns all the visible positions within a certain interval.
 		/// </summary>
-		public override IEnumerable<DateTime> GetPositions( Interval<DateTime> range )
+		public IEnumerable<DateTime> GetPositions( Interval<DateTime> range )
 		{
 			DateTime current = RoundToStart( range.Start );
 			while ( current <= range.End )
