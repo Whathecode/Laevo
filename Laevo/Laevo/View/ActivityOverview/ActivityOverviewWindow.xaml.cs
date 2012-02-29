@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -46,32 +47,54 @@ namespace Laevo.View.ActivityOverview
 
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
+			var months = new IrregularInterval( TimeSpanHelper.MinimumMonthLength, DateTimePart.Month, d => d.AddMonths( 1 ) );
+			var years = new IrregularInterval( TimeSpanHelper.MinimumYearLength, DateTimePart.Year, d => d.AddYears( 1 ) );
 			var weeks = new RegularInterval(
 				d => d.Round( DateTimePart.Day ) - TimeSpan.FromDays( (int)d.DayOfWeek == 0 ? 6 : (int)d.DayOfWeek - 1 ),
-				TimeSpan.FromDays( 7 ),
-				"MMMM d");
-			var days = new RegularInterval( 1, DateTimePart.Day, @"d\t\h" );
-			var everySixHours = new RegularInterval( 6, DateTimePart.Hour, @"H tt" );
-			var hours = new RegularInterval( 1, DateTimePart.Hour, @"H:00" );
-			var quarters = new RegularInterval( 15, DateTimePart.Minute, "HH:mm" );
-			AbstractInterval[] intervals = { weeks, days, everySixHours, hours, quarters };
+				TimeSpan.FromDays( 7 ) );
+			var days = new RegularInterval( 1, DateTimePart.Day );
+			var everySixHours = new RegularInterval( 6, DateTimePart.Hour );
+			var hours = new RegularInterval( 1, DateTimePart.Hour );
+			var quarters = new RegularInterval( 15, DateTimePart.Minute );
 
-			// Create vertical interval lines.			
-			var labelList = new TupleList<RegularInterval, Func<DateTime, bool>>
+			// Create vertical interval lines.
+			var labelList = new TupleList<IInterval, Func<DateTime, bool>>
 			{
-				{ weeks, d => true },
-				{ days, d => d.DayOfWeek != DayOfWeek.Monday },
+				{ years, d => true },
+				{ months, d => d.Month != 1 },
+				{ weeks, d => d.Day != 1 },
+				{ days, d => d.DayOfWeek != DayOfWeek.Monday && d.Day != 1 },
 				{ everySixHours, d => d.Hour.EqualsAny( 6, 12, 18 ) },
 				{ hours, d => d.Hour != 0 && !d.Hour.EqualsAny( 6, 12, 18 ) },
 				{ quarters, d => d.Minute != 0 }
 			};
-			labelList.ForEach( l => _labels.Add( new RegularIntervalLines( TimeLine, l.Item1, l.Item2 ) ) );
-
-			// TODO: Add variant labels. (months/years)
+			labelList.ForEach( l => _labels.Add( new TimeSpanLabels( TimeLine, l.Item1, l.Item1.MinimumInterval, l.Item2 ) ) );			
 
 			// Add header labels.
-			_labels.Add( new HeaderLabels( TimeLine, intervals ) );
-			_labels.Add( new BreadcrumbLabels( TimeLine, intervals ) );
+			HeaderLabels headerLabels = new HeaderLabels( TimeLine );
+			headerLabels.AddInterval( years, "yyyy" );
+			headerLabels.AddInterval( months, "MMMM" );
+			headerLabels.AddInterval(
+				weeks,
+				d => "Week " + CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( d, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday ) );
+			headerLabels.AddInterval( days, @"d\t\h" );
+			headerLabels.AddInterval(
+				everySixHours,
+				d => d.Hour == 0 ? "Midnight" : d.Hour == 6 ? "Morning" : d.Hour == 12 ? "Noon" : "Evening" );
+			headerLabels.AddInterval( hours, "H:00" );
+			headerLabels.AddInterval( quarters, "HH:mm" );
+			_labels.Add( headerLabels );
+
+			// Add breadcrumb labels.
+			BreadcrumbLabels breadcrumbs = new BreadcrumbLabels( TimeLine );
+			breadcrumbs.AddInterval( years, "yyyy" );
+			breadcrumbs.AddInterval( months, "yyyy" );
+			breadcrumbs.AddInterval( weeks, "Y" );
+			breadcrumbs.AddInterval( days, "Y" );
+			breadcrumbs.AddInterval( everySixHours, "D" );
+			breadcrumbs.AddInterval( hours, "D" );
+			breadcrumbs.AddInterval( quarters, "D" );
+			_labels.Add( breadcrumbs );
 
 			// Hook up all labels to listen to time line changes.
 			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += (s, e) =>

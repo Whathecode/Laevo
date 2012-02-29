@@ -14,8 +14,8 @@ namespace Laevo.View.ActivityOverview.Labels
 		const double VerticalLabelOffset = 15.0;
 
 
-		public HeaderLabels( TimeLineControl timeLine, params AbstractInterval[] intervals )
-			: base( timeLine, intervals ) { }
+		public HeaderLabels( TimeLineControl timeLine )
+			: base( timeLine ) { }
 
 
 		protected override TextBlock CreateNewLabel()
@@ -34,9 +34,8 @@ namespace Laevo.View.ActivityOverview.Labels
 			return CurrentDepth.GetPositions( interval ).ToArray();
 		}
 
-		protected override void UpdateTopLabelText( TextBlock block, DateTime occurance )
+		protected override void UpdateTopLabel( TextBlock block )
 		{
-			block.Text = CurrentDepth.Format( occurance );
 			block.SetValue( TimeLineControl.OffsetProperty, TimeLine.ActualHeight - block.ActualHeight + VerticalLabelOffset );
 		}
 	}
