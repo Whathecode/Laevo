@@ -16,7 +16,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			TimeLineControl timeLine,
 			IInterval interval,
 			Func<DateTime, bool> predicate )
-			: base( timeLine, interval, predicate )
+			: base( timeLine, interval, predicate, TimeSpan.Zero )
 		{
 		}
 

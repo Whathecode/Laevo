@@ -80,13 +80,17 @@ namespace Laevo.View.ActivityOverview
 			_labels.Add( sixHourUnits );
 			var dayUnits = new UnitLabels( TimeLine, days, @"d\t\h", () => !sixHourUnits.LabelsFitScreen() );
 			_labels.Add( dayUnits );
+			var dayNameUnits = new UnitLabels( TimeLine, days, "dddd", () => !sixHourUnits.LabelsFitScreen(), 25, 15 );
+			_labels.Add( dayNameUnits );
 			var weekUnits = new UnitLabels( TimeLine, weeks, @"d\t\h", () => !dayUnits.LabelsFitScreen() );
 			_labels.Add( weekUnits );
+			var monthSmallUnits = new UnitLabels( TimeLine, months, "MMMM", () => !dayUnits.LabelsFitScreen() && weekUnits.LabelsFitScreen(), 25, 30 );
+			_labels.Add( monthSmallUnits );
 			var monthUnits = new UnitLabels( TimeLine, months, "MMMM", () => !weekUnits.LabelsFitScreen() );
 			_labels.Add( monthUnits );
 
 			// Add header labels.
-			HeaderLabels headerLabels = new HeaderLabels( TimeLine );
+			var headerLabels = new HeaderLabels( TimeLine );
 			headerLabels.AddInterval( years, "yyyy" );
 			headerLabels.AddInterval( months, "MMMM" );
 			headerLabels.AddInterval(
@@ -101,7 +105,7 @@ namespace Laevo.View.ActivityOverview
 			_labels.Add( headerLabels );
 
 			// Add breadcrumb labels.
-			BreadcrumbLabels breadcrumbs = new BreadcrumbLabels( TimeLine );
+			var breadcrumbs = new BreadcrumbLabels( TimeLine );
 			breadcrumbs.AddInterval( years, "yyyy" );
 			breadcrumbs.AddInterval( months, "yyyy" );
 			breadcrumbs.AddInterval( weeks, "Y" );

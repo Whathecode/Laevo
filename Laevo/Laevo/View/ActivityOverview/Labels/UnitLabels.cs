@@ -12,13 +12,17 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		readonly string _formatString;
 		readonly Func<bool> _predicate;
+		readonly double _offset;
+		readonly double _fontSize;
 
 
-		public UnitLabels( TimeLineControl timeLine, IInterval interval, string formatString, Func<bool> predicate )
-			: base( timeLine, interval, d => true )
+		public UnitLabels( TimeLineControl timeLine, IInterval interval, string formatString, Func<bool> predicate, double offset = 0, double fontSize = 20 )
+			: base( timeLine, interval, d => true, interval.MinimumInterval )
 		{
 			_formatString = formatString;
 			_predicate = predicate;
+			_offset = offset;
+			_fontSize = fontSize;
 		}
 
 
@@ -32,7 +36,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			return new TextBlock
 			{
 				Foreground = Brushes.White,
-				FontSize = 20,
+				FontSize = _fontSize,
 				HorizontalAlignment = HorizontalAlignment.Left,
 				Margin = new Thickness( HorizontalLabelOffset, 0, 0, 0 )
 			};
@@ -41,6 +45,8 @@ namespace Laevo.View.ActivityOverview.Labels
 		protected override void UpdateLabel( TextBlock label, DateTime occurance )
 		{
 			label.Text = occurance.ToString( _formatString );
+			label.FontSize = _fontSize;
+			label.SetValue( TimeLineControl.OffsetProperty, _offset );
 		}
 	}
 }

@@ -19,8 +19,9 @@ namespace Laevo.View.ActivityOverview.Labels
 		protected AbstractIntervalLabels(
 			TimeLineControl timeLine,
 			IInterval interval,
-			Func<DateTime, bool> predicate )
-			: base( timeLine )
+			Func<DateTime, bool> predicate,
+			TimeSpan extendVisibleRange )
+			: base( timeLine, extendVisibleRange )
 		{
 			Interval = interval;
 			_predicate = predicate;
@@ -34,7 +35,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override bool IsVisible( T label, DateTime occurance )
 		{
-			return TimeLine.VisibleInterval.LiesInInterval( occurance );
+			return ExtendedVisibleRange.LiesInInterval( occurance );
 		}
 
 		public bool LabelsFitScreen()

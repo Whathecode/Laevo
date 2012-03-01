@@ -35,7 +35,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 
 		protected AbstractTopLabels( TimeLineControl timeLine )
-			: base( timeLine )
+			: base( timeLine, TimeSpan.Zero )
 		{
 			_earliestLabel = CreateNewLabelInner();
 			TimeLine.Children.Add( _earliestLabel );
