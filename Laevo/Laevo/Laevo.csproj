@@ -79,6 +79,7 @@
     <Compile Include="ViewModel\Activity\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
+    <Compile Include="View\ActivityOverview\AspectRatioToGeometryConverter.cs" />
     <Compile Include="View\ActivityOverview\ActivityOverviewWindow.xaml.cs">
       <DependentUpon>ActivityOverviewWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

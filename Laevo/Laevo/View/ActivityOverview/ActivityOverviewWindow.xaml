@@ -7,13 +7,27 @@
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
-	Topmost="True">
+	Topmost="True"
+	FontFamily="Segoe UI Light">
 	
 	<Window.Resources>
 		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1">
 			<GradientStop Color="#606c88" Offset="0" />
 			<GradientStop Color="#282944" Offset="1" />
 		</LinearGradientBrush>
+
+		<!--<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="1,0">
+			<GradientStop Color="#606c88" Offset="0" />
+			<GradientStop Color="#606c88" Offset="0.2" />
+			<GradientStop Color="#606c88" Offset="0.7" />
+			<GradientStop Color="CornflowerBlue" Offset="0.9" />
+			<GradientStop Color="White" Offset="1" />		
+		</LinearGradientBrush>
+		<LinearGradientBrush x:Key="TimeLineBrush" StartPoint="0,0" EndPoint="1,0">
+			<GradientStop Color="#606c88" Offset="0" />
+			<GradientStop Color="#99282944" Offset="1" />
+		</LinearGradientBrush>
+		<ActivityOverview:AspectRatioToGeometryConverter x:Key="AspectRatioToPositions" />-->
 	</Window.Resources>
 
 
@@ -23,11 +37,57 @@
 		MouseWheel="OnMouseWheel"
 		MouseMove="OnMouseMoved">
 
+		<!--<Viewport3D>
+			<Viewport3D.Camera>
+				<PerspectiveCamera
+					Position="0 0 5"
+					LookDirection="0.4 0 -1"
+					UpDirection="0 1 0" />
+			</Viewport3D.Camera>
+			
+			<ContainerUIElement3D>
+				<ModelUIElement3D>
+					<AmbientLight Color="White" />
+				</ModelUIElement3D>
+			</ContainerUIElement3D>
+			
+			<Viewport2DVisual3D>			
+				<Viewport2DVisual3D.Geometry>
+					<MeshGeometry3D
+						TriangleIndices="0,1,2 2,3,0"
+						TextureCoordinates="0 0, 0 1, 1 1, 1 0">
+						<MeshGeometry3D.Positions>
+							<MultiBinding Converter="{StaticResource AspectRatioToPositions}">
+								<Binding ElementName="TimeLineContainer" Path="Width" />
+								<Binding ElementName="TimeLineContainer" Path="Height" />
+							</MultiBinding>
+						</MeshGeometry3D.Positions>					
+					</MeshGeometry3D>													
+				</Viewport2DVisual3D.Geometry>
+				
+				<Viewport2DVisual3D.Material>
+					<DiffuseMaterial
+						Viewport2DVisual3D.IsVisualHostMaterial="True"
+						Brush="White" />
+				</Viewport2DVisual3D.Material>
+
+				<Grid x:Name="TimeLineContainer" Width="1650" Height="600" ClipToBounds="True" Background="{StaticResource TimeLineBrush}">
+					<ActivityOverview:TimeLineControl x:Name="TimeLine" Focusable="True">
+						<ActivityOverview:TimeLineControl.CommandBindings>
+							<CommandBinding
+								Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
+								Executed="MoveTimeLine" />
+						</ActivityOverview:TimeLineControl.CommandBindings>
+					</ActivityOverview:TimeLineControl>
+				</Grid>
+			</Viewport2DVisual3D>
+		</Viewport3D>-->
+
 		<ActivityOverview:TimeLineControl x:Name="TimeLine" Focusable="True">
 			<ActivityOverview:TimeLineControl.CommandBindings>
 				<CommandBinding
-					Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
-					Executed="MoveTimeLine" />
+								Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
+								Executed="MoveTimeLine" />
 			</ActivityOverview:TimeLineControl.CommandBindings>
 		</ActivityOverview:TimeLineControl>
 

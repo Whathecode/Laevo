@@ -44,8 +44,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			long minimumTicks = Interval.MinimumInterval.Ticks;
 			double minimumWidth = (double)minimumTicks / TimeLine.GetVisibleTicks() * TimeLine.ActualWidth;
-			const double maxHeight = 2000;  // TODO: Limit to maximum screen height.
-			label.Y2 = minimumWidth > maxHeight ? maxHeight : minimumWidth;
+			label.Y2 = minimumWidth > TimeLine.ActualHeight ? TimeLine.ActualHeight : minimumWidth;
 		}
 	}
 }

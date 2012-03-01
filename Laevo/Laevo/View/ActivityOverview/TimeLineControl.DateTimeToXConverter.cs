@@ -28,7 +28,9 @@ namespace Laevo.View.ActivityOverview
 				}
 				var alignment = (HorizontalAlignment)values[ 4 ];
 
-				double position = ticksInterval.GetPercentageFor( occuranceTicks ) * width;
+				double percentage = ticksInterval.GetPercentageFor( occuranceTicks );
+				double position = percentage * width;
+
 				switch ( alignment )
 				{
 					case HorizontalAlignment.Left:
