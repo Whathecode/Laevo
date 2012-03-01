@@ -80,7 +80,7 @@ namespace Laevo.View.ActivityOverview
 			_labels.Add( sixHourUnits );
 			var dayUnits = new UnitLabels( TimeLine, days, @"d\t\h", () => !sixHourUnits.LabelsFitScreen() );
 			_labels.Add( dayUnits );
-			var dayNameUnits = new UnitLabels( TimeLine, days, "dddd", () => !sixHourUnits.LabelsFitScreen(), 25, 15 );
+			var dayNameUnits = new UnitLabels( TimeLine, days, "dddd", () => !sixHourUnits.LabelsFitScreen(), 25, 18 );
 			_labels.Add( dayNameUnits );
 			var weekUnits = new UnitLabels( TimeLine, weeks, @"d\t\h", () => !dayUnits.LabelsFitScreen() );
 			_labels.Add( weekUnits );
