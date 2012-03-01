@@ -47,6 +47,7 @@ namespace Laevo.View.ActivityOverview
 
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
+			// TODO: Prevent showing dates outside of a certain scope to prevent exceptions.
 			var months = new IrregularInterval( TimeSpanHelper.MinimumMonthLength, DateTimePart.Month, d => d.AddMonths( 1 ) );
 			var years = new IrregularInterval( TimeSpanHelper.MinimumYearLength, DateTimePart.Year, d => d.AddYears( 1 ) );
 			var weeks = new RegularInterval(
@@ -68,7 +69,21 @@ namespace Laevo.View.ActivityOverview
 				{ hours, d => d.Hour != 0 && !d.Hour.EqualsAny( 6, 12, 18 ) },
 				{ quarters, d => d.Minute != 0 }
 			};
-			labelList.ForEach( l => _labels.Add( new TimeSpanLabels( TimeLine, l.Item1, l.Item1.MinimumInterval, l.Item2 ) ) );			
+			labelList.ForEach( l => _labels.Add( new TimeSpanLabels( TimeLine, l.Item1, l.Item2 ) ) );
+	
+			// Create unit labels near interval lines.
+			var quarterUnits = new UnitLabels( TimeLine, quarters, "HH:mm", () => true );
+			_labels.Add( quarterUnits );
+			var hourUnits = new UnitLabels( TimeLine, hours, "HH:mm", () => !quarterUnits.LabelsFitScreen() );
+			_labels.Add( hourUnits );
+			var sixHourUnits = new UnitLabels( TimeLine, everySixHours, "HH:mm", () => !hourUnits.LabelsFitScreen() );
+			_labels.Add( sixHourUnits );
+			var dayUnits = new UnitLabels( TimeLine, days, @"d\t\h", () => !sixHourUnits.LabelsFitScreen() );
+			_labels.Add( dayUnits );
+			var weekUnits = new UnitLabels( TimeLine, weeks, @"d\t\h", () => !dayUnits.LabelsFitScreen() );
+			_labels.Add( weekUnits );
+			var monthUnits = new UnitLabels( TimeLine, months, "MMMM", () => !weekUnits.LabelsFitScreen() );
+			_labels.Add( monthUnits );
 
 			// Add header labels.
 			HeaderLabels headerLabels = new HeaderLabels( TimeLine );

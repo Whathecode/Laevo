@@ -84,6 +84,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="View\ActivityOverview\AbstractInterval.cs" />
+    <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -99,6 +100,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="View\ActivityOverview\IrregularInterval.cs" />
+    <Compile Include="View\ActivityOverview\Labels\UnitLabels.cs" />
     <Compile Include="View\ActivityOverview\RegularInterval.cs" />
     <Compile Include="View\ActivityOverview\TimeLineControl.DateTimeToXConverter.cs">
       <SubType>Code</SubType>
