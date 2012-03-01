@@ -82,6 +82,8 @@ namespace Laevo.View.ActivityOverview
 			_labels.Add( dayUnits );
 			var dayNameUnits = new UnitLabels( TimeLine, days, "dddd", () => !sixHourUnits.LabelsFitScreen(), 25, 18 );
 			_labels.Add( dayNameUnits );
+			var dayCompleteUnits = new UnitLabels( TimeLine, days, @"dddd d\t\h", () => sixHourUnits.LabelsFitScreen() && dayUnits.LabelsFitScreen(), 25, 18 );
+			_labels.Add( dayCompleteUnits );
 			var weekUnits = new UnitLabels( TimeLine, weeks, @"d\t\h", () => !dayUnits.LabelsFitScreen() );
 			_labels.Add( weekUnits );
 			var monthSmallUnits = new UnitLabels( TimeLine, months, "MMMM", () => !dayUnits.LabelsFitScreen() && weekUnits.LabelsFitScreen(), 25, 30 );
@@ -96,7 +98,7 @@ namespace Laevo.View.ActivityOverview
 			headerLabels.AddInterval(
 				weeks,
 				d => "Week " + CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( d, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday ) );
-			headerLabels.AddInterval( days, @"d\t\h" );
+			headerLabels.AddInterval( days, @"dddd d\t\h" );
 			headerLabels.AddInterval(
 				everySixHours,
 				d => d.Hour == 0 ? "Midnight" : d.Hour == 6 ? "Morning" : d.Hour == 12 ? "Noon" : "Evening" );
