@@ -111,12 +111,11 @@ namespace Laevo.View.ActivityOverview.Labels
 			return positions;
 		}
 
-		protected override void UpdateLabel( TextBlock label )
+		protected override void UpdateLabel( TextBlock label, DateTime occurance )
 		{
 			_matchLabelsToDepth[ label ] = CurrentDepth;
 
 			// Show actual label when it doesn't overlap with the earliest label.
-			var occurance = (DateTime)label.GetValue( TimeLineControl.OccuranceProperty );
 			label.Visibility = TimeLine.VisibleInterval.LiesInInterval( occurance ) ? Visibility.Visible : Visibility.Hidden;
 			UpdateText( label, occurance );
 		}
