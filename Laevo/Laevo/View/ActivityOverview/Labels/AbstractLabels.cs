@@ -12,16 +12,24 @@ namespace Laevo.View.ActivityOverview.Labels
 	abstract class AbstractLabels<T> : ILabels
 		where T : FrameworkElement
 	{
+		readonly TimeSpan _extendVisibleRange;
+
 		public ObservableCollection<FrameworkElement> Labels { get; private set; }
 
 		protected readonly TimeLineControl TimeLine;
 		protected readonly List<T> VisibleLabels = new List<T>();
 		protected readonly Stack<T> AvailableLabels = new Stack<T>();
 
+		protected Interval<DateTime> ExtendedVisibleRange
+		{
+			get { return new Interval<DateTime>( TimeLine.VisibleInterval.Start - _extendVisibleRange, TimeLine.VisibleInterval.End + _extendVisibleRange ); }
+		}
 
-		protected AbstractLabels( TimeLineControl timeLine )
+
+		protected AbstractLabels( TimeLineControl timeLine, TimeSpan extendVisibleRange )
 		{
 			TimeLine = timeLine;
+			_extendVisibleRange = extendVisibleRange;
 			Labels = new ObservableCollection<FrameworkElement>();
 		}
 
@@ -52,8 +60,8 @@ namespace Laevo.View.ActivityOverview.Labels
 				}
 				toRemove.ForEach( r => VisibleLabels.Remove( r ) );
 
-				// Position all remaining labels.
-				foreach ( var date in toPosition.Where( visibleRange.LiesInInterval ) )
+				// Position all remaining labels.				
+				foreach ( var date in toPosition.Where( ExtendedVisibleRange.LiesInInterval ) )
 				{
 					// Create a new label when needed.
 					if ( AvailableLabels.Count == 0 )
