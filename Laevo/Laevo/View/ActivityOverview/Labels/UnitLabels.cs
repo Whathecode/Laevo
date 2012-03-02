@@ -38,7 +38,8 @@ namespace Laevo.View.ActivityOverview.Labels
 				Foreground = Brushes.White,
 				FontSize = _fontSize,
 				HorizontalAlignment = HorizontalAlignment.Left,
-				Margin = new Thickness( HorizontalLabelOffset, 0, 0, 0 )
+				Margin = new Thickness( HorizontalLabelOffset, 0, 0, 0 ),
+				IsHitTestVisible = false
 			};
 		}
 

@@ -36,7 +36,8 @@ namespace Laevo.View.ActivityOverview.Labels
 				Y2 = 500,
 				Stroke = Brushes.White,
 				StrokeThickness = 1,
-				HorizontalAlignment = HorizontalAlignment.Center
+				HorizontalAlignment = HorizontalAlignment.Center,
+				IsHitTestVisible = false
 			};
 		}
 
