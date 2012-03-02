@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using Whathecode.System.Arithmetic.Range;
 
 
@@ -25,7 +26,8 @@ namespace Laevo.View.ActivityOverview.Labels
 				Foreground = Brushes.White,
 				FontSize = 70,
 				HorizontalAlignment = HorizontalAlignment.Left,
-				Margin = new Thickness( HorizontalLabelOffset, 0, HorizontalLabelOffset, 0 )
+				Margin = new Thickness( HorizontalLabelOffset, 0, HorizontalLabelOffset, 0 ),
+				IsHitTestVisible = false
 			};
 		}
 

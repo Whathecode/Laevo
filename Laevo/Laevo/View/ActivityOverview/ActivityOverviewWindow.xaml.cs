@@ -28,10 +28,17 @@ namespace Laevo.View.ActivityOverview
 
 		readonly List<ILabels> _labels = new List<ILabels>();
 
-
 		public ActivityOverviewWindow()
 		{
 			InitializeComponent();
+
+#if DEBUG
+			WindowStyle = WindowStyle.None;
+			WindowState = WindowState.Normal;
+			Topmost = false;
+			Width = 500;
+			Height = 500;
+#endif
 
 			// Set focus so commands are triggered.
 			TimeLine.Focus();
@@ -132,7 +139,6 @@ namespace Laevo.View.ActivityOverview
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
 			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );			
 		}
-
 
 		Interval<long> _startDrag;
 		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
