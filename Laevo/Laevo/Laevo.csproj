@@ -86,6 +86,8 @@
     </Compile>
     <Compile Include="View\ActivityOverview\AbstractInterval.cs" />
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToFovConverter.cs" />
+    <Compile Include="View\ActivityOverview\Converters\AspectRatioToTransformOffset.cs" />
+    <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
       <SubType>Code</SubType>

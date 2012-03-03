@@ -32,13 +32,13 @@ namespace Laevo.View.ActivityOverview
 		{
 			InitializeComponent();
 
-#if DEBUG
+/*#if DEBUG
 			WindowStyle = WindowStyle.None;
 			WindowState = WindowState.Normal;
 			Topmost = false;
 			Width = 500;
 			Height = 500;
-#endif
+#endif*/
 
 			// Set focus so commands are triggered.
 			TimeLine.Focus();

@@ -21,6 +21,8 @@
 		
 		<Converters:AspectRatioToGeometryConverter x:Key="AspectRatioToPositions" />
 		<Converters:AspectRatioToFovConverter x:Key="AspectRatioToFov" />
+		<Converters:AspectRatioToTransformOffset x:Key="AspectRatioToTransformOffset" />
+		<Converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
 	</Window.Resources>
 
 
@@ -33,8 +35,8 @@
 					UpDirection="0 1 0">
 					<PerspectiveCamera.FieldOfView>
 						<MultiBinding Converter="{StaticResource AspectRatioToFov}">
-							<Binding ElementName="TimeLineContainer" Path="Width" />
-							<Binding ElementName="TimeLineContainer" Path="Height" />
+							<Binding ElementName="MainWindow" Path="Width" />
+							<Binding ElementName="MainWindow" Path="Height" />
 						</MultiBinding>
 					</PerspectiveCamera.FieldOfView>
 				</PerspectiveCamera>
@@ -50,14 +52,30 @@
 				<Viewport2DVisual3D.CacheMode>
 					<BitmapCache />
 				</Viewport2DVisual3D.CacheMode>
+
+				<Viewport2DVisual3D.Transform>
+					<RotateTransform3D>
+						<RotateTransform3D.CenterX>
+							<MultiBinding Converter="{StaticResource AspectRatioToTransformOffset}">
+								<Binding ElementName="MainWindow" Path="Width" />
+								<Binding ElementName="MainWindow" Path="Height" />
+							</MultiBinding>
+						</RotateTransform3D.CenterX>
+						<RotateTransform3D.Rotation>
+							<AxisAngleRotation3D
+								Angle="10" />
+						</RotateTransform3D.Rotation>
+					</RotateTransform3D>
+				</Viewport2DVisual3D.Transform>
+
 				<Viewport2DVisual3D.Geometry>
 					<MeshGeometry3D
 						TriangleIndices="0,1,2 2,3,0"
 						TextureCoordinates="0 0, 0 1, 1 1, 1 0">
 						<MeshGeometry3D.Positions>
 							<MultiBinding Converter="{StaticResource AspectRatioToPositions}">
-								<Binding ElementName="TimeLineContainer" Path="Width" />
-								<Binding ElementName="TimeLineContainer" Path="Height" />
+								<Binding ElementName="MainWindow" Path="ActualWidth" />
+								<Binding ElementName="MainWindow" Path="ActualHeight" />
 							</MultiBinding>
 						</MeshGeometry3D.Positions>
 					</MeshGeometry3D>
@@ -70,8 +88,7 @@
 				</Viewport2DVisual3D.Material>
 
 				<Grid 
-					x:Name="TimeLineContainer"
-					Width="{Binding ElementName=MainWindow, Path=ActualWidth}"
+					Width="{Binding ElementName=MainWindow, Path=ActualWidth, Converter={StaticResource TimeLineWidthConverter}}"
 					Height="{Binding ElementName=MainWindow, Path=ActualHeight}"
 					ClipToBounds="True"
 					Background="{StaticResource TimeLineBrush}"
