@@ -13,7 +13,7 @@ namespace Laevo.ViewModel.Main
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class MainViewModel
 	{
-		Model.Laevo _model;
+		readonly Model.Laevo _model;
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
 

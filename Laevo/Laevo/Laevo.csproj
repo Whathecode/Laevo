@@ -79,6 +79,9 @@
     <Compile Include="ViewModel\Activity\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
+    <Compile Include="View\ActivityOverview\ClockControl.xaml.cs">
+      <DependentUpon>ClockControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToGeometryConverter.cs" />
     <Compile Include="View\ActivityOverview\ActivityOverviewWindow.xaml.cs">
       <DependentUpon>ActivityOverviewWindow.xaml</DependentUpon>
@@ -166,6 +169,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="View\ActivityOverview\ActivityOverviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ActivityOverview\ClockControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -30,15 +30,15 @@ namespace Laevo.View.ActivityOverview
 
 		public ActivityOverviewWindow()
 		{
-			InitializeComponent();
+			InitializeComponent();			
 
-/*#if DEBUG
+#if DEBUG
 			WindowStyle = WindowStyle.None;
 			WindowState = WindowState.Normal;
 			Topmost = false;
 			Width = 500;
 			Height = 500;
-#endif*/
+#endif
 
 			// Set focus so commands are triggered.
 			TimeLine.Focus();
@@ -47,8 +47,8 @@ namespace Laevo.View.ActivityOverview
 			DateTime now = DateTime.Now;
 			Activated += ( sender, args ) =>
 			{
-				var start = now - TimeSpan.FromHours( 2 );
-				var end = now + TimeSpan.FromHours( 1 );
+				var start = now - TimeSpan.FromHours( 1 );
+				var end = now + TimeSpan.FromHours( 2 );
 				TimeLine.VisibleInterval = new Interval<DateTime>( start, end );
 			};
 
