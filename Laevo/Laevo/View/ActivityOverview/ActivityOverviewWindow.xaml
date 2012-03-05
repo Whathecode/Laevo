@@ -9,6 +9,7 @@
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
+	ShowInTaskbar="False"
 	Topmost="True"
 	FontFamily="Segoe UI Light">
 	
@@ -27,6 +28,8 @@
 
 
 	<Grid Background="{StaticResource BackgroundBrush}">
+		
+		<!-- Time Line -->
 		<Viewport3D ClipToBounds="False" RenderOptions.EdgeMode="Aliased">
 			<Viewport3D.Camera>
 				<PerspectiveCamera
@@ -107,6 +110,12 @@
 				</Grid>
 			</Viewport2DVisual3D>
 		</Viewport3D>
+		
+		<!-- Clock -->
+		<ActivityOverview:ClockControl
+			Time="{Binding CurrentTime}"
+			HorizontalAlignment="Right"
+			VerticalAlignment="Bottom" />
 	</Grid>
 
 	<!-- No 3D. -->
