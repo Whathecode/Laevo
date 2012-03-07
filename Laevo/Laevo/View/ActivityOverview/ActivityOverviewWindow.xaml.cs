@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
 using Whathecode.System;
 using Whathecode.System.Arithmetic.Range;
@@ -138,6 +140,17 @@ namespace Laevo.View.ActivityOverview
 			TimeLine.VisibleIntervalChangedEvent += i => updatePositions();
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
 			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );			
+
+			// TODO: Remove test activities.
+			var test = new ActivityControl();
+			test.SetValue( TimeLineControl.OccuranceProperty, DateTime.Now );
+			test.SetValue( TimeLineControl.OffsetProperty, 200.0 );
+			test.HorizontalAlignment = HorizontalAlignment.Left;
+			test.Width = 300;
+			test.Height = 100;
+			test.Color = ActivityControl.PresetColors[ 0 ];
+			test.SetValue( Canvas.ZIndexProperty, 100 );
+			TimeLine.Children.Add( test );
 		}
 
 		Interval<long> _startDrag;
