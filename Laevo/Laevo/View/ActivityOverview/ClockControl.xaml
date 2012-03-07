@@ -23,7 +23,7 @@
 		<TextBlock
 			HorizontalAlignment="Right"
 			FontSize="20"
-			Foreground="White">
+			Foreground="Yellow">
 			<TextBlock.Text>
 				<Binding ElementName="Control" Path="Time" StringFormat="D" />
 			</TextBlock.Text>

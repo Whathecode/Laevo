@@ -116,6 +116,10 @@
       <DependentUpon>TimeLineControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="View\Activity\ActivityControl.xaml.cs">
+      <DependentUpon>ActivityControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Activity\Converters\ActivityColorConverter.cs" />
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
@@ -177,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ActivityOverview\TimeLineControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Activity\ActivityControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
