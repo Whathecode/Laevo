@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
+using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Collections.Generic;
@@ -141,16 +142,47 @@ namespace Laevo.View.ActivityOverview
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
 			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );			
 
-			// TODO: Remove test activities.
+			// TODO: Remove test stuff.
+			DataContextChanged += AddDemoActivities;
+		}
+
+		void AddDemoActivities( object sender, DependencyPropertyChangedEventArgs e )
+		{
+			var vm = DataContext as ActivityOverviewViewModel;			
+			var now = DateTime.Now;
 			var test = new ActivityControl();
-			test.SetValue( TimeLineControl.OccuranceProperty, DateTime.Now );
-			test.SetValue( TimeLineControl.OffsetProperty, 200.0 );
+			test.DataContext = vm._desktops[ 0 ];
+			test.SetValue( TimeLineControl.OccuranceProperty, now - TimeSpan.FromHours( 2 ) );
+			test.SetValue( TimeLineControl.OffsetProperty, 100.0 );
+			test.SetValue( TimeLineControl.TimeSpanProperty, TimeSpan.FromHours( 2 ) );
 			test.HorizontalAlignment = HorizontalAlignment.Left;
-			test.Width = 300;
-			test.Height = 100;
+			test.ActivityHeight = 50;
 			test.Color = ActivityControl.PresetColors[ 0 ];
-			test.SetValue( Canvas.ZIndexProperty, 100 );
+			test.Label = "Thesis";
+			test.SetValue( Panel.ZIndexProperty, 100 );			
 			TimeLine.Children.Add( test );
+			var test2 = new ActivityControl();
+			test2.DataContext = vm._desktops[ 1 ];
+			test2.SetValue( TimeLineControl.OccuranceProperty, now - TimeSpan.FromHours( 1 ) );
+			test2.SetValue( TimeLineControl.OffsetProperty, 200.0 );
+			test2.SetValue( TimeLineControl.TimeSpanProperty, TimeSpan.FromHours( 1 ) );
+			test2.HorizontalAlignment = HorizontalAlignment.Left;
+			test2.ActivityHeight = 70;
+			test2.Color = ActivityControl.PresetColors[ 1 ];
+			test2.Label = "Programming";
+			test2.SetValue( Panel.ZIndexProperty, 100 );
+			TimeLine.Children.Add( test2 );
+			var test3 = new ActivityControl();
+			test3.DataContext = vm._desktops[ 2 ];
+			test3.SetValue( TimeLineControl.OccuranceProperty, now - TimeSpan.FromHours( 3 ) );
+			test3.SetValue( TimeLineControl.OffsetProperty, 300.0 );
+			test3.SetValue( TimeLineControl.TimeSpanProperty, TimeSpan.FromHours( 3 ) );
+			test3.HorizontalAlignment = HorizontalAlignment.Left;
+			test3.ActivityHeight = 30;
+			test3.Color = ActivityControl.PresetColors[ 2 ];
+			test3.Label = "Browsing";
+			test3.SetValue( Panel.ZIndexProperty, 100 );
+			TimeLine.Children.Add( test3 );
 		}
 
 		Interval<long> _startDrag;

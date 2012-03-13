@@ -16,7 +16,8 @@ namespace Laevo.View.Activity
 		public static readonly List<Color> PresetColors = new List<Color>
 		{
 			Color.FromRgb( 86, 124, 212 ),
-			Color.FromRgb( 88, 160,2 ),
+			Color.FromRgb( 88, 160, 2 ),
+			Color.FromRgb( 193, 217, 197 )
 		};
 
 
@@ -24,12 +25,13 @@ namespace Laevo.View.Activity
 		public enum Properties
 		{
 			Color,
-			Label
+			Label,
+			ActivityHeight
 		}
 
 
 		/// <summary>
-		///   The background color for the activity representation. This color is used as the main color to costruct a gradient.
+		///   The background color for the activity representation. This color is used as the main color to construct a gradient.
 		/// </summary>
 		[DependencyProperty( Properties.Color )]
 		public Color Color { get; set; }
@@ -39,6 +41,12 @@ namespace Laevo.View.Activity
 		/// </summary>
 		[DependencyProperty( Properties.Label )]
 		public string Label { get; set; }
+
+		/// <summary>
+		///   The height of the box which represents the activity.
+		/// </summary>
+		[DependencyProperty( Properties.ActivityHeight )]
+		public double ActivityHeight { get; set; }
 
 
 		public ActivityControl()

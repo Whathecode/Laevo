@@ -27,6 +27,15 @@ namespace Laevo.Model
 		{
 			_activities = new ObservableCollection<Activity>();
 			_readOnlyActivities = new ReadOnlyObservableCollection<Activity>( _activities );
+
+			// TODO: Remove demo activities.
+			var thesis = new Activity( "Thesis" );
+			var programming = new Activity( "Programming" );
+			var browsing = new Activity( "browsing" );
+			_activities.Add( thesis );
+			_activities.Add( programming );
+			_activities.Add( browsing );
+			CurrentActivity = programming;
 		}
 	}
 }

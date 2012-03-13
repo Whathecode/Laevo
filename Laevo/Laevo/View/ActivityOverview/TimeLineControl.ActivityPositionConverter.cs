@@ -12,7 +12,7 @@ namespace Laevo.View.ActivityOverview
 		/// <summary>
 		///   Determines the necessary offset for an element on the time line.
 		/// </summary>
-		class TimeLinePositionConverter : IMultiValueConverter
+		class ActivityPositionConverter : IMultiValueConverter
 		{
 			public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 			{

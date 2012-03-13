@@ -83,11 +83,9 @@
 						</MeshGeometry3D.Positions>
 					</MeshGeometry3D>
 				</Viewport2DVisual3D.Geometry>
-
+				
 				<Viewport2DVisual3D.Material>
-					<DiffuseMaterial
-						Viewport2DVisual3D.IsVisualHostMaterial="True"
-						Brush="White" />
+					<DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" />
 				</Viewport2DVisual3D.Material>
 
 				<Grid 

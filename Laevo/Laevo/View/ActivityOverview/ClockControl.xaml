@@ -17,7 +17,7 @@
 			FontSize="60"
 			Foreground="White">
 			<TextBlock.Text>
-				<Binding ElementName="Control" Path="Time" StringFormat="h:mm" />
+				<Binding ElementName="Control" Path="Time" StringFormat="H:mm" />
 			</TextBlock.Text>
 		</TextBlock>
 		<TextBlock
