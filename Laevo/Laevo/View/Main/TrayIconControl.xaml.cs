@@ -8,6 +8,7 @@ using Whathecode.System.Windows.Input.InputController;
 using Whathecode.System.Windows.Input.InputController.Condition;
 using Whathecode.System.Windows.Input.InputController.Trigger;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using Timer = System.Timers.Timer;
 
 
 namespace Laevo.View.Main
@@ -34,7 +35,7 @@ namespace Laevo.View.Main
 			_keyboardListener.KeyDown += OnKeyDown;
 			_keyboardListener.KeyUp += OnKeyUp;
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
-			_updateLoop.Tick += OnUpdate;
+			_updateLoop.Elapsed += OnUpdate;
 			_updateLoop.Start();
 
 			// Add triggers for desired system-wide commands.
@@ -48,7 +49,7 @@ namespace Laevo.View.Main
 		{
 			_keyboardListener.KeyDown -= OnKeyDown;
 			_keyboardListener.KeyUp -= OnKeyUp;
-			_updateLoop.Tick -= OnUpdate;
+			_updateLoop.Elapsed -= OnUpdate;
 			_updateLoop.Stop();
 		}
 

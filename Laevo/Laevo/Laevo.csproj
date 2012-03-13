@@ -40,6 +40,36 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\Laevo.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\Laevo.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
@@ -130,20 +160,11 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -189,12 +210,148 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Activity\Icons\Icons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Main\TrayIconControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\06-magnify.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\08-chat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\11-clock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\13-target.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\16-line-chart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\18-envelope.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\20-gear2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\28-star.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\29-heart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\33-cabinet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\34-coffee.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\37-suitcase.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\46-movie-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\48-fork-and-knife.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\59-flag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\60-signpost.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\68-paperclip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\83-calendar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\88-beer-mug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\89-dumbell.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\91-beaker-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\96-book.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\98-palette.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\101-gameplan.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\110-bug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\111-user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\112-group.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\114-balloon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\117-todo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\121-landscape.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\123-id-card.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\125-food.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\137-presentation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\138-scales.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\153-guitar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\156-controlpad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\161-calculator.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\164-glasses-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\179-notepad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\184-warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\187-pencil.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\192-credit-card.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\194-note-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\196-radiation.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
