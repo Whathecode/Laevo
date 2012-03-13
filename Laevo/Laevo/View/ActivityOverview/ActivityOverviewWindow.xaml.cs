@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -148,6 +149,8 @@ namespace Laevo.View.ActivityOverview
 
 		void AddDemoActivities( object sender, DependencyPropertyChangedEventArgs e )
 		{
+			var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+
 			var vm = DataContext as ActivityOverviewViewModel;			
 			var now = DateTime.Now;
 			var test = new ActivityControl();
@@ -159,6 +162,7 @@ namespace Laevo.View.ActivityOverview
 			test.ActivityHeight = 50;
 			test.Color = ActivityControl.PresetColors[ 0 ];
 			test.Label = "Thesis";
+			test.Icon = ActivityControl.PresetIcons[ 0 ];
 			test.SetValue( Panel.ZIndexProperty, 100 );			
 			TimeLine.Children.Add( test );
 			var test2 = new ActivityControl();
@@ -170,6 +174,7 @@ namespace Laevo.View.ActivityOverview
 			test2.ActivityHeight = 70;
 			test2.Color = ActivityControl.PresetColors[ 1 ];
 			test2.Label = "Programming";
+			test2.Icon = ActivityControl.PresetIcons[ 1 ];
 			test2.SetValue( Panel.ZIndexProperty, 100 );
 			TimeLine.Children.Add( test2 );
 			var test3 = new ActivityControl();
@@ -181,6 +186,7 @@ namespace Laevo.View.ActivityOverview
 			test3.ActivityHeight = 30;
 			test3.Color = ActivityControl.PresetColors[ 2 ];
 			test3.Label = "Browsing";
+			test3.Icon = ActivityControl.PresetIcons[ 2 ];
 			test3.SetValue( Panel.ZIndexProperty, 100 );
 			TimeLine.Children.Add( test3 );
 		}

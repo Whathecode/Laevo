@@ -8,6 +8,7 @@
 	xmlns:Converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206">
 
@@ -17,12 +18,22 @@
 
 	<StackPanel Orientation="Vertical">
 
-		<TextBlock
+		<StackPanel Orientation="Horizontal">
+			<Image Source="{Binding ElementName=Control, Path=Icon}" />
+			<TextBlock
 				Foreground="White"
 				FontSize="20"
 				Text="{Binding ElementName=Control, Path=Label}" />
+		</StackPanel>
 
-		<Border CornerRadius="1" BorderBrush="White" BorderThickness="2" Height="{Binding ElementName=Control, Path=ActivityHeight}">
+		<Border
+			CornerRadius="1"
+			BorderBrush="White"
+			BorderThickness="2"
+			Height="{Binding ElementName=Control, Path=ActivityHeight}"
+			Behaviors:MouseBehavior.LeftMouseUpCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+			Cursor="Hand">
+			
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 					<GradientStop
@@ -31,12 +42,6 @@
 						Color="{Binding ElementName=Control, Path=Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
 				</LinearGradientBrush>
 			</Border.Background>
-			
-			<Button
-				Command="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
-				Width="100" Height="20"
-				HorizontalAlignment="Right"
-				VerticalAlignment="Bottom">Open</Button>
 		</Border>
 
 	</StackPanel>
