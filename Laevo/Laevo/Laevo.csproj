@@ -151,6 +151,7 @@
       <DependentUpon>ActivityControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Activity\Converters\ActivityColorConverter.cs" />
+    <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
@@ -210,10 +211,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Activity\Icons\Icons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="View\Main\TrayIconControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -221,136 +218,44 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Resource Include="View\Activity\Icons\06-magnify.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\08-chat.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\11-clock.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\13-target.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\16-line-chart.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\18-envelope.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\20-gear2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\28-star.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\29-heart.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\33-cabinet.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\34-coffee.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\37-suitcase.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\46-movie-2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\48-fork-and-knife.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\59-flag.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\60-signpost.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\68-paperclip.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\83-calendar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\88-beer-mug.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\89-dumbell.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\91-beaker-2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\96-book.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\98-palette.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\101-gameplan.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\110-bug.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\111-user.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\112-group.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\114-balloon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\117-todo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\121-landscape.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\123-id-card.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\125-food.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\137-presentation.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\138-scales.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\153-guitar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\156-controlpad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\161-calculator.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\164-glasses-2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\179-notepad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\184-warning.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\187-pencil.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\192-credit-card.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\194-note-2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Activity\Icons\196-radiation.png" />
+    <Resource Include="View\Activity\Icons\Address_Book.png" />
+    <Resource Include="View\Activity\Icons\Alert.png" />
+    <Resource Include="View\Activity\Icons\Announcement.png" />
+    <Resource Include="View\Activity\Icons\Box.png" />
+    <Resource Include="View\Activity\Icons\Burn.png" />
+    <Resource Include="View\Activity\Icons\Calender.png" />
+    <Resource Include="View\Activity\Icons\CD.png" />
+    <Resource Include="View\Activity\Icons\Chat.png" />
+    <Resource Include="View\Activity\Icons\Clock.png" />
+    <Resource Include="View\Activity\Icons\Computer.png" />
+    <Resource Include="View\Activity\Icons\Contact.png" />
+    <Resource Include="View\Activity\Icons\Database.png" />
+    <Resource Include="View\Activity\Icons\Favorite.png" />
+    <Resource Include="View\Activity\Icons\Flag.png" />
+    <Resource Include="View\Activity\Icons\Help.png" />
+    <Resource Include="View\Activity\Icons\Home.png" />
+    <Resource Include="View\Activity\Icons\Info.png" />
+    <Resource Include="View\Activity\Icons\Key.png" />
+    <Resource Include="View\Activity\Icons\Lock.png" />
+    <Resource Include="View\Activity\Icons\Mail.png" />
+    <Resource Include="View\Activity\Icons\Mail_Read.png" />
+    <Resource Include="View\Activity\Icons\Options.png" />
+    <Resource Include="View\Activity\Icons\Pictures.png" />
+    <Resource Include="View\Activity\Icons\Portfolio.png" />
+    <Resource Include="View\Activity\Icons\Search.png" />
+    <Resource Include="View\Activity\Icons\Security.png" />
+    <Resource Include="View\Activity\Icons\Speaker.png" />
+    <Resource Include="View\Activity\Icons\Stats.png" />
+    <Resource Include="View\Activity\Icons\System.png" />
+    <Resource Include="View\Activity\Icons\Tag.png" />
+    <Resource Include="View\Activity\Icons\Template.png" />
+    <Resource Include="View\Activity\Icons\Tip.png" />
+    <Resource Include="View\Activity\Icons\Tools.png" />
+    <Resource Include="View\Activity\Icons\Tutorial.png" />
+    <Resource Include="View\Activity\Icons\User.png" />
+    <Resource Include="View\Activity\Icons\Web.png" />
+    <Resource Include="View\Activity\Icons\Window.png" />
+    <Resource Include="View\Activity\Icons\Write.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
