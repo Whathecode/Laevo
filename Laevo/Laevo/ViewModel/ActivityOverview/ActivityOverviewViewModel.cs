@@ -20,7 +20,8 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		readonly Model.Laevo _model;
 		readonly DesktopManager _desktopManager = new DesktopManager();
-		readonly List<ActivityViewModel> _desktops = new List<ActivityViewModel>();
+		// TODO: How to reach the desktops?
+		public readonly List<ActivityViewModel> _desktops = new List<ActivityViewModel>();
 
 		/// <summary>
 		///   Timer used to update data regularly.

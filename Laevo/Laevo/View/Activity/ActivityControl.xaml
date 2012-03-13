@@ -1,27 +1,44 @@
 ﻿<UserControl
 	x:Name="Control"
 	x:Class="Laevo.View.Activity.ActivityControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:Converters="clr-namespace:Laevo.View.Activity.Converters"
-    mc:Ignorable="d" 
-    d:DesignHeight="118" d:DesignWidth="206">
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:Converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	mc:Ignorable="d" 
+	d:DesignHeight="118" d:DesignWidth="206">
 
 	<UserControl.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 	</UserControl.Resources>
-	
-	<Grid>
-		
-		<Grid.Background>
-			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-				<GradientStop Color="{Binding ElementName=Control, Path=Color}" Offset="1" />
-				<GradientStop Color="{Binding ElementName=Control, Path=Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />				
-			</LinearGradientBrush>
-		</Grid.Background>
 
-	</Grid>
-	
+	<StackPanel Orientation="Vertical">
+
+		<TextBlock
+				Foreground="White"
+				FontSize="20"
+				Text="{Binding ElementName=Control, Path=Label}" />
+
+		<Border CornerRadius="1" BorderBrush="White" BorderThickness="2" Height="{Binding ElementName=Control, Path=ActivityHeight}">
+			<Border.Background>
+				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+					<GradientStop
+						Color="{Binding ElementName=Control, Path=Color}" Offset="1" />
+					<GradientStop
+						Color="{Binding ElementName=Control, Path=Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
+				</LinearGradientBrush>
+			</Border.Background>
+			
+			<Button
+				Command="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+				Width="100" Height="20"
+				HorizontalAlignment="Right"
+				VerticalAlignment="Bottom">Open</Button>
+		</Border>
+
+	</StackPanel>
+
 </UserControl>
