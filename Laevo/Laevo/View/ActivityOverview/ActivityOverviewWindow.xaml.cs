@@ -162,8 +162,7 @@ namespace Laevo.View.ActivityOverview
 			test.ActivityHeight = 50;
 			test.Color = ActivityControl.PresetColors[ 0 ];
 			test.Label = "Thesis";
-			test.Icon = ActivityControl.PresetIcons[ 0 ];
-			test.SetValue( Panel.ZIndexProperty, 100 );			
+			test.Icon = ActivityControl.PresetIcons[ 0 ];	
 			TimeLine.Children.Add( test );
 			var test2 = new ActivityControl();
 			test2.DataContext = vm._desktops[ 1 ];
@@ -175,7 +174,6 @@ namespace Laevo.View.ActivityOverview
 			test2.Color = ActivityControl.PresetColors[ 1 ];
 			test2.Label = "Programming";
 			test2.Icon = ActivityControl.PresetIcons[ 1 ];
-			test2.SetValue( Panel.ZIndexProperty, 100 );
 			TimeLine.Children.Add( test2 );
 			var test3 = new ActivityControl();
 			test3.DataContext = vm._desktops[ 2 ];
@@ -187,7 +185,6 @@ namespace Laevo.View.ActivityOverview
 			test3.Color = ActivityControl.PresetColors[ 2 ];
 			test3.Label = "Browsing";
 			test3.Icon = ActivityControl.PresetIcons[ 2 ];
-			test3.SetValue( Panel.ZIndexProperty, 100 );
 			TimeLine.Children.Add( test3 );
 		}
 

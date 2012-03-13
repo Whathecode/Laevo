@@ -10,16 +10,28 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	mc:Ignorable="d" 
-	d:DesignHeight="118" d:DesignWidth="206">
+	d:DesignHeight="118" d:DesignWidth="206"
+	Panel.ZIndex="10">
 
 	<UserControl.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
+		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
 
-		<StackPanel Orientation="Horizontal">
-			<Image Source="{Binding ElementName=Control, Path=Icon}" />
+		<StackPanel Orientation="Horizontal" Panel.ZIndex="20">
+			<Image
+				x:Name="Image"
+				Source="{Binding ElementName=Control, Path=Icon}"
+				Stretch="None">
+				<Image.Margin>
+					<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
+						<Binding ElementName="Image" Path="ActualWidth" />
+						<Binding ElementName="Image" Path="ActualHeight" />
+					</MultiBinding>
+				</Image.Margin>
+			</Image>
 			<TextBlock
 				Foreground="White"
 				FontSize="20"
@@ -27,13 +39,21 @@
 		</StackPanel>
 
 		<Border
-			CornerRadius="1"
-			BorderBrush="White"
+			CornerRadius="3"
 			BorderThickness="2"
 			Height="{Binding ElementName=Control, Path=ActivityHeight}"
 			Behaviors:MouseBehavior.LeftMouseUpCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
-			Cursor="Hand">
-			
+			Cursor="Hand"
+			Panel.ZIndex="15">
+			<!--<Border.Effect>
+				<DropShadowEffect Color="Black" />
+			</Border.Effect>-->
+			<Border.BorderBrush>
+				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+					<GradientStop Offset="0" Color="White" />
+					<GradientStop Offset="1" Color="{Binding ElementName=Control, Path=Color}" />					
+				</LinearGradientBrush>
+			</Border.BorderBrush>
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 					<GradientStop

@@ -75,7 +75,7 @@ namespace Laevo.View.Activity
 			var resourceSet = manager.GetResourceSet( CultureInfo.CurrentUICulture, true, true );
 			PresetIcons = resourceSet
 				.OfType<DictionaryEntry>()
-				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) && !r.Key.ToString().EndsWith( ".baml" ) )
+				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
 				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
 				.ToList();
 		}
