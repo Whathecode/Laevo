@@ -35,19 +35,17 @@
 			<TextBlock
 				Foreground="White"
 				FontSize="20"
-				Text="{Binding ElementName=Control, Path=Label}" />
+				Text="{Binding ElementName=Control, Path=Label}"
+				Margin="5, 0, 0, 0" />
 		</StackPanel>
 
 		<Border
 			CornerRadius="3"
 			BorderThickness="2"
 			Height="{Binding ElementName=Control, Path=ActivityHeight}"
-			Behaviors:MouseBehavior.LeftMouseUpCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 			Cursor="Hand"
 			Panel.ZIndex="15">
-			<!--<Border.Effect>
-				<DropShadowEffect Color="Black" />
-			</Border.Effect>-->
 			<Border.BorderBrush>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
 					<GradientStop Offset="0" Color="White" />
