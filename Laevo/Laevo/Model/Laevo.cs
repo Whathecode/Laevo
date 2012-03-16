@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 
@@ -11,31 +12,30 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Laevo
 	{
-		public static readonly string ProgramData = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), "Laevo" );
+		public static readonly string ProgramData
+			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), "Laevo" );
 
-		readonly ObservableCollection<Activity> _activities;
-		readonly ReadOnlyObservableCollection<Activity> _readOnlyActivities;
-		public ReadOnlyObservableCollection<Activity> Activities
-		{
-			get { return _readOnlyActivities; }
-		}
+		readonly List<Activity> _activities;
+		public readonly ReadOnlyCollection<Activity> Activities;
 
 		public Activity CurrentActivity { get; private set; }
 
 
 		public Laevo()
 		{
-			_activities = new ObservableCollection<Activity>();
-			_readOnlyActivities = new ReadOnlyObservableCollection<Activity>( _activities );
+			_activities = new List<Activity>();
+			Activities = new ReadOnlyCollection<Activity>( _activities );
 
-			// TODO: Remove demo activities.
-			var thesis = new Activity( "Thesis" );
-			var programming = new Activity( "Programming" );
-			var browsing = new Activity( "browsing" );
-			_activities.Add( thesis );
-			_activities.Add( programming );
-			_activities.Add( browsing );
-			CurrentActivity = programming;
+			// Create startup activity.
+			var startup = new Activity( "Home" );
+			CurrentActivity = startup;
+			_activities.Add( startup );
+		}
+
+
+		public void Update()
+		{
+			_activities.ForEach( a => a.Update() );
 		}
 	}
 }
