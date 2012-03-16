@@ -5,8 +5,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows.Data;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 
@@ -147,7 +149,11 @@ namespace Laevo.View.ActivityOverview
 						e.SetBinding( Canvas.LeftProperty, positionBinding );
 
 						// Position vertically.
-						var bottom = new Binding { Path = new PropertyPath( OffsetProperty ), Source = e };
+						var bottom = new Binding
+						{
+							Path = new PropertyPath( OffsetProperty ),
+							Source = e
+						};
 						e.SetBinding( Canvas.BottomProperty, bottom );
 
 						// Resize width.

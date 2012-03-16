@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Threading;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Laevo.ViewModel.Activity.Binding;
 using Microsoft.WindowsAPICodePack.Shell;
 using VirtualDesktopManager;
+using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
@@ -16,6 +24,19 @@ namespace Laevo.ViewModel.Activity
 	class ActivityViewModel
 	{
 		readonly static object StaticLock = new object();
+
+		const string IconResourceLocation = "view/activity/icons";
+		public static List<BitmapImage> PresetIcons = new List<BitmapImage>();
+
+		public static readonly List<Color> PresetColors = new List<Color>
+		{
+			Color.FromRgb( 86, 124, 212 ),
+			Color.FromRgb( 88, 160, 2 ),
+			Color.FromRgb( 193, 217, 197 )
+		};
+		public static readonly Color DefaultColor = PresetColors[ 0 ];
+		public static BitmapImage DefaultIcon;
+		public static BitmapImage HomeIcon;
 
 		/// <summary>
 		///   Path of the folder which contains the file libraries.
@@ -39,22 +60,83 @@ namespace Laevo.ViewModel.Activity
 		readonly VirtualDesktop _virtualDesktop;
 
 
+		/// <summary>
+		///   The time when the activity started.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.Occurance )]
+		public DateTime Occurance { get; set; }
+
+		/// <summary>
+		///   The entire timespan during which the activity has been open, regardless of whether it was closed in between.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.TimeSpan )]
+		public TimeSpan TimeSpan { get; set; }
+
+		/// <summary>
+		///   An icon representing the activity.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.Icon )]
+		public ImageSource Icon { get; set; }
+
+		/// <summary>
+		///   The background color for the activity representation. This color is used as the main color to construct a gradient.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.Color )]
+		public Color Color { get; set; }
+
+		/// <summary>
+		///   Text label which names the activity.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.Label )]
+		public string Label { get; set; }
+
+		/// <summary>
+		///   The height of the box which represents the activity.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.ActivityHeight )]
+		public double ActivityHeight { get; set; }
+
+		/// <summary>
+		///   The offset from the bottom of the box which represents the activity.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.Offset )]
+		public double Offset { get; set; }
+
+
 		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) { }
 
 		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager, VirtualDesktop virtualDesktop )
 		{
 			_activity = activity;
+			Occurance = _activity.DateCreated;
+
 			_desktopManager = desktopManager;
 			_virtualDesktop = virtualDesktop;
 
 			InitializeLibrary();
+
+			// Load icons.			
+			var assembly = Assembly.GetExecutingAssembly();
+			var resourcesName = assembly.GetName().Name + ".g";
+			var manager = new ResourceManager( resourcesName, assembly );
+			var resourceSet = manager.GetResourceSet( CultureInfo.CurrentUICulture, true, true );
+			PresetIcons = resourceSet
+				.OfType<DictionaryEntry>()
+				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
+				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
+				.ToList();
+
+			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) );
+			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
+			ActivityHeight = 80;
 		}
 
 
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
+			_activity.Open();
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
 			InitializeLibrary();
@@ -89,6 +171,15 @@ namespace Laevo.ViewModel.Activity
 				}
 			} );
 			initializeShellLibrary.Start();
+		}
+
+		public void Update()
+		{
+			Occurance = _activity.DateCreated;
+			if ( _activity.OpenIntervals.Count > 0 )
+			{
+				TimeSpan = _activity.OpenIntervals.Last().End - _activity.OpenIntervals.First().Start;
+			}
 		}
 	}
 }

@@ -65,6 +65,12 @@ namespace Laevo.ViewModel.Main
 			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
 		}
 
+		[CommandExecute( Commands.NewActivity )]
+		public void NewActivity()
+		{
+			// TODO: Add and open a new activity.
+		}
+
 		/// <summary>
 		///   Ensure that the activity overview window is created.
 		/// </summary>

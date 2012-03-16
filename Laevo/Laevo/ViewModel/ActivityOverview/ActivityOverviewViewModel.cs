@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Timers;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using VirtualDesktopManager;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 
 
@@ -19,9 +20,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.OpenedActivityEventHandler OpenedActivityEvent;
 
 		readonly Model.Laevo _model;
-		readonly DesktopManager _desktopManager = new DesktopManager();
-		// TODO: How to reach the desktops?
-		public readonly List<ActivityViewModel> _desktops = new List<ActivityViewModel>();
+		readonly DesktopManager _desktopManager = new DesktopManager();		
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -33,6 +32,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
 
+		[NotifyProperty( Binding.Properties.Activities )]
+		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
+
 
 		public ActivityOverviewViewModel( Model.Laevo model )
 		{
@@ -43,22 +45,32 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.Start();
 
 			// Initialize a view model for all activities.
+			Activities = new ObservableCollection<ActivityViewModel>();
 			foreach ( var activity in _model.Activities )
 			{
 				ActivityViewModel viewModel;
 				if ( _model.CurrentActivity == activity )
 				{
-					// Ensure current (first) activity is assigned to the correct desktop.
-					viewModel = new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop );
+					// Ensure current (first) activity is assigned to the correct desktop.					
+					viewModel = new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop )
+					{
+						Icon = ActivityViewModel.HomeIcon,
+						Label = "Home"
+					};
 					CurrentActivityViewModel = viewModel;
+					activity.Open();
 				}
 				else
 				{
-					viewModel = new ActivityViewModel( activity, _desktopManager );
+					viewModel = new ActivityViewModel( activity, _desktopManager )
+					{
+						Icon = ActivityViewModel.DefaultIcon
+					};
 				}
+				viewModel.Color = ActivityViewModel.DefaultColor;
 
 				viewModel.OpenedActivityEvent += OnActivityOpened;
-				_desktops.Add( viewModel );
+				Activities.Add( viewModel );
 			}				
 		}
 
@@ -81,6 +93,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		void UpdateData( object sender, ElapsedEventArgs e )
 		{
 			CurrentTime = DateTime.Now;
+
+			// Update model.
+			_model.Update();
+
+			// Update required view models.
+			Activities.ForEach( a => a.Update() );
 		}
 	}
 }

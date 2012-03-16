@@ -2,7 +2,8 @@
 {
 	public enum Properties
 	{
-		CurrentTime
+		CurrentTime,
+		Activities
 	}
 
 	public enum Commands { }

@@ -8,6 +8,7 @@
 		ShowActivityOverview,
 		HideActivityOverview,
 		SwitchActivityOverview,
-		OpenCurrentActivityLibrary
+		OpenCurrentActivityLibrary,
+		NewActivity
 	}
 }

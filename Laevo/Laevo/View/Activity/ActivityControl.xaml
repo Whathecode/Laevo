@@ -1,5 +1,4 @@
 ﻿<UserControl
-	x:Name="Control"
 	x:Class="Laevo.View.Activity.ActivityControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,10 +8,23 @@
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
+	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:WtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
-	Panel.ZIndex="10">
+	Panel.ZIndex="10"	
+	ActivityOverview:TimeLineControl.Occurance="{Binding Occurance}"
+	ActivityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
+	MinWidth="80">
 
+	<ActivityOverview:TimeLineControl.Offset>
+		<Binding Path="Offset">
+			<Binding.Converter>
+				<WtcConverters:CalculateValueConverter Operation="Addition" Value="45" />
+			</Binding.Converter>
+		</Binding>
+	</ActivityOverview:TimeLineControl.Offset>
+	
 	<UserControl.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
@@ -23,7 +35,7 @@
 		<StackPanel Orientation="Horizontal" Panel.ZIndex="20">
 			<Image
 				x:Name="Image"
-				Source="{Binding ElementName=Control, Path=Icon}"
+				Source="{Binding Path=Icon}"
 				Stretch="None">
 				<Image.Margin>
 					<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
@@ -35,29 +47,29 @@
 			<TextBlock
 				Foreground="White"
 				FontSize="20"
-				Text="{Binding ElementName=Control, Path=Label}"
+				Text="{Binding Path=Label}"
 				Margin="5, 0, 0, 0" />
 		</StackPanel>
 
 		<Border
 			CornerRadius="3"
 			BorderThickness="2"
-			Height="{Binding ElementName=Control, Path=ActivityHeight}"
+			Height="{Binding Path=ActivityHeight}"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 			Cursor="Hand"
 			Panel.ZIndex="15">
 			<Border.BorderBrush>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
 					<GradientStop Offset="0" Color="White" />
-					<GradientStop Offset="1" Color="{Binding ElementName=Control, Path=Color}" />					
+					<GradientStop Offset="1" Color="{Binding Color}" />					
 				</LinearGradientBrush>
 			</Border.BorderBrush>
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 					<GradientStop
-						Color="{Binding ElementName=Control, Path=Color}" Offset="1" />
+						Color="{Binding Color}" Offset="1" />
 					<GradientStop
-						Color="{Binding ElementName=Control, Path=Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
+						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
 				</LinearGradientBrush>
 			</Border.Background>
 		</Border>

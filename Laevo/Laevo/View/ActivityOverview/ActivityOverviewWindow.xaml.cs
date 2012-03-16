@@ -4,12 +4,11 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
+using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
 using Whathecode.System.Arithmetic.Range;
@@ -31,6 +30,8 @@ namespace Laevo.View.ActivityOverview
 		DateTime _focusedTime = DateTime.Now;
 
 		readonly List<ILabels> _labels = new List<ILabels>();
+		readonly Dictionary<ActivityViewModel, ActivityControl> _activities = new Dictionary<ActivityViewModel, ActivityControl>();
+
 
 		public ActivityOverviewWindow()
 		{
@@ -141,51 +142,51 @@ namespace Laevo.View.ActivityOverview
 			Action updatePositions = () =>  _labels.ForEach( l => l.UpdatePositions() );
 			TimeLine.VisibleIntervalChangedEvent += i => updatePositions();
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
-			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );			
+			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );
 
-			// TODO: Remove test stuff.
-			DataContextChanged += AddDemoActivities;
+			DataContextChanged += NewDataContext;
 		}
 
-		void AddDemoActivities( object sender, DependencyPropertyChangedEventArgs e )
-		{
-			var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 
-			var vm = DataContext as ActivityOverviewViewModel;			
-			var now = DateTime.Now;
-			var test = new ActivityControl();
-			test.DataContext = vm._desktops[ 0 ];
-			test.SetValue( TimeLineControl.OccuranceProperty, now - TimeSpan.FromHours( 2 ) );
-			test.SetValue( TimeLineControl.OffsetProperty, 100.0 );
-			test.SetValue( TimeLineControl.TimeSpanProperty, TimeSpan.FromHours( 2 ) );
-			test.HorizontalAlignment = HorizontalAlignment.Left;
-			test.ActivityHeight = 50;
-			test.Color = ActivityControl.PresetColors[ 0 ];
-			test.Label = "Thesis";
-			test.Icon = ActivityControl.PresetIcons[ 0 ];	
-			TimeLine.Children.Add( test );
-			var test2 = new ActivityControl();
-			test2.DataContext = vm._desktops[ 1 ];
-			test2.SetValue( TimeLineControl.OccuranceProperty, now - TimeSpan.FromHours( 1 ) );
-			test2.SetValue( TimeLineControl.OffsetProperty, 200.0 );
-			test2.SetValue( TimeLineControl.TimeSpanProperty, TimeSpan.FromHours( 1 ) );
-			test2.HorizontalAlignment = HorizontalAlignment.Left;
-			test2.ActivityHeight = 70;
-			test2.Color = ActivityControl.PresetColors[ 1 ];
-			test2.Label = "Programming";
-			test2.Icon = ActivityControl.PresetIcons[ 1 ];
-			TimeLine.Children.Add( test2 );
-			var test3 = new ActivityControl();
-			test3.DataContext = vm._desktops[ 2 ];
-			test3.SetValue( TimeLineControl.OccuranceProperty, now - TimeSpan.FromHours( 3 ) );
-			test3.SetValue( TimeLineControl.OffsetProperty, 300.0 );
-			test3.SetValue( TimeLineControl.TimeSpanProperty, TimeSpan.FromHours( 3 ) );
-			test3.HorizontalAlignment = HorizontalAlignment.Left;
-			test3.ActivityHeight = 30;
-			test3.Color = ActivityControl.PresetColors[ 2 ];
-			test3.Label = "Browsing";
-			test3.Icon = ActivityControl.PresetIcons[ 2 ];
-			TimeLine.Children.Add( test3 );
+		void NewDataContext( object sender, DependencyPropertyChangedEventArgs e )
+		{
+			var oldViewModel = e.OldValue as ActivityOverviewViewModel;
+			if ( oldViewModel != null )
+			{
+				oldViewModel.Activities.CollectionChanged -= ActivitiesChanged;
+			}
+		
+			var viewModel = e.NewValue as ActivityOverviewViewModel;
+			if ( viewModel == null )
+			{
+				return;
+			}		
+			viewModel.Activities.ForEach( NewActivity );
+			viewModel.Activities.CollectionChanged += ActivitiesChanged;
+		}
+
+		void ActivitiesChanged( object sender, NotifyCollectionChangedEventArgs e )
+		{
+			// Remove old items.
+			foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
+			{
+				TimeLine.Children.Remove( _activities[ activity ] );
+				_activities.Remove( activity );
+			}
+
+			// Add new items.
+			e.NewItems.Cast<ActivityViewModel>().ForEach( NewActivity );
+		}
+
+		void NewActivity( ActivityViewModel viewModel )
+		{
+			var activity = new ActivityControl
+			{
+				DataContext = viewModel,
+				HorizontalAlignment = HorizontalAlignment.Left
+			};
+			_activities.Add( viewModel, activity );
+			TimeLine.Children.Add( activity );
 		}
 
 		Interval<long> _startDrag;
