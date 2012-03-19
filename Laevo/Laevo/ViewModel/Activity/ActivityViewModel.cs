@@ -97,10 +97,10 @@ namespace Laevo.ViewModel.Activity
 		public double HeightPercentage { get; set; }
 
 		/// <summary>
-		///   The offset from the bottom of the box which represents the activity.
+		///   The offset, as a percentage of the total available height, where to position the activity box, from the bottom.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.Offset )]
-		public double Offset { get; set; }
+		[NotifyProperty( Binding.Properties.OffsetPercentage )]
+		public double OffsetPercentage { get; set; }
 
 
 		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager )
@@ -130,6 +130,7 @@ namespace Laevo.ViewModel.Activity
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) );
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 			HeightPercentage = 0.2;
+			OffsetPercentage = 0;
 		}
 
 
