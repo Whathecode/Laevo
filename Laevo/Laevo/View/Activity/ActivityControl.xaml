@@ -28,11 +28,15 @@
 	<UserControl.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
+		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
 
-		<StackPanel Orientation="Horizontal" Panel.ZIndex="20">
+		<StackPanel
+			x:Name="Header"
+			Orientation="Horizontal"
+			Panel.ZIndex="20">
 			<Image
 				x:Name="Image"
 				Source="{Binding Path=Icon}"
@@ -54,10 +58,20 @@
 		<Border
 			CornerRadius="3"
 			BorderThickness="2"
-			Height="{Binding Path=ActivityHeight}"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 			Cursor="Hand"
 			Panel.ZIndex="15">
+			<Border.Height>
+				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">
+					<Binding Path="HeightPercentage" />
+					<Binding ElementName="Header" Path="ActualHeight" />
+					<Binding Path="ActualHeight">
+						<Binding.RelativeSource>
+							<RelativeSource Mode="FindAncestor" AncestorType="{x:Type FrameworkElement}" AncestorLevel="5" />
+						</Binding.RelativeSource>
+					</Binding>
+				</MultiBinding>
+			</Border.Height>
 			<Border.BorderBrush>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
 					<GradientStop Offset="0" Color="White" />

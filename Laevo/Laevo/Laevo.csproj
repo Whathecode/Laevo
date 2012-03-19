@@ -152,6 +152,7 @@
     </Compile>
     <Compile Include="View\Activity\Converters\ActivityColorConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
+    <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
