@@ -8,7 +8,7 @@
 		Color,
 		Label,
 		HeightPercentage,
-		Offset
+		OffsetPercentage
 	}
 
 	public enum Commands

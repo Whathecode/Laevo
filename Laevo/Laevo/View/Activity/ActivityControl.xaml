@@ -9,7 +9,6 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
-	xmlns:WtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
 	Panel.ZIndex="10"	
@@ -18,17 +17,23 @@
 	MinWidth="80">
 
 	<ActivityOverview:TimeLineControl.Offset>
-		<Binding Path="Offset">
-			<Binding.Converter>
-				<WtcConverters:CalculateValueConverter Operation="Addition" Value="45" />
-			</Binding.Converter>
-		</Binding>
-	</ActivityOverview:TimeLineControl.Offset>
+		<MultiBinding>
+			<MultiBinding.Converter>
+				<Converters:ActivityOffsetConverter />
+			</MultiBinding.Converter>
+			<Binding Path="OffsetPercentage" />
+			<Binding Path="ActualHeight">
+				<Binding.RelativeSource>
+					<RelativeSource Mode="FindAncestor" AncestorType="{x:Type FrameworkElement}" AncestorLevel="2" />
+				</Binding.RelativeSource>
+			</Binding>
+		</MultiBinding>
+	</ActivityOverview:TimeLineControl.Offset>	
 	
 	<UserControl.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
-		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
+		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />		
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
