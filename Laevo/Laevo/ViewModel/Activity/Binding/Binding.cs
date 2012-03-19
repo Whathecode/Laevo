@@ -7,7 +7,7 @@
 		Icon,
 		Color,
 		Label,
-		ActivityHeight,
+		HeightPercentage,
 		Offset
 	}
 

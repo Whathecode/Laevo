@@ -15,15 +15,15 @@
 		<tb:TaskbarIcon.ContextMenu>
 			<ContextMenu>
 				<MenuItem
-					Header="Open Current Activity Context"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenCurrentActivityLibrary}}" />
+					Header="Exit"
+					Command="{view:TrayCommandBinding {x:Static b:Commands.Exit}}" />
 				<Separator />
 				<MenuItem
 					Header="New Activity"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}" />
 				<MenuItem
-					Header="Exit"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.Exit}}" />				
+					Header="Open Current Activity Context"
+					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenCurrentActivityLibrary}}" />
 			</ContextMenu>
 		</tb:TaskbarIcon.ContextMenu>
 		

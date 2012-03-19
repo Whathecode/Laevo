@@ -91,10 +91,10 @@ namespace Laevo.ViewModel.Activity
 		public string Label { get; set; }
 
 		/// <summary>
-		///   The height of the box which represents the activity.
+		///   The percentage of the available height the activity box occupies.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.ActivityHeight )]
-		public double ActivityHeight { get; set; }
+		[NotifyProperty( Binding.Properties.HeightPercentage )]
+		public double HeightPercentage { get; set; }
 
 		/// <summary>
 		///   The offset from the bottom of the box which represents the activity.
@@ -129,7 +129,7 @@ namespace Laevo.ViewModel.Activity
 
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) );
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
-			ActivityHeight = 80;
+			HeightPercentage = 0.2;
 		}
 
 
