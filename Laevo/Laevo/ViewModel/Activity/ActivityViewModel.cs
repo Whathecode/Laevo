@@ -20,7 +20,7 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 namespace Laevo.ViewModel.Activity
 {
-	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
+	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]	
 	class ActivityViewModel
 	{
 		readonly static object StaticLock = new object();
@@ -50,10 +50,17 @@ namespace Laevo.ViewModel.Activity
 
 
 		public delegate void OpenedActivityEventHandler( ActivityViewModel viewModel );
+
+
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
 		public event OpenedActivityEventHandler OpenedActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when an activity is selected.
+		/// </summary>
+		public event Action SelectedActivityEvent;
 
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
@@ -130,8 +137,8 @@ namespace Laevo.ViewModel.Activity
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) );
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 			HeightPercentage = 0.2;
-			OffsetPercentage = 0;
-		}
+			OffsetPercentage = 1;
+		}		
 
 
 		[CommandExecute( Commands.OpenActivity )]
@@ -142,10 +149,7 @@ namespace Laevo.ViewModel.Activity
 
 			InitializeLibrary();
 
-			if ( OpenedActivityEvent != null )
-			{
-				OpenedActivityEvent( this );
-			}
+			OpenedActivityEvent( this );
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]
@@ -153,6 +157,12 @@ namespace Laevo.ViewModel.Activity
 		{
 			string folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
 			Process.Start( "explorer.exe", Path.ChangeExtension( folderName, LibraryExtension ) );
+		}
+
+		[CommandExecute( Commands.SelectActivity )]
+		public void SelectActivity()
+		{
+			SelectedActivityEvent();
 		}
 
 		/// <summary>

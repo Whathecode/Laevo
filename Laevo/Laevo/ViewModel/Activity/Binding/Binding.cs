@@ -14,6 +14,7 @@
 	public enum Commands
 	{
 		OpenActivity,
-		OpenActivityLibrary
+		OpenActivityLibrary,
+		SelectActivity
 	}
 }
