@@ -27,6 +27,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		readonly Timer _updateTimer = new Timer( 1000 );
 
+		/// <summary>
+		///   The ViewModel of the activity which is currently open.
+		/// </summary>
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]

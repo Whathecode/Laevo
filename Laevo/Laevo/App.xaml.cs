@@ -1,8 +1,10 @@
 ﻿using System.Windows;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
+using Whathecode.System.Aspects;
 
 
+[assembly: InitializeEventHandlers( AttributeTargetTypes = "Laevo.*" )]
 namespace Laevo
 {
 	/// <summary>

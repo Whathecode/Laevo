@@ -1,5 +1,5 @@
 ﻿namespace Laevo.View.Activity
-{
+{	
 	/// <summary>
 	/// Interaction logic for ActivityControl.xaml
 	/// </summary>

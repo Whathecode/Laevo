@@ -27,6 +27,7 @@
 					<RelativeSource Mode="FindAncestor" AncestorType="{x:Type FrameworkElement}" AncestorLevel="2" />
 				</Binding.RelativeSource>
 			</Binding>
+			<Binding Path="HeightPercentage" />
 		</MultiBinding>
 	</ActivityOverview:TimeLineControl.Offset>	
 	
@@ -64,6 +65,7 @@
 			CornerRadius="3"
 			BorderThickness="2"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+			Behaviors:MouseBehavior.LeftMouseDownCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			Cursor="Hand"
 			Panel.ZIndex="15">
 			<Border.Height>

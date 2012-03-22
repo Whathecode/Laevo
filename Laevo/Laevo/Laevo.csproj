@@ -100,7 +100,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Laevo.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
@@ -186,6 +185,10 @@
     <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj">
       <Project>{9C755F97-8302-4415-AC95-FABFCDCE14B2}</Project>
       <Name>Whathecode.PresentationFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj">
+      <Project>{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}</Project>
+      <Name>Whathecode.System.Aspects</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.System\Whathecode.System.csproj">
       <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>

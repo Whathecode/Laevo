@@ -13,8 +13,10 @@ namespace Laevo.View.Activity.Converters
 			const double topOffset = 90;
 			const double bottomOffset = 45;
 
-			double offsetPercentage = (double)values[ 0 ];
+			double offsetPercentage = (double)values[ 0 ];					
 			double availableHeight = (double)values[ 1 ] - topOffset - bottomOffset;
+			double heightPercentage = (double)values[ 2 ];
+			availableHeight -= heightPercentage * availableHeight;
 
 			return (availableHeight * offsetPercentage) + bottomOffset;
 		}
