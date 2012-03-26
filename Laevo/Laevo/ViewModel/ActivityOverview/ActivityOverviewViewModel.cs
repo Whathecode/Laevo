@@ -17,7 +17,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
-		public event ActivityViewModel.OpenedActivityEventHandler OpenedActivityEvent;
+		public event ActivityViewModel.ActivityEventHandler OpenedActivityEvent;
 
 		readonly Model.Laevo _model;
 		readonly DesktopManager _desktopManager = new DesktopManager();		
@@ -31,6 +31,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		///   The ViewModel of the activity which is currently open.
 		/// </summary>
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
+
+		/// <summary>
+		///   The ViewModel of the activity which is currently selected.
+		///   This means it is being edited, or more information is requested about it. It doesn't mean it's open!
+		/// </summary>
+		public ActivityViewModel SelectedActivityViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
@@ -73,6 +79,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				viewModel.Color = ActivityViewModel.DefaultColor;
 
 				viewModel.OpenedActivityEvent += OnActivityOpened;
+				viewModel.SelectedActivityEvent += OnActivitySelected;
 				Activities.Add( viewModel );
 			}				
 		}
@@ -86,11 +93,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivityOpened( ActivityViewModel viewModel )
 		{
 			CurrentActivityViewModel = viewModel;
+			OpenedActivityEvent( viewModel );
+		}
 
-			if ( OpenedActivityEvent != null )
-			{
-				OpenedActivityEvent( viewModel );
-			}
+		void OnActivitySelected( ActivityViewModel viewModel )
+		{
+			SelectedActivityViewModel = viewModel;
 		}
 
 		void UpdateData( object sender, ElapsedEventArgs e )
