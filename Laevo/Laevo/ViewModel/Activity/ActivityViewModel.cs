@@ -49,18 +49,18 @@ namespace Laevo.ViewModel.Activity
 		const string LibraryExtension = "library-ms";
 
 
-		public delegate void OpenedActivityEventHandler( ActivityViewModel viewModel );
+		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
 
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
-		public event OpenedActivityEventHandler OpenedActivityEvent;
+		public event ActivityEventHandler OpenedActivityEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is selected.
 		/// </summary>
-		public event Action SelectedActivityEvent;
+		public event ActivityEventHandler SelectedActivityEvent;
 
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
@@ -162,7 +162,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.SelectActivity )]
 		public void SelectActivity()
 		{
-			SelectedActivityEvent();
+			SelectedActivityEvent( this );
 		}
 
 		/// <summary>

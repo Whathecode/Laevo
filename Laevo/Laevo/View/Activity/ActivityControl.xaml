@@ -9,6 +9,7 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:Activity="clr-namespace:Laevo.View.Activity"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
 	Panel.ZIndex="10"	
@@ -66,8 +67,17 @@
 			BorderThickness="2"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 			Behaviors:MouseBehavior.LeftMouseDownCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
-			Cursor="Hand"
+			Behaviors:MouseBehavior.LeftClickDragCommand="Activity:ActivityControl.MouseDragged"
+			Behaviors:MouseBehavior.ClickDragContainer="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type FrameworkElement}, AncestorLevel=5}}"
+		    Cursor="Hand"
 			Panel.ZIndex="15">
+			
+			<Border.CommandBindings>
+				<CommandBinding
+					Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
+					Executed="MoveActivity" />
+			</Border.CommandBindings>
+			
 			<Border.Height>
 				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">
 					<Binding Path="HeightPercentage" />

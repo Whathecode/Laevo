@@ -172,10 +172,7 @@ namespace Laevo.View.ActivityOverview
 		static void OnVisibleIntervalChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
 		{
 			var control = (TimeLineControl)o;
-			if ( control.VisibleIntervalChangedEvent != null )
-			{
-				control.VisibleIntervalChangedEvent( control.VisibleInterval );
-			}
+			control.VisibleIntervalChangedEvent( control.VisibleInterval );
 		}
 	}
 }
