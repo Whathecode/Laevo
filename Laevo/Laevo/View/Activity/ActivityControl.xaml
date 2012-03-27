@@ -15,8 +15,16 @@
 	Panel.ZIndex="10"	
 	ActivityOverview:TimeLineControl.Occurance="{Binding Occurance}"
 	ActivityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
-	MinWidth="80">
+	MinWidth="80"
+	Focusable="True">
 
+	<UserControl.CommandBindings>
+		<CommandBinding
+			Command="Activity:ActivityControl.MouseDragged"					
+			Executed="MoveActivity"
+			CanExecute="CommandBinding_CanExecute"/>
+	</UserControl.CommandBindings>
+	
 	<ActivityOverview:TimeLineControl.Offset>
 		<MultiBinding>
 			<MultiBinding.Converter>
@@ -68,15 +76,8 @@
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 			Behaviors:MouseBehavior.LeftMouseDownCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="Activity:ActivityControl.MouseDragged"
-			Behaviors:MouseBehavior.ClickDragContainer="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type FrameworkElement}, AncestorLevel=5}}"
 		    Cursor="Hand"
-			Panel.ZIndex="15">
-			
-			<Border.CommandBindings>
-				<CommandBinding
-					Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
-					Executed="MoveActivity" />
-			</Border.CommandBindings>
+			Panel.ZIndex="15">		
 			
 			<Border.Height>
 				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">

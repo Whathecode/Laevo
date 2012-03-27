@@ -26,7 +26,7 @@ namespace Laevo.View.ActivityOverview
 	{
 		const double ZoomPercentage = 0.001;
 
-		public static readonly RoutedCommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
+		public static readonly ICommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
 		DateTime _focusedTime = DateTime.Now;
 
 		readonly List<ILabels> _labels = new List<ILabels>();
@@ -35,7 +35,7 @@ namespace Laevo.View.ActivityOverview
 
 		public ActivityOverviewWindow()
 		{
-			InitializeComponent();			
+			InitializeComponent();
 
 #if DEBUG
 			WindowStyle = WindowStyle.None;
@@ -44,9 +44,6 @@ namespace Laevo.View.ActivityOverview
 			Width = 500;
 			Height = 500;
 #endif
-
-			// Set focus so commands are triggered.
-			TimeLine.Focus();
 
 			// Set the time line's position around the current time when opening it.
 			DateTime now = DateTime.Now;
@@ -206,7 +203,7 @@ namespace Laevo.View.ActivityOverview
 				interval.Move( -ticksOffset );
 				TimeLine.VisibleInterval = ToTimeInterval( interval );
 			}
-		}	
+		}
 
 		void OnMouseMoved( object sender, MouseEventArgs e )
 		{
