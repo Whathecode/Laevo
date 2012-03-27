@@ -88,22 +88,24 @@
 					<DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" />
 				</Viewport2DVisual3D.Material>
 
-				<Grid 
+				<Grid
+					x:Name="TimeLineContainer"
 					Width="{Binding ElementName=MainWindow, Path=ActualWidth, Converter={StaticResource TimeLineWidthConverter}}"
 					Height="{Binding ElementName=MainWindow, Path=ActualHeight}"
 					ClipToBounds="True"
 					Background="{StaticResource TimeLineBrush}"
 					Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+					Behaviors:MouseBehavior.DragCapturesMouse="False"
 					MouseWheel="OnMouseWheel"
 					MouseMove="OnMouseMoved">
 
-					<ActivityOverview:TimeLineControl x:Name="TimeLine" Focusable="True">
-						<ActivityOverview:TimeLineControl.CommandBindings>
-							<CommandBinding
-								Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
-								Executed="MoveTimeLine" />
-						</ActivityOverview:TimeLineControl.CommandBindings>
-					</ActivityOverview:TimeLineControl>
+					<Grid.CommandBindings>
+						<CommandBinding
+							Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"		
+							Executed="MoveTimeLine" />
+					</Grid.CommandBindings>
+					
+					<ActivityOverview:TimeLineControl x:Name="TimeLine" />				
 
 				</Grid>
 			</Viewport2DVisual3D>
