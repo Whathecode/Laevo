@@ -180,7 +180,7 @@ namespace Laevo.View.ActivityOverview
 			var activity = new ActivityControl
 			{
 				DataContext = viewModel,
-				HorizontalAlignment = HorizontalAlignment.Left
+				HorizontalAlignment = HorizontalAlignment.Left,
 			};
 			_activities.Add( viewModel, activity );
 			TimeLine.Children.Add( activity );
@@ -189,7 +189,7 @@ namespace Laevo.View.ActivityOverview
 		Interval<long> _startDrag;
 		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
 		{
-			var info = (MouseBehavior.ClickDragInfo)e.Parameter;
+			var info = (MouseBehavior.ClickDragInfo)e.Parameter;			
 			if ( info.State == MouseBehavior.ClickDragState.Start )
 			{
 				_startDrag = ToTicksInterval( TimeLine.VisibleInterval );
@@ -200,8 +200,8 @@ namespace Laevo.View.ActivityOverview
 				var visibleTicks = ToTicksInterval( TimeLine.VisibleInterval ).Size;
 				var ticksOffset = (long)(visibleTicks * offsetPercentage);
 				var interval = (Interval<long>)_startDrag.Clone();
-				interval.Move( -ticksOffset );
-				TimeLine.VisibleInterval = ToTimeInterval( interval );
+				interval.Move( -ticksOffset );				
+				TimeLine.VisibleInterval = ToTimeInterval( interval );				
 			}
 		}
 

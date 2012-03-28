@@ -1,4 +1,5 @@
 ﻿<UserControl
+	x:Name="Control"
 	x:Class="Laevo.View.Activity.ActivityControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,28 +10,19 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
-	xmlns:Activity="clr-namespace:Laevo.View.Activity"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
 	Panel.ZIndex="10"	
 	ActivityOverview:TimeLineControl.Occurance="{Binding Occurance}"
 	ActivityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
-	MinWidth="80"
-	Focusable="True">
-
-	<UserControl.CommandBindings>
-		<CommandBinding
-			Command="Activity:ActivityControl.MouseDragged"					
-			Executed="MoveActivity"
-			CanExecute="CommandBinding_CanExecute"/>
-	</UserControl.CommandBindings>
+	MinWidth="80">
 	
 	<ActivityOverview:TimeLineControl.Offset>
-		<MultiBinding>
+		<MultiBinding Mode="TwoWay">
 			<MultiBinding.Converter>
 				<Converters:ActivityOffsetConverter />
 			</MultiBinding.Converter>
-			<Binding Path="OffsetPercentage" />
+			<Binding Path="OffsetPercentage" Mode="TwoWay" />
 			<Binding Path="ActualHeight">
 				<Binding.RelativeSource>
 					<RelativeSource Mode="FindAncestor" AncestorType="{x:Type FrameworkElement}" AncestorLevel="2" />
@@ -75,9 +67,9 @@
 			BorderThickness="2"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 			Behaviors:MouseBehavior.LeftMouseDownCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
-			Behaviors:MouseBehavior.LeftClickDragCommand="Activity:ActivityControl.MouseDragged"
+			Behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 		    Cursor="Hand"
-			Panel.ZIndex="15">		
+			Panel.ZIndex="15">
 			
 			<Border.Height>
 				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">

@@ -4,14 +4,21 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:Activity="clr-namespace:Laevo.View.Activity"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
-	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
+	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"	
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
 	ShowInTaskbar="False"
 	Topmost="True"
 	FontFamily="Segoe UI Light">
+	
+	<Window.CommandBindings>
+		<CommandBinding
+			Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+			Executed="MoveTimeLine" />	
+	</Window.CommandBindings>
 	
 	<Window.Resources>
 		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1">
@@ -89,7 +96,6 @@
 				</Viewport2DVisual3D.Material>
 
 				<Grid
-					x:Name="TimeLineContainer"
 					Width="{Binding ElementName=MainWindow, Path=ActualWidth, Converter={StaticResource TimeLineWidthConverter}}"
 					Height="{Binding ElementName=MainWindow, Path=ActualHeight}"
 					ClipToBounds="True"
@@ -98,12 +104,6 @@
 					Behaviors:MouseBehavior.DragCapturesMouse="False"
 					MouseWheel="OnMouseWheel"
 					MouseMove="OnMouseMoved">
-
-					<Grid.CommandBindings>
-						<CommandBinding
-							Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"		
-							Executed="MoveTimeLine" />
-					</Grid.CommandBindings>
 					
 					<ActivityOverview:TimeLineControl x:Name="TimeLine" />				
 
