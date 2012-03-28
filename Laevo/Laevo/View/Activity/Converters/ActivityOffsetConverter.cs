@@ -7,23 +7,37 @@ namespace Laevo.View.Activity.Converters
 {
 	public class ActivityOffsetConverter : IMultiValueConverter
 	{
+		// TODO: Get these offsets from somewhere else instead.
+		const double TopOffset = 90;
+		const double BottomOffset = 45;
+
+		double _containerHeight;
+		double _heightPercentage;
+		double _availableHeight;
+		double _offsetPercentage;
+
+
 		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 		{
-			// TODO: Get these offsets from somewhere else instead.
-			const double topOffset = 90;
-			const double bottomOffset = 45;
+			_offsetPercentage = (double)values[ 0 ];
+			_containerHeight = (double)values[ 1 ];
+			_availableHeight = _containerHeight - TopOffset - BottomOffset;
+			_heightPercentage = (double)values[ 2 ];
+			_availableHeight -= _heightPercentage * _availableHeight;
 
-			double offsetPercentage = (double)values[ 0 ];					
-			double availableHeight = (double)values[ 1 ] - topOffset - bottomOffset;
-			double heightPercentage = (double)values[ 2 ];
-			availableHeight -= heightPercentage * availableHeight;
-
-			return (availableHeight * offsetPercentage) + bottomOffset;
+			return (_availableHeight * _offsetPercentage) + BottomOffset;
 		}
 
-		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
+		public object[] ConvertBack( object offset, Type[] targetTypes, object parameter, CultureInfo culture )
 		{
-			throw new NotSupportedException();
+			double offsetPercentage = ((double)offset - BottomOffset) / _availableHeight;
+
+			return new []
+			{
+				offsetPercentage != _offsetPercentage ? offsetPercentage : Binding.DoNothing,
+				Binding.DoNothing,
+				Binding.DoNothing
+			};
 		}
 	}
 }

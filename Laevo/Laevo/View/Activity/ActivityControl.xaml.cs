@@ -1,4 +1,10 @@
-﻿using System.Windows.Input;
+﻿using System.Diagnostics;
+using System.Windows.Input;
+using Laevo.View.ActivityOverview;
+using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
+using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
+using Whathecode.System.Windows.Input;
+using Whathecode.System.Xaml.Behaviors;
 
 
 namespace Laevo.View.Activity
@@ -6,25 +12,30 @@ namespace Laevo.View.Activity
 	/// <summary>
 	/// Interaction logic for ActivityControl.xaml
 	/// </summary>
+	[WpfControl( typeof( Properties ) )]
 	public partial class ActivityControl
 	{
-		public static readonly RoutedCommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityControl ) );
+		public enum Properties
+		{
+			MouseDragged
+		}
+
+		[DependencyProperty( Properties.MouseDragged )]
+		public DelegateCommand<MouseBehavior.ClickDragInfo> MouseDragged { get; private set; }
 
 
 		public ActivityControl()
 		{
 			InitializeComponent();
+
+			MouseDragged = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveActivity );
 		}
 
 
-		void MoveActivity( object sender, ExecutedRoutedEventArgs e )
+		void MoveActivity( MouseBehavior.ClickDragInfo e )
 		{
-			throw new System.NotImplementedException();
-		}
-
-		private void CommandBinding_CanExecute( object sender, CanExecuteRoutedEventArgs e )
-		{
-			e.CanExecute = true;
+			double offset = (double)GetValue( TimeLineControl.OffsetProperty );
+			SetValue( TimeLineControl.OffsetProperty, offset - e.Displacement.Y );
 		}
 	}
 }
