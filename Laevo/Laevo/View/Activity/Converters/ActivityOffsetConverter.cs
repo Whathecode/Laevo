@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using Whathecode.System.Extensions;
 
 
 namespace Laevo.View.Activity.Converters
@@ -14,27 +15,26 @@ namespace Laevo.View.Activity.Converters
 		double _containerHeight;
 		double _heightPercentage;
 		double _availableHeight;
-		double _offsetPercentage;
 
 
 		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 		{
-			_offsetPercentage = (double)values[ 0 ];
+			double offsetPercentage = (double)values[ 0 ];
 			_containerHeight = (double)values[ 1 ];
 			_availableHeight = _containerHeight - TopOffset - BottomOffset;
 			_heightPercentage = (double)values[ 2 ];
 			_availableHeight -= _heightPercentage * _availableHeight;
 
-			return (_availableHeight * _offsetPercentage) + BottomOffset;
+			return (_availableHeight * offsetPercentage) + BottomOffset;
 		}
 
 		public object[] ConvertBack( object offset, Type[] targetTypes, object parameter, CultureInfo culture )
 		{
-			double offsetPercentage = ((double)offset - BottomOffset) / _availableHeight;
+			double offsetPercentage = ( ((double)offset - BottomOffset) / _availableHeight ).Clamp( 0, 1 );
 
 			return new []
 			{
-				offsetPercentage != _offsetPercentage ? offsetPercentage : Binding.DoNothing,
+				offsetPercentage,
 				Binding.DoNothing,
 				Binding.DoNothing
 			};

@@ -110,6 +110,23 @@ namespace Laevo.ViewModel.Activity
 		public double OffsetPercentage { get; set; }
 
 
+		static ActivityViewModel()
+		{
+			// Load icons.			
+			var assembly = Assembly.GetExecutingAssembly();
+			var resourcesName = assembly.GetName().Name + ".g";
+			var manager = new ResourceManager( resourcesName, assembly );
+			var resourceSet = manager.GetResourceSet( CultureInfo.CurrentUICulture, true, true );
+			PresetIcons = resourceSet
+				.OfType<DictionaryEntry>()
+				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
+				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
+				.ToList();
+
+			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) );
+			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );			
+		}
+
 		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) { }
 
@@ -123,19 +140,9 @@ namespace Laevo.ViewModel.Activity
 
 			InitializeLibrary();
 
-			// Load icons.			
-			var assembly = Assembly.GetExecutingAssembly();
-			var resourcesName = assembly.GetName().Name + ".g";
-			var manager = new ResourceManager( resourcesName, assembly );
-			var resourceSet = manager.GetResourceSet( CultureInfo.CurrentUICulture, true, true );
-			PresetIcons = resourceSet
-				.OfType<DictionaryEntry>()
-				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
-				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
-				.ToList();
-
-			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) );
-			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
+			Label = activity.Name;
+			Icon = DefaultIcon;
+			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
 		}		
@@ -177,6 +184,7 @@ namespace Laevo.ViewModel.Activity
 				lock ( StaticLock )
 				{
 					var activityContext = new ShellLibrary( LibraryName, true );
+					// TODO: Handle DirectoryNotFoundException when the folder no longer exists.
 					Array.ForEach( dataPaths, activityContext.Add );
 					activityContext.Close();
 				}

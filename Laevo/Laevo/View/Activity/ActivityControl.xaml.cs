@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows.Input;
-using Laevo.View.ActivityOverview;
+﻿using Laevo.View.ActivityOverview;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Input;
