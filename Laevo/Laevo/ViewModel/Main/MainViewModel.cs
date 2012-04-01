@@ -11,7 +11,7 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 namespace Laevo.ViewModel.Main
 {
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
-	class MainViewModel
+	class MainViewModel : AbstractViewModel
 	{
 		readonly Model.Laevo _model;
 		ActivityOverviewWindow _activityOverview;
@@ -92,6 +92,11 @@ namespace Laevo.ViewModel.Main
 		void OnOpenedActivityEvent( ActivityViewModel viewModel )
 		{
 			HideActivityOverview();
+		}
+
+		public override void Persist()
+		{
+			_activityOverviewViewModel.Persist();
 		}
 	}
 }

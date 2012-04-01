@@ -12,19 +12,31 @@ namespace Laevo
 	/// </summary>
 	public partial class App
 	{
+		Model.Laevo _model;
+		MainViewModel _viewModel;
+
+
 		protected override void OnStartup( StartupEventArgs e )
 		{
 			base.OnStartup(e);
 			ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
 			// Create Model.
-			var model = new Model.Laevo();
+			_model = new Model.Laevo();
 
 			// Create ViewModel.
-			var mainViewModel = new MainViewModel( model );
+			_viewModel = new MainViewModel( _model );
 
 			// Create View.
-			new TrayIconControl { DataContext = mainViewModel };
+			new TrayIconControl { DataContext = _viewModel };
+		}
+
+		protected override void OnExit( ExitEventArgs e )
+		{
+			base.OnExit( e );
+
+			_viewModel.Persist();
+			_model.Persist();
 		}
 	}
 }
