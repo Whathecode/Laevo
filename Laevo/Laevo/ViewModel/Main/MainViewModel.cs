@@ -68,7 +68,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
-			// TODO: Add and open a new activity.
+			_activityOverviewViewModel.NewActivity();
 		}
 
 		/// <summary>

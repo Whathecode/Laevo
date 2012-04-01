@@ -64,30 +64,38 @@ namespace Laevo.ViewModel.ActivityOverview
 					viewModel = new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop )
 					{
 						Icon = ActivityViewModel.HomeIcon,
-						Label = "Home"
+						Label = activity.Name
 					};
 					CurrentActivityViewModel = viewModel;
 					activity.Open();
 				}
 				else
 				{
-					viewModel = new ActivityViewModel( activity, _desktopManager )
-					{
-						Icon = ActivityViewModel.DefaultIcon
-					};
+					viewModel = new ActivityViewModel( activity, _desktopManager );
 				}
-				viewModel.Color = ActivityViewModel.DefaultColor;
 
 				viewModel.OpenedActivityEvent += OnActivityOpened;
 				viewModel.SelectedActivityEvent += OnActivitySelected;
 				Activities.Add( viewModel );
-			}				
+			}		
 		}
 
 		~ActivityOverviewViewModel()
 		{
 			_updateTimer.Stop();
 			_desktopManager.Close();
+		}
+
+
+		/// <summary>
+		///   Create a new activity and open it.
+		/// </summary>
+		public void NewActivity()
+		{
+			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _desktopManager );
+			Activities.Add( newActivity );
+
+			newActivity.OpenActivity();
 		}
 
 		void OnActivityOpened( ActivityViewModel viewModel )

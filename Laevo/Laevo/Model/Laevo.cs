@@ -37,5 +37,18 @@ namespace Laevo.Model
 		{
 			_activities.ForEach( a => a.Update() );
 		}
+
+		/// <summary>
+		///   Creates a new activity and sets it as the current activity.
+		/// </summary>
+		/// <returns>The newly created activity.</returns>
+		public Activity CreateNewActivity()
+		{
+			var activity = new Activity();
+			_activities.Add( activity );
+
+			CurrentActivity = activity;
+			return activity;
+		}
 	}
 }

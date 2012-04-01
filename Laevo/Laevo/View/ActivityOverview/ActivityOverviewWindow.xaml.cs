@@ -165,10 +165,13 @@ namespace Laevo.View.ActivityOverview
 		void ActivitiesChanged( object sender, NotifyCollectionChangedEventArgs e )
 		{
 			// Remove old items.
-			foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
+			if ( e.OldItems != null )
 			{
-				TimeLine.Children.Remove( _activities[ activity ] );
-				_activities.Remove( activity );
+				foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
+				{
+					TimeLine.Children.Remove( _activities[ activity ] );
+					_activities.Remove( activity );
+				}
 			}
 
 			// Add new items.
