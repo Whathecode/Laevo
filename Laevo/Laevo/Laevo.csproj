@@ -87,8 +87,10 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +104,8 @@
     </Compile>
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\Laevo.cs" />
+    <Compile Include="ViewModel\AbstractViewModel.cs" />
+    <Compile Include="ViewModel\ActivityOverview\DataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Binding.cs" />
     <Compile Include="ViewModel\Activity\Binding\Binding.cs" />

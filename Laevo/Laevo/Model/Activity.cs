@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.Serialization;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.IO;
@@ -13,14 +14,16 @@ namespace Laevo.Model
 	///   Class containing all the data relating to one activity context.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
+	[DataContract]
 	class Activity
 	{
-		readonly string _activityContextPath = Path.Combine( Laevo.ProgramData, "Activities" );
+		readonly string _activityContextPath = Path.Combine( Laevo.ProgramDataFolder, "Activities" );
 
 
 		/// <summary>
 		///   A name describing this activity.
 		/// </summary>
+		[DataMember]
 		public string Name { get; set; }
 
 		/// <summary>
@@ -31,6 +34,7 @@ namespace Laevo.Model
 		/// <summary>
 		///   The date when this activity was first created.
 		/// </summary>
+		[DataMember]
 		public DateTime DateCreated { get; private set; }
 
 		Interval<DateTime> _currentOpenInterval;
@@ -38,16 +42,18 @@ namespace Laevo.Model
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
+		[DataMember]
 		public ReadOnlyCollection<Interval<DateTime>> OpenIntervals { get; private set; }
 
 		/// <summary>
 		///   All paths to relevant data sources which are part of this activity context.
 		/// </summary>
+		[DataMember]
 		public List<Uri> DataPaths { get; private set; }
 
 
 		public Activity()
-			: this( DateTime.Now.ToString( "s" ) ) { }
+			: this( "" ) { }
 
 		public Activity( string name )
 		{
@@ -57,7 +63,12 @@ namespace Laevo.Model
 			OpenIntervals = new ReadOnlyCollection<Interval<DateTime>>( _openIntervals );
 
 			// Create initial data path.
-			string safeName = PathHelper.ReplaceInvalidChars( name, '-' );
+			string folderName = name;
+			if ( folderName.Length == 0 )
+			{
+				folderName = DateTime.Now.ToString( "g" );
+			}
+			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
 			string path = Path.Combine( _activityContextPath, safeName ).MakeUnique( p => !Directory.Exists( p ), "_i" );
 			var activityDirectory = new DirectoryInfo( path );
 			activityDirectory.Create();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.Serialization;
 
 
 namespace Laevo.Model
@@ -12,9 +13,11 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Laevo
 	{
-		public static readonly string ProgramData
+		public static readonly string ProgramDataFolder
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), "Laevo" );
+		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
 
+		static readonly DataContractSerializer ActivitySerializer = new DataContractSerializer( typeof( List<Activity> ) );
 		readonly List<Activity> _activities;
 		public readonly ReadOnlyCollection<Activity> Activities;
 
@@ -26,8 +29,18 @@ namespace Laevo.Model
 			_activities = new List<Activity>();
 			Activities = new ReadOnlyCollection<Activity>( _activities );
 
+			// Add activities from previous sessions.
+			if ( File.Exists( ActivitiesFile ) )
+			{
+				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
+				{
+					var existingActivities = (List<Activity>)ActivitySerializer.ReadObject( activityFileStream );
+					_activities.AddRange( existingActivities );
+				}
+			}
+
 			// Create startup activity.
-			var startup = new Activity( "Home" );
+			var startup = new Activity( "Startup" );
 			CurrentActivity = startup;
 			_activities.Add( startup );
 		}
@@ -49,6 +62,14 @@ namespace Laevo.Model
 
 			CurrentActivity = activity;
 			return activity;
+		}
+
+		public void Persist()
+		{
+			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
+			{
+				ActivitySerializer.WriteObject( activityFileStream, _activities );
+			}
 		}
 	}
 }

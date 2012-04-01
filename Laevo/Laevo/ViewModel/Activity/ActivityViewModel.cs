@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -20,8 +21,10 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 namespace Laevo.ViewModel.Activity
 {
-	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]	
-	class ActivityViewModel
+	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
+	[DataContract]
+	[KnownType( typeof( BitmapImage ) )]
+	class ActivityViewModel : AbstractViewModel
 	{
 		readonly static object StaticLock = new object();
 
@@ -68,6 +71,14 @@ namespace Laevo.ViewModel.Activity
 
 
 		/// <summary>
+		///   The time when the activity was created.
+		/// </summary>
+		public DateTime DateCreated
+		{
+			get { return _activity.DateCreated; }
+		}
+
+		/// <summary>
 		///   The time when the activity started.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Occurance )]
@@ -83,12 +94,14 @@ namespace Laevo.ViewModel.Activity
 		///   An icon representing the activity.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Icon )]
+		[DataMember]
 		public ImageSource Icon { get; set; }
 
 		/// <summary>
 		///   The background color for the activity representation. This color is used as the main color to construct a gradient.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Color )]
+		[DataMember]
 		public Color Color { get; set; }
 
 		/// <summary>
@@ -101,12 +114,14 @@ namespace Laevo.ViewModel.Activity
 		///   The percentage of the available height the activity box occupies.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.HeightPercentage )]
+		[DataMember]
 		public double HeightPercentage { get; set; }
 
 		/// <summary>
 		///   The offset, as a percentage of the total available height, where to position the activity box, from the bottom.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.OffsetPercentage )]
+		[DataMember]
 		public double OffsetPercentage { get; set; }
 
 
@@ -138,14 +153,27 @@ namespace Laevo.ViewModel.Activity
 			_desktopManager = desktopManager;
 			_virtualDesktop = virtualDesktop;
 
-			InitializeLibrary();
-
 			Label = activity.Name;
 			Icon = DefaultIcon;
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
-		}		
+		}
+
+		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager, ActivityViewModel storedViewModel )
+		{
+			_activity = activity;
+			Occurance = _activity.DateCreated;
+
+			_desktopManager = desktopManager;
+			_virtualDesktop = desktopManager.CreateEmptyDesktop();
+
+			Label = activity.Name;
+			Icon = storedViewModel.Icon;
+			Color = storedViewModel.Color;
+			HeightPercentage = storedViewModel.HeightPercentage;
+			OffsetPercentage = storedViewModel.OffsetPercentage;
+		}
 
 
 		[CommandExecute( Commands.OpenActivity )]
@@ -178,7 +206,7 @@ namespace Laevo.ViewModel.Activity
 		void InitializeLibrary()
 		{
 			// Initialize on a separate thread so the UI doesn't lock.		
-			var dataPaths = _activity.DataPaths.Select( p => p.AbsolutePath ).ToArray();
+			var dataPaths = _activity.DataPaths.Select( p => p.LocalPath ).ToArray();
 			var initializeShellLibrary = new Thread( () =>
 			{
 				lock ( StaticLock )
@@ -199,6 +227,11 @@ namespace Laevo.ViewModel.Activity
 			{
 				TimeSpan = _activity.OpenIntervals.Last().End - _activity.OpenIntervals.First().Start;
 			}
+		}
+
+		public override void Persist()
+		{
+			_activity.Name = Label;
 		}
 	}
 }
