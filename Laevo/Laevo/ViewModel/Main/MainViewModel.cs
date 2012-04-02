@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Reactive.Linq;
+using System.Windows;
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
@@ -40,6 +42,25 @@ namespace Laevo.ViewModel.Main
 			_activityOverview.Show();
 		}
 
+		/// <summary>
+		///   Opens the activity overview in order to select one of the activities.
+		/// </summary>
+		/// <param name="selectedActivity">The action to perform on the selected activity.</param>
+		public void SelectActivity( Action<ActivityViewModel> selectedActivity )
+		{
+			_activityOverviewViewModel.ActivityMode = ActivityOverviewViewModel.Mode.Select;
+			var awaitOpen = Observable.FromEvent<ActivityViewModel.ActivityEventHandler, ActivityViewModel>(
+				h => _activityOverviewViewModel.SelectedActivityEvent += h,
+				h => _activityOverviewViewModel.SelectedActivityEvent -= h );
+			awaitOpen.Subscribe( a =>
+			{
+				selectedActivity( a );
+				_activityOverviewViewModel.ActivityMode = ActivityOverviewViewModel.Mode.Open;
+				HideActivityOverview();
+			} );
+			ShowActivityOverview();
+		}
+
 		[CommandExecute( Commands.HideActivityOverview )]
 		public void HideActivityOverview()
 		{
@@ -59,6 +80,12 @@ namespace Laevo.ViewModel.Main
 			}
 		}
 
+		[CommandCanExecute( Commands.SwitchActivityOverview )]
+		public bool CanSwitchActivityOverview()
+		{
+			return _activityOverviewViewModel.ActivityMode != ActivityOverviewViewModel.Mode.Select;
+		}
+
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
 		public void OpenCurrentActivityLibrary()
 		{
@@ -76,7 +103,7 @@ namespace Laevo.ViewModel.Main
 		/// </summary>
 		void EnsureActivityOverview()
 		{
-			if ( _activityOverview != null && _activityOverview.IsLoaded )
+			if ( _activityOverview != null )
 			{
 				return;
 			}

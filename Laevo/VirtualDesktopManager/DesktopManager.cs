@@ -91,6 +91,20 @@ namespace VirtualDesktopManager
 		}
 
 		/// <summary>
+		///   Merges two desktops together and returns the new desktop.
+		/// </summary>
+		/// <returns>A new virtual desktop which has windows of both passed desktops assigned to it.</returns>
+		public VirtualDesktop Merge( VirtualDesktop desktop1, VirtualDesktop desktop2 )
+		{
+			_availableDesktops.Remove( desktop1 );
+			_availableDesktops.Remove( desktop2 );
+			var newDesktop = new VirtualDesktop( desktop1.Windows.Concat( desktop2.Windows ) );
+			_availableDesktops.Add( newDesktop );
+
+			return newDesktop;
+		}
+
+		/// <summary>
 		///   Closes the virtual desktop manager by restoring all windows.
 		/// </summary>
 		public void Close()

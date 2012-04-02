@@ -19,11 +19,22 @@ namespace Laevo.ViewModel.ActivityOverview
 	class ActivityOverviewViewModel : AbstractViewModel
 	{
 		static readonly string ActivitiesFile = Path.Combine( Model.Laevo.ProgramDataFolder, "ActivityRepresentations.xml" );
+		public enum Mode
+		{
+			Open,
+			Select
+		}
+
 
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
 		public event ActivityViewModel.ActivityEventHandler OpenedActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when an activity is selected.
+		/// </summary>
+		public event ActivityViewModel.ActivityEventHandler SelectedActivityEvent;
 
 		readonly Model.Laevo _model;
 		readonly DesktopManager _desktopManager = new DesktopManager();		
@@ -34,15 +45,15 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly Timer _updateTimer = new Timer( 1000 );
 
 		/// <summary>
+		///   The mode determines which actions are possible within the activity overview.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.Mode )]
+		public Mode ActivityMode { get; set; }
+
+		/// <summary>
 		///   The ViewModel of the activity which is currently open.
 		/// </summary>
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
-
-		/// <summary>
-		///   The ViewModel of the activity which is currently selected.
-		///   This means it is being edited, or more information is requested about it. It doesn't mean it's open!
-		/// </summary>
-		public ActivityViewModel SelectedActivityViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
@@ -82,21 +93,24 @@ namespace Laevo.ViewModel.ActivityOverview
 				if ( _model.CurrentActivity == activity )
 				{
 					// Ensure current (first) activity is assigned to the correct desktop.					
-					viewModel = new ActivityViewModel( activity, _desktopManager, _desktopManager.CurrentDesktop )
+					viewModel = new ActivityViewModel( this, activity, _desktopManager )
 					{
 						Icon = ActivityViewModel.HomeIcon,
-						Label = activity.Name
+						Color = ActivityViewModel.DefaultColor,
+						HeightPercentage = 0.2,
+						OffsetPercentage = 1
 					};
-					CurrentActivityViewModel = viewModel;
 					viewModel.OpenActivity();
 				}
 				else if ( existingActivities.ContainsKey( activity.DateCreated ) )
 				{
-					viewModel = new ActivityViewModel( activity, _desktopManager, existingActivities[ activity.DateCreated ] );
+					// Activities from previous sessions.
+					viewModel = new ActivityViewModel( this, activity, _desktopManager, existingActivities[ activity.DateCreated ] );
 				}
 				else
 				{
-					viewModel = new ActivityViewModel( activity, _desktopManager );
+					// Newly added activities at startup.
+					viewModel = new ActivityViewModel( this, activity, _desktopManager );
 				}
 
 				viewModel.OpenedActivityEvent += OnActivityOpened;
@@ -117,7 +131,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public void NewActivity()
 		{
-			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _desktopManager );
+			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _desktopManager );
 			Activities.Add( newActivity );
 
 			newActivity.OpenActivity();
@@ -131,7 +145,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnActivitySelected( ActivityViewModel viewModel )
 		{
-			SelectedActivityViewModel = viewModel;
+			SelectedActivityEvent( viewModel );
 		}
 
 		void UpdateData( object sender, ElapsedEventArgs e )
@@ -142,7 +156,10 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.Update();
 
 			// Update required view models.
-			Activities.ForEach( a => a.Update() );
+			if ( Activities != null )
+			{
+				Activities.ForEach( a => a.Update() );
+			}
 		}
 
 		public override void Persist()

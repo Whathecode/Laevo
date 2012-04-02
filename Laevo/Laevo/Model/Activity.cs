@@ -38,6 +38,7 @@ namespace Laevo.Model
 		public DateTime DateCreated { get; private set; }
 
 		Interval<DateTime> _currentOpenInterval;
+		[DataMember]
 		readonly List<Interval<DateTime>> _openIntervals = new List<Interval<DateTime>>();
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
