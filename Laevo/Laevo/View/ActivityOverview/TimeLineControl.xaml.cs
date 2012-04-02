@@ -157,7 +157,6 @@ namespace Laevo.View.ActivityOverview
 						// Resize width.
 						var widthBinding = new MultiBinding();						
 						widthBinding.Bindings.Add( timeLineWidth );
-						widthBinding.Bindings.Add( elementWidth );
 						widthBinding.Bindings.Add( viewport );
 						var timeSpan = new Binding { Path = new PropertyPath( TimeSpanProperty ), Source = e };
 						widthBinding.Bindings.Add( timeSpan );

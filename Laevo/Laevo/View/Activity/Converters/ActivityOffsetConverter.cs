@@ -9,7 +9,7 @@ namespace Laevo.View.Activity.Converters
 	public class ActivityOffsetConverter : IMultiValueConverter
 	{
 		// TODO: Get these offsets from somewhere else instead.
-		const double TopOffset = 90;
+		const double TopOffset = 105;
 		const double BottomOffset = 45;
 
 		double _containerHeight;

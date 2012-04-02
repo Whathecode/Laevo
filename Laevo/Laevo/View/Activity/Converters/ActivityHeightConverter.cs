@@ -10,7 +10,7 @@ namespace Laevo.View.Activity.Converters
 		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 		{
 			// TODO: Get these offsets from somewhere else instead.
-			const double topOffset = 90;
+			const double topOffset = 105;
 			const double bottomOffset = 45;
 
 			double heightPercentage = (double)values[ 0 ];

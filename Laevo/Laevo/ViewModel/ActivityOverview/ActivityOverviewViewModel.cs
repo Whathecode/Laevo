@@ -92,7 +92,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				ActivityViewModel viewModel;
 				if ( _model.CurrentActivity == activity )
 				{
-					// Ensure current (first) activity is assigned to the correct desktop.					
+					// Ensure current (first) activity is assigned to the correct desktop.
 					viewModel = new ActivityViewModel( this, activity, _desktopManager )
 					{
 						Icon = ActivityViewModel.HomeIcon,

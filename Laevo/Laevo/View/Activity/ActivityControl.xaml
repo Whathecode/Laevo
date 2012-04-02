@@ -6,6 +6,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:Converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
@@ -15,7 +16,7 @@
 	Panel.ZIndex="10"	
 	ActivityOverview:TimeLineControl.Occurance="{Binding Occurance}"
 	ActivityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
-	MinWidth="80">
+	ClipToBounds="False">
 	
 	<ActivityOverview:TimeLineControl.Offset>
 		<MultiBinding Mode="TwoWay">
@@ -35,32 +36,35 @@
 	<UserControl.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
-		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />		
+		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />	
+		<wtcConverters:CalculateValueConverter x:Key="DivideByTwoConverter" Operation="Division" Value="2" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
-
-		<StackPanel
+		
+		<Canvas
 			x:Name="Header"
-			Orientation="Horizontal"
-			Panel.ZIndex="20">
-			<Image
-				x:Name="Image"
-				Source="{Binding Path=Icon}"
-				Stretch="None">
-				<Image.Margin>
-					<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
-						<Binding ElementName="Image" Path="ActualWidth" />
-						<Binding ElementName="Image" Path="ActualHeight" />
-					</MultiBinding>
-				</Image.Margin>
-			</Image>
-			<TextBlock
-				Foreground="White"
-				FontSize="20"
-				Text="{Binding Path=Label}"
-				Margin="5, 0, 0, 0" />
-		</StackPanel>
+			Panel.ZIndex="20"
+			Height="{Binding ElementName=Image, Path=ActualHeight, Converter={StaticResource DivideByTwoConverter}}">
+			<StackPanel Orientation="Horizontal">
+				<Image
+					x:Name="Image"
+					Source="{Binding Path=Icon}"
+					Stretch="None">
+					<Image.Margin>
+						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
+							<Binding ElementName="Image" Path="ActualWidth" />
+							<Binding ElementName="Image" Path="ActualHeight" />
+						</MultiBinding>
+					</Image.Margin>
+				</Image>
+				<TextBlock
+					Foreground="White"
+					FontSize="20"
+					Text="{Binding Path=Label}"
+					Margin="5, -13, 0, 0" />
+			</StackPanel>
+		</Canvas>
 
 		<Border
 			CornerRadius="3"

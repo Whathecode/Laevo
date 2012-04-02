@@ -104,7 +104,7 @@
 					MouseWheel="OnMouseWheel"
 					MouseMove="OnMouseMoved">
 					
-					<ActivityOverview:TimeLineControl x:Name="TimeLine" />				
+					<ActivityOverview:TimeLineControl x:Name="TimeLine" />
 
 				</Grid>
 			</Viewport2DVisual3D>

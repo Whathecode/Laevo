@@ -127,6 +127,7 @@
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToFovConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToTransformOffset.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
+    <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
     <Compile Include="View\ActivityOverview\TimeLineControl.ActivityWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
