@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Laevo.ViewModel.Activity.Binding;
@@ -210,11 +210,6 @@ namespace Laevo.ViewModel.Activity
 			OpenedActivityEvent( this );
 		}
 
-		[CommandCanExecute( Commands.OpenActivity )]
-		public bool CanOpenActivity()
-		{
-			return _overview.ActivityMode == ActivityOverviewViewModel.Mode.Open;
-		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]
 		public void OpenActivityLibrary()
@@ -226,7 +221,15 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.SelectActivity )]
 		public void SelectActivity()
 		{
-			SelectedActivityEvent( this );
+			switch ( _overview.ActivityMode )
+			{
+				case ActivityOverviewViewModel.Mode.Select:
+					SelectedActivityEvent( this );
+					break;
+				case ActivityOverviewViewModel.Mode.Open:
+					OpenActivity();
+					break;
+			}			
 		}
 
 		/// <summary>
@@ -236,7 +239,8 @@ namespace Laevo.ViewModel.Activity
 		{
 			// Initialize on a separate thread so the UI doesn't lock.		
 			var dataPaths = _activity.DataPaths.Select( p => p.LocalPath ).ToArray();
-			var initializeShellLibrary = new Thread( () =>
+			var initializeShellLibrary = new BackgroundWorker();
+			initializeShellLibrary.DoWork += ( e, a ) =>
 			{
 				lock ( StaticLock )
 				{
@@ -245,8 +249,8 @@ namespace Laevo.ViewModel.Activity
 					Array.ForEach( dataPaths, activityContext.Add );
 					activityContext.Close();
 				}
-			} );
-			initializeShellLibrary.Start();
+			};
+			initializeShellLibrary.RunWorkerAsync();
 		}
 
 		public void Update()

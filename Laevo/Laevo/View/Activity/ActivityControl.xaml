@@ -65,8 +65,7 @@
 		<Border
 			CornerRadius="3"
 			BorderThickness="2"
-			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
-			Behaviors:MouseBehavior.LeftMouseDownCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
+			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 		    Cursor="Hand"
 			Panel.ZIndex="15">

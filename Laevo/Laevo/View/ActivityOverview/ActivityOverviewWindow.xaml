@@ -4,7 +4,6 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
-	xmlns:Activity="clr-namespace:Laevo.View.Activity"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"	
 	Title="Laevo Activity Time Line"
