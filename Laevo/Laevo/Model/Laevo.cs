@@ -38,11 +38,6 @@ namespace Laevo.Model
 					_activities.AddRange( existingActivities );
 				}
 			}
-
-			// Create startup activity.
-			var startup = new Activity( "Startup" );
-			CurrentActivity = startup;
-			_activities.Add( startup );
 		}
 
 

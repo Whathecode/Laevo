@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Laevo.ViewModel.Activity.Binding;
+using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;
 using VirtualDesktopManager;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -25,8 +26,9 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	class ActivityViewModel : AbstractViewModel
-	{
+	{		
 		readonly static object StaticLock = new object();
+		readonly ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
 		public static List<BitmapImage> PresetIcons = new List<BitmapImage>();
@@ -67,7 +69,7 @@ namespace Laevo.ViewModel.Activity
 
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
-		readonly VirtualDesktop _virtualDesktop;
+		VirtualDesktop _virtualDesktop;
 
 
 		/// <summary>
@@ -142,16 +144,14 @@ namespace Laevo.ViewModel.Activity
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );			
 		}
 
-		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager )
-			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) { }
-
-		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager, VirtualDesktop virtualDesktop )
+		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager )
 		{
+			_overview = overview;
 			_activity = activity;
 			Occurance = _activity.DateCreated;
 
 			_desktopManager = desktopManager;
-			_virtualDesktop = virtualDesktop;
+			_virtualDesktop = desktopManager.CreateEmptyDesktop();
 
 			Label = activity.Name;
 			Icon = DefaultIcon;
@@ -160,8 +160,12 @@ namespace Laevo.ViewModel.Activity
 			OffsetPercentage = 1;
 		}
 
-		public ActivityViewModel( Model.Activity activity, DesktopManager desktopManager, ActivityViewModel storedViewModel )
+		public ActivityViewModel(
+			ActivityOverviewViewModel overview,
+			Model.Activity activity,
+			DesktopManager desktopManager, ActivityViewModel storedViewModel )
 		{
+			_overview = overview;
 			_activity = activity;
 			Occurance = _activity.DateCreated;
 
@@ -176,15 +180,40 @@ namespace Laevo.ViewModel.Activity
 		}
 
 
+		static bool _firstActivity = true;
+		/// <summary>
+		///   Open the activity.
+		///   When it is the first activity opened, the current open windows will merge with the stored ones.
+		/// </summary>
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
+			if ( this == _overview.CurrentActivityViewModel )
+			{
+				// Activity is already open.
+				OpenedActivityEvent( this );
+				return;
+			}
+
+			// The first opened activity should include the currently open windows.
+			if ( _firstActivity )
+			{
+				_virtualDesktop = _desktopManager.Merge( _virtualDesktop, _desktopManager.CurrentDesktop );
+				_firstActivity = false;
+			}
+
 			_activity.Open();
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
 			InitializeLibrary();
 
 			OpenedActivityEvent( this );
+		}
+
+		[CommandCanExecute( Commands.OpenActivity )]
+		public bool CanOpenActivity()
+		{
+			return _overview.ActivityMode == ActivityOverviewViewModel.Mode.Open;
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]

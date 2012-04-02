@@ -3,7 +3,8 @@
 	public enum Properties
 	{
 		CurrentTime,
-		Activities
+		Activities,
+		Mode
 	}
 
 	public enum Commands { }

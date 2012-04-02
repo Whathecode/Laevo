@@ -116,7 +116,8 @@ Global
 		{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}.Release|x64.ActiveCfg = Release|Any CPU
-		{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}.Release|x86.ActiveCfg = Release|Any CPU
+		{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}.Release|x86.ActiveCfg = Release|x86
+		{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
