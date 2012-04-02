@@ -13,7 +13,7 @@ namespace Laevo.View.Activity.Converters
 			double width = (double)values[ 0 ];
 			double height = (double)values[ 1 ];
 
-			return new Thickness( -width / 2, 0, 0, -height / 2 );
+			return new Thickness( -width / 2, 0, 0, 0 );
 		}
 
 		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )

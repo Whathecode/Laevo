@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
@@ -53,6 +54,12 @@ namespace Laevo.View.ActivityOverview
 				var end = now + TimeSpan.FromHours( 2 );
 				TimeLine.VisibleInterval = new Interval<DateTime>( start, end );
 			};
+
+			// Create the line which indicates the current time.
+			var currentTime = new TimeIndicator { Width = 20 };
+			currentTime.SetBinding( HeightProperty, new Binding( "ActualHeight" ) { Source = TimeLine } );
+			currentTime.SetBinding( TimeLineControl.OccuranceProperty, "CurrentTime" );
+			TimeLine.Children.Add( currentTime );
 
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
