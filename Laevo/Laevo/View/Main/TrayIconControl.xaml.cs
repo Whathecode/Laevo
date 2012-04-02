@@ -31,9 +31,9 @@ namespace Laevo.View.Main
 			InitializeComponent();
 
 			// Capture system-wide keyboard events.
-			_keyboardListener.Enabled = true;
 			_keyboardListener.KeyDown += OnKeyDown;
 			_keyboardListener.KeyUp += OnKeyUp;
+			_keyboardListener.Start();
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
 			_updateLoop.Elapsed += OnUpdate;
 			_updateLoop.Start();

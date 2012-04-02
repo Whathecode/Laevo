@@ -40,11 +40,14 @@ namespace Laevo.Model
 		Interval<DateTime> _currentOpenInterval;
 		[DataMember]
 		readonly List<Interval<DateTime>> _openIntervals = new List<Interval<DateTime>>();
+
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
-		[DataMember]
-		public ReadOnlyCollection<Interval<DateTime>> OpenIntervals { get; private set; }
+		public ReadOnlyCollection<Interval<DateTime>> OpenIntervals
+		{
+			get { return _openIntervals.AsReadOnly(); }
+		}
 
 		/// <summary>
 		///   All paths to relevant data sources which are part of this activity context.
@@ -61,7 +64,6 @@ namespace Laevo.Model
 			Name = name;
 			DataPaths = new List<Uri>();
 			DateCreated = DateTime.Now;
-			OpenIntervals = new ReadOnlyCollection<Interval<DateTime>>( _openIntervals );
 
 			// Create initial data path.
 			string folderName = name;
