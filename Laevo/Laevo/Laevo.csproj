@@ -106,6 +106,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Model\Activity.cs" />
+    <Compile Include="Model\AttentionShift.cs" />
+    <Compile Include="Model\IAttentionShift.cs" />
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\DataContractSurrogate.cs" />

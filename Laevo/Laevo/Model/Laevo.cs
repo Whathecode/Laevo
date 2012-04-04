@@ -23,21 +23,30 @@ namespace Laevo.Model
 
 		public Activity CurrentActivity { get; private set; }
 
+		readonly List<IAttentionShift<object>> _attentionShifts;
+		public readonly ReadOnlyCollection<IAttentionShift<object>> AttentionShifts;
+
 
 		public Laevo()
 		{
 			_activities = new List<Activity>();
 			Activities = new ReadOnlyCollection<Activity>( _activities );
 
-			// Add activities from previous sessions.
+			_attentionShifts = new List<IAttentionShift<object>>();
+			AttentionShifts = new ReadOnlyCollection<IAttentionShift<object>>( _attentionShifts );
+
+			// Add activities from previous sessions.);
 			if ( File.Exists( ActivitiesFile ) )
 			{
 				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
 				{
 					var existingActivities = (List<Activity>)ActivitySerializer.ReadObject( activityFileStream );
-					_activities.AddRange( existingActivities );
+					existingActivities.ForEach( AddActivity );
 				}
 			}
+
+			// Attention was shifted to Laevo since the user launched it.
+			ShiftAttention( this );
 		}
 
 
@@ -53,10 +62,29 @@ namespace Laevo.Model
 		public Activity CreateNewActivity()
 		{
 			var activity = new Activity();
-			_activities.Add( activity );
+			AddActivity( activity );
 
 			CurrentActivity = activity;
 			return activity;
+		}
+
+		void AddActivity( Activity activity )
+		{
+			// TODO: Unhook event once activities can be deleted.
+			activity.OpenedEvent += ShiftAttention;
+
+			_activities.Add( activity );
+		}
+
+		/// <summary>
+		///   Indicates an attention shift of the user towards a new object.
+		/// </summary>
+		/// <typeparam name = "T">The type of the object the user's attention shifted to.</typeparam>
+		/// <param name = "object">The object the user's attention shifted to.</param>
+		void ShiftAttention<T>( T @object )
+			where T : class
+		{
+			_attentionShifts.Add( new AttentionShift<T>( DateTime.Now, @object ) );
 		}
 
 		public void Persist()
@@ -65,6 +93,14 @@ namespace Laevo.Model
 			{
 				ActivitySerializer.WriteObject( activityFileStream, _activities );
 			}
+		}
+
+		public void Exit()
+		{
+			// Attention shift to 'null' is used to indicate the application was shut down.
+			ShiftAttention<object>( null );
+
+			Persist();
 		}
 	}
 }
