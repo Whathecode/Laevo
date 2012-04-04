@@ -56,10 +56,7 @@ namespace Laevo
 
 		protected override void OnExit( ExitEventArgs e )
 		{
-			base.OnExit( e );
-
-			_viewModel.Persist();
-			_model.Persist();
+			_viewModel.Dispose();
 		}
 	}
 }

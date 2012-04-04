@@ -31,6 +31,9 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
+			Persist();			
+			_model.Exit();
+
 			Application.Current.Shutdown();
 		}
 
@@ -124,6 +127,11 @@ namespace Laevo.ViewModel.Main
 		public override void Persist()
 		{
 			_activityOverviewViewModel.Persist();
+		}
+
+		protected override void FreeUnmanagedResources()
+		{
+			_activityOverviewViewModel.Dispose();
 		}
 	}
 }

@@ -10,8 +10,7 @@ namespace Laevo.View.ActivityOverview.Labels
 	public class TimeIndicator : Canvas
 	{
 		static readonly Color Color = Colors.Yellow;
-		// TODO: Base offset on the view which causes it. (The headers at the top.)
-		const double TopOffset = 95.0;
+		const double TopOffset = ActivityOverviewWindow.TopOffset - 10;
 		const double TriangleWidth = 20;
 		const double TriangleHeight = 20;
 

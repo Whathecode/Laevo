@@ -171,5 +171,10 @@ namespace Laevo.ViewModel.ActivityOverview
 				ActivitySerializer.WriteObject( activityFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
 			}
 		}
+
+		protected override void FreeUnmanagedResources()
+		{
+			Activities.ForEach( a => a.Dispose() );
+		}
 	}
 }

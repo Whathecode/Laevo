@@ -19,6 +19,7 @@ namespace Laevo.Model
 	{
 		readonly string _activityContextPath = Path.Combine( Laevo.ProgramDataFolder, "Activities" );
 
+		public event Action<Activity> OpenedEvent;
 
 		/// <summary>
 		///   A name describing this activity.
@@ -90,6 +91,8 @@ namespace Laevo.Model
 			_currentOpenInterval = new Interval<DateTime>( now, now );
 			_openIntervals.Add( _currentOpenInterval );
 			IsOpen = true;
+
+			OpenedEvent( this );
 		}
 
 		public void Close()

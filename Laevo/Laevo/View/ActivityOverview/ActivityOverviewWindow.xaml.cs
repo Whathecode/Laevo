@@ -25,6 +25,8 @@ namespace Laevo.View.ActivityOverview
 	/// </summary>
 	public partial class ActivityOverviewWindow
 	{
+		public const double TopOffset = 105;
+		public const double BottomOffset = 45;
 		const double ZoomPercentage = 0.001;
 
 		public static readonly ICommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );

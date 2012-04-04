@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using Laevo.View.ActivityOverview;
 using Whathecode.System.Extensions;
 
 
@@ -9,8 +10,8 @@ namespace Laevo.View.Activity.Converters
 	public class ActivityOffsetConverter : IMultiValueConverter
 	{
 		// TODO: Get these offsets from somewhere else instead.
-		const double TopOffset = 105;
-		const double BottomOffset = 45;
+		const double TopOffset = ActivityOverviewWindow.TopOffset;
+		const double BottomOffset = ActivityOverviewWindow.BottomOffset;
 
 		double _containerHeight;
 		double _heightPercentage;

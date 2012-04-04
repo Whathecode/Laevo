@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
@@ -70,6 +71,7 @@ namespace Laevo.ViewModel.Activity
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
 		VirtualDesktop _virtualDesktop;
+		BackgroundWorker _initializeLibraryWorker;
 
 
 		/// <summary>
@@ -239,8 +241,8 @@ namespace Laevo.ViewModel.Activity
 		{
 			// Initialize on a separate thread so the UI doesn't lock.		
 			var dataPaths = _activity.DataPaths.Select( p => p.LocalPath ).ToArray();
-			var initializeShellLibrary = new BackgroundWorker();
-			initializeShellLibrary.DoWork += ( e, a ) =>
+			_initializeLibraryWorker = new BackgroundWorker();
+			_initializeLibraryWorker.DoWork += ( e, a ) =>
 			{
 				lock ( StaticLock )
 				{
@@ -250,7 +252,7 @@ namespace Laevo.ViewModel.Activity
 					activityContext.Close();
 				}
 			};
-			initializeShellLibrary.RunWorkerAsync();
+			_initializeLibraryWorker.RunWorkerAsync();
 		}
 
 		public void Update()
@@ -265,6 +267,22 @@ namespace Laevo.ViewModel.Activity
 		public override void Persist()
 		{
 			_activity.Name = Label;
+		}
+
+		protected override void FreeUnmanagedResources()
+		{
+			if ( _initializeLibraryWorker != null )
+			{
+				if ( _initializeLibraryWorker.IsBusy )
+				{
+					var awaitDiposed = Observable.FromEvent<EventHandler, EventArgs>(
+						h => _initializeLibraryWorker.Disposed += h, h => _initializeLibraryWorker.Disposed -= h );
+					awaitDiposed.Subscribe();
+
+					_initializeLibraryWorker.Dispose();
+					awaitDiposed.First();
+				}
+			}
 		}
 	}
 }
