@@ -38,7 +38,7 @@ namespace Laevo.View.ActivityOverview
 					case HorizontalAlignment.Center:
 						return position - (elementWidth / 2);
 					case HorizontalAlignment.Right:
-						return position + elementWidth;
+						return position - elementWidth;
 					default:
 						throw new NotSupportedException( alignment + " is not supported by the TimeLineControl." );
 				}				

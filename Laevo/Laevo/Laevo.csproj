@@ -106,8 +106,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Model\Activity.cs" />
-    <Compile Include="Model\AttentionShift.cs" />
-    <Compile Include="Model\IAttentionShift.cs" />
+    <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
+    <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
+    <Compile Include="Model\AttentionShifts\ApplicationAttentionShift.cs" />
+    <Compile Include="Model\AttentionShifts\DataContractSurrogate.cs" />
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\DataContractSurrogate.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
+    <Compile Include="View\Activity\Converters\TimeSpanConverter.cs" />
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>

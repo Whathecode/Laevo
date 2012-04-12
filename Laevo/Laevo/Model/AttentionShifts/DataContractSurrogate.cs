@@ -2,26 +2,34 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 
-namespace Laevo.ViewModel.ActivityOverview
+namespace Laevo.Model.AttentionShifts
 {
-	public class DataContractSurrogate : IDataContractSurrogate
+	class DataContractSurrogate : IDataContractSurrogate
 	{
 		[DataContract]
-		class SerializedBitmap
+		class SerializedActivity
 		{
 			[DataMember]
-			public Uri Source { get; private set; }
+			public DateTime DateCreated { get; private set; }
 
-			public SerializedBitmap( Uri source )
+			public SerializedActivity( DateTime dateCreated )
 			{
-				Source = source;
+				DateCreated = dateCreated;
 			}
+		}
+
+
+		readonly List<Activity> _activities;
+
+
+		public DataContractSurrogate( List<Activity> activities )
+		{
+			_activities = activities;
 		}
 
 
@@ -29,8 +37,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			var convertTypes = new Dictionary<Type, Type>
 			{
-				{ typeof( ImageSource ), typeof( SerializedBitmap ) },
-				{ typeof( SerializedBitmap ), typeof( BitmapImage ) }
+				{ typeof( Activity ), typeof( SerializedActivity ) },
+				{ typeof( SerializedActivity ), typeof( Activity ) }
 			};
 
 			return convertTypes.ContainsKey( type ) ? convertTypes[ type ] : type;
@@ -38,9 +46,9 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public object GetObjectToSerialize( object obj, Type targetType )
 		{
-			if ( targetType == typeof( SerializedBitmap ) )
+			if ( targetType == typeof( SerializedActivity ) )
 			{
-				return new SerializedBitmap( ((BitmapImage)obj).UriSource );
+				return new SerializedActivity( ((Activity)obj).DateCreated );
 			}
 
 			return obj;
@@ -48,10 +56,10 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public object GetDeserializedObject( object obj, Type targetType )
 		{
-			SerializedBitmap bitmap = obj as SerializedBitmap;
-			if ( bitmap != null )
+			SerializedActivity activity = obj as SerializedActivity;
+			if ( activity != null )
 			{
-				return new BitmapImage( bitmap.Source );
+				return _activities.First( a => a.DateCreated == activity.DateCreated );
 			}
 
 			return obj;

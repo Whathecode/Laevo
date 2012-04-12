@@ -17,9 +17,12 @@ namespace Laevo.Model
 	[DataContract]
 	class Activity
 	{
-		readonly string _activityContextPath = Path.Combine( Laevo.ProgramDataFolder, "Activities" );
+		readonly string _activityContextPath 
+			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), Laevo.ProgramName, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
+
+		public event Action<Activity> ActivatedEvent;
 
 		/// <summary>
 		///   A name describing this activity.
@@ -31,6 +34,11 @@ namespace Laevo.Model
 		///   Determines whether or not the activity is currently open, but not necessarily active (working on it).
 		/// </summary>
 		public bool IsOpen { get; private set; }
+
+		/// <summary>
+		///   Determines whether or not the activity is currently active (working on it).
+		/// </summary>
+		public bool IsActive { get; private set; }
 
 		/// <summary>
 		///   The date when this activity was first created.
@@ -82,17 +90,29 @@ namespace Laevo.Model
 
 		public void Open()
 		{
-			if ( IsOpen )
+			if ( !IsOpen )
 			{
-				return;
+				var now = DateTime.Now;
+				_currentOpenInterval = new Interval<DateTime>( now, now );
+				_openIntervals.Add( _currentOpenInterval );
+				IsOpen = true;
+				if ( OpenedEvent != null )	// HACK: Why does OpenedEvent become null? The aspect should prevent that!
+				{
+					OpenedEvent( this );
+				}
 			}
 
-			var now = DateTime.Now;
-			_currentOpenInterval = new Interval<DateTime>( now, now );
-			_openIntervals.Add( _currentOpenInterval );
-			IsOpen = true;
+			// Opening an activity also activates it.
+			if ( !IsActive )
+			{
+				IsActive = true;
+				ActivatedEvent( this );
+			}
+		}
 
-			OpenedEvent( this );
+		public void Deactivate()
+		{
+			IsActive = false;
 		}
 
 		public void Close()
@@ -105,13 +125,14 @@ namespace Laevo.Model
 			_currentOpenInterval.ExpandTo( DateTime.Now );
 			_currentOpenInterval = null;
 			IsOpen = false;
+			IsActive = false;
 		}
 
-		internal void Update()
+		internal void Update( DateTime now )
 		{
 			if ( IsOpen )
 			{
-				_currentOpenInterval.ExpandTo( DateTime.Now );
+				_currentOpenInterval.ExpandTo( now );
 			}
 		}
 	}

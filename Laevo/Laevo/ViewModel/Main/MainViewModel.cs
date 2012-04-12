@@ -31,7 +31,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
-			Persist();			
+			Persist();
 			_model.Exit();
 
 			Application.Current.Shutdown();
@@ -99,6 +99,12 @@ namespace Laevo.ViewModel.Main
 		public void NewActivity()
 		{
 			_activityOverviewViewModel.NewActivity();
+		}
+
+		[CommandCanExecute( Commands.NewActivity )]
+		public bool CanNewActivity()
+		{
+			return _activityOverviewViewModel.ActivityMode != ActivityOverviewViewModel.Mode.Select;
 		}
 
 		/// <summary>

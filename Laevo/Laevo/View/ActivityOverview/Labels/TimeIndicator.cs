@@ -11,14 +11,14 @@ namespace Laevo.View.ActivityOverview.Labels
 	{
 		static readonly Color Color = Colors.Yellow;
 		const double TopOffset = ActivityOverviewWindow.TopOffset - 10;
-		const double TriangleWidth = 20;
-		const double TriangleHeight = 20;
+		const double TriangleWidth = 15;
+		const double TriangleHeight = 13;
 
 		public TimeIndicator()
 		{			
 			HorizontalAlignment = HorizontalAlignment.Center;
 			SetValue( ZIndexProperty, 20 );
-			var lineBrush = new LinearGradientBrush( Color, Colors.Transparent, 90 );
+			var lineBrush = new LinearGradientBrush( Colors.Transparent, Color, 90 );
 			lineBrush.Freeze();
 
 			var heightBinding = new Binding( "ActualHeight" ) { Source = this };
@@ -31,22 +31,22 @@ namespace Laevo.View.ActivityOverview.Labels
 				Y1 = 0,
 				X2 = 0,
 				Stroke = lineBrush,
-				StrokeThickness = 2,				
+				StrokeThickness = 3,				
 				IsHitTestVisible = false
 			};
 			line.SetValue( TopProperty, TopOffset );
 			line.SetBinding( Line.Y2Property, heightBinding );
 			Children.Add( line );
 
-			// Top triangle.
+			// Bottom triangle.
 			var triangleBrush = new SolidColorBrush( Color );
 			triangleBrush.Freeze();
 			var topTriangle = new Polygon
 			{
-				Points = { new Point( -halfTriangle, 0 ), new Point( halfTriangle, 0 ), new Point( 0, TriangleHeight ) },
+				Points = { new Point( -halfTriangle, 0 ), new Point( halfTriangle, 0 ), new Point( 0, -TriangleHeight ) },
 				Fill = triangleBrush
 			};
-			topTriangle.SetValue( TopProperty, TopOffset );
+			topTriangle.SetBinding( TopProperty, heightBinding );
 			Children.Add( topTriangle );
 		}
 	}
