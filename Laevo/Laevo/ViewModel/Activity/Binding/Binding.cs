@@ -4,6 +4,7 @@
 	{
 		Occurance,
 		TimeSpan,
+		ActiveTimeSpans,
 		Icon,
 		Color,
 		Label,

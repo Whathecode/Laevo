@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.Serialization;
+using Laevo.Model.AttentionShifts;
 
 
 namespace Laevo.Model
@@ -13,29 +14,32 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Laevo
 	{
+		public static readonly string ProgramName = "Laevo";
 		public static readonly string ProgramDataFolder
-			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), "Laevo" );
+			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), ProgramName );		
 		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
+		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
 
 		static readonly DataContractSerializer ActivitySerializer = new DataContractSerializer( typeof( List<Activity> ) );
-		readonly List<Activity> _activities;
-		public readonly ReadOnlyCollection<Activity> Activities;
+		readonly List<Activity> _activities = new List<Activity>();
+		public ReadOnlyCollection<Activity> Activities
+		{
+			get { return _activities.AsReadOnly(); }
+		}
 
 		public Activity CurrentActivity { get; private set; }
 
-		readonly List<IAttentionShift<object>> _attentionShifts;
-		public readonly ReadOnlyCollection<IAttentionShift<object>> AttentionShifts;
+		readonly DataContractSerializer _attentionShiftSerializer;
+		readonly List<AbstractAttentionShift> _attentionShifts = new List<AbstractAttentionShift>();
+		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
+		{
+			get { return _attentionShifts.AsReadOnly(); }
+		}
 
 
 		public Laevo()
 		{
-			_activities = new List<Activity>();
-			Activities = new ReadOnlyCollection<Activity>( _activities );
-
-			_attentionShifts = new List<IAttentionShift<object>>();
-			AttentionShifts = new ReadOnlyCollection<IAttentionShift<object>>( _attentionShifts );
-
-			// Add activities from previous sessions.);
+			// Add activities from previous sessions.
 			if ( File.Exists( ActivitiesFile ) )
 			{
 				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
@@ -45,14 +49,27 @@ namespace Laevo.Model
 				}
 			}
 
-			// Attention was shifted to Laevo since the user launched it.
-			ShiftAttention( this );
+			// Add attention spans from previous sessions.
+			_attentionShiftSerializer = new DataContractSerializer(
+				typeof( List<AbstractAttentionShift> ), new [] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
+				int.MaxValue, true, false,
+				new DataContractSurrogate( _activities ) );
+			if ( File.Exists( AttentionShiftsFile ) )
+			{
+				using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Open ) )
+				{
+					var existingAttentionShifts = (List<AbstractAttentionShift>)_attentionShiftSerializer.ReadObject( attentionFileStream );
+					_attentionShifts.AddRange( existingAttentionShifts );
+				}
+			}
+
+			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
 		}
 
 
-		public void Update()
+		public void Update( DateTime now )
 		{
-			_activities.ForEach( a => a.Update() );
+			_activities.ForEach( a => a.Update( now ) );
 		}
 
 		/// <summary>
@@ -71,34 +88,29 @@ namespace Laevo.Model
 		void AddActivity( Activity activity )
 		{
 			// TODO: Unhook event once activities can be deleted.
-			activity.OpenedEvent += ShiftAttention;
+			activity.ActivatedEvent += a => _attentionShifts.Add( new ActivityAttentionShift( a ) );
 
 			_activities.Add( activity );
 		}
 
-		/// <summary>
-		///   Indicates an attention shift of the user towards a new object.
-		/// </summary>
-		/// <typeparam name = "T">The type of the object the user's attention shifted to.</typeparam>
-		/// <param name = "object">The object the user's attention shifted to.</param>
-		void ShiftAttention<T>( T @object )
-			where T : class
-		{
-			_attentionShifts.Add( new AttentionShift<T>( DateTime.Now, @object ) );
-		}
-
 		public void Persist()
 		{
+			// Activities.
 			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
 			{
 				ActivitySerializer.WriteObject( activityFileStream, _activities );
+			}
+
+			// Attention shifts.
+			using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Create ) )
+			{
+				_attentionShiftSerializer.WriteObject( attentionFileStream, _attentionShifts );
 			}
 		}
 
 		public void Exit()
 		{
-			// Attention shift to 'null' is used to indicate the application was shut down.
-			ShiftAttention<object>( null );
+			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
 
 			Persist();
 		}

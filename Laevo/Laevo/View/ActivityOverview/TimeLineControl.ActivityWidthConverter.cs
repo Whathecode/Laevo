@@ -15,14 +15,14 @@ namespace Laevo.View.ActivityOverview
 		{
 			public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 			{
-				var width = (double)values[ 0 ];
+				var timeLineWidth = (double)values[ 0 ];
 				var interval = (Interval<DateTime>)values[ 1 ];
 				var ticksInterval = new Interval<long>( interval.Start.Ticks, interval.End.Ticks );
-
+				
 				TimeSpan timeSpan = (TimeSpan)values[ 2 ];
 				if ( timeSpan != TimeSpan.Zero )
 				{
-					return ((double)timeSpan.Ticks / ticksInterval.Size) * width;
+					return ((double)timeSpan.Ticks / ticksInterval.Size) * timeLineWidth;
 				}
 				return double.NaN;
 			}

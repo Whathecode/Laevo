@@ -67,12 +67,14 @@
 		</Canvas>
 
 		<Border
+			x:Name="Container"
 			CornerRadius="3"
 			BorderThickness="2"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 		    Cursor="Hand"
-			Panel.ZIndex="15">
+			Panel.ZIndex="15"
+			ClipToBounds="True">
 			
 			<Border.Height>
 				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">
@@ -84,7 +86,7 @@
 						</Binding.RelativeSource>
 					</Binding>
 				</MultiBinding>
-			</Border.Height>
+			</Border.Height>			
 			<Border.BorderBrush>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
 					<GradientStop Offset="0" Color="White" />
@@ -99,6 +101,48 @@
 						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
 				</LinearGradientBrush>
 			</Border.Background>
+			<Border.Resources>
+				<Converters:TimeSpanConverter x:Key="TimeSpanConverter" />
+				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="3" Operation="Subtraction" />
+				<DataTemplate x:Key="TimeSpanTemplate">
+					<Line
+						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+						Stroke="Yellow" StrokeThickness="3">
+						<Line.X1>
+							<MultiBinding
+								Converter="{StaticResource TimeSpanConverter}"
+								ConverterParameter="Start">
+								<Binding Path="." />
+								<Binding ElementName="Control" Path="DataContext.Occurance" />
+								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+								<Binding ElementName="Container" Path="ActualWidth" />
+							</MultiBinding>
+						</Line.X1>
+						<Line.X2>
+							<MultiBinding
+								Converter="{StaticResource TimeSpanConverter}"
+								ConverterParameter="End">
+								<Binding Path="." />
+								<Binding ElementName="Control" Path="DataContext.Occurance" />
+								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+								<Binding ElementName="Container" Path="ActualWidth" />								
+							</MultiBinding>
+						</Line.X2>
+					</Line>
+				</DataTemplate>
+			</Border.Resources>
+			
+			<ItemsControl
+				ItemsSource="{Binding ActiveTimeSpans}"
+				ItemTemplate="{StaticResource TimeSpanTemplate}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>
+			
 		</Border>
 
 	</StackPanel>

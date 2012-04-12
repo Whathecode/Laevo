@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -27,7 +26,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			return new TextBlock
 			{
-				Foreground = Brushes.Yellow,
+				Foreground = Brushes.WhiteSmoke,
 				FontSize = 30,
 				HorizontalAlignment = HorizontalAlignment.Left,
 				Margin = new Thickness( HorizontalLabelOffset, 0, HorizontalLabelOffset, 0 ),

@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity.Binding;
 using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;
 using VirtualDesktopManager;
+using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
@@ -28,7 +29,6 @@ namespace Laevo.ViewModel.Activity
 	[KnownType( typeof( BitmapImage ) )]
 	class ActivityViewModel : AbstractViewModel
 	{		
-		readonly static object StaticLock = new object();
 		readonly ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
@@ -71,7 +71,6 @@ namespace Laevo.ViewModel.Activity
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
 		VirtualDesktop _virtualDesktop;
-		BackgroundWorker _initializeLibraryWorker;
 
 
 		/// <summary>
@@ -86,13 +85,20 @@ namespace Laevo.ViewModel.Activity
 		///   The time when the activity started.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Occurance )]
-		public DateTime Occurance { get; set; }
+		public DateTime Occurance { get; private set; }
 
 		/// <summary>
 		///   The entire timespan during which the activity has been open, regardless of whether it was closed in between.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.TimeSpan )]
-		public TimeSpan TimeSpan { get; set; }
+		public TimeSpan TimeSpan { get; private set; }
+
+		Interval<DateTime> _currentActiveTimeSpan;
+		/// <summary>
+		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.ActiveTimeSpans )]
+		public ObservableCollection<Interval<DateTime>> ActiveTimeSpans { get; private set; }
 
 		/// <summary>
 		///   An icon representing the activity.
@@ -150,7 +156,6 @@ namespace Laevo.ViewModel.Activity
 		{
 			_overview = overview;
 			_activity = activity;
-			Occurance = _activity.DateCreated;
 
 			_desktopManager = desktopManager;
 			_virtualDesktop = desktopManager.CreateEmptyDesktop();
@@ -165,11 +170,12 @@ namespace Laevo.ViewModel.Activity
 		public ActivityViewModel(
 			ActivityOverviewViewModel overview,
 			Model.Activity activity,
-			DesktopManager desktopManager, ActivityViewModel storedViewModel )
+			DesktopManager desktopManager,
+			ActivityViewModel storedViewModel,
+			IEnumerable<ActivityAttentionShift> activitySwitches )
 		{
 			_overview = overview;
 			_activity = activity;
-			Occurance = _activity.DateCreated;
 
 			_desktopManager = desktopManager;
 			_virtualDesktop = desktopManager.CreateEmptyDesktop();
@@ -179,6 +185,41 @@ namespace Laevo.ViewModel.Activity
 			Color = storedViewModel.Color;
 			HeightPercentage = storedViewModel.HeightPercentage;
 			OffsetPercentage = storedViewModel.OffsetPercentage;
+
+			// Initiate attention history.
+			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+			Model.Activity lastActivity = null;
+			ActivityAttentionShift lastShift = null;
+			foreach ( var s in activitySwitches )
+			{
+				if ( s.Activity == activity )
+				{					
+					if ( _currentActiveTimeSpan != null && lastShift != null )
+					{
+						// Activity reopened. First close previous open interval.
+						var closedInterval = activity.OpenIntervals.First( i => i.LiesInInterval( lastShift.Time ) );
+						_currentActiveTimeSpan.ExpandTo( closedInterval.End );
+					}
+
+					// Activity opened.
+					_currentActiveTimeSpan = new Interval<DateTime>( s.Time, s.Time );
+					ActiveTimeSpans.Add( _currentActiveTimeSpan );						
+				}
+				else if ( _currentActiveTimeSpan != null )
+				{
+					// Switched from this activity, to other activity.
+					_currentActiveTimeSpan.ExpandTo( s.Time );
+					_currentActiveTimeSpan = null;					
+				}
+				lastShift = s;
+				lastActivity = s.Activity;
+			}
+			if ( _currentActiveTimeSpan != null && lastActivity != null )
+			{
+				// Since the application shut down, the activity wasn't open afterwards.
+				_currentActiveTimeSpan.ExpandTo( lastActivity.OpenIntervals.Last().End );
+				_currentActiveTimeSpan = null;
+			}
 		}
 
 
@@ -193,6 +234,7 @@ namespace Laevo.ViewModel.Activity
 			if ( this == _overview.CurrentActivityViewModel )
 			{
 				// Activity is already open.
+				// The event is still necessary to indicate the user is no longer selecting an activity.
 				OpenedActivityEvent( this );
 				return;
 			}
@@ -204,6 +246,15 @@ namespace Laevo.ViewModel.Activity
 				_firstActivity = false;
 			}
 
+			// Activity also becomes active when it is opened.
+			if ( ActiveTimeSpans == null )
+			{
+				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+			}
+			DateTime now = DateTime.Now;
+			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
+			ActiveTimeSpans.Add( _currentActiveTimeSpan );
+
 			_activity.Open();
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
@@ -211,7 +262,6 @@ namespace Laevo.ViewModel.Activity
 
 			OpenedActivityEvent( this );
 		}
-
 
 		[CommandExecute( Commands.OpenActivityLibrary )]
 		public void OpenActivityLibrary()
@@ -239,29 +289,43 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		void InitializeLibrary()
 		{
-			// Initialize on a separate thread so the UI doesn't lock.		
+			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
+
 			var dataPaths = _activity.DataPaths.Select( p => p.LocalPath ).ToArray();
-			_initializeLibraryWorker = new BackgroundWorker();
-			_initializeLibraryWorker.DoWork += ( e, a ) =>
+			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
 			{
-				lock ( StaticLock )
-				{
-					var activityContext = new ShellLibrary( LibraryName, true );
-					// TODO: Handle DirectoryNotFoundException when the folder no longer exists.
-					Array.ForEach( dataPaths, activityContext.Add );
-					activityContext.Close();
-				}
-			};
-			_initializeLibraryWorker.RunWorkerAsync();
+				// TODO: Handle DirectoryNotFoundException when the folder no longer exists.
+				Array.ForEach( dataPaths, activityContext.Add );
+			}
 		}
 
-		public void Update()
+		public void Update( DateTime now )
 		{
-			Occurance = _activity.DateCreated;
+			// Update the interval which indicates when the activity was open.
 			if ( _activity.OpenIntervals.Count > 0 )
 			{
+				Occurance = _activity.OpenIntervals.First().Start;
 				TimeSpan = _activity.OpenIntervals.Last().End - _activity.OpenIntervals.First().Start;
 			}
+			else
+			{
+				Occurance = _activity.DateCreated;
+			}
+
+			// Update the intervals which indicate when the activity was active.
+			if ( _currentActiveTimeSpan != null )
+			{
+				_currentActiveTimeSpan.ExpandTo( now );
+			}
+		}
+
+		/// <summary>
+		///   Called by ActivityOverviewModel once the user has opened an activity other than this one.
+		/// </summary>
+		internal void Deactivated()
+		{
+			_activity.Deactivate();
+			_currentActiveTimeSpan = null;
 		}
 
 		public override void Persist()
@@ -271,18 +335,7 @@ namespace Laevo.ViewModel.Activity
 
 		protected override void FreeUnmanagedResources()
 		{
-			if ( _initializeLibraryWorker != null )
-			{
-				if ( _initializeLibraryWorker.IsBusy )
-				{
-					var awaitDiposed = Observable.FromEvent<EventHandler, EventArgs>(
-						h => _initializeLibraryWorker.Disposed += h, h => _initializeLibraryWorker.Disposed -= h );
-					awaitDiposed.Subscribe();
-
-					_initializeLibraryWorker.Dispose();
-					awaitDiposed.First();
-				}
-			}
+			// Nothing to do.
 		}
 	}
 }

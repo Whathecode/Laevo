@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
+using Whathecode.System.Windows.Input.CommandFactory;
 using Whathecode.System.Windows.Input.InputController;
 using Whathecode.System.Windows.Input.InputController.Condition;
 using Whathecode.System.Windows.Input.InputController.Trigger;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using MenuItem = System.Windows.Controls.MenuItem;
 using Timer = System.Timers.Timer;
 
 
