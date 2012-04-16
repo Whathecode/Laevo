@@ -9,6 +9,7 @@ using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
+using Whathecode.System.Windows.DependencyPropertyFactory.Attributes.Coercion;
 
 
 namespace Laevo.View.ActivityOverview
@@ -23,6 +24,8 @@ namespace Laevo.View.ActivityOverview
 		public enum Properties
 		{
 			VisibleInterval,
+			Minimum,
+			Maximum,
 			Children
 		}
 
@@ -37,7 +40,14 @@ namespace Laevo.View.ActivityOverview
 		///   The currently visible interval.
 		/// </summary>
 		[DependencyProperty( Properties.VisibleInterval )]
+		[CoercionHandler( typeof( VisibleIntervalCoercion ) )]
 		public Interval<DateTime> VisibleInterval { get; set; }
+
+		[DependencyProperty( Properties.Minimum )]
+		public DateTime? Minimum { get; set; }
+
+		[DependencyProperty( Properties.Maximum )]
+		public DateTime? Maximum { get; set; }
 
 		/// <summary>
 		///   Collection of elements which are placed at a specific point, or timespan in time.
