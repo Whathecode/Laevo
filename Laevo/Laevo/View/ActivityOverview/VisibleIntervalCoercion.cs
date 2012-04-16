@@ -9,15 +9,30 @@ namespace Laevo.View.ActivityOverview
 	{
 		public TimeLineControl.Properties DependentProperties
 		{
-			get { return TimeLineControl.Properties.Minimum | TimeLineControl.Properties.Maximum; }
+			get
+			{
+				return
+					TimeLineControl.Properties.Minimum | TimeLineControl.Properties.Maximum |
+					TimeLineControl.Properties.MinimumTimeSpan | TimeLineControl.Properties.MaximumTimeSpan;
+			}
 		}
 
 		public Interval<DateTime> Coerce( object context, Interval<DateTime> value )
 		{
-			TimeLineControl timeLine = (TimeLineControl)context;
+			var timeLine = (TimeLineControl)context;
+
+			// Limit visible time span.
+			TimeSpan desiredTimeSpan = value.End - value.Start;
+			TimeSpan minTimeSpan = timeLine.MinimumTimeSpan ?? TimeSpan.FromHours( 0.5 );
+			TimeSpan maxTimeSpan = timeLine.MaximumTimeSpan ?? TimeSpan.FromDays( 1000 );
+			if ( desiredTimeSpan > maxTimeSpan || desiredTimeSpan < minTimeSpan )
+			{
+				return timeLine.VisibleInterval;
+			}
+
+			// Limit how far the time line goes.
 			DateTime min = timeLine.Minimum ?? DateTime.MinValue;
 			DateTime max = timeLine.Maximum ?? DateTime.MaxValue;
-
 			var ticksInterval = new Interval<long>( value.Start.Ticks, value.End.Ticks );
 			var limitedRange = new Interval<long>( min.Ticks, max.Ticks );
 			var clamped = ticksInterval.Clamp( limitedRange );
