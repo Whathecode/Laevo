@@ -65,7 +65,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Whathecode.System">
+    <Reference Include="Whathecode.System, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <HintPath>Libraries\Framework Class Library Extension\x86\Whathecode.System.dll</HintPath>
     </Reference>
   </ItemGroup>

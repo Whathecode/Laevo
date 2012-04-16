@@ -22,7 +22,13 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected Interval<DateTime> ExtendedVisibleRange
 		{
-			get { return new Interval<DateTime>( TimeLine.VisibleInterval.Start - _extendVisibleRange, TimeLine.VisibleInterval.End + _extendVisibleRange ); }
+			get
+			{
+
+				return new Interval<DateTime>(
+					TimeLine.VisibleInterval.Start.SafeSubtract( _extendVisibleRange ),
+					TimeLine.VisibleInterval.End.SafeAdd( _extendVisibleRange ) );
+			}
 		}
 
 

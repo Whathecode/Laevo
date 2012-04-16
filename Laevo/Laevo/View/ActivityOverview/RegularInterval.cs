@@ -38,7 +38,7 @@ namespace Laevo.View.ActivityOverview
 		public IEnumerable<DateTime> GetPositions( Interval<DateTime> range )
 		{
 			DateTime current = RoundToStart( range.Start );
-			while ( current <= range.End )
+			while ( current <= range.End && current.Ticks + MinimumInterval.Ticks < DateTime.MaxValue.Ticks )
 			{
 				yield return current;
 				current += MinimumInterval;

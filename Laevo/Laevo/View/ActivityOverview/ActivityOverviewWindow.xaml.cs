@@ -48,14 +48,11 @@ namespace Laevo.View.ActivityOverview
 			Height = 500;
 #endif
 
-			// Set the time line's position around the current time when opening it.
+			// Set the time line's position around the current time when first starting the application.
 			DateTime now = DateTime.Now;
-			Activated += ( sender, args ) =>
-			{
-				var start = now - TimeSpan.FromHours( 1 );
-				var end = now + TimeSpan.FromHours( 2 );
-				TimeLine.VisibleInterval = new Interval<DateTime>( start, end );
-			};
+			var start = now - TimeSpan.FromHours( 1 );
+			var end = now + TimeSpan.FromHours( 2 );
+			TimeLine.VisibleInterval = new Interval<DateTime>( start, end );
 
 			// Create the line which indicates the current time.
 			var currentTime = new TimeIndicator { Width = 20 };
@@ -212,8 +209,11 @@ namespace Laevo.View.ActivityOverview
 				var visibleTicks = ToTicksInterval( TimeLine.VisibleInterval ).Size;
 				var ticksOffset = (long)(visibleTicks * offsetPercentage);
 				var interval = (Interval<long>)_startDrag.Clone();
-				interval.Move( -ticksOffset );				
-				TimeLine.VisibleInterval = ToTimeInterval( interval );				
+				if ( interval.Start - ticksOffset > DateTime.MinValue.Ticks && interval.End - ticksOffset < DateTime.MaxValue.Ticks )
+				{
+					interval.Move( -ticksOffset );
+					TimeLine.VisibleInterval = ToTimeInterval( interval );
+				}
 			}
 		}
 
@@ -239,7 +239,12 @@ namespace Laevo.View.ActivityOverview
 
 		static Interval<DateTime> ToTimeInterval( Interval<long> interval )
 		{
-			return new Interval<DateTime>( new DateTime( interval.Start ), new DateTime( interval.End ) );
+			long minTicks = DateTime.MinValue.Ticks;
+			long maxTicks = DateTime.MaxValue.Ticks;
+
+			return new Interval<DateTime>(
+				new DateTime( interval.Start < minTicks ? minTicks : interval.Start ),
+				new DateTime( interval.End > maxTicks ? maxTicks : interval.End ) );
 		}
 	}
 }
