@@ -58,10 +58,14 @@
 						</MultiBinding>
 					</Image.Margin>
 				</Image>
-				<TextBlock
+				<TextBox
+					Background="Transparent"
+					BorderBrush="Transparent"
 					Foreground="White"
+					CaretBrush="White"
 					FontSize="20"
-					Text="{Binding Path=Label}"
+					Text="{Binding Path=Label, Mode=TwoWay}"
+					PreviewKeyDown="LabelKeyDown"
 					Margin="5, -13, 0, 0" />
 			</StackPanel>
 		</Canvas>

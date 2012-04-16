@@ -158,6 +158,7 @@
       <DependentUpon>TimeLineControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="View\ActivityOverview\VisibleIntervalCoercion.cs" />
     <Compile Include="View\Activity\ActivityControl.xaml.cs">
       <DependentUpon>ActivityControl.xaml</DependentUpon>
     </Compile>
