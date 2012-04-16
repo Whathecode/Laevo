@@ -26,6 +26,8 @@ namespace Laevo.View.ActivityOverview
 			VisibleInterval,
 			Minimum,
 			Maximum,
+			MinimumTimeSpan,
+			MaximumTimeSpan,
 			Children
 		}
 
@@ -48,6 +50,12 @@ namespace Laevo.View.ActivityOverview
 
 		[DependencyProperty( Properties.Maximum )]
 		public DateTime? Maximum { get; set; }
+
+		[DependencyProperty( Properties.MinimumTimeSpan )]
+		public TimeSpan? MinimumTimeSpan { get; set; }
+
+		[DependencyProperty( Properties.MaximumTimeSpan )]
+		public TimeSpan? MaximumTimeSpan { get; set; }
 
 		/// <summary>
 		///   Collection of elements which are placed at a specific point, or timespan in time.
