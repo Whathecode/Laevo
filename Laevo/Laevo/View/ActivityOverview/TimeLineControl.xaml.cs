@@ -108,7 +108,7 @@ namespace Laevo.View.ActivityOverview
 		{
 			InitializeComponent();
 
-			VisibleInterval = new Interval<DateTime>( DateTime.Today, DateTime.Today + TimeSpan.FromDays( 1 ) );
+			VisibleInterval = new Interval<DateTime>( DateTime.Today, DateTime.Today.SafeAdd( TimeSpan.FromDays( 1 ) ) );
 
 			Children = new ObservableCollection<FrameworkElement>();
 			Children.CollectionChanged += OnChildrenChanged;
@@ -128,10 +128,19 @@ namespace Laevo.View.ActivityOverview
 		public void MoveInterval( TimeSpan timeSpan, bool moveForward = true )
 		{
 			long ticks = moveForward ? timeSpan.Ticks : -timeSpan.Ticks;
+			Func<DateTime, DateTime> operation;
+			if ( ticks > 0 )
+			{
+				operation = d => d.SafeAdd( TimeSpan.FromTicks( ticks ) );
+			}
+			else
+			{
+				operation = d => d.SafeSubtract( TimeSpan.FromTicks( ticks ) );
+			}
 
 			VisibleInterval = new Interval<DateTime>(
-				new DateTime( VisibleInterval.Start.Ticks + ticks ),
-				new DateTime( VisibleInterval.End.Ticks + ticks ) );
+				operation( VisibleInterval.Start ),
+				operation( VisibleInterval.End ) );
 		}
 
 		void OnChildrenChanged( object sender, NotifyCollectionChangedEventArgs eventArgs )
