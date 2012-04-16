@@ -59,6 +59,7 @@ namespace Laevo.View.ActivityOverview
 			currentTime.SetBinding( HeightProperty, new Binding( "ActualHeight" ) { Source = TimeLine } );
 			currentTime.SetBinding( TimeLineControl.OccuranceProperty, "CurrentTime" );
 			TimeLine.Children.Add( currentTime );
+			Activated += ( s, e ) => TimeLine.Focus();
 
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
@@ -147,7 +148,7 @@ namespace Laevo.View.ActivityOverview
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
 			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );
 
-			DataContextChanged += NewDataContext;
+			DataContextChanged += NewDataContext;			
 		}
 
 
@@ -215,6 +216,8 @@ namespace Laevo.View.ActivityOverview
 					TimeLine.VisibleInterval = ToTimeInterval( interval );
 				}
 			}
+
+			TimeLine.Focus();
 		}
 
 		void OnMouseMoved( object sender, MouseEventArgs e )

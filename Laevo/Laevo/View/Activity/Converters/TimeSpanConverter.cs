@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using Whathecode.System.Arithmetic.Range;
 
@@ -13,7 +14,7 @@ namespace Laevo.View.Activity.Converters
 			var attentionSpan = (Interval<DateTime>)values[ 0 ];
 			DateTime occurance = (DateTime)values[ 1 ];
 			TimeSpan timeSpan = (TimeSpan)values[ 2 ];
-			double width = (double)values[ 3 ];
+			double width = values[ 3 ] == DependencyProperty.UnsetValue ? 0 : (double)values[ 3 ];
 
 			return new Interval<long>( occurance.Ticks, occurance.Ticks + timeSpan.Ticks ).Map(
 				parameter.Equals( "Start" ) ? attentionSpan.Start.Ticks : attentionSpan.End.Ticks,
