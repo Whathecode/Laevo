@@ -11,7 +11,8 @@
 	Width="500"
 	Height="400"
 	FontFamily="Segoe UI Light"
-	Foreground="White">
+	Foreground="White"
+	Topmost="True">
 	
 	<Window.Resources>
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
