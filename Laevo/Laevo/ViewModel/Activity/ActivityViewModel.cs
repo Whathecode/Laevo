@@ -12,14 +12,16 @@ using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Laevo.Model.AttentionShifts;
-using Laevo.ViewModel.Activity.Binding;
+using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
+using Laevo.ViewModel.ActivityOverview.Binding;
 using Microsoft.WindowsAPICodePack.Shell;
 using VirtualDesktopManager;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
 namespace Laevo.ViewModel.Activity
@@ -32,7 +34,7 @@ namespace Laevo.ViewModel.Activity
 		readonly ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
-		public static List<BitmapImage> PresetIcons = new List<BitmapImage>();
+		public static List<BitmapImage> PresetIcons { get; private set; }
 
 		public static readonly List<Color> PresetColors = new List<Color>
 		{
@@ -67,6 +69,16 @@ namespace Laevo.ViewModel.Activity
 		///   Event which is triggered when an activity is selected.
 		/// </summary>
 		public event ActivityEventHandler SelectedActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when starting to edit an activity.
+		/// </summary>
+		public event ActivityEventHandler ActivityEditStartedEvent;
+
+		/// <summary>
+		///   Event which is triggered when finished editing an activity.
+		/// </summary>
+		public event ActivityEventHandler ActivityEditFinishedEvent;
 
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
@@ -275,13 +287,26 @@ namespace Laevo.ViewModel.Activity
 		{
 			switch ( _overview.ActivityMode )
 			{
-				case ActivityOverviewViewModel.Mode.Select:
+				case Mode.Select:
 					SelectedActivityEvent( this );
 					break;
-				case ActivityOverviewViewModel.Mode.Open:
+				case Mode.Open:
 					OpenActivity();
 					break;
 			}			
+		}
+
+		[CommandExecute( Commands.EditActivity )]
+		public void EditActivity()
+		{
+			ActivityEditStartedEvent( this );
+
+			var popup = new EditActivityPopup
+			{
+				DataContext = this
+			};
+			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
+			popup.Show();
 		}
 
 		/// <summary>

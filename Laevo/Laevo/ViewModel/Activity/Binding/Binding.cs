@@ -16,6 +16,7 @@
 	{
 		OpenActivity,
 		OpenActivityLibrary,
-		SelectActivity
+		SelectActivity,
+		EditActivity
 	}
 }
