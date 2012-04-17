@@ -31,29 +31,52 @@
 		<Converters:AspectRatioToFovConverter x:Key="AspectRatioToFov" />
 		<Converters:AspectRatioToTransformOffset x:Key="AspectRatioToTransformOffset" />
 		<Converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
-	</Window.Resources>
-
-	<Grid x:Name="BackgroundContainer">
 		
+		<ExponentialEase x:Key="EaseIn" EasingMode="EaseIn" Exponent="3" />
+		<ExponentialEase x:Key="EaseOut" EasingMode="EaseOut" Exponent="3" />
+	</Window.Resources>
+	
+	<Grid Background="{StaticResource BackgroundBrush}">
+
+		<!-- Blur effect for popups. -->
+		<Grid.Effect>
+			<BlurEffect Radius="0" />
+		</Grid.Effect>		
 		<Grid.Style>
-			<Style TargetType="Grid">
+			<Style>
 				<Style.Triggers>
 					<DataTrigger Binding="{Binding ActivityMode}">
 						<DataTrigger.Value>
 							<Binding:Mode>Edit</Binding:Mode>
-						</DataTrigger.Value>
-						<Setter	Property="Grid.Background" Value="Black" />
-					</DataTrigger>
-					<DataTrigger Binding="{Binding ActivityMode}">
-						<DataTrigger.Value>
-							<Binding:Mode>Open</Binding:Mode>
-						</DataTrigger.Value>
-						<Setter Property="Grid.Background" Value="{StaticResource BackgroundBrush}" />
-					</DataTrigger>
+						</DataTrigger.Value>		
+						<DataTrigger.Setters>
+							<Setter Property="UIElement.IsHitTestVisible" Value="False" />
+						</DataTrigger.Setters>
+						<DataTrigger.EnterActions>
+							<BeginStoryboard>
+								<Storyboard>
+									<DoubleAnimation
+										Storyboard.TargetProperty="(Grid.Effect).(BlurEffect.Radius)"
+										To="5" Duration="0:0:1"
+										EasingFunction="{StaticResource EaseOut}" />
+								</Storyboard>
+							</BeginStoryboard>
+						</DataTrigger.EnterActions>
+						<DataTrigger.ExitActions>
+							<BeginStoryboard>
+								<Storyboard>
+									<DoubleAnimation
+										Storyboard.TargetProperty="(Grid.Effect).(BlurEffect.Radius)"
+										To="0" Duration="0:0:1"
+										EasingFunction="{StaticResource EaseIn}" />
+								</Storyboard>
+							</BeginStoryboard>							
+						</DataTrigger.ExitActions>
+					</DataTrigger>				
 				</Style.Triggers>
 			</Style>
 		</Grid.Style>
-		
+
 		<!-- Time Line -->
 		<Viewport3D ClipToBounds="False" RenderOptions.EdgeMode="Aliased">
 			<Viewport3D.Camera>
@@ -121,13 +144,13 @@
 					Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
 					Behaviors:MouseBehavior.DragCapturesMouse="False"
 					MouseWheel="OnMouseWheel"
-					MouseMove="OnMouseMoved">
+					MouseMove="OnMouseMoved">				
 					
 					<ActivityOverview:TimeLineControl
 						x:Name="TimeLine"
 						Focusable="True" />
 
-				</Grid>
+				</Grid>				
 			</Viewport2DVisual3D>
 		</Viewport3D>
 		
@@ -136,6 +159,47 @@
 			Time="{Binding CurrentTime}"
 			HorizontalAlignment="Right"
 			VerticalAlignment="Bottom" />
+
+		<!-- Background drop for popups. -->
+		<Grid
+			x:Name="Shadow"
+			Background="Black"
+			Opacity="0"
+			IsHitTestVisible="False"
+			ZIndex="100">
+			<Grid.Style>
+				<Style>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding ActivityMode}">
+							<DataTrigger.Value>
+								<Binding:Mode>Edit</Binding:Mode>
+							</DataTrigger.Value>
+							<DataTrigger.EnterActions>
+								<BeginStoryboard>
+									<Storyboard>
+										<DoubleAnimation
+											Storyboard.TargetProperty="Opacity"
+											To="0.6" Duration="0:0:1"
+											EasingFunction="{StaticResource EaseOut}" />
+									</Storyboard>
+								</BeginStoryboard>
+							</DataTrigger.EnterActions>
+							<DataTrigger.ExitActions>
+								<BeginStoryboard>
+									<Storyboard>
+										<DoubleAnimation
+											Storyboard.TargetProperty="Opacity"
+											To="0" Duration="0:0:1"
+											EasingFunction="{StaticResource EaseIn}" />
+									</Storyboard>
+								</BeginStoryboard>								
+							</DataTrigger.ExitActions>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</Grid.Style>
+		</Grid>
+		
 	</Grid>
 
 	<!-- No 3D. -->
