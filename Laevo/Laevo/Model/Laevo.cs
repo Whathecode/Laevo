@@ -78,7 +78,7 @@ namespace Laevo.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity()
 		{
-			var activity = new Activity();
+			var activity = new Activity( "New Activity" );
 			AddActivity( activity );
 
 			CurrentActivity = activity;

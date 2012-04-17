@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Laevo.View.ActivityOverview;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Input;
@@ -42,17 +43,12 @@ namespace Laevo.View.Activity
 
 		void LabelKeyDown( object sender, KeyEventArgs e )
 		{
-			UIElement element = (UIElement)e.Source;
+			var element = (UIElement)e.Source;
 
-			// Pressing enter updates the source and removed focus from the element.
-			if ( e.Key == Key.Enter )
+			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				BindingExpression binding = BindingOperations.GetBindingExpression( element, TextBox.TextProperty );
-				if ( binding != null )
-				{
-					binding.UpdateSource();
-					element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
-				}
+				// Moving focus also updates the source.
+				element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 			}
 		}
 	}
