@@ -66,7 +66,13 @@
 					FontSize="20"
 					Text="{Binding Path=Label, Mode=TwoWay}"
 					PreviewKeyDown="LabelKeyDown"
-					Margin="5, -13, 0, 0" />
+					Margin="5, -13, 0, 0">
+					<TextBox.Template>
+						<ControlTemplate TargetType="{x:Type TextBox}">
+							<ScrollViewer Name="PART_ContentHost" />
+						</ControlTemplate>
+					</TextBox.Template>
+				</TextBox>
 			</StackPanel>
 		</Canvas>
 
