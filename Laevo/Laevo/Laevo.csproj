@@ -132,6 +132,7 @@
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToTransformOffset.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
+    <Compile Include="ViewModel\ActivityOverview\Binding\Mode.cs" />
     <Compile Include="View\ActivityOverview\TimeLineControl.ActivityWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
@@ -167,6 +168,9 @@
     <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
     <Compile Include="View\Activity\Converters\TimeSpanConverter.cs" />
+    <Compile Include="View\Activity\EditActivityPopup.xaml.cs">
+      <DependentUpon>EditActivityPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
@@ -227,6 +231,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Activity\ActivityControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Activity\EditActivityPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -50,7 +50,9 @@
 				<Image
 					x:Name="Image"
 					Source="{Binding Path=Icon}"
-					Stretch="None">
+					Stretch="None"
+					Cursor="Hand"
+					Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
@@ -64,7 +66,7 @@
 					Foreground="White"
 					CaretBrush="White"
 					FontSize="20"
-					Text="{Binding Path=Label, Mode=TwoWay}"
+					Text="{Binding Path=Label}"
 					PreviewKeyDown="LabelKeyDown"
 					Margin="5, -13, 0, 0">
 					<TextBox.Template>

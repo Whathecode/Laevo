@@ -4,10 +4,11 @@ using System.Windows;
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
-using Laevo.ViewModel.Main.Binding;
+using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Commands = Laevo.ViewModel.Main.Binding.Commands;
 
 
 namespace Laevo.ViewModel.Main
@@ -51,14 +52,14 @@ namespace Laevo.ViewModel.Main
 		/// <param name="selectedActivity">The action to perform on the selected activity.</param>
 		public void SelectActivity( Action<ActivityViewModel> selectedActivity )
 		{
-			_activityOverviewViewModel.ActivityMode = ActivityOverviewViewModel.Mode.Select;
+			_activityOverviewViewModel.ActivityMode = Mode.Select;
 			var awaitOpen = Observable.FromEvent<ActivityViewModel.ActivityEventHandler, ActivityViewModel>(
 				h => _activityOverviewViewModel.SelectedActivityEvent += h,
 				h => _activityOverviewViewModel.SelectedActivityEvent -= h );
 			awaitOpen.Subscribe( a =>
 			{
 				selectedActivity( a );
-				_activityOverviewViewModel.ActivityMode = ActivityOverviewViewModel.Mode.Open;
+				_activityOverviewViewModel.ActivityMode = Mode.Open;
 				HideActivityOverview();
 			} );
 			ShowActivityOverview();
@@ -86,7 +87,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode != ActivityOverviewViewModel.Mode.Select;
+			return _activityOverviewViewModel.ActivityMode != Mode.Select;
 		}
 
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
@@ -104,7 +105,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.NewActivity )]
 		public bool CanNewActivity()
 		{
-			return _activityOverviewViewModel.ActivityMode != ActivityOverviewViewModel.Mode.Select;
+			return _activityOverviewViewModel.ActivityMode != Mode.Select;
 		}
 
 		/// <summary>

@@ -21,11 +21,6 @@ namespace Laevo.ViewModel.ActivityOverview
 	class ActivityOverviewViewModel : AbstractViewModel
 	{
 		static readonly string ActivitiesFile = Path.Combine( Model.Laevo.ProgramDataFolder, "ActivityRepresentations.xml" );
-		public enum Mode
-		{
-			Open,
-			Select
-		}
 
 
 		/// <summary>
@@ -121,8 +116,7 @@ namespace Laevo.ViewModel.ActivityOverview
 					// Newly added activities at startup.
 					viewModel = new ActivityViewModel( this, activity, _desktopManager );
 				}
-				viewModel.OpenedActivityEvent += OnActivityOpened;
-				viewModel.SelectedActivityEvent += OnActivitySelected;
+				HookActivityEvents( viewModel );
 
 				Activities.Add( viewModel );
 
@@ -150,9 +144,16 @@ namespace Laevo.ViewModel.ActivityOverview
 				Activities.Add( newActivity );
 			}
 
-			newActivity.OpenedActivityEvent += OnActivityOpened;
-			newActivity.SelectedActivityEvent += OnActivitySelected;
+			HookActivityEvents( newActivity );
 			newActivity.OpenActivity();
+		}
+
+		void HookActivityEvents( ActivityViewModel activity )
+		{
+			activity.OpenedActivityEvent += OnActivityOpened;
+			activity.SelectedActivityEvent += OnActivitySelected;
+			activity.ActivityEditStartedEvent += a => ActivityMode = Mode.Edit;
+			activity.ActivityEditFinishedEvent += a => ActivityMode = Mode.Open;			
 		}
 
 		void OnActivityOpened( ActivityViewModel viewModel )
