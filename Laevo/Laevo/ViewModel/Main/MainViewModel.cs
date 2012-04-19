@@ -87,7 +87,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode != Mode.Select;
+			return _activityOverviewViewModel.ActivityMode == Mode.Open;
 		}
 
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
