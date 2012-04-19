@@ -127,12 +127,15 @@
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<Button
-								Width="40" Height="40"
-								BorderBrush="White" BorderThickness="1"
-								Margin="5, 5, 0, 0"
-								Command="{wtc:CommandBinding {x:Static b:Commands.ChangeIcon}, ElementName=Control}"
-								CommandParameter="{Binding}">
-									<Image Source="{Binding}" />
+									Width="40" Height="40"
+									BorderBrush="White" BorderThickness="1"
+									Margin="5, 5, 0, 0"
+									Padding="5"
+									Command="{wtc:CommandBinding {x:Static b:Commands.ChangeIcon}, ElementName=Control}"
+									CommandParameter="{Binding}"
+									Background="Transparent">
+									<Image
+										Source="{Binding}" />
 								</Button>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
