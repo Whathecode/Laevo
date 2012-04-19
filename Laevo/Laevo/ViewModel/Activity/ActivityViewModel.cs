@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Laevo.Model.AttentionShifts;
@@ -146,6 +147,12 @@ namespace Laevo.ViewModel.Activity
 		[DataMember]
 		public double OffsetPercentage { get; set; }
 
+		[NotifyProperty( Binding.Properties.PossibleColors )]
+		public ObservableCollection<Color> PossibleColors { get; set; }
+
+		[NotifyProperty( Binding.Properties.PossibleIcons )]
+		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
+
 
 		static ActivityViewModel()
 		{
@@ -177,6 +184,8 @@ namespace Laevo.ViewModel.Activity
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
+
+			CommonInitialize();			
 		}
 
 		public ActivityViewModel(
@@ -198,8 +207,9 @@ namespace Laevo.ViewModel.Activity
 			HeightPercentage = storedViewModel.HeightPercentage;
 			OffsetPercentage = storedViewModel.OffsetPercentage;
 
+			CommonInitialize();
+
 			// Initiate attention history.
-			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
 			Model.Activity lastActivity = null;
 			ActivityAttentionShift lastShift = null;
 			foreach ( var s in activitySwitches )
@@ -232,6 +242,13 @@ namespace Laevo.ViewModel.Activity
 				_currentActiveTimeSpan.ExpandTo( lastActivity.OpenIntervals.Last().End );
 				_currentActiveTimeSpan = null;
 			}
+		}
+
+		void CommonInitialize()
+		{
+			PossibleColors = new ObservableCollection<Color>( PresetColors );
+			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
+			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();			
 		}
 
 
@@ -307,6 +324,18 @@ namespace Laevo.ViewModel.Activity
 			};
 			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
 			popup.Show();
+		}
+
+		[CommandExecute( Commands.ChangeColor )]
+		public void ChangeColor( Color newColor )
+		{
+			Color = newColor;
+		}
+
+		[CommandExecute( Commands.ChangeIcon )]
+		public void ChangeIcon( BitmapImage newIcon )
+		{
+			Icon = newIcon;
 		}
 
 		/// <summary>
