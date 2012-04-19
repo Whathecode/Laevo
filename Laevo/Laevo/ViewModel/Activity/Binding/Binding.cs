@@ -20,6 +20,7 @@
 		OpenActivityLibrary,
 		SelectActivity,
 		EditActivity,
+		CloseActivity,
 		ChangeColor,
 		ChangeIcon
 	}

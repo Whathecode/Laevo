@@ -28,7 +28,7 @@ namespace VirtualDesktopManager
 	public class VirtualDesktop
 	{
 		List<WindowInfo> _windows = new List<WindowInfo>();
-		internal ReadOnlyCollection<WindowInfo> Windows
+		public ReadOnlyCollection<WindowInfo> Windows
 		{
 			get { return _windows.AsReadOnly(); }
 		}
