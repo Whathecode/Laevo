@@ -9,6 +9,7 @@
 		HideActivityOverview,
 		SwitchActivityOverview,
 		OpenCurrentActivityLibrary,
-		NewActivity
+		CloseActivity,
+		NewActivity		
 	}
 }

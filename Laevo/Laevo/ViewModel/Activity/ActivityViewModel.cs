@@ -9,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Laevo.Model.AttentionShifts;
@@ -80,6 +79,11 @@ namespace Laevo.ViewModel.Activity
 		///   Event which is triggered when finished editing an activity.
 		/// </summary>
 		public event ActivityEventHandler ActivityEditFinishedEvent;
+
+		/// <summary>
+		///   Event which is triggered when activity is closed.
+		/// </summary>
+		public event ActivityEventHandler ActivityClosedEvent;
 
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
@@ -324,6 +328,23 @@ namespace Laevo.ViewModel.Activity
 			};
 			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
 			popup.Show();
+		}
+
+		[CommandExecute( Commands.CloseActivity )]
+		public void CloseActivity()
+		{
+			_activity.Close();
+
+			_currentActiveTimeSpan = null;
+
+			ActivityClosedEvent( this );
+		}
+
+		[CommandCanExecute( Commands.CloseActivity )]
+		public bool CanCloseActivity()
+		{
+			_desktopManager.UpdateWindows();
+			return _virtualDesktop.Windows.Count == 0;
 		}
 
 		[CommandExecute( Commands.ChangeColor )]

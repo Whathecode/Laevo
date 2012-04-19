@@ -33,8 +33,13 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public event ActivityViewModel.ActivityEventHandler SelectedActivityEvent;
 
+		/// <summary>
+		///   Event which is triggered when an activity is closed.
+		/// </summary>
+		public event ActivityViewModel.ActivityEventHandler ClosedActivityEvent;
+
 		readonly Model.Laevo _model;
-		readonly DesktopManager _desktopManager = new DesktopManager();		
+		readonly DesktopManager _desktopManager = new DesktopManager();
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -67,6 +72,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public ActivityOverviewViewModel( Model.Laevo model )
 		{
 			_model = model;
+
+			// Setup desktop manager.
+			_desktopManager.AddWindowFilter( w => !(w.GetProcess().ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" )) );
 
 			// Check for stored presentation options for existing activities.
 			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
@@ -153,7 +161,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.OpenedActivityEvent += OnActivityOpened;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += a => ActivityMode = Mode.Edit;
-			activity.ActivityEditFinishedEvent += a => ActivityMode = Mode.Open;			
+			activity.ActivityEditFinishedEvent += a => ActivityMode = Mode.Open;
+			activity.ActivityClosedEvent += OnActivityClosed;
 		}
 
 		void OnActivityOpened( ActivityViewModel viewModel )
@@ -166,6 +175,12 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			CurrentActivityViewModel = viewModel;
 			OpenedActivityEvent( viewModel );
+		}
+
+		void OnActivityClosed( ActivityViewModel viewModel )
+		{
+			CurrentActivityViewModel = null;
+			ClosedActivityEvent( viewModel );
 		}
 
 		void OnActivitySelected( ActivityViewModel viewModel )

@@ -96,6 +96,21 @@ namespace Laevo.ViewModel.Main
 			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
 		}
 
+		[CommandExecute( Commands.CloseActivity )]
+		public void CloseActivity()
+		{
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			{
+				_activityOverviewViewModel.CurrentActivityViewModel.CloseActivity();
+			}
+		}
+
+		[CommandCanExecute( Commands.CloseActivity )]
+		public bool CanCloseActivity()
+		{
+			return _activityOverviewViewModel.CurrentActivityViewModel != null && _activityOverviewViewModel.CurrentActivityViewModel.CanCloseActivity();
+		}
+
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
@@ -120,6 +135,7 @@ namespace Laevo.ViewModel.Main
 
 			_activityOverviewViewModel = new ActivityOverviewViewModel( _model );
 			_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
+			_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow
 			{
 				DataContext = _activityOverviewViewModel
@@ -129,6 +145,12 @@ namespace Laevo.ViewModel.Main
 		void OnOpenedActivityEvent( ActivityViewModel viewModel )
 		{
 			HideActivityOverview();
+		}
+
+		void OnClosedActivityEvent( ActivityViewModel viewModel )
+		{
+			// Open time line in order to select a new activity to continue work on.
+			SelectActivity( a => a.OpenActivity() );
 		}
 
 		public override void Persist()

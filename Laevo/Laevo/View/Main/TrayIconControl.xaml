@@ -24,6 +24,9 @@
 				<MenuItem
 					Header="Open Current Activity Context"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenCurrentActivityLibrary}}" />
+				<MenuItem
+					Header="Close Activity"
+					Command="{view:TrayCommandBinding {x:Static b:Commands.CloseActivity}}" />
 			</ContextMenu>
 		</tb:TaskbarIcon.ContextMenu>
 		

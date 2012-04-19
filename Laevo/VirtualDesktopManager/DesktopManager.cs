@@ -36,10 +36,11 @@ namespace VirtualDesktopManager
 			{ "explorer", "Button" },			// Start button.
 			{ "explorer", "Shell_TrayWnd" },	// Start bar.
 			{ "explorer", "Progman" }			// Desktop icons.
-		};
+		};		
 
-		readonly List<WindowInfo> _ignoreWindows;
+		readonly List<WindowInfo> _ignoreWindows;		
 		readonly List<VirtualDesktop> _availableDesktops = new List<VirtualDesktop>();
+		readonly List<Func<WindowInfo, bool>> _customWindowFilters = new List<Func<WindowInfo, bool>>();
 
 		public VirtualDesktop CurrentDesktop { get; private set; }
 
@@ -67,6 +68,17 @@ namespace VirtualDesktopManager
 		}
 
 		/// <summary>
+		///   Update which windows are associated to the current virtual desktop.
+		/// </summary>
+		public void UpdateWindows()
+		{
+			IEnumerable<WindowInfo> newWindows = GetOpenWindows()
+				.Except( _availableDesktops.SelectMany( d => d.Windows ) )
+				.Where( IsValidWindow );
+			CurrentDesktop.UpdateWindows( newWindows );
+		}
+
+		/// <summary>
 		///   Switch to the given virtual desktop.
 		/// </summary>
 		/// <param name="desktop">The desktop to switch to.</param>
@@ -77,11 +89,7 @@ namespace VirtualDesktopManager
 				return;
 			}
 
-			// Update which windows are associated to the current virtual desktop.
-			IEnumerable<WindowInfo> newWindows = GetOpenWindows()
-				.Except( _availableDesktops.SelectMany( d => d.Windows ) )
-				.Where( IsValidWindow );
-			CurrentDesktop.UpdateWindows( newWindows );
+			UpdateWindows();
 
 			// Hide windows and show those from the new desktop.
 			CurrentDesktop.Hide();
@@ -105,6 +113,15 @@ namespace VirtualDesktopManager
 		}
 
 		/// <summary>
+		///   Add a custom filter which determines whether or not a window should be managed by the desktop manager.
+		/// </summary>
+		/// <param name = "filter">The filter which returns true if the given window should be managed by the desktop manager, false otherwise.</param>
+		public void AddWindowFilter( Func<WindowInfo, bool> filter )
+		{
+			_customWindowFilters.Add( filter );
+		}
+
+		/// <summary>
 		///   Closes the virtual desktop manager by restoring all windows.
 		/// </summary>
 		public void Close()
@@ -112,11 +129,12 @@ namespace VirtualDesktopManager
 			_availableDesktops.ForEach( d => d.Show() );
 		}
 
-		static bool IsValidWindow( WindowInfo window )
+		bool IsValidWindow( WindowInfo window )
 		{
 			return
 				window.IsVisible() &&
-				!IgnoreProcesses.Contains( new Tuple<string, string>( window.GetProcess().ProcessName, window.GetClassName() ) );
+				!IgnoreProcesses.Contains( new Tuple<string, string>( window.GetProcess().ProcessName, window.GetClassName() ) ) &&
+				_customWindowFilters.All( f => f( window ) );
 		}
 
 		IEnumerable<WindowInfo> GetOpenWindows()
