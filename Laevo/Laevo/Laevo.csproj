@@ -167,6 +167,7 @@
     <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
+    <Compile Include="View\Activity\Converters\EditActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\TimeSpanConverter.cs" />
     <Compile Include="View\Activity\EditActivityPopup.xaml.cs">
       <DependentUpon>EditActivityPopup.xaml</DependentUpon>

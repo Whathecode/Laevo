@@ -9,7 +9,9 @@
 		Color,
 		Label,
 		HeightPercentage,
-		OffsetPercentage
+		OffsetPercentage,
+		PossibleColors,
+		PossibleIcons
 	}
 
 	public enum Commands
@@ -17,6 +19,8 @@
 		OpenActivity,
 		OpenActivityLibrary,
 		SelectActivity,
-		EditActivity
+		EditActivity,
+		ChangeColor,
+		ChangeIcon
 	}
 }

@@ -1,21 +1,34 @@
 ﻿<Window
 	x:Class="Laevo.View.Activity.EditActivityPopup"
+	x:Name="Control"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:Converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	WindowStyle="None"
 	ShowInTaskbar="False"
 	WindowStartupLocation="CenterScreen"
 	AllowsTransparency="True"
 	Background="Transparent"
-	Width="500"
-	Height="400"
+	Width="600"
+	Height="500"
 	FontFamily="Segoe UI Light"
 	Foreground="White"
-	Topmost="True">
+	Topmost="True"
+	FontSize="18">
 	
 	<Window.Resources>
+		<!-- Styles -->
+		<Style TargetType="Label">
+			<Setter Property="Foreground" Value="White" />
+		</Style>
+		<Style TargetType="Button">
+			<Setter Property="Padding" Value="10, 0, 10, 0" />
+		</Style>
+
 		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
+		<Converters:EditActivityIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
 	</Window.Resources>
 	
 	<Border
@@ -24,7 +37,7 @@
 		BorderThickness="1">
 		
 		<Border.BorderBrush>
-			<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 				<GradientStop Offset="0" Color="White" />
 				<GradientStop Offset="1" Color="{Binding Color}" />
 			</LinearGradientBrush>
@@ -42,42 +55,97 @@
 		<Border.Effect>
 			<DropShadowEffect />
 		</Border.Effect>
-		
-		<Grid>
+
+		<Grid Margin="20">
 		
 			<Grid.RowDefinitions>
 				<RowDefinition Height="30" />
 				<RowDefinition Height="80"/>
-				<RowDefinition />
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="40" />
 			</Grid.RowDefinitions>		
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
-		
-			<StackPanel
-				Orientation="Horizontal"
+
+			<Canvas>
+				<Image x:Name="Image" Source="{Binding Icon}">
+					<Image.Margin>
+						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
+							<Binding ElementName="Image" Path="ActualWidth" />
+							<Binding ElementName="Image" Path="ActualHeight" />
+						</MultiBinding>
+					</Image.Margin>					
+				</Image>
+			</Canvas>
+
+			<DockPanel
 				Grid.Row="0" Grid.Column="0">
 				<Label>Name</Label>
-				<TextBlock Text="{Binding Label}" />
-			</StackPanel>
+				<TextBox
+					Margin="10, 0, 0, 0"
+					HorizontalAlignment="Stretch"
+					Text="{Binding Label}" />
+			</DockPanel>
 
-			<StackPanel
-				Orientation="Vertical"
-				Grid.Row="1" Grid.Column="0">
+			<DockPanel Grid.Row="1" Grid.Column="0">				
 				<Label DockPanel.Dock="Top">Color</Label>
-				<WrapPanel>
-					<Label>ColorSample</Label>
-				</WrapPanel>
-			</StackPanel>
+				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
+					<ItemsControl ItemsSource="{Binding PossibleColors}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button
+								Width="40" Height="40"
+								BorderBrush="White" BorderThickness="1"
+								Margin="5, 5, 0, 0"
+								Command="{wtc:CommandBinding {x:Static b:Commands.ChangeColor}, ElementName=Control}"
+								CommandParameter="{Binding}">
+									<Button.Background>
+										<SolidColorBrush Color="{Binding}" />
+									</Button.Background>
+								</Button>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+			</DockPanel>
+
+			<DockPanel Grid.Row="2" Grid.Column="0">
+				<Label DockPanel.Dock="Top">Icon</Label>
+				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
+					<ItemsControl ItemsSource="{Binding PossibleIcons}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button
+								Width="40" Height="40"
+								BorderBrush="White" BorderThickness="1"
+								Margin="5, 5, 0, 0"
+								Command="{wtc:CommandBinding {x:Static b:Commands.ChangeIcon}, ElementName=Control}"
+								CommandParameter="{Binding}">
+									<Image Source="{Binding}" />
+								</Button>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+			</DockPanel>
 
 			<StackPanel
-				Orientation="Vertical"
-				Grid.Row="3" Grid.Column="0">
-				<Label DockPanel.Dock="Top">Icon</Label>
-				<WrapPanel>
-					<Label>IconSample</Label>
-				</WrapPanel>
-			</StackPanel>
+				Grid.Row="3" Grid.Column="0"
+				HorizontalAlignment="Right"
+				Margin="0, 10, 0, 0">
+				<Button Click="OnCloseButtonClicked">Save</Button>
+			</StackPanel>			
 		</Grid>
 	</Border>
 
