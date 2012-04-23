@@ -7,14 +7,17 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
+using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Collections.Generic;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows.DependencyPropertyFactory;
 using Whathecode.System.Xaml.Behaviors;
 
 
@@ -28,6 +31,7 @@ namespace Laevo.View.ActivityOverview
 		public const double TopOffset = 105;
 		public const double BottomOffset = 45;
 		const double ZoomPercentage = 0.001;
+		const double DragMomentum = 0.0000001;
 
 		public static readonly ICommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
 		DateTime _focusedTime = DateTime.Now;
@@ -86,7 +90,7 @@ namespace Laevo.View.ActivityOverview
 				{ quarters, d => d.Minute != 0 }
 			};
 			labelList.ForEach( l => _labels.Add( new TimeSpanLabels( TimeLine, l.Item1, l.Item2 ) ) );
-	
+
 			// Create unit labels near interval lines.
 			var quarterUnits = new UnitLabels( TimeLine, quarters, "HH:mm", () => true );
 			_labels.Add( quarterUnits );
@@ -134,7 +138,7 @@ namespace Laevo.View.ActivityOverview
 			_labels.Add( breadcrumbs );
 
 			// Hook up all labels to listen to time line changes.
-			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += (s, e) =>
+			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += ( s, e ) =>
 			{
 				switch ( e.Action )
 				{
@@ -143,12 +147,13 @@ namespace Laevo.View.ActivityOverview
 						break;
 				}
 			} );
-			Action updatePositions = () =>  _labels.ForEach( l => l.UpdatePositions() );
+			Action updatePositions = () => _labels.ForEach( l => l.UpdatePositions() );
 			TimeLine.VisibleIntervalChangedEvent += i => updatePositions();
 			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
-			widthDescriptor.AddValueChanged( TimeLine, (s, e) => updatePositions() );
+			widthDescriptor.AddValueChanged( TimeLine, ( s, e ) => updatePositions() );
 
-			DataContextChanged += NewDataContext;			
+			DataContextChanged += NewDataContext;
+			CompositionTarget.Rendering += OnRendering;
 		}
 
 
@@ -197,12 +202,38 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		Interval<long> _startDrag;
+		VisibleIntervalAnimation _dragAnimation;
 		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
 		{
-			var info = (MouseBehavior.ClickDragInfo)e.Parameter;			
+			TimeLine.Focus();	// TODO: Is this needed?
+
+			var info = (MouseBehavior.ClickDragInfo)e.Parameter;
+
+			// Stop current time line animation.
+			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
+			if ( _dragAnimation != null )
+			{
+				StopDragAnimation( visibleIntervalProperty );
+			}
+
 			if ( info.State == MouseBehavior.ClickDragState.Start )
 			{
 				_startDrag = ToTicksInterval( TimeLine.VisibleInterval );
+			}
+			else if ( info.State == MouseBehavior.ClickDragState.Stop )
+			{
+				_startDrag = null;
+
+				// Animate momentum when moving time line.
+				long velocity = _velocity.GetCurrentRateOfChange();
+				_dragAnimation = new VisibleIntervalAnimation
+				{
+					StartVelocity = velocity,
+					ConstantDeceleration = velocity * DragMomentum,
+					TimeLine = TimeLine
+				};
+				_dragAnimation.Completed += ( s, a ) => StopDragAnimation( visibleIntervalProperty );
+				TimeLine.BeginAnimation( visibleIntervalProperty, _dragAnimation );
 			}
 			else
 			{
@@ -216,8 +247,13 @@ namespace Laevo.View.ActivityOverview
 					TimeLine.VisibleInterval = ToTimeInterval( interval );
 				}
 			}
+		}
 
-			TimeLine.Focus();
+		void StopDragAnimation( DependencyProperty animatedProperty )
+		{
+			TimeLine.VisibleInterval = TimeLine.VisibleInterval;	// Required to copy latest animated value to local value.
+			TimeLine.BeginAnimation( animatedProperty, null );
+			_dragAnimation = null;			
 		}
 
 		void OnMouseMoved( object sender, MouseEventArgs e )
@@ -233,6 +269,16 @@ namespace Laevo.View.ActivityOverview
 			Interval<long> ticksInterval = ToTicksInterval( TimeLine.VisibleInterval );
 			ticksInterval.Scale( zoom, ticksInterval.GetPercentageFor( _focusedTime.Ticks ) );
 			TimeLine.VisibleInterval = ToTimeInterval( ticksInterval );
+		}
+
+		readonly RateOfChange<long, long> _velocity = new RateOfChange<long, long>( TimeSpan.FromMilliseconds( 200 ).Ticks );
+		void OnRendering( object sender, EventArgs e )
+		{
+			// While dragging, calculate velocity.
+			if ( _startDrag != null )
+			{
+				_velocity.AddSample( TimeLine.VisibleInterval.Start.Ticks, DateTime.Now.Ticks );
+			}
 		}
 
 		static Interval<long> ToTicksInterval( Interval<DateTime> interval )

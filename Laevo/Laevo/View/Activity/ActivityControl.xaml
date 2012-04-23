@@ -120,7 +120,7 @@
 					<Line
 						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-						Stroke="Yellow" StrokeThickness="3">
+						Stroke="Yellow" StrokeThickness="5">
 						<Line.X1>
 							<MultiBinding
 								Converter="{StaticResource TimeSpanConverter}"
