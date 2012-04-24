@@ -19,6 +19,11 @@
 					Command="{view:TrayCommandBinding {x:Static b:Commands.Exit}}" />
 				<Separator />
 				<MenuItem
+					x:Name="CapsLockMenuItem"
+					Header="Turn Caps Lock On/Off"
+					Click="SwitchCapsLock" />
+				<Separator />
+				<MenuItem
 					Header="New Activity"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}" />
 				<MenuItem

@@ -8,6 +8,7 @@ using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Application = System.Windows.Application;
 using Commands = Laevo.ViewModel.Main.Binding.Commands;
 
 

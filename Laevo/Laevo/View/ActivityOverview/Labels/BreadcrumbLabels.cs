@@ -36,6 +36,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override DateTime[] GetTopLabelPositions( Interval<DateTime> interval )
 		{
+			// TODO: Performance issue with string formatting.
 			IEnumerable<DateTime> flattened = Intervals
 				.TakeWhile( i => i != CurrentDepth )
 				.SelectMany( i => i.GetPositions( interval ) )
