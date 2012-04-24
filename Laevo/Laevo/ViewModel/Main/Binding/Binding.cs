@@ -10,6 +10,6 @@
 		SwitchActivityOverview,
 		OpenCurrentActivityLibrary,
 		CloseActivity,
-		NewActivity		
+		NewActivity
 	}
 }

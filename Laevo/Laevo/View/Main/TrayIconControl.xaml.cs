@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
-using Whathecode.System.Windows.Input.CommandFactory;
 using Whathecode.System.Windows.Input.InputController;
 using Whathecode.System.Windows.Input.InputController.Condition;
 using Whathecode.System.Windows.Input.InputController.Trigger;
+using WindowsInput;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using MenuItem = System.Windows.Controls.MenuItem;
+using KeyInterop = Whathecode.System.Windows.Input.KeyHelper;
 using Timer = System.Timers.Timer;
 
 
@@ -21,17 +20,22 @@ namespace Laevo.View.Main
 	/// </summary>
 	public partial class TrayIconControl
 	{
-		const int UpdatesPerSecond = 25;
+		const int UpdatesPerSecond = 25;		
 
 		readonly Timer _updateLoop = new Timer();
 		readonly KeyboardHookListener _keyboardListener = new KeyboardHookListener( new GlobalHooker() );
 		readonly InputController _inputController = new InputController();
 		readonly Dictionary<Keys, bool> _keyStates = new Dictionary<Keys, bool>();
 
+		const string TurnCapsLockText = "Turn Caps Lock ";
+		bool _switchingCapsLock;
+
 
 		public TrayIconControl()
 		{
 			InitializeComponent();
+
+			SetCapsLockMenuText( KeyInterop.IsCapsLockEnabled() );
 
 			// Capture system-wide keyboard events.
 			_keyboardListener.KeyDown += OnKeyDown;
@@ -59,6 +63,14 @@ namespace Laevo.View.Main
 
 		void OnKeyDown( object sender, KeyEventArgs e )
 		{
+			lock ( this )
+			{
+				if ( _switchingCapsLock )
+				{
+					return;
+				}
+			}
+
 			_keyStates[ e.KeyCode ] = true;
 
 			// Disable caps lock.
@@ -66,6 +78,27 @@ namespace Laevo.View.Main
 			{
 				e.Handled = true;
 			}
+		}
+
+		void SwitchCapsLock( object sender, System.Windows.RoutedEventArgs e )
+		{
+			bool isCapsEnabled = KeyInterop.IsCapsLockEnabled();
+
+			lock ( this )
+			{
+				_switchingCapsLock = true;
+				// TODO: Add SendInput to own interop classes.
+				InputSimulator.SimulateKeyPress( VirtualKeyCode.CAPITAL );
+				_switchingCapsLock = false;
+			}
+
+			SetCapsLockMenuText( !isCapsEnabled );
+		}
+
+		void SetCapsLockMenuText( bool isCapsLockEnabled )
+		{
+			string headerText = TurnCapsLockText + (isCapsLockEnabled ? "Off" : "On");
+			CapsLockMenuItem.Header = headerText;
 		}
 
 		void OnKeyUp( object sender, KeyEventArgs e )
