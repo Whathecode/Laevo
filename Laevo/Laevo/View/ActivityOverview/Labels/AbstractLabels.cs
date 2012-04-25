@@ -24,7 +24,6 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			get
 			{
-
 				return new Interval<DateTime>(
 					TimeLine.VisibleInterval.Start.SafeSubtract( _extendVisibleRange ),
 					TimeLine.VisibleInterval.End.SafeAdd( _extendVisibleRange ) );
@@ -72,9 +71,9 @@ namespace Laevo.View.ActivityOverview.Labels
 					// Create a new label when needed.
 					if ( AvailableLabels.Count == 0 )
 					{
-						var line = CreateNewLabel();
-						AvailableLabels.Push( line );
-						Labels.Add( line );
+						var label = CreateNewLabel();
+						AvailableLabels.Push( label );
+						Labels.Add( label );
 					}
 
 					T toPlace = AvailableLabels.Pop();
