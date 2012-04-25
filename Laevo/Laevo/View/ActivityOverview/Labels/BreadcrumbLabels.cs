@@ -36,12 +36,14 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override DateTime[] GetTopLabelPositions( Interval<DateTime> interval )
 		{
-			// TODO: Performance issue with string formatting.
 			IEnumerable<DateTime> flattened = Intervals
 				.TakeWhile( i => i != CurrentDepth )
 				.SelectMany( i => i.GetPositions( interval ) )
 				.OrderBy( d => d )
-				.Distinct( d => Formatting[ CurrentDepth ]( d ) );
+				// For performance reasons, do the formatting once prior to calling Distinct().
+				.Select( d => new { Date = d, Formatted = Formatting[ CurrentDepth ]( d ) } )
+				.Distinct( d => d.Formatted )
+				.Select( d => d.Date );
 
 			if ( flattened.Count() >= 2 )
 			{
