@@ -66,7 +66,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override bool IsVisible( TextBlock label, DateTime occurance )
 		{
-			return CurrentDepth != null && _matchLabelsToDepth[ label ] == CurrentDepth;
+			return CurrentDepth != null && _matchLabelsToDepth[ label ] == CurrentDepth && ExtendedVisibleRange.LiesInInterval( occurance );
 		}
 
 		bool IsIntervalHigherThanScreen( IInterval interval )
