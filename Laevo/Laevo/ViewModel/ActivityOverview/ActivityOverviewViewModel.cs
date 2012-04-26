@@ -74,6 +74,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 
 			// Setup desktop manager.
+			// TODO: NullReferenceException in the lambda. w != null
 			_desktopManager.AddWindowFilter( w => !(w.GetProcess().ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" )) );
 
 			// Check for stored presentation options for existing activities.

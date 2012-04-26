@@ -38,6 +38,7 @@
 		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />	
 		<wtcConverters:CalculateValueConverter x:Key="DivideByTwoConverter" Operation="Division" Value="2" />
+		<Converters:ActivityBorderConverter x:Key="BorderThicknessConverter" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
@@ -84,7 +85,7 @@
 			BorderThickness="2"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
-		    Cursor="Hand"
+			Cursor="Hand"
 			Panel.ZIndex="15"
 			ClipToBounds="True">
 			
@@ -113,6 +114,7 @@
 						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
 				</LinearGradientBrush>
 			</Border.Background>
+			
 			<Border.Resources>
 				<Converters:TimeSpanConverter x:Key="TimeSpanConverter" />
 				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="3" Operation="Subtraction" />
@@ -144,18 +146,22 @@
 					</Line>
 				</DataTemplate>
 			</Border.Resources>
-			
-			<ItemsControl
-				ItemsSource="{Binding ActiveTimeSpans}"
-				ItemTemplate="{StaticResource TimeSpanTemplate}">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<Canvas />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-			</ItemsControl>
-			
-		</Border>
+
+			<Border
+				CornerRadius="0"
+				BorderBrush="Yellow"
+				BorderThickness="{Binding IsActive, Converter={StaticResource BorderThicknessConverter}}">
+				<ItemsControl
+					ItemsSource="{Binding ActiveTimeSpans}"
+					ItemTemplate="{StaticResource TimeSpanTemplate}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<Canvas />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</Border>			
+		</Border>		
 
 	</StackPanel>
 
