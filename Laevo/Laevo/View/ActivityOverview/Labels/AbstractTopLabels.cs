@@ -22,10 +22,25 @@ namespace Laevo.View.ActivityOverview.Labels
 		protected readonly Dictionary<IInterval, Func<DateTime, string>> Formatting
 			= new Dictionary<IInterval, Func<DateTime, string>>();
 
+		IInterval _currentDepth;
 		/// <summary>
 		///   The smallest interval which is too large to fit the screen vertically. This is the most relevant 'depth'.
 		/// </summary>
-		protected IInterval CurrentDepth;
+		protected IInterval CurrentDepth
+		{
+			get { return _currentDepth; }
+			private set
+			{
+				var prevValue = value;
+				_currentDepth = value;
+				if ( prevValue != value )
+				{
+					CurrentDepthChanged();
+				}
+			}
+		}
+
+		protected event Action CurrentDepthChanged;
 
 		DateTime _earliestLabelTime;
 		DateTime? _secondLabelTime;
