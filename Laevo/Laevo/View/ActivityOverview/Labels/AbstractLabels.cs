@@ -20,13 +20,21 @@ namespace Laevo.View.ActivityOverview.Labels
 		protected readonly List<T> VisibleLabels = new List<T>();
 		protected readonly Stack<T> AvailableLabels = new Stack<T>();
 
+		Interval<DateTime> _currentVisibleInterval;
+		Interval<DateTime> _extendedVisibleInterval;
 		protected Interval<DateTime> ExtendedVisibleRange
 		{
 			get
 			{
-				return new Interval<DateTime>(
-					TimeLine.VisibleInterval.Start.SafeSubtract( _extendVisibleRange ),
-					TimeLine.VisibleInterval.End.SafeAdd( _extendVisibleRange ) );
+				if ( TimeLine.VisibleInterval != _currentVisibleInterval )
+				{
+					_extendedVisibleInterval = new Interval<DateTime>(
+						TimeLine.VisibleInterval.Start.SafeSubtract( _extendVisibleRange ),
+						TimeLine.VisibleInterval.End.SafeAdd( _extendVisibleRange ) );
+					_currentVisibleInterval = TimeLine.VisibleInterval;
+				}
+
+				return _extendedVisibleInterval;
 			}
 		}
 
