@@ -11,7 +11,8 @@
 		HeightPercentage,
 		OffsetPercentage,
 		PossibleColors,
-		PossibleIcons
+		PossibleIcons,
+		IsActive
 	}
 
 	public enum Commands

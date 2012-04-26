@@ -151,6 +151,13 @@ namespace Laevo.ViewModel.Activity
 		[DataMember]
 		public double OffsetPercentage { get; set; }
 
+		/// <summary>
+		///   Determines whether or not the activity is active.
+		///   This means it is open and being used.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsActive )]
+		public bool IsActive { get; set; }
+
 		[NotifyProperty( Binding.Properties.PossibleColors )]
 		public ObservableCollection<Color> PossibleColors { get; set; }
 
@@ -280,6 +287,7 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			// Activity also becomes active when it is opened.
+			IsActive = true;
 			if ( ActiveTimeSpans == null )
 			{
 				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
@@ -292,7 +300,7 @@ namespace Laevo.ViewModel.Activity
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
 			InitializeLibrary();
-
+			
 			OpenedActivityEvent( this );
 		}
 
@@ -399,6 +407,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		internal void Deactivated()
 		{
+			IsActive = false;
 			_activity.Deactivate();
 			_currentActiveTimeSpan = null;
 		}
