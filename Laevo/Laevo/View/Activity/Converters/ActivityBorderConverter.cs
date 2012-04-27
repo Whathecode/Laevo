@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Windows.Media;
 using Whathecode.System.Windows.Data;
 
 
 namespace Laevo.View.Activity.Converters
 {
-	public class ActivityBorderConverter : AbstractGenericValueConverter<bool, double>
+	public class ActivityBorderConverter : AbstractGenericValueConverter<bool, Brush>
 	{
-		public override double Convert( bool value )
+		public override Brush Convert( bool value )
 		{
-			return value ? 2 : 0;
+			return new SolidColorBrush( value ? Colors.Yellow : Colors.White );
 		}
 
-		public override bool ConvertBack( double value )
+		public override bool ConvertBack( Brush value )
 		{
 			throw new NotSupportedException();
 		}

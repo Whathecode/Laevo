@@ -38,7 +38,7 @@
 		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />	
 		<wtcConverters:CalculateValueConverter x:Key="DivideByTwoConverter" Operation="Division" Value="2" />
-		<Converters:ActivityBorderConverter x:Key="BorderThicknessConverter" />
+		<Converters:ActivityBorderConverter x:Key="BorderBrushConverter" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
@@ -83,6 +83,7 @@
 			x:Name="Container"
 			CornerRadius="3"
 			BorderThickness="2"
+			BorderBrush="{Binding IsActive, Converter={StaticResource BorderBrushConverter}}"
 			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 			Cursor="Hand"
@@ -100,12 +101,6 @@
 					</Binding>
 				</MultiBinding>
 			</Border.Height>			
-			<Border.BorderBrush>
-				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-					<GradientStop Offset="0" Color="White" />
-					<GradientStop Offset="1" Color="{Binding Color}" />					
-				</LinearGradientBrush>
-			</Border.BorderBrush>
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 					<GradientStop
@@ -147,20 +142,15 @@
 				</DataTemplate>
 			</Border.Resources>
 
-			<Border
-				CornerRadius="0"
-				BorderBrush="Yellow"
-				BorderThickness="{Binding IsActive, Converter={StaticResource BorderThicknessConverter}}">
-				<ItemsControl
-					ItemsSource="{Binding ActiveTimeSpans}"
-					ItemTemplate="{StaticResource TimeSpanTemplate}">
-					<ItemsControl.ItemsPanel>
-						<ItemsPanelTemplate>
-							<Canvas />
-						</ItemsPanelTemplate>
-					</ItemsControl.ItemsPanel>
-				</ItemsControl>
-			</Border>			
+			<ItemsControl
+				ItemsSource="{Binding ActiveTimeSpans}"
+				ItemTemplate="{StaticResource TimeSpanTemplate}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>	
 		</Border>		
 
 	</StackPanel>
