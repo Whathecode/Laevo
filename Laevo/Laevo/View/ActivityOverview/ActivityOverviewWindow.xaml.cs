@@ -230,9 +230,9 @@ namespace Laevo.View.ActivityOverview
 				{
 					StartVelocity = velocity,
 					ConstantDeceleration = velocity * DragMomentum,
-					TimeLine = TimeLine
+					TimeLine = TimeLine					
 				};
-				_dragAnimation.Completed += ( s, a ) => StopDragAnimation( visibleIntervalProperty );
+				_dragAnimation.Completed += DragAnimationCompleted;	
 				TimeLine.BeginAnimation( visibleIntervalProperty, _dragAnimation );
 			}
 			else
@@ -249,8 +249,15 @@ namespace Laevo.View.ActivityOverview
 			}
 		}
 
+		void DragAnimationCompleted( object sender, EventArgs e )
+		{
+			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
+			StopDragAnimation( visibleIntervalProperty );
+		}
+
 		void StopDragAnimation( DependencyProperty animatedProperty )
 		{
+			_dragAnimation.Completed -= DragAnimationCompleted;
 			TimeLine.VisibleInterval = TimeLine.VisibleInterval;	// Required to copy latest animated value to local value.
 			TimeLine.BeginAnimation( animatedProperty, null );
 			_dragAnimation = null;			

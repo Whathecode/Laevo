@@ -45,6 +45,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			{
 				// Different depths may use different formats.
 				_formattedDates.Clear();
+				_currentDepthChanged = false;
 			}
 
 			IEnumerable<DateTime> flattened = Intervals
