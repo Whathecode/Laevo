@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ namespace Laevo.View.Activity
 	[WpfControl( typeof( Properties ) )]
 	public partial class ActivityControl
 	{
+		[Flags]
 		public enum Properties
 		{
 			MouseDragged
