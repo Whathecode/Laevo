@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -79,7 +80,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		}
 
 		protected override void UpdateTopLabel( TextBlock block )
-		{			
+		{
 			block.SetValue( TimeLineControl.OffsetProperty, TimeLine.ActualHeight - block.ActualHeight + VerticalLabelOffset );
 		}
 	}

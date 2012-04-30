@@ -191,6 +191,10 @@ namespace Laevo.View.ActivityOverview
 						e.SetBinding( WidthProperty, widthBinding );
 					} );
 					break;
+
+				case NotifyCollectionChangedAction.Remove:
+					eventArgs.OldItems.Cast<FrameworkElement>().ForEach( BindingOperations.ClearAllBindings );
+					break;
 			}
 		}
 
