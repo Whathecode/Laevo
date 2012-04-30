@@ -145,6 +145,10 @@ namespace Laevo.View.ActivityOverview
 					case NotifyCollectionChangedAction.Add:
 						e.NewItems.Cast<FrameworkElement>().ForEach( i => TimeLine.Children.Add( i ) );
 						break;
+
+					case NotifyCollectionChangedAction.Remove:
+						e.OldItems.Cast<FrameworkElement>().ForEach( i => TimeLine.Children.Remove( i ) );
+						break;
 				}
 			} );
 			Action updatePositions = () => _labels.ForEach( l => l.UpdatePositions() );
@@ -260,7 +264,7 @@ namespace Laevo.View.ActivityOverview
 			_dragAnimation.Completed -= DragAnimationCompleted;
 			TimeLine.VisibleInterval = TimeLine.VisibleInterval;	// Required to copy latest animated value to local value.
 			TimeLine.BeginAnimation( animatedProperty, null );
-			_dragAnimation = null;			
+			_dragAnimation = null;
 		}
 
 		void OnMouseMoved( object sender, MouseEventArgs e )

@@ -93,10 +93,18 @@ namespace Laevo.View.ActivityOverview.Labels
 			}
 			else
 			{
-				// Not enough space in between labels, zoomed out too much.				
+				// Not enough space in between labels, zoomed out too much.
 				VisibleLabels.ForEach( v => AvailableLabels.Push( v ) );
 				VisibleLabels.Clear();
-				AvailableLabels.ForEach( v => v.Visibility = Visibility.Hidden );				
+				AvailableLabels.ForEach( l => l.Visibility = Visibility.Hidden );			
+			}
+
+			// Clean up available labels.
+			// HACK: Keep one label available to prevent newly added labels with uninitialized sizes right after an animation finishes.
+			//       No idea why this occurs, but presumably preventing having to add a new label by keeping one available solves it.
+			while ( AvailableLabels.Count > 1 )
+			{
+				Labels.Remove( AvailableLabels.Pop() );
 			}
 		}
 
