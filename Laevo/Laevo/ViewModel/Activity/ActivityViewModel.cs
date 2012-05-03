@@ -342,6 +342,7 @@ namespace Laevo.ViewModel.Activity
 		public void CloseActivity()
 		{
 			_activity.Close();
+			Deactivated();
 
 			_currentActiveTimeSpan = null;
 
