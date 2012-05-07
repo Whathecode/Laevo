@@ -4,7 +4,8 @@
 	{
 		CurrentTime,
 		Activities,
-		Mode
+		Mode,
+		TimeLineRenderScale
 	}
 
 	public enum Commands { }

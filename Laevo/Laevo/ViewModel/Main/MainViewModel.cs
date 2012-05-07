@@ -2,9 +2,11 @@
 using System.Reactive.Linq;
 using System.Windows;
 using Laevo.View.ActivityOverview;
+using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.ActivityOverview.Binding;
+using Laevo.ViewModel.Settings;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
@@ -37,6 +39,23 @@ namespace Laevo.ViewModel.Main
 			_model.Exit();
 
 			Application.Current.Shutdown();
+		}
+
+		[CommandExecute( Commands.OpenSettings )]
+		public void OpenSettings()
+		{
+			var viewModel = new SettingsViewModel( _model.Settings );
+			var settingsWindow = new SettingsWindow
+			{
+				DataContext = viewModel
+			};
+			settingsWindow.Closed += ( s, a ) =>
+			{
+				viewModel.Persist();
+				_activityOverviewViewModel.TimeLineRenderScale = viewModel.TimeLineRenderScale;
+			};
+
+			settingsWindow.Show();
 		}
 
 		[CommandExecute( Commands.ShowActivityOverview )]
@@ -134,7 +153,10 @@ namespace Laevo.ViewModel.Main
 				return;
 			}
 
-			_activityOverviewViewModel = new ActivityOverviewViewModel( _model );
+			_activityOverviewViewModel = new ActivityOverviewViewModel( _model )
+			{
+				TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale
+			};
 			_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
 			_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow

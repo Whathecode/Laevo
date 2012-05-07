@@ -19,6 +19,9 @@
 					Command="{view:TrayCommandBinding {x:Static b:Commands.Exit}}" />
 				<Separator />
 				<MenuItem
+					Header="Settings"
+					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenSettings}}" />				
+				<MenuItem
 					x:Name="CapsLockMenuItem"
 					Header="Turn Caps Lock On/Off"
 					Click="SwitchCapsLock" />
