@@ -5,6 +5,7 @@
 	public enum Commands
 	{
 		Exit,
+		OpenSettings,
 		ShowActivityOverview,
 		HideActivityOverview,
 		SwitchActivityOverview,

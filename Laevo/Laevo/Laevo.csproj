@@ -147,6 +147,7 @@
     <Compile Include="Model\AttentionShifts\ApplicationAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\DataContractSurrogate.cs" />
     <Compile Include="Model\Laevo.cs" />
+    <Compile Include="Model\Settings.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\DataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
@@ -155,6 +156,8 @@
     <Compile Include="ViewModel\Activity\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
+    <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
+    <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="View\ActivityOverview\ClockControl.xaml.cs">
       <DependentUpon>ClockControl.xaml</DependentUpon>
     </Compile>
@@ -213,6 +216,9 @@
     <Compile Include="View\Main\TrayCommandBindingExtension.cs" />
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Settings\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -278,6 +284,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Main\TrayIconControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Settings\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

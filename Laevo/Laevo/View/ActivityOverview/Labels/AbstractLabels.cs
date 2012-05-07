@@ -26,12 +26,13 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			get
 			{
-				if ( TimeLine.VisibleInterval != _currentVisibleInterval )
+				Interval<DateTime> visibleInterval = TimeLine.VisibleInterval;
+				if ( visibleInterval != _currentVisibleInterval )
 				{
 					_extendedVisibleInterval = new Interval<DateTime>(
-						TimeLine.VisibleInterval.Start.SafeSubtract( _extendVisibleRange ),
-						TimeLine.VisibleInterval.End.SafeAdd( _extendVisibleRange ) );
-					_currentVisibleInterval = TimeLine.VisibleInterval;
+						visibleInterval.Start.SafeSubtract( _extendVisibleRange ),
+						visibleInterval.End.SafeAdd( _extendVisibleRange ) );
+					_currentVisibleInterval = visibleInterval;
 				}
 
 				return _extendedVisibleInterval;

@@ -72,7 +72,7 @@
 			</Style>
 		</Grid.Style>
 
-		<!-- Time Line -->
+		<!-- Time Line 3D -->
 		<Viewport3D ClipToBounds="False" RenderOptions.EdgeMode="Aliased">
 			<Viewport3D.Camera>
 				<PerspectiveCamera
@@ -96,7 +96,7 @@
 
 			<Viewport2DVisual3D>
 				<Viewport2DVisual3D.CacheMode>
-					<BitmapCache />
+					<BitmapCache RenderAtScale="{Binding TimeLineRenderScale}" />
 				</Viewport2DVisual3D.CacheMode>
 
 				<Viewport2DVisual3D.Transform>
@@ -128,7 +128,7 @@
 				</Viewport2DVisual3D.Geometry>
 				
 				<Viewport2DVisual3D.Material>
-					<DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" />
+					<DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" Brush="White" />
 				</Viewport2DVisual3D.Material>
 
 				<Grid
@@ -144,11 +144,28 @@
 					<ActivityOverview:TimeLineControl
 						x:Name="TimeLine"
 						Focusable="True" />
-
-				</Grid>				
+					
+				</Grid>
+				
 			</Viewport2DVisual3D>
 		</Viewport3D>
-		
+
+		<!-- No 3D. -->
+		<!--<Grid
+			Width="{Binding ElementName=MainWindow, Path=ActualWidth, Converter={StaticResource TimeLineWidthConverter}}"
+			Height="{Binding ElementName=MainWindow, Path=ActualHeight}"
+			ClipToBounds="True"
+			Background="{StaticResource TimeLineBrush}"
+			Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+			Behaviors:MouseBehavior.DragCapturesMouse="False"
+			MouseWheel="OnMouseWheel"
+			MouseMove="OnMouseMoved">
+
+			<ActivityOverview:TimeLineControl
+						x:Name="TimeLine"
+						Focusable="True" />
+		</Grid>-->
+
 		<!-- Clock -->
 		<ActivityOverview:ClockControl
 			Time="{Binding CurrentTime}"
@@ -194,22 +211,5 @@
 		</Grid>
 		
 	</Grid>
-
-	<!-- No 3D. -->
-	<!--<Grid
-		Background="{StaticResource BackgroundBrush}"
-		Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
-		MouseWheel="OnMouseWheel"
-		MouseMove="OnMouseMoved">
-
-		<ActivityOverview:TimeLineControl x:Name="TimeLine" Focusable="True">
-			<ActivityOverview:TimeLineControl.CommandBindings>
-				<CommandBinding
-					Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"					
-					Executed="MoveTimeLine" />
-			</ActivityOverview:TimeLineControl.CommandBindings>
-		</ActivityOverview:TimeLineControl>
-		
-	</Grid>-->
 
 </Window>

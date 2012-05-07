@@ -18,7 +18,7 @@ namespace Laevo.Model
 	class Activity
 	{
 		readonly string _activityContextPath 
-			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), Laevo.ProgramName, "Activities" );
+			= Path.Combine( Laevo.ProgramDataFolder, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
 

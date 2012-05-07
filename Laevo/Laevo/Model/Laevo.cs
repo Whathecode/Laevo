@@ -15,10 +15,11 @@ namespace Laevo.Model
 	class Laevo
 	{
 		public static readonly string ProgramName = "Laevo";
-		public static readonly string ProgramDataFolder
-			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ), ProgramName );		
+		public static readonly string ProgramDataFolder 
+			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );		
 		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
+		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
 
 		static readonly DataContractSerializer ActivitySerializer = new DataContractSerializer( typeof( List<Activity> ) );
 		readonly List<Activity> _activities = new List<Activity>();
@@ -35,10 +36,26 @@ namespace Laevo.Model
 		{
 			get { return _attentionShifts.AsReadOnly(); }
 		}
+		
+		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
+		public Settings Settings { get; private set; }
 
 
 		public Laevo()
 		{
+			// Load settings.
+			if ( File.Exists( SettingsFile ) )
+			{
+				using ( var settingsFileStream = new FileStream( SettingsFile, FileMode.Open ) )
+				{
+					Settings = (Settings)SettingsSerializer.ReadObject( settingsFileStream );
+				}
+			}
+			else
+			{
+				Settings = new Settings();
+			}
+
 			// Add activities from previous sessions.
 			if ( File.Exists( ActivitiesFile ) )
 			{
@@ -95,6 +112,12 @@ namespace Laevo.Model
 
 		public void Persist()
 		{
+			// Settings.
+			using ( var settingsFileStream = new FileStream( SettingsFile, FileMode.Create ) )
+			{
+				SettingsSerializer.WriteObject( settingsFileStream, Settings );
+			}
+
 			// Activities.
 			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
 			{

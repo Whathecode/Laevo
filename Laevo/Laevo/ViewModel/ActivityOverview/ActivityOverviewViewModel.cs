@@ -46,6 +46,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		readonly Timer _updateTimer = new Timer( 100 );
 
+		[NotifyProperty( Binding.Properties.TimeLineRenderScale )]
+		public float TimeLineRenderScale { get; set; }
+
 		/// <summary>
 		///   The mode determines which actions are possible within the activity overview.
 		/// </summary>

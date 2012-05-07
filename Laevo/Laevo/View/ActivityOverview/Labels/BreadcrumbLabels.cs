@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,9 +48,10 @@ namespace Laevo.View.ActivityOverview.Labels
 				_currentDepthChanged = false;
 			}
 
-			IEnumerable<DateTime> flattened = Intervals
+			DateTime[] flattened = Intervals
 				.TakeWhile( i => i != CurrentDepth )
-				.SelectMany( i => i.GetPositions( interval ) );
+				.SelectMany( i => i.GetPositions( interval ) )
+				.ToArray();
 
 			// Update the list of formatted dates.
 			var toRemove = _formattedDates.Keys.Where( d => !flattened.Contains( d ) ).ToArray();
@@ -68,9 +68,10 @@ namespace Laevo.View.ActivityOverview.Labels
 			if ( filtered.Count() >= 2 )
 			{
 				// Only keep one position which lies in front of the time line.
+				DateTime start = TimeLine.VisibleInterval.Start;
 				return filtered
 					.Zip( filtered.Skip( 1 ), Tuple.Create )
-					.SkipWhile( t => t.Item2 <= TimeLine.VisibleInterval.Start )
+					.SkipWhile( t => t.Item2 <= start )
 					.Select( t => t.Item1 )
 					.Concat( new [] { filtered.Last() } ) // Don't forget the last! It was dropped when zipping with Skip().
 					.ToArray();
