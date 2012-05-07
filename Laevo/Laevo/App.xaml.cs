@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Windows;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
@@ -19,8 +20,12 @@ namespace Laevo
 
 		protected override void OnStartup( StartupEventArgs e )
 		{
-			base.OnStartup(e);
+			base.OnStartup( e );
 			ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+			// Create exception logger.
+			DispatcherUnhandledException += ( s, a )
+				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramDataFolder, "log.txt" ), a.Exception.ToString() );
 
 			// Create Model.
 			_model = new Model.Laevo();
