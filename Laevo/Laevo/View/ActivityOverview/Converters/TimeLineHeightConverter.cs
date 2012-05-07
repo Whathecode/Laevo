@@ -5,15 +5,14 @@ using System.Windows.Data;
 
 namespace Laevo.View.ActivityOverview.Converters
 {
-	public class TimeLineWidthConverter : IMultiValueConverter
+	public class TimeLineHeightConverter : IMultiValueConverter
 	{
 		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 		{
-			double width = (double)values[ 0 ];
+			double height = (double)values[ 0 ];
 			float renderSize = (float)values[ 1 ];
 
-			// TODO: Calculate exactly how much bigger the time line should be to prevent excess rendering.
-			return (width * renderSize) * 2;
+			return height * renderSize;
 		}
 
 		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
