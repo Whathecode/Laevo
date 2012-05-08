@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
@@ -24,6 +25,7 @@ namespace Laevo.View.ActivityOverview
 		public enum Properties
 		{
 			VisibleInterval,
+			InternalVisibleInterval,
 			Minimum,
 			Maximum,
 			MinimumTimeSpan,
@@ -44,6 +46,9 @@ namespace Laevo.View.ActivityOverview
 		[DependencyProperty( Properties.VisibleInterval )]
 		[CoercionHandler( typeof( VisibleIntervalCoercion ) )]
 		public Interval<DateTime> VisibleInterval { get; set; }
+
+		[DependencyProperty( Properties.InternalVisibleInterval )]
+		public Interval<long> InternalVisibleInterval { get; private set; }
 
 		[DependencyProperty( Properties.Minimum )]
 		public DateTime? Minimum { get; set; }
@@ -116,6 +121,7 @@ namespace Laevo.View.ActivityOverview
 		{
 			InitializeComponent();
 
+			RenderTransform = new TranslateTransform();
 			VisibleInterval = new Interval<DateTime>( DateTime.Today, DateTime.Today.SafeAdd( TimeSpan.FromDays( 1 ) ) );
 
 			Children = new ObservableCollection<FrameworkElement>();
@@ -159,19 +165,23 @@ namespace Laevo.View.ActivityOverview
 					eventArgs.NewItems.Cast<FrameworkElement>().ForEach( e =>
 					{
 						// Position horizontally.
-						var positionBinding = new MultiBinding();
+						var positionBinding = new MultiBinding { ConverterParameter = this };
 						var timeLineWidth = new Binding( "ActualWidth" ) { Source = this };
 						positionBinding.Bindings.Add( timeLineWidth );
 						var elementWidth = new Binding( "ActualWidth" ) { Source = e };
 						positionBinding.Bindings.Add( elementWidth );
-						var viewport = new Binding( "VisibleInterval" ) { Source = this };
+						var viewport = new Binding( "InternalVisibleInterval" ) { Source = this };
 						positionBinding.Bindings.Add( viewport );
 						var occurance = new Binding { Path = new PropertyPath( OccuranceProperty ), Source = e };
 						positionBinding.Bindings.Add( occurance );
 						var alignment = new Binding( "HorizontalAlignment" ) { Source = e };
 						positionBinding.Bindings.Add( alignment  );
 						positionBinding.Converter = new ActivityPositionConverter();
-						e.SetBinding( Canvas.LeftProperty, positionBinding );
+						// TODO: Is the TranslateTransform faster?
+						//e.SetBinding( Canvas.LeftProperty, positionBinding );
+						var transform = new TranslateTransform( 0, 0 );						
+						BindingOperations.SetBinding( transform, TranslateTransform.XProperty, positionBinding );
+						e.RenderTransform = transform;
 
 						// Position vertically.
 						var bottom = new Binding
@@ -202,7 +212,30 @@ namespace Laevo.View.ActivityOverview
 		static void OnVisibleIntervalChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
 		{
 			var control = (TimeLineControl)o;
-			control.VisibleIntervalChangedEvent( control.VisibleInterval );
+			var newInterval = (Interval<DateTime>)e.NewValue;
+			var newTicksInterval = new Interval<long>( newInterval.Start.Ticks, newInterval.End.Ticks );
+
+			bool changeInternalInterval = true;
+			if ( e.OldValue != null )
+			{
+				var oldInterval = (Interval<DateTime>)e.OldValue;
+				var oldTicksInterval = new Interval<long>( oldInterval.Start.Ticks, oldInterval.End.Ticks );
+				if ( oldTicksInterval.Size == newTicksInterval.Size )
+				{
+					changeInternalInterval = false;
+				}
+			}
+			if ( changeInternalInterval )
+			{
+				control.InternalVisibleInterval = newTicksInterval;										
+			}
+
+			// Set required transform based on difference between the internal interval and the actual interval.
+			var transform = (TranslateTransform)control.RenderTransform;
+			long ticksDifference = control.InternalVisibleInterval.Start - control.VisibleInterval.Start.Ticks;
+			transform.X = (double)ticksDifference / control.InternalVisibleInterval.Size * control.ActualWidth;			
+
+			control.VisibleIntervalChangedEvent( control.VisibleInterval );		
 		}
 	}
 }

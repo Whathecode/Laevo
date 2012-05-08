@@ -126,13 +126,18 @@ namespace Laevo.View.ActivityOverview.Labels
 			return positions;
 		}
 
-		protected override void UpdateLabel( TextBlock label, DateTime occurance )
+		protected override void InitializeLabel( TextBlock label, DateTime occurance )
 		{
 			_matchLabelsToDepth[ label ] = CurrentDepth;
 
 			// Show actual label when it doesn't overlap with the earliest label.
 			label.Visibility = TimeLine.VisibleInterval.LiesInInterval( occurance ) ? Visibility.Visible : Visibility.Hidden;
 			UpdateText( label, occurance );
+		}
+
+		protected override void UpdateLabel( TextBlock label )
+		{
+			// Nothing to do.
 		}
 
 		void UpdateText( TextBlock label, DateTime occurance )

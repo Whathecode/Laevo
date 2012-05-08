@@ -62,7 +62,7 @@ namespace Laevo.View.ActivityOverview.Labels
 					var occurance = (DateTime)visible.GetValue( TimeLineControl.OccuranceProperty );
 					if ( IsVisible( visible, occurance ) )
 					{
-						UpdateLabel( visible, occurance );
+						InitializeLabel( visible, occurance );
 						toPosition.Remove( occurance );
 					}
 					else
@@ -88,7 +88,7 @@ namespace Laevo.View.ActivityOverview.Labels
 					T toPlace = AvailableLabels.Pop();
 					toPlace.SetValue( TimeLineControl.OccuranceProperty, date );
 					toPlace.Visibility = Visibility.Visible;
-					UpdateLabel( toPlace, date );
+					InitializeLabel( toPlace, date );
 					VisibleLabels.Add( toPlace );
 				}
 			}
@@ -123,6 +123,8 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected abstract T CreateNewLabel();
 
-		protected abstract void UpdateLabel( T label, DateTime occurance );
+		protected abstract void InitializeLabel( T label, DateTime occurance );
+
+		protected abstract void UpdateLabel( T label );
 	}
 }
