@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -78,7 +79,12 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			// Setup desktop manager.
 			// TODO: NullReferenceException in the lambda. w != null
-			_desktopManager.AddWindowFilter( w => !(w.GetProcess().ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" )) );
+			_desktopManager.AddWindowFilter(
+				w =>
+				{
+					Process process = w.GetProcess();
+					return process != null && !(process.ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" ));
+				} );
 
 			// Check for stored presentation options for existing activities.
 			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
