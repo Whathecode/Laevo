@@ -18,8 +18,8 @@ namespace Laevo.View.ActivityOverview.Converters
 			{
 				new Point3D( -ratio, 1, 0 ),	// Top left.
 				new Point3D( -ratio, -1, 0 ),	// Bottom left.	
-				new Point3D( ratio * 3, -1, 0 ),	// Bottom right.
-				new Point3D( ratio * 3, 1, 0 ),		// Top right.	
+				new Point3D( ratio * 2, -1, 0 ),	// Bottom right.
+				new Point3D( ratio * 2, 1, 0 ),		// Top right.	
 			};
 
 			var pointCollection = new Point3DCollection( points );
