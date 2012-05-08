@@ -13,7 +13,7 @@ namespace Laevo.View.ActivityOverview.Converters
 			float renderSize = (float)values[ 1 ];
 
 			// TODO: Calculate exactly how much bigger the time line should be to prevent excess rendering.
-			return (width * renderSize) * 2;
+			return (width * renderSize) * (6/4.0);
 		}
 
 		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
