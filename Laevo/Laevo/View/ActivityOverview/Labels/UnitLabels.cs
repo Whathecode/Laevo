@@ -43,11 +43,16 @@ namespace Laevo.View.ActivityOverview.Labels
 			};
 		}
 
-		protected override void UpdateLabel( TextBlock label, DateTime occurance )
+		protected override void InitializeLabel( TextBlock label, DateTime occurance )
 		{
 			label.Text = occurance.ToString( _formatString );
 			label.FontSize = _fontSize;
 			label.SetValue( TimeLineControl.OffsetProperty, _offset );
+		}
+
+		protected override void UpdateLabel( TextBlock label )
+		{
+			// Nothing to do.
 		}
 	}
 }

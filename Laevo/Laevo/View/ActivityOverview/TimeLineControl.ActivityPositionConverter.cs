@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Media;
 using Whathecode.System.Arithmetic.Range;
 using System.Windows;
 
@@ -15,11 +16,13 @@ namespace Laevo.View.ActivityOverview
 		class ActivityPositionConverter : IMultiValueConverter
 		{
 			public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
-			{
+			{				
+				TimeLineControl control = (TimeLineControl)parameter;
+
 				var width = (double)values[ 0 ];
 				var elementWidth = (double)values[ 1 ];
-				var interval = (Interval<DateTime>)values[ 2 ];
-				var ticksInterval = new Interval<long>( interval.Start.Ticks, interval.End.Ticks );
+				var interval = (Interval<long>)values[ 2 ];
+
 				object occurance = values[ 3 ];
 				long occuranceTicks = 0;
 				if ( occurance is DateTime )
@@ -28,7 +31,7 @@ namespace Laevo.View.ActivityOverview
 				}
 				var alignment = (HorizontalAlignment)values[ 4 ];
 
-				double percentage = ticksInterval.GetPercentageFor( occuranceTicks );
+				double percentage = interval.GetPercentageFor( occuranceTicks );
 				double position = percentage * width;
 
 				switch ( alignment )

@@ -41,11 +41,21 @@ namespace Laevo.View.ActivityOverview.Labels
 			};
 		}
 
-		protected override void UpdateLabel( Line label, DateTime occurance )
+		protected override void InitializeLabel( Line label, DateTime occurance )
+		{
+			Update( label );
+		}
+
+		protected override void UpdateLabel( Line label )
+		{
+			Update( label );
+		}
+
+		void Update( Line label )
 		{
 			long minimumTicks = Interval.MinimumInterval.Ticks;
 			double minimumWidth = (double)minimumTicks / TimeLine.GetVisibleTicks() * TimeLine.ActualWidth;
-			label.Y2 = minimumWidth > TimeLine.ActualHeight ? TimeLine.ActualHeight : minimumWidth;
+			label.Y2 = minimumWidth > TimeLine.ActualHeight ? TimeLine.ActualHeight : minimumWidth;			
 		}
 	}
 }

@@ -16,13 +16,12 @@ namespace Laevo.View.ActivityOverview
 			public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 			{
 				var timeLineWidth = (double)values[ 0 ];
-				var interval = (Interval<DateTime>)values[ 1 ];
-				var ticksInterval = new Interval<long>( interval.Start.Ticks, interval.End.Ticks );
+				var interval = (Interval<long>)values[ 1 ];
 				
 				TimeSpan timeSpan = (TimeSpan)values[ 2 ];
 				if ( timeSpan != TimeSpan.Zero )
 				{
-					return ((double)timeSpan.Ticks / ticksInterval.Size) * timeLineWidth;
+					return ((double)timeSpan.Ticks / interval.Size) * timeLineWidth;
 				}
 				return double.NaN;
 			}

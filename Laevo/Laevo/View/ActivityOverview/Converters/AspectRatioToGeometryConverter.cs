@@ -22,7 +22,9 @@ namespace Laevo.View.ActivityOverview.Converters
 				new Point3D( ratio * 3, 1, 0 ),		// Top right.	
 			};
 
-			return new Point3DCollection( points );
+			var pointCollection = new Point3DCollection( points );
+			pointCollection.Freeze();
+			return pointCollection;
 		}
 
 		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
