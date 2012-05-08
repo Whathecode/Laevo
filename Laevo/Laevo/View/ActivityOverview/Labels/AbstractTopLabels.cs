@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Windows;
 
@@ -70,7 +71,9 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		TextBlock CreateNewLabelInner()
 		{
-			return CreateNewLabel();
+			TextBlock newLabel = CreateNewLabel();
+			newLabel.CacheMode = new BitmapCache();
+			return newLabel;
 		}
 
 		protected override bool ShouldShowLabels()

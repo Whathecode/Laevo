@@ -14,6 +14,7 @@
 	Topmost="True"
 	FontFamily="Segoe UI Light">
 	
+	
 	<Window.CommandBindings>
 		<CommandBinding
 			Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"
@@ -33,7 +34,7 @@
 		<Converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
 		<Converters:TimeLineHeightConverter x:Key="TimeLineHeightConverter" />
 	</Window.Resources>
-	
+		
 	<Grid Background="{StaticResource BackgroundBrush}">
 
 		<!-- Blur effect for popups. -->
@@ -97,7 +98,7 @@
 
 			<Viewport2DVisual3D>
 				<Viewport2DVisual3D.CacheMode>
-					<BitmapCache />
+					<BitmapCache RenderAtScale="1.0" />
 				</Viewport2DVisual3D.CacheMode>
 
 				<Viewport2DVisual3D.Transform>

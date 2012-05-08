@@ -48,7 +48,7 @@ namespace Laevo.View.ActivityOverview
 			WindowStyle = WindowStyle.None;
 			WindowState = WindowState.Normal;
 			Topmost = false;
-			Width = 500;
+			Width = 1000;
 			Height = 500;
 #endif
 

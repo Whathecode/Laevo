@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 
@@ -81,6 +82,7 @@ namespace Laevo.View.ActivityOverview.Labels
 					if ( AvailableLabels.Count == 0 )
 					{
 						var label = CreateNewLabel();
+						label.CacheMode = new BitmapCache();
 						AvailableLabels.Push( label );
 						Labels.Add( label );
 					}
