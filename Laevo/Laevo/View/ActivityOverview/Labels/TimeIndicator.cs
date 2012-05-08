@@ -48,6 +48,8 @@ namespace Laevo.View.ActivityOverview.Labels
 			};
 			topTriangle.SetBinding( TopProperty, heightBinding );
 			Children.Add( topTriangle );
+
+			CacheMode = new BitmapCache();
 		}
 	}
 }

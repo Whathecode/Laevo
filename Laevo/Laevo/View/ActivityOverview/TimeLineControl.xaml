@@ -11,5 +11,5 @@
 			</ItemsPanelTemplate>
 		</ItemsControl.ItemsPanel>
 	</ItemsControl>
-	
+
 </UserControl>
