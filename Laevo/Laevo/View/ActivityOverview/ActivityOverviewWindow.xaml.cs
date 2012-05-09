@@ -12,6 +12,7 @@ using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
+using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System;
 using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
@@ -173,7 +174,7 @@ namespace Laevo.View.ActivityOverview
 			if ( viewModel == null )
 			{
 				return;
-			}		
+			}
 			viewModel.Activities.ForEach( NewActivity );
 			viewModel.Activities.CollectionChanged += ActivitiesChanged;
 		}
@@ -209,7 +210,7 @@ namespace Laevo.View.ActivityOverview
 		VisibleIntervalAnimation _dragAnimation;
 		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
 		{
-			TimeLine.Focus();	// TODO: Is this needed?
+			//TimeLine.Focus();	// TODO: Is this needed?
 
 			var info = (MouseBehavior.ClickDragInfo)e.Parameter;
 
