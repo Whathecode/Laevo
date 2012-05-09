@@ -11,9 +11,15 @@
 	WindowStyle="None"
 	WindowState="Maximized"
 	ShowInTaskbar="False"
-	Topmost="True"
 	FontFamily="Segoe UI Light">
 	
+	<Window.Topmost>
+		<Binding Path="ActivityMode">
+			<Binding.Converter>
+				<Converters:ActivityModeToTopMostConverter />
+			</Binding.Converter>
+		</Binding>
+	</Window.Topmost>
 	
 	<Window.CommandBindings>
 		<CommandBinding
