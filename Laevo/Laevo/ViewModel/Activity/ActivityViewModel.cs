@@ -297,7 +297,7 @@ namespace Laevo.ViewModel.Activity
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
 			_activity.Open();
-			//_desktopManager.SwitchToDesktop( _virtualDesktop );
+			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
 			InitializeLibrary();
 			
