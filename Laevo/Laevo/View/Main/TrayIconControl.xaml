@@ -28,7 +28,8 @@
 				<Separator />
 				<MenuItem
 					Header="New Activity"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}" />
+					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}"
+					/>
 				<MenuItem
 					Header="Open Current Activity Context"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenCurrentActivityLibrary}}" />

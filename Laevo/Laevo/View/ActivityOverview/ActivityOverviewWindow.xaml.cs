@@ -12,7 +12,6 @@ using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
-using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System;
 using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
