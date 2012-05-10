@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
+using Whathecode.System;
+using Whathecode.System.Extensions;
+using Whathecode.System.Windows.Input;
 using Whathecode.System.Windows.Input.InputController;
 using Whathecode.System.Windows.Input.InputController.Condition;
 using Whathecode.System.Windows.Input.InputController.Trigger;
 using WindowsInput;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using KeyInterop = Whathecode.System.Windows.Input.KeyHelper;
 using Timer = System.Timers.Timer;
 
 
@@ -23,7 +26,8 @@ namespace Laevo.View.Main
 		const int UpdatesPerSecond = 25;		
 
 		readonly Timer _updateLoop = new Timer();
-		readonly KeyboardHookListener _keyboardListener = new KeyboardHookListener( new GlobalHooker() );
+		readonly KeyboardHookListener _keyboardListener = new KeyboardHookListener( new GlobalHooker() );		
+
 		readonly InputController _inputController = new InputController();
 		readonly Dictionary<Keys, bool> _keyStates = new Dictionary<Keys, bool>();
 
@@ -35,7 +39,7 @@ namespace Laevo.View.Main
 		{
 			InitializeComponent();
 
-			SetCapsLockMenuText( KeyInterop.IsCapsLockEnabled() );
+			SetCapsLockMenuText( KeyHelper.IsCapsLockEnabled() );
 
 			// Capture system-wide keyboard events.
 			_keyboardListener.KeyDown += OnKeyDown;
@@ -43,24 +47,68 @@ namespace Laevo.View.Main
 			_keyboardListener.Start();
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
 			_updateLoop.Elapsed += OnUpdate;
-			_updateLoop.Start();
+			_updateLoop.Start();			
 
 			// Add triggers for desired system-wide commands.
 			_keyStates[ Keys.CapsLock ] = false;	// Prevent exception when looking up a non-existent key.
-			var capsLockUp = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
-			var activityOverviewTrigger = new CommandBindingTrigger<Commands>( capsLockUp, this, Commands.SwitchActivityOverview );
-			_inputController.AddTrigger( activityOverviewTrigger );
+			_keyStates[ Keys.N ] = false;
+			_keyStates[ Keys.W ] = false;
+			_keyStates[ Keys.L ] = false;
+			var capsLockDown = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
+			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
+			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );			
+			var newActivity = new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, newActivity ), Keys.CapsLock | Keys.N, Commands.NewActivity );
+			var closeActivity = new KeyInputCondition( () => _keyStates[ Keys.W ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, closeActivity ), Keys.CapsLock | Keys.W, Commands.CloseActivity );
+			var openLibrary = new KeyInputCondition( () => _keyStates[ Keys.L ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, openLibrary ), Keys.CapsLock | Keys.L, Commands.OpenCurrentActivityLibrary );
+
+			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
+			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
+			var resetExclusiveTriggers = new EventTrigger( anyKeyDown );
+			resetExclusiveTriggers.ConditionsMet += () => _exclusiveConditions.ForEach( c => c.Reset() );
+			_inputController.AddTrigger( resetExclusiveTriggers );
+		}
+
+		readonly List<ExclusiveCondition> _exclusiveConditions = new List<ExclusiveCondition>();
+		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Commands command )
+		{
+			Func<bool> otherThanExclusive = () => _keyStates.Any( k => !exclusiveKeys.HasFlag( k.Key ) && k.Value );
+			var exclusiveCondition = new ExclusiveCondition( condition, new DelegateCondition( otherThanExclusive ) );
+			var trigger = new CommandBindingTrigger<Commands>( exclusiveCondition, this, command );
+			_inputController.AddTrigger( trigger );
+			_exclusiveConditions.Add( exclusiveCondition );
 		}
 
 		~TrayIconControl()
 		{
-			_keyboardListener.KeyDown -= OnKeyDown;
-			_keyboardListener.KeyUp -= OnKeyUp;
 			_updateLoop.Elapsed -= OnUpdate;
+			_keyboardListener.KeyDown -= OnKeyDown;
+			_keyboardListener.KeyUp -= OnKeyUp;			
 			_updateLoop.Stop();
 		}
 
 
+		void OnUpdate( object sender, EventArgs e )
+		{
+			lock ( _inputController )
+			{
+				lock ( _newInput )
+				{
+					foreach ( var input in _newInput )
+					{
+						_keyStates[ input.Key ] = input.Value;
+					}
+					_newInput.Clear();
+				}
+
+				_inputController.Update();
+			}
+		}
+
+		bool _suppressKeys = false;
+		readonly Dictionary<Keys, bool> _newInput = new Dictionary<Keys, bool>();
 		void OnKeyDown( object sender, KeyEventArgs e )
 		{
 			lock ( this )
@@ -71,10 +119,35 @@ namespace Laevo.View.Main
 				}
 			}
 
-			_keyStates[ e.KeyCode ] = true;
+			lock ( _newInput )
+			{
+				_newInput[ e.KeyCode ] = true;
+			}
 
-			// Disable caps lock.
+			// Disable caps lock, and any keys pressed simultaneously with caps lock.
 			if ( e.KeyCode == Keys.CapsLock )
+			{
+				_suppressKeys = true;
+			}			
+			if ( _suppressKeys )
+			{
+				e.Handled = true;
+			}
+		}
+
+		void OnKeyUp( object sender, KeyEventArgs e )
+		{
+			lock ( _newInput )
+			{
+				_newInput[ e.KeyCode ] = false;
+			}
+
+			// Re-enable key input when Caps Lock is released.
+			if ( e.KeyCode == Keys.CapsLock )
+			{
+				_suppressKeys = false;
+			}
+			if ( _suppressKeys )
 			{
 				e.Handled = true;
 			}
@@ -82,7 +155,7 @@ namespace Laevo.View.Main
 
 		void SwitchCapsLock( object sender, System.Windows.RoutedEventArgs e )
 		{
-			bool isCapsEnabled = KeyInterop.IsCapsLockEnabled();
+			bool isCapsEnabled = KeyHelper.IsCapsLockEnabled();
 
 			lock ( this )
 			{
@@ -99,16 +172,6 @@ namespace Laevo.View.Main
 		{
 			string headerText = TurnCapsLockText + (isCapsLockEnabled ? "Off" : "On");
 			CapsLockMenuItem.Header = headerText;
-		}
-
-		void OnKeyUp( object sender, KeyEventArgs e )
-		{
-			_keyStates[ e.KeyCode ] = false;
-		}
-
-		void OnUpdate( object sender, EventArgs e )
-		{
-			_inputController.Update();
 		}
 	}
 }

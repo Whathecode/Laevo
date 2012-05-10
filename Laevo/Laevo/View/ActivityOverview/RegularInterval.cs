@@ -10,7 +10,6 @@ namespace Laevo.View.ActivityOverview
 	class RegularInterval : IInterval
 	{	
 		public Func<DateTime, DateTime> RoundToStart { get; private set; }
-		readonly Func<DateTime, DateTime> _addition;
 
 		readonly TimeSpan _minimumInterval;
 		public TimeSpan MinimumInterval
