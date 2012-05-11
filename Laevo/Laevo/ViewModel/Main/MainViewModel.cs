@@ -143,6 +143,18 @@ namespace Laevo.ViewModel.Main
 			return _activityOverviewViewModel.ActivityMode != Mode.Select;
 		}
 
+		[CommandExecute( Commands.CutWindow )]
+		public void CutWindow()
+		{
+			_activityOverviewViewModel.CutWindow();
+		}
+
+		[CommandExecute( Commands.PasteWindows )]
+		public void PasteWindows()
+		{
+			_activityOverviewViewModel.PasteWindows();
+		}
+
 		/// <summary>
 		///   Ensure that the activity overview window is created.
 		/// </summary>

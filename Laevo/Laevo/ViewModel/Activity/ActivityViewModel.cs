@@ -21,6 +21,7 @@ using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Whathecode.System.Windows.Interop;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
@@ -352,7 +353,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.CloseActivity )]
 		public bool CanCloseActivity()
 		{
-			_desktopManager.UpdateWindows();
+			_desktopManager.UpdateWindowAssociations();
 			return _virtualDesktop.Windows.Count == 0;
 		}
 
@@ -416,6 +417,16 @@ namespace Laevo.ViewModel.Activity
 		public override void Persist()
 		{
 			_activity.Name = Label;
+		}
+
+		public void RemoveWindow( WindowInfo toRemove )
+		{
+			_virtualDesktop.RemoveWindow( toRemove );
+		}
+
+		public void AddWindow( WindowInfo toAdd )
+		{
+			_virtualDesktop.AddWindow( toAdd );
 		}
 
 		protected override void FreeUnmanagedResources()
