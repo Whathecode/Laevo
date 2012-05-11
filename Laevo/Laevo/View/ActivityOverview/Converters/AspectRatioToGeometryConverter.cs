@@ -1,35 +1,30 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media.Media3D;
+using Whathecode.System;
+using Whathecode.System.Extensions;
 
 
 namespace Laevo.View.ActivityOverview.Converters
 {
-	public class AspectRatioToGeometryConverter : IMultiValueConverter
+	public class AspectRatioToGeometryConverter : AbstractTimeLineWidthConverter
 	{
-		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
+		protected override object Convert( double windowWidth, double ratio, double planeWidth, object[] remainingValues )
 		{
-			double ratio = (double)values[ 0 ] / (double)values[ 1 ];
-
-			// TODO: Calculate exactly how much bigger the time line should be to prevent excess rendering.
 			// See TimeLineWidthConverter as well.
 			var points = new[]
 			{
 				new Point3D( -ratio, 1, 0 ),	// Top left.
 				new Point3D( -ratio, -1, 0 ),	// Bottom left.	
-				new Point3D( ratio * 2, -1, 0 ),	// Bottom right.
-				new Point3D( ratio * 2, 1, 0 ),		// Top right.	
+				new Point3D( planeWidth - ratio, -1, 0 ),	// Bottom right.
+				new Point3D( planeWidth - ratio, 1, 0 ),		// Top right.
 			};
 
 			var pointCollection = new Point3DCollection( points );
 			pointCollection.Freeze();
 			return pointCollection;
-		}
-
-		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
-		{
-			throw new NotSupportedException();
 		}
 	}
 }

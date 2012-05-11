@@ -117,6 +117,7 @@
 						</RotateTransform3D.CenterX>
 						<RotateTransform3D.Rotation>
 							<AxisAngleRotation3D
+								x:Name="RotationTransform"
 								Angle="10" />
 						</RotateTransform3D.Rotation>
 					</RotateTransform3D>
@@ -130,6 +131,7 @@
 							<MultiBinding Converter="{StaticResource AspectRatioToPositions}">
 								<Binding ElementName="MainWindow" Path="ActualWidth" />
 								<Binding ElementName="MainWindow" Path="ActualHeight" />
+								<Binding ElementName="RotationTransform" Path="Angle" />
 							</MultiBinding>
 						</MeshGeometry3D.Positions>
 					</MeshGeometry3D>
@@ -140,16 +142,18 @@
 				</Viewport2DVisual3D.Material>
 
 				<Grid
+					x:Name="TimeLineContainer"
 					ClipToBounds="True"
 					Background="{StaticResource TimeLineBrush}"
 					Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
-					Behaviors:MouseBehavior.DragCapturesMouse="False"
-					MouseWheel="OnMouseWheel"
-					MouseMove="OnMouseMoved">				
+					Behaviors:MouseBehavior.DragCapturesMouse="False"					
+					MouseWheel="OnMouseWheel">				
 					
 					<Grid.Width>
 						<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
 							<Binding ElementName="MainWindow" Path="ActualWidth" />
+							<Binding ElementName="MainWindow" Path="ActualHeight" />
+							<Binding ElementName="RotationTransform" Path="Angle" />
 							<Binding Path="TimeLineRenderScale" />
 						</MultiBinding>
 					</Grid.Width>
