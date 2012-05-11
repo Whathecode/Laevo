@@ -11,6 +11,8 @@
 		SwitchActivityOverview,
 		OpenCurrentActivityLibrary,
 		CloseActivity,
-		NewActivity
+		NewActivity,
+		CutWindow,
+		PasteWindows
 	}
 }

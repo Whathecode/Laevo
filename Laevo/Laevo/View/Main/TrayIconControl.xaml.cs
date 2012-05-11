@@ -49,11 +49,9 @@ namespace Laevo.View.Main
 			_updateLoop.Elapsed += OnUpdate;
 			_updateLoop.Start();			
 
-			// Add triggers for desired system-wide commands.
-			_keyStates[ Keys.CapsLock ] = false;	// Prevent exception when looking up a non-existent key.
-			_keyStates[ Keys.N ] = false;
-			_keyStates[ Keys.W ] = false;
-			_keyStates[ Keys.L ] = false;
+			// Add triggers for desired system-wide commands.			
+			new[] // Prevent exception when looking up a non-existent key.
+				{ Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V }.ForEach( k => _keyStates[ k ] = false );
 			var capsLockDown = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );			
@@ -63,6 +61,10 @@ namespace Laevo.View.Main
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, closeActivity ), Keys.CapsLock | Keys.W, Commands.CloseActivity );
 			var openLibrary = new KeyInputCondition( () => _keyStates[ Keys.L ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, openLibrary ), Keys.CapsLock | Keys.L, Commands.OpenCurrentActivityLibrary );
+			var cutWindow = new KeyInputCondition( () => _keyStates[ Keys.X ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, cutWindow ), Keys.CapsLock | Keys.X, Commands.CutWindow );
+			var pasteWindows = new KeyInputCondition( () => _keyStates[ Keys.V ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );

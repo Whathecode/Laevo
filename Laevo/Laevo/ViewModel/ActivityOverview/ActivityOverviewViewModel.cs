@@ -14,6 +14,7 @@ using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
+using Whathecode.System.Windows.Interop;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -212,6 +213,22 @@ namespace Laevo.ViewModel.ActivityOverview
 				{
 					Activities.ForEach( a => a.Update( CurrentTime ) );
 				}
+			}
+		}
+
+		readonly Stack<WindowInfo> _windowClipboard = new Stack<WindowInfo>();
+		public void CutWindow()
+		{
+			WindowInfo cutWindow = WindowManager.GetForegroundWindow();
+			_windowClipboard.Push( cutWindow );
+			CurrentActivityViewModel.RemoveWindow( cutWindow );
+		}
+
+		public void PasteWindows()
+		{
+			while ( _windowClipboard.Count > 0 )
+			{
+				CurrentActivityViewModel.AddWindow( _windowClipboard.Pop() );
 			}
 		}
 

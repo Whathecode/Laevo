@@ -70,12 +70,12 @@ namespace VirtualDesktopManager
 		/// <summary>
 		///   Update which windows are associated to the current virtual desktop.
 		/// </summary>
-		public void UpdateWindows()
+		public void UpdateWindowAssociations()
 		{
 			IEnumerable<WindowInfo> newWindows = GetOpenWindows()
 				.Except( _availableDesktops.SelectMany( d => d.Windows ) )
 				.Where( IsValidWindow );
-			CurrentDesktop.UpdateWindows( newWindows );
+			CurrentDesktop.UpdateWindowAssociations( newWindows );
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace VirtualDesktopManager
 				return;
 			}
 
-			UpdateWindows();
+			UpdateWindowAssociations();
 
 			// Hide windows and show those from the new desktop.
 			CurrentDesktop.Hide();

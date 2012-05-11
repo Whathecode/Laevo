@@ -53,14 +53,34 @@ namespace VirtualDesktopManager
 		/// <summary>
 		///   Adds the passed new windows and removes windows which are no longer open from the list.
 		/// </summary>
-		/// <param name="newWindows">Newly opened windows on this virtual desktop.</param>
-		public void UpdateWindows( IEnumerable<WindowInfo> newWindows )
+		/// <param name = "newWindows">Newly opened windows on this virtual desktop.</param>
+		public void UpdateWindowAssociations( IEnumerable<WindowInfo> newWindows )
 		{
 			// Add new windows.
 			_windows.AddRange( newWindows );
 
 			// Remove windows which are no longer open.
 			_windows = _windows.Where( w => !w.IsDestroyed() ).ToList();
+		}
+
+		/// <summary>
+		///   Adds the passed window to the virtual desktop and activates it.
+		/// </summary>
+		/// <param name = "toAdd">The window to add.</param>
+		public void AddWindow( WindowInfo toAdd )
+		{
+			_windows.Add( toAdd );
+			toAdd.Show();
+		}	
+
+		/// <summary>
+		///   Removes the passed window from the virtual desktop and hides it.
+		/// </summary>
+		/// <param name = "toRemove">The window to remove.</param>
+		public void RemoveWindow( WindowInfo toRemove )
+		{
+			_windows.Remove( toRemove );
+			toRemove.Hide();
 		}
 
 		/// <summary>
