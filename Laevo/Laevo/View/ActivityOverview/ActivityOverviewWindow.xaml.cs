@@ -34,7 +34,6 @@ namespace Laevo.View.ActivityOverview
 		const double DragMomentum = 0.0000001;
 
 		public static readonly ICommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
-		DateTime _focusedTime = DateTime.Now;
 
 		readonly List<ILabels> _labels = new List<ILabels>();
 		readonly Dictionary<ActivityViewModel, ActivityControl> _activities = new Dictionary<ActivityViewModel, ActivityControl>();
@@ -215,10 +214,7 @@ namespace Laevo.View.ActivityOverview
 
 			// Stop current time line animation.
 			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
-			if ( _dragAnimation != null )
-			{
-				StopDragAnimation( visibleIntervalProperty );
-			}
+			StopDragAnimation();
 
 			if ( info.State == MouseBehavior.ClickDragState.Start )
 			{
@@ -254,31 +250,38 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		void DragAnimationCompleted( object sender, EventArgs e )
-		{
-			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
-			StopDragAnimation( visibleIntervalProperty );
+		{			
+			StopDragAnimation();
 		}
 
-		void StopDragAnimation( DependencyProperty animatedProperty )
+		void StopDragAnimation()
 		{
+			if ( _dragAnimation == null )
+			{
+				return;
+			}
+
+			DependencyProperty animatedProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
 			_dragAnimation.Completed -= DragAnimationCompleted;
 			TimeLine.VisibleInterval = TimeLine.VisibleInterval;	// Required to copy latest animated value to local value.
 			TimeLine.BeginAnimation( animatedProperty, null );
-			_dragAnimation = null;
-		}
-
-		void OnMouseMoved( object sender, MouseEventArgs e )
-		{
-			double horizontalPercentage = e.GetPosition( this ).X / ActualWidth;
-			long focusTicks = ToTicksInterval( TimeLine.VisibleInterval ).GetValueAt( horizontalPercentage );
-			_focusedTime = new DateTime( focusTicks );
+			_dragAnimation = null;			
 		}
 
 		void OnMouseWheel( object sender, MouseWheelEventArgs e )
 		{
-			double zoom = 1.0 - (-e.Delta * ZoomPercentage);
+			StopDragAnimation();
+
+			// Calculate which time is focused.
+			double horizontalPercentage = Mouse.GetPosition( TimeLineContainer ).X / TimeLineContainer.ActualWidth;
 			Interval<long> ticksInterval = ToTicksInterval( TimeLine.VisibleInterval );
-			ticksInterval.Scale( zoom, ticksInterval.GetPercentageFor( _focusedTime.Ticks ) );
+			long focusTicks = ticksInterval.GetValueAt( horizontalPercentage );
+			var focusedTime = new DateTime( focusTicks );	
+
+			// Zoom the currently visible interval in/out.
+			double zoom = 1.0 - (-e.Delta * ZoomPercentage);			
+			double focusPercentage = ticksInterval.GetPercentageFor( focusedTime.Ticks );
+			ticksInterval.Scale( zoom, focusPercentage );
 			TimeLine.VisibleInterval = ToTimeInterval( ticksInterval );
 		}
 

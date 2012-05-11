@@ -161,6 +161,7 @@
     <Compile Include="View\ActivityOverview\ClockControl.xaml.cs">
       <DependentUpon>ClockControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ActivityOverview\Converters\AbstractTimeLineWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToGeometryConverter.cs" />
     <Compile Include="View\ActivityOverview\ActivityOverviewWindow.xaml.cs">
       <DependentUpon>ActivityOverviewWindow.xaml</DependentUpon>
@@ -174,6 +175,7 @@
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Mode.cs" />
+    <Compile Include="View\ActivityOverview\Converters\VectorLine.cs" />
     <Compile Include="View\ActivityOverview\TimeLineControl.ActivityWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
