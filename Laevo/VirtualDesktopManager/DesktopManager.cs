@@ -35,6 +35,7 @@ namespace VirtualDesktopManager
 			// Format: { process name, class name }
 			{ "explorer", "Button" },			// Start button.
 			{ "explorer", "Shell_TrayWnd" },	// Start bar.
+			{ "explorer", "DV2ControlHost" },   // Start menu.
 			{ "explorer", "Progman" }			// Desktop icons.
 		};		
 
@@ -129,7 +130,7 @@ namespace VirtualDesktopManager
 			_availableDesktops.ForEach( d => d.Show() );
 		}
 
-		bool IsValidWindow( WindowInfo window )
+		public bool IsValidWindow( WindowInfo window )
 		{
 			return
 				window.IsVisible() &&

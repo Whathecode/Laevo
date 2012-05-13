@@ -220,8 +220,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void CutWindow()
 		{
 			WindowInfo cutWindow = WindowManager.GetForegroundWindow();
-			_windowClipboard.Push( cutWindow );
-			CurrentActivityViewModel.RemoveWindow( cutWindow );
+			if ( _desktopManager.IsValidWindow( cutWindow ) )
+			{
+				_windowClipboard.Push( cutWindow );
+				CurrentActivityViewModel.RemoveWindow( cutWindow );
+			}
 		}
 
 		public void PasteWindows()
