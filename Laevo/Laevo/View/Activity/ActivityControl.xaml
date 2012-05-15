@@ -53,6 +53,7 @@
 					Source="{Binding Path=Icon}"
 					Stretch="None"
 					Cursor="Hand"
+					PreviewMouseDown="OnStartEditActivity"
 					Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">

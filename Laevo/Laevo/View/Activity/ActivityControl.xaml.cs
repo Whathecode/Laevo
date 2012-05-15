@@ -45,13 +45,23 @@ namespace Laevo.View.Activity
 
 		void LabelKeyDown( object sender, KeyEventArgs e )
 		{
-			var element = (UIElement)e.Source;
-
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				// Moving focus also updates the source.
-				element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+				ForceUpdateSource( e );
 			}
+		}
+
+		void OnStartEditActivity( object sender, MouseButtonEventArgs e )
+		{
+			ForceUpdateSource( e );
+		}
+
+		static void ForceUpdateSource( RoutedEventArgs e )
+		{			
+			var element = (UIElement)e.Source;
+
+			// Moving focus also updates the source.
+			element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 		}
 	}
 }
