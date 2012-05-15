@@ -7,7 +7,6 @@
 	xmlns:Binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
-	xmlns:System="clr-namespace:System;assembly=mscorlib"
 	xmlns:Interop="clr-namespace:System.Windows.Interop;assembly=PresentationCore"
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
