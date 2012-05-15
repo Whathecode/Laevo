@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -24,6 +25,16 @@ namespace Laevo
 		{
 			base.OnStartup( e );
 			ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+			// Verify whether application is already running.
+			// TODO: Improved verification, rather than just name.
+			if ( Process.GetProcessesByName( "Laevo" ).Count() > 1 )
+			{
+				MessageBox.Show( "Laevo is already running.", "Laevo", MessageBoxButton.OK );
+
+				Current.Shutdown();
+				return;
+			}
 
 			// TODO: Support multiple languages, for now force english.
 			CultureInfo english = new CultureInfo( "en-US" );
@@ -67,7 +78,10 @@ namespace Laevo
 
 		protected override void OnExit( ExitEventArgs e )
 		{
-			_viewModel.Dispose();
+			if ( _viewModel != null )
+			{
+				_viewModel.Dispose();
+			}
 		}
 	}
 }

@@ -91,6 +91,7 @@ namespace Laevo.Model
 			_processTracker.Start();
 			_processTracker.ProcessStopped += p =>
 			{				
+				// TODO: Improved verification, rather than just name.
 				if ( p.Name == "LogonUI.exe" )
 				{
 					LogonScreenExited();
