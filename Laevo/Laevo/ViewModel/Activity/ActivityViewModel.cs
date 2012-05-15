@@ -38,10 +38,16 @@ namespace Laevo.ViewModel.Activity
 		public static List<BitmapImage> PresetIcons { get; private set; }
 
 		public static readonly List<Color> PresetColors = new List<Color>
-		{
-			Color.FromRgb( 86, 124, 212 ),
-			Color.FromRgb( 88, 160, 2 ),
-			Color.FromRgb( 193, 217, 197 )
+		{			
+			Color.FromRgb( 86, 124, 212 ),	// Blue
+			Color.FromRgb( 121, 234, 255 ),	// Cyan
+			Color.FromRgb( 88, 160, 2 ),	// Green			
+			Color.FromRgb( 227, 220, 0 ),	// Yellow
+			Color.FromRgb( 212, 131, 0 ),	// Orange
+			Color.FromRgb( 212, 50, 38 ),	// Red
+			Color.FromRgb( 193, 75, 159 ),	// Purple
+			Color.FromRgb( 193, 217, 197 ),	// Gray/White
+			Color.FromRgb( 49, 54, 52 )		// Dark gray
 		};
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
 		public static BitmapImage DefaultIcon;
