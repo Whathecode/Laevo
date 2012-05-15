@@ -79,7 +79,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 
 			// Setup desktop manager.
-			// TODO: NullReferenceException in the lambda. w != null
 			_desktopManager.AddWindowFilter(
 				w =>
 				{

@@ -135,7 +135,7 @@
 								<Binding Path="." />
 								<Binding ElementName="Control" Path="DataContext.Occurance" />
 								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-								<Binding ElementName="Container" Path="ActualWidth" />								
+								<Binding ElementName="Container" Path="ActualWidth" />
 							</MultiBinding>
 						</Line.X2>
 					</Line>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using Laevo.View.ActivityOverview;
 using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
@@ -22,11 +23,14 @@ namespace Laevo.ViewModel.Main
 		readonly Model.Laevo _model;
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
+		Dispatcher _dispatcher;
 
 
 		public MainViewModel( Model.Laevo model )
-		{
+		{			
 			_model = model;
+			_dispatcher = Dispatcher.CurrentDispatcher;
+			_model.LogonScreenExited += () => _dispatcher.Invoke( new Action( RecoverFromGuiCrash ) );
 
 			EnsureActivityOverview();
 		}
@@ -39,6 +43,25 @@ namespace Laevo.ViewModel.Main
 			_model.Exit();
 
 			Application.Current.Shutdown();
+		}
+
+		/// <summary>
+		///   HACK: This functionality is provided since this is still a prototype and sometimes the GUI seems to hang.
+		///         This could be due to a possible WPF bug:
+		///			https://connect.microsoft.com/VisualStudio/feedback/details/602232/when-using-cachemode-bitmapcache-upon-waking-up-from-sleep-wpf-rendering-thread-consumes-40-cpu#tabs
+		/// </summary>
+		[CommandExecute( Commands.RecoverFromGuiCrash )]
+		public void RecoverFromGuiCrash()
+		{
+			if ( _activityOverview != null )
+			{
+				_activityOverview.Close();
+				_activityOverview = null;
+				if ( _activityOverviewViewModel.ActivityMode == Mode.Select )
+				{
+					ShowActivityOverview();
+				}
+			}
 		}
 
 		[CommandExecute( Commands.OpenSettings )]
@@ -94,6 +117,8 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivityOverview )]
 		public void SwitchActivityOverview()
 		{
+			EnsureActivityOverview();
+
 			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
 			{
 				ShowActivityOverview();
@@ -165,10 +190,13 @@ namespace Laevo.ViewModel.Main
 				return;
 			}
 
-			_activityOverviewViewModel = new ActivityOverviewViewModel( _model )
+			if ( _activityOverviewViewModel == null )
 			{
-				TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale
-			};
+				_activityOverviewViewModel = new ActivityOverviewViewModel( _model )
+				{
+					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale
+				};
+			}
 			_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
 			_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow

@@ -16,7 +16,7 @@ namespace Laevo.View.ActivityOverview
 		class ActivityPositionConverter : IMultiValueConverter
 		{
 			public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
-			{				
+			{
 				TimeLineControl control = (TimeLineControl)parameter;
 
 				var width = (double)values[ 0 ];

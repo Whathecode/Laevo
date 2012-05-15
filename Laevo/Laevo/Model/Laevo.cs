@@ -21,6 +21,13 @@ namespace Laevo.Model
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
 		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
 
+		readonly ProcessTracker _processTracker = new ProcessTracker();
+		/// <summary>
+		///   Triggered when the user returns from the logon screen to the desktop.
+		///   HACK: This is required due to a bug in WPF. More info can be found in MainViewModel.RecoverFromGuiCrash().
+		/// </summary>
+		public event Action LogonScreenExited;
+
 		static readonly DataContractSerializer ActivitySerializer = new DataContractSerializer( typeof( List<Activity> ) );
 		readonly List<Activity> _activities = new List<Activity>();
 		public ReadOnlyCollection<Activity> Activities
@@ -80,6 +87,16 @@ namespace Laevo.Model
 				}
 			}
 
+			// Start tracking processes.
+			_processTracker.Start();
+			_processTracker.ProcessStopped += p =>
+			{				
+				if ( p.Name == "LogonUI.exe" )
+				{
+					LogonScreenExited();
+				}
+			};
+
 			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
 		}
 
@@ -134,6 +151,8 @@ namespace Laevo.Model
 		public void Exit()
 		{
 			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
+
+			_processTracker.Stop();
 
 			Persist();
 		}
