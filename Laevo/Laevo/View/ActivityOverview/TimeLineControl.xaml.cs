@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -235,7 +234,7 @@ namespace Laevo.View.ActivityOverview
 			long ticksDifference = control.InternalVisibleInterval.Start - control.VisibleInterval.Start.Ticks;
 			transform.X = (double)ticksDifference / control.InternalVisibleInterval.Size * control.ActualWidth;			
 
-			control.VisibleIntervalChangedEvent( control.VisibleInterval );		
+			control.VisibleIntervalChangedEvent( control.VisibleInterval );
 		}
 	}
 }

@@ -6,7 +6,9 @@
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:Binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
-	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"	
+	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
+	xmlns:System="clr-namespace:System;assembly=mscorlib"
+	xmlns:Interop="clr-namespace:System.Windows.Interop;assembly=PresentationCore"
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
@@ -176,16 +178,22 @@
 
 		<!-- No 3D. -->
 		<!--<Grid
+			x:Name="TimeLineContainer"
 			ClipToBounds="True"
 			Background="{StaticResource TimeLineBrush}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
 			Behaviors:MouseBehavior.DragCapturesMouse="False"
-			MouseWheel="OnMouseWheel"
-			MouseMove="OnMouseMoved">
+			MouseWheel="OnMouseWheel">
 
+			<Grid.Resources>
+				<System:Double x:Key="Angle">0</System:Double>
+			</Grid.Resources>
+			
 			<Grid.Width>
 				<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
 					<Binding ElementName="MainWindow" Path="ActualWidth" />
+					<Binding ElementName="MainWindow" Path="ActualHeight" />
+					<Binding Source="{StaticResource Angle}" />
 					<Binding Path="TimeLineRenderScale" />
 				</MultiBinding>
 			</Grid.Width>
@@ -198,8 +206,8 @@
 			</Grid.Height>
 
 			<ActivityOverview:TimeLineControl
-						x:Name="TimeLine"
-						Focusable="True" />
+					x:Name="TimeLine"
+					Focusable="True" />
 		</Grid>-->
 
 		<!-- Clock -->
@@ -245,6 +253,12 @@
 				</Style>
 			</Grid.Style>
 		</Grid>
+		
+		<Image>
+			<Image.Source>
+				<Interop:D3DImage />
+			</Image.Source>
+		</Image>
 		
 	</Grid>
 

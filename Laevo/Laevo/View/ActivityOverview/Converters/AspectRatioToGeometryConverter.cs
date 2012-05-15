@@ -1,10 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Media.Media3D;
-using Whathecode.System;
-using Whathecode.System.Extensions;
+﻿using System.Windows.Media.Media3D;
 
 
 namespace Laevo.View.ActivityOverview.Converters
