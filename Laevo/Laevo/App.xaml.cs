@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
@@ -22,6 +24,10 @@ namespace Laevo
 		{
 			base.OnStartup( e );
 			ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+			// TODO: Support multiple languages, for now force english.
+			CultureInfo english = new CultureInfo( "en-US" );
+			Thread.CurrentThread.CurrentCulture = english;
 
 			// Create exception logger.
 			DispatcherUnhandledException += ( s, a )
