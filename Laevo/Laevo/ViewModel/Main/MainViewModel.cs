@@ -23,7 +23,7 @@ namespace Laevo.ViewModel.Main
 		readonly Model.Laevo _model;
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
-		Dispatcher _dispatcher;
+		readonly Dispatcher _dispatcher;
 
 
 		public MainViewModel( Model.Laevo model )
@@ -72,13 +72,16 @@ namespace Laevo.ViewModel.Main
 			{
 				DataContext = viewModel
 			};
+
 			settingsWindow.Closed += ( s, a ) =>
 			{
 				viewModel.Persist();
 				_activityOverviewViewModel.TimeLineRenderScale = viewModel.TimeLineRenderScale;
+				_activityOverviewViewModel.EnableAttentionLines = viewModel.EnableAttentionLines;
 			};
-
+			
 			settingsWindow.Show();
+
 		}
 
 		[CommandExecute( Commands.ShowActivityOverview )]
@@ -194,7 +197,8 @@ namespace Laevo.ViewModel.Main
 			{
 				_activityOverviewViewModel = new ActivityOverviewViewModel( _model )
 				{
-					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale
+					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale,
+					EnableAttentionLines = _model.Settings.EnableAttentionLines
 				};
 			}
 			_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;

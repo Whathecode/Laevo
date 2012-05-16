@@ -16,5 +16,11 @@ namespace Laevo.Model
 		/// </summary>
 		[DataMember]
 		public float TimeLineRenderAtScale = 1f;
+
+		/// <summary>
+		///   Determines whether or not the attention lines are visible.
+		/// </summary>
+		[DataMember]
+		public bool EnableAttentionLines = true;
 	}
 }

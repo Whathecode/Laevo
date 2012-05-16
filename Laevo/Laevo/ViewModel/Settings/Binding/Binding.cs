@@ -2,7 +2,8 @@
 {
 	public enum Properties
 	{
-		TimeLineRenderScale
+		TimeLineRenderScale,
+		EnableAttentionLines
 	}
 
 	public enum Commands { }

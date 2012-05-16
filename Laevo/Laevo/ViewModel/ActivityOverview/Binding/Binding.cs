@@ -5,7 +5,8 @@
 		CurrentTime,
 		Activities,
 		Mode,
-		TimeLineRenderScale
+		TimeLineRenderScale,
+		EnableAttentionLines
 	}
 
 	public enum Commands { }

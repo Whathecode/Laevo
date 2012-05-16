@@ -16,10 +16,14 @@
 					<TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right">Maximum</TextBlock>
 				</DockPanel>
 				<Slider
-				Value="{Binding TimeLineRenderScale}"
-				Minimum="0.5"
-				Maximum="1.0"
-				TickPlacement="TopLeft" />
+					Value="{Binding TimeLineRenderScale}"
+					Minimum="0.5"
+					Maximum="1.0"
+					TickPlacement="TopLeft" />
+				<CheckBox
+					Margin="0, 10, 0, 0"
+					IsChecked="{Binding EnableAttentionLines}"
+					Content="Enable attention span lines" />
 			</StackPanel>
 			<Button
 				Margin="0, 10, 0, 0"
