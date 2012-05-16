@@ -82,7 +82,13 @@
 		</Grid.Style>
 
 		<!-- Time Line 3D -->
-		<Viewport3D ClipToBounds="False" RenderOptions.EdgeMode="Aliased">
+		<Viewport3D
+			ClipToBounds="False"
+			RenderOptions.EdgeMode="Aliased"
+			Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+			Behaviors:MouseBehavior.DragCapturesMouse="True"
+			MouseWheel="OnMouseWheel">
+			
 			<Viewport3D.Camera>
 				<PerspectiveCamera
 					Position="0 0 1"
@@ -145,10 +151,7 @@
 				<Grid
 					x:Name="TimeLineContainer"
 					ClipToBounds="True"
-					Background="{StaticResource TimeLineBrush}"
-					Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
-					Behaviors:MouseBehavior.DragCapturesMouse="False"					
-					MouseWheel="OnMouseWheel">				
+					Background="{StaticResource TimeLineBrush}">				
 					
 					<Grid.Width>
 						<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
