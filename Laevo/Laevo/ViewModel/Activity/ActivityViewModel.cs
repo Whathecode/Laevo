@@ -125,6 +125,12 @@ namespace Laevo.ViewModel.Activity
 		public ObservableCollection<Interval<DateTime>> ActiveTimeSpans { get; private set; }
 
 		/// <summary>
+		///   Determines whether or not the active timespans should be shown.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.ShowActiveTimeSpans )]
+		public bool ShowActiveTimeSpans { get; set; }
+
+		/// <summary>
 		///   An icon representing the activity.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Icon )]

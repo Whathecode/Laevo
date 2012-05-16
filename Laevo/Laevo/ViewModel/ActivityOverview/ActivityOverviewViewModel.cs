@@ -51,6 +51,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.TimeLineRenderScale )]
 		public float TimeLineRenderScale { get; set; }
 
+		[NotifyProperty( Binding.Properties.EnableAttentionLines )]
+		public bool EnableAttentionLines { get; set; }
+
 		/// <summary>
 		///   The mode determines which actions are possible within the activity overview.
 		/// </summary>
@@ -197,6 +200,17 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			SelectedActivityEvent( viewModel );
 		}
+
+		// ReSharper disable UnusedMember.Local
+		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
+		void OnEnableAttentionLinesChanged( bool oldIsEnabled, bool newIsEnabled )
+		{
+			foreach ( var activity in Activities )
+			{
+				activity.ShowActiveTimeSpans = newIsEnabled;
+			}
+		}
+		// ReSharper restore UnusedMember.Local
 
 		void UpdateData( object sender, ElapsedEventArgs e )
 		{

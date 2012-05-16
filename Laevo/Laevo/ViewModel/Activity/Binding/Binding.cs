@@ -5,6 +5,7 @@
 		Occurance,
 		TimeSpan,
 		ActiveTimeSpans,
+		ShowActiveTimeSpans,
 		Icon,
 		Color,
 		Label,

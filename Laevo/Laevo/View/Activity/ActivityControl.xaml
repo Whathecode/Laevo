@@ -39,6 +39,7 @@
 		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />	
 		<wtcConverters:CalculateValueConverter x:Key="DivideByTwoConverter" Operation="Division" Value="2" />
 		<Converters:ActivityBorderConverter x:Key="BorderBrushConverter" />
+		<Converters:AttentionLinesVisibilityConverter x:Key="AttentionLineConverter" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
@@ -119,6 +120,7 @@
 						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Stroke="Yellow" StrokeThickness="5">
+						
 						<Line.X1>
 							<MultiBinding
 								Converter="{StaticResource TimeSpanConverter}"
@@ -143,9 +145,27 @@
 				</DataTemplate>
 			</Border.Resources>
 
+			<!-- Attention time spans. -->
 			<ItemsControl
-				ItemsSource="{Binding ActiveTimeSpans}"
+				Visibility="{Binding ShowActiveTimeSpans, Converter={StaticResource AttentionLineConverter}}"
 				ItemTemplate="{StaticResource TimeSpanTemplate}">
+				
+				<ItemsControl.Style>
+					<Style TargetType="ItemsControl">
+						<Style.Triggers>
+							<Trigger Property="ItemsControl.Visibility" Value="Visible">
+								<Setter Property="ItemsSource" Value="{Binding ActiveTimeSpans}"/>
+							</Trigger>
+							<Trigger Property="ItemsControl.Visibility" Value="Hidden">
+								<Setter Property="ItemsSource" Value="{x:Null}"/>
+							</Trigger>
+							<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
+								<Setter Property="ItemsSource" Value="{x:Null}"/>
+							</Trigger>
+						</Style.Triggers>
+					</Style>
+				</ItemsControl.Style>
+				
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<Canvas />
