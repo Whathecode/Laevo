@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Forms;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;

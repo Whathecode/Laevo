@@ -176,6 +176,7 @@
     <Compile Include="View\ActivityOverview\Converters\ActivityModeToTopMostConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineHeightConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
+    <Compile Include="View\ActivityOverview\Shaders\FadeEffect.cs" />
     <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Mode.cs" />
     <Compile Include="View\ActivityOverview\Converters\VectorLine.cs" />
@@ -244,8 +245,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="View\ActivityOverview\Shaders\FadeEffect.fx" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="View\ActivityOverview\Shaders\FadeEffect.ps" />
     <Resource Include="View\Main\Standby.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -300,7 +303,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Resource Include="View\Activity\Icons\Address_Book.png" />
     <Resource Include="View\Activity\Icons\Alert.png" />

@@ -30,28 +30,18 @@ namespace Laevo.ViewModel.Main
 		{			
 			_model = model;
 			_dispatcher = Dispatcher.CurrentDispatcher;
-			_model.LogonScreenExited += () => _dispatcher.Invoke( new Action( RecoverFromGuiCrash ) );
+			_model.LogonScreenExited += () => _dispatcher.Invoke( new Action( ResetGui ) );
 
 			EnsureActivityOverview();
 		}
 
-
-		[CommandExecute( Commands.Exit )]
-		public void Exit()
-		{
-			Persist();
-			_model.Exit();
-
-			Application.Current.Shutdown();
-		}
 
 		/// <summary>
 		///   HACK: This functionality is provided since this is still a prototype and sometimes the GUI seems to hang.
 		///         This could be due to a possible WPF bug:
 		///			https://connect.microsoft.com/VisualStudio/feedback/details/602232/when-using-cachemode-bitmapcache-upon-waking-up-from-sleep-wpf-rendering-thread-consumes-40-cpu#tabs
 		/// </summary>
-		[CommandExecute( Commands.RecoverFromGuiCrash )]
-		public void RecoverFromGuiCrash()
+		void ResetGui()
 		{
 			if ( _activityOverview != null )
 			{
@@ -62,6 +52,16 @@ namespace Laevo.ViewModel.Main
 					ShowActivityOverview();
 				}
 			}
+		}
+
+
+		[CommandExecute( Commands.Exit )]
+		public void Exit()
+		{
+			Persist();
+			_model.Exit();
+
+			Application.Current.Shutdown();
 		}
 
 		[CommandExecute( Commands.OpenSettings )]

@@ -5,7 +5,6 @@
 	public enum Commands
 	{
 		Exit,
-		RecoverFromGuiCrash,
 		OpenSettings,
 		ShowActivityOverview,
 		HideActivityOverview,
