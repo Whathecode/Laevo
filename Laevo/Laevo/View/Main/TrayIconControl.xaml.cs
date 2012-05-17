@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
-using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Input;
 using Whathecode.System.Windows.Input.InputController;
@@ -51,7 +51,7 @@ namespace Laevo.View.Main
 
 			// Add triggers for desired system-wide commands.			
 			new[] // Prevent exception when looking up a non-existent key.
-				{ Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V }.ForEach( k => _keyStates[ k ] = false );
+				{ Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A }.ForEach( k => _keyStates[ k ] = false );
 			var capsLockDown = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );			
@@ -65,6 +65,9 @@ namespace Laevo.View.Main
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, cutWindow ), Keys.CapsLock | Keys.X, Commands.CutWindow );
 			var pasteWindows = new KeyInputCondition( () => _keyStates[ Keys.V ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
+			var switchCapsLock = new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger(
+				new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, () => SwitchCapsLock( this, null ) );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
@@ -76,9 +79,28 @@ namespace Laevo.View.Main
 		readonly List<ExclusiveCondition> _exclusiveConditions = new List<ExclusiveCondition>();
 		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Commands command )
 		{
+			CreateExclusiveTrigger(
+				condition, exclusiveKeys,
+				c => new CommandBindingTrigger<Commands>( c, this, command ) );
+
+		}
+		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Action action )
+		{
+			var dispatcher = Dispatcher;
+			CreateExclusiveTrigger(
+				condition, exclusiveKeys,
+				c =>
+				{
+					var trigger = new EventTrigger( c );
+					trigger.ConditionsMet += () => dispatcher.Invoke( action );
+					return trigger;
+				} );
+		}
+		void CreateExclusiveTrigger( AbstractCondition condition, Keys exclusiveKeys, Func<AbstractCondition, EventTrigger> createTrigger )
+		{
 			Func<bool> otherThanExclusive = () => _keyStates.Any( k => !exclusiveKeys.HasFlag( k.Key ) && k.Value );
 			var exclusiveCondition = new ExclusiveCondition( condition, new DelegateCondition( otherThanExclusive ) );
-			var trigger = new CommandBindingTrigger<Commands>( exclusiveCondition, this, command );
+			EventTrigger trigger = createTrigger( exclusiveCondition );
 			_inputController.AddTrigger( trigger );
 			_exclusiveConditions.Add( exclusiveCondition );
 		}
