@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Laevo.View.Activity;
+using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
@@ -205,6 +206,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		Interval<long> _startDrag;
+		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
 		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
 		{
@@ -219,6 +221,7 @@ namespace Laevo.View.ActivityOverview
 			if ( info.State == MouseBehavior.ClickDragState.Start )
 			{
 				_startDrag = ToTicksInterval( TimeLine.VisibleInterval );
+				_startDragFocus = GetFocusedTime( _startDrag );
 			}
 			else if ( info.State == MouseBehavior.ClickDragState.Stop )
 			{
@@ -237,9 +240,8 @@ namespace Laevo.View.ActivityOverview
 			}
 			else
 			{
-				double offsetPercentage = info.Mouse.Position.Percentage.X - info.StartPosition.Percentage.X;
-				var visibleTicks = ToTicksInterval( TimeLine.VisibleInterval ).Size;
-				var ticksOffset = (long)(visibleTicks * offsetPercentage);
+				DateTime currentFocus = GetFocusedTime( _startDrag );
+				var ticksOffset = currentFocus.Ticks - _startDragFocus.Ticks;
 				var interval = (Interval<long>)_startDrag.Clone();
 				if ( interval.Start - ticksOffset > DateTime.MinValue.Ticks && interval.End - ticksOffset < DateTime.MaxValue.Ticks )
 				{
@@ -247,6 +249,27 @@ namespace Laevo.View.ActivityOverview
 					TimeLine.VisibleInterval = ToTimeInterval( interval );
 				}
 			}
+		}
+
+		DateTime GetFocusedTime( Interval<long> ticksInterval )
+		{
+			// Find intersection of the ray along which is viewed, with the plane which shows the time line.
+			double ratio = TimeLineContainer.ActualWidth / TimeLineContainer.ActualHeight;
+			Vector leftFieldOfView = new Vector( -ratio, 0 );
+			double angleRadians = MathHelper.DegreesToRadians( RotationTransform.Angle );
+			VectorLine planeLine = new VectorLine( leftFieldOfView, new Vector( 0, Math.Tan( angleRadians ) * -ratio ) );
+			double viewPercentage = Mouse.GetPosition( this ).X / TimeLineContainer.ActualWidth;
+			double viewWidth = 2 * ratio;
+			VectorLine viewRay = new VectorLine( new Vector( 0, 1 ), new Vector( -ratio + (viewWidth * viewPercentage), 0 ) );
+			Vector viewIntersection = planeLine.Intersection( viewRay );
+
+			// Find the percentage of the focused point on the time line.
+			VectorLine rightFieldOfViewLine = new VectorLine( new Vector( 0, 1 ), new Vector( ratio, 0 ) );
+			Vector rightIntersection = planeLine.Intersection( rightFieldOfViewLine );
+			double planePercentage = leftFieldOfView.DistanceTo( viewIntersection ) / leftFieldOfView.DistanceTo( rightIntersection );
+
+			long focusTicks = ticksInterval.GetValueAt( planePercentage );
+			return new DateTime( focusTicks );
 		}
 
 		void DragAnimationCompleted( object sender, EventArgs e )
@@ -273,10 +296,8 @@ namespace Laevo.View.ActivityOverview
 			StopDragAnimation();
 
 			// Calculate which time is focused.
-			double horizontalPercentage = Mouse.GetPosition( TimeLineContainer ).X / TimeLineContainer.ActualWidth;
 			Interval<long> ticksInterval = ToTicksInterval( TimeLine.VisibleInterval );
-			long focusTicks = ticksInterval.GetValueAt( horizontalPercentage );
-			var focusedTime = new DateTime( focusTicks );	
+			var focusedTime = GetFocusedTime( ticksInterval );
 
 			// Zoom the currently visible interval in/out.
 			double zoom = 1.0 - (-e.Delta * ZoomPercentage);			

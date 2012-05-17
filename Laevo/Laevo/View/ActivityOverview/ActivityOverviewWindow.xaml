@@ -1,5 +1,4 @@
 ﻿<Window
-	x:Name="MainWindow"
 	x:Class="Laevo.View.ActivityOverview.ActivityOverviewWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -42,7 +41,12 @@
 		<Converters:TimeLineHeightConverter x:Key="TimeLineHeightConverter" />
 	</Window.Resources>
 		
-	<Grid Background="{StaticResource BackgroundBrush}">
+	<Grid
+		x:Name="TimeLineContainer"
+		Background="{StaticResource BackgroundBrush}"
+		Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+		Behaviors:MouseBehavior.DragCapturesMouse="True"
+		MouseWheel="OnMouseWheel">
 
 		<!-- Blur effect for popups. -->
 		<Grid.Effect>
@@ -84,10 +88,7 @@
 		<!-- Time Line 3D -->
 		<Viewport3D
 			ClipToBounds="False"
-			RenderOptions.EdgeMode="Aliased"
-			Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
-			Behaviors:MouseBehavior.DragCapturesMouse="True"
-			MouseWheel="OnMouseWheel">
+			RenderOptions.EdgeMode="Aliased">
 			
 			<Viewport3D.Camera>
 				<PerspectiveCamera
@@ -96,8 +97,8 @@
 					UpDirection="0 1 0">
 					<PerspectiveCamera.FieldOfView>
 						<MultiBinding Converter="{StaticResource AspectRatioToFov}">
-							<Binding ElementName="MainWindow" Path="Width" />
-							<Binding ElementName="MainWindow" Path="Height" />
+							<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+							<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 						</MultiBinding>
 					</PerspectiveCamera.FieldOfView>
 				</PerspectiveCamera>
@@ -118,8 +119,8 @@
 					<RotateTransform3D>
 						<RotateTransform3D.CenterX>
 							<MultiBinding Converter="{StaticResource AspectRatioToTransformOffset}">
-								<Binding ElementName="MainWindow" Path="Width" />
-								<Binding ElementName="MainWindow" Path="Height" />
+								<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+								<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 							</MultiBinding>
 						</RotateTransform3D.CenterX>
 						<RotateTransform3D.Rotation>
@@ -136,8 +137,8 @@
 						TextureCoordinates="0 0, 0 1, 1 1, 1 0">
 						<MeshGeometry3D.Positions>
 							<MultiBinding Converter="{StaticResource AspectRatioToPositions}">
-								<Binding ElementName="MainWindow" Path="ActualWidth" />
-								<Binding ElementName="MainWindow" Path="ActualHeight" />
+								<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+								<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 								<Binding ElementName="RotationTransform" Path="Angle" />
 							</MultiBinding>
 						</MeshGeometry3D.Positions>
@@ -149,14 +150,13 @@
 				</Viewport2DVisual3D.Material>
 
 				<Grid
-					x:Name="TimeLineContainer"
 					ClipToBounds="True"
 					Background="{StaticResource TimeLineBrush}">				
 					
 					<Grid.Width>
 						<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
-							<Binding ElementName="MainWindow" Path="ActualWidth" />
-							<Binding ElementName="MainWindow" Path="ActualHeight" />
+							<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+							<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 							<Binding ElementName="RotationTransform" Path="Angle" />
 							<Binding Path="TimeLineRenderScale" />
 						</MultiBinding>
@@ -164,7 +164,7 @@
 
 					<Grid.Height>
 						<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
-							<Binding ElementName="MainWindow" Path="ActualHeight" />
+							<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 							<Binding Path="TimeLineRenderScale" />
 						</MultiBinding>
 					</Grid.Height>					
@@ -180,7 +180,6 @@
 
 		<!-- No 3D. -->
 		<!--<Grid
-			x:Name="TimeLineContainer"
 			ClipToBounds="True"
 			Background="{StaticResource TimeLineBrush}"
 			Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
@@ -193,8 +192,8 @@
 			
 			<Grid.Width>
 				<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
-					<Binding ElementName="MainWindow" Path="ActualWidth" />
-					<Binding ElementName="MainWindow" Path="ActualHeight" />
+					<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+					<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 					<Binding Source="{StaticResource Angle}" />
 					<Binding Path="TimeLineRenderScale" />
 				</MultiBinding>
@@ -202,7 +201,7 @@
 
 			<Grid.Height>
 				<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
-					<Binding ElementName="MainWindow" Path="ActualHeight" />
+					<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
 					<Binding Path="TimeLineRenderScale" />
 				</MultiBinding>
 			</Grid.Height>
