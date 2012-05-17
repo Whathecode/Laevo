@@ -17,9 +17,6 @@
 				<MenuItem
 					Header="Exit"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.Exit}}" />
-				<MenuItem
-					Header="Recover From Crash"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.RecoverFromGuiCrash}}" />
 				<Separator />
 				<MenuItem
 					Header="Settings"
