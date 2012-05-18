@@ -171,6 +171,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void HookActivityEvents( ActivityViewModel activity )
 		{
+			activity.OpeningActivityEvent += OnActivityOpening;
 			activity.OpenedActivityEvent += OnActivityOpened;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += a => ActivityMode = Mode.Edit;
@@ -178,14 +179,18 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityClosedEvent += OnActivityClosed;
 		}
 
-		void OnActivityOpened( ActivityViewModel viewModel )
+		void OnActivityOpening( ActivityViewModel viewModel )
 		{
 			// Indicate an activity is no longer active (visible).
 			if ( CurrentActivityViewModel != null && viewModel != CurrentActivityViewModel )
 			{
 				CurrentActivityViewModel.Deactivated();
 			}
+			
+		}
 
+		void OnActivityOpened( ActivityViewModel viewModel )
+		{
 			CurrentActivityViewModel = viewModel;
 			OpenedActivityEvent( viewModel );
 		}

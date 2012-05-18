@@ -118,19 +118,21 @@
 				</Viewport2DVisual3D.CacheMode>
 
 				<Viewport2DVisual3D.Transform>
-					<RotateTransform3D>
-						<RotateTransform3D.CenterX>
-							<MultiBinding Converter="{StaticResource AspectRatioToTransformOffset}">
-								<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-								<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-							</MultiBinding>
-						</RotateTransform3D.CenterX>
-						<RotateTransform3D.Rotation>
-							<AxisAngleRotation3D
-								x:Name="RotationTransform"
-								Angle="10" />
-						</RotateTransform3D.Rotation>
-					</RotateTransform3D>
+					<Transform3DGroup>
+						<RotateTransform3D>
+							<RotateTransform3D.CenterX>
+								<MultiBinding Converter="{StaticResource AspectRatioToTransformOffset}">
+									<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+									<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+								</MultiBinding>
+							</RotateTransform3D.CenterX>
+							<RotateTransform3D.Rotation>
+								<AxisAngleRotation3D
+									x:Name="RotationTransform"
+									Angle="10" />
+							</RotateTransform3D.Rotation>
+						</RotateTransform3D>
+					</Transform3DGroup>
 				</Viewport2DVisual3D.Transform>
 
 				<Viewport2DVisual3D.Geometry>
