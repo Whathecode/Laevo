@@ -68,6 +68,11 @@ namespace Laevo.ViewModel.Activity
 
 
 		/// <summary>
+		///   Event which is triggered when an activity is being opened.
+		/// </summary>
+		public event ActivityEventHandler OpeningActivityEvent;
+
+		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
 		public event ActivityEventHandler OpenedActivityEvent;
@@ -284,13 +289,15 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
+			OpeningActivityEvent( this );
+
 			if ( this == _overview.CurrentActivityViewModel )
 			{
 				// Activity is already open.
 				// The event is still necessary to indicate the user is no longer selecting an activity.
 				OpenedActivityEvent( this );
 				return;
-			}
+			}			
 
 			// The first opened activity should include the currently open windows.
 			if ( _firstActivity )
@@ -421,6 +428,16 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		internal void Deactivated()
 		{
+			// Store activity context paths.
+			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
+			{
+				_activity.DataPaths.Clear();
+				foreach ( var folder in activityContext )
+				{
+					_activity.DataPaths.Add( new Uri( folder.Path ) );
+				}				
+			}
+
 			IsActive = false;
 			_activity.Deactivate();
 			_currentActiveTimeSpan = null;
