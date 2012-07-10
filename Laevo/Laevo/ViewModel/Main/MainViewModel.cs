@@ -81,7 +81,6 @@ namespace Laevo.ViewModel.Main
 			};
 			
 			settingsWindow.Show();
-
 		}
 
 		[CommandExecute( Commands.ShowActivityOverview )]
@@ -114,6 +113,10 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityOverview )]
 		public void HideActivityOverview()
 		{
+			// HACK: When just coming out of the logon screen, the time line seems to might have been reset, prior to wanting to hide it.
+			//       This was reported as an issue once, at this specific spot.
+			EnsureActivityOverview();
+
 			_activityOverview.Hide();
 		}
 

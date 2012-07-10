@@ -44,7 +44,8 @@ namespace Laevo.Model
 		///   The date when this activity was first created.
 		/// </summary>
 		[DataMember]
-		public DateTime DateCreated { get; private set; }
+		// TODO: Make private again after presentation.
+		public DateTime DateCreated { get; set; }
 
 		Interval<DateTime> _currentOpenInterval;
 		[DataMember]
@@ -66,13 +67,26 @@ namespace Laevo.Model
 
 
 		public Activity()
-			: this( "" ) { }
+			: this( "", DateTime.Now ) { }
 
-		public Activity( string name )
+		public Activity( string name, DateTime? planned, int minutes = 0 )
 		{
 			Name = name;
 			DataPaths = new List<Uri>();
-			DateCreated = DateTime.Now;
+			if ( planned == null )
+			{
+				DateCreated = DateTime.Now;
+			}
+			else
+			{
+				DateCreated = planned.Value;
+			}
+
+			// TODO: Remove after presentation.
+			if ( minutes != 0 )
+			{
+				_openIntervals.Add( new Interval<DateTime>( DateCreated, DateCreated + TimeSpan.FromMinutes( minutes ) ) );
+			}
 
 			// Create initial data path.
 			string folderName = name;
@@ -81,17 +95,35 @@ namespace Laevo.Model
 				folderName = DateTime.Now.ToString( "g" );
 			}
 			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
-			string path = Path.Combine( _activityContextPath, safeName ).MakeUnique( p => !Directory.Exists( p ), "_i" );
+			string path;
+			if ( planned != null )
+			{
+				path = Path.Combine( _activityContextPath, safeName ); //.MakeUnique( p => !Directory.Exists( p ), "_i" );
+			}
+			else
+			{
+				path = Path.Combine( _activityContextPath, safeName ).MakeUnique( p => !Directory.Exists( p ), "_i" );
+			}
 			var activityDirectory = new DirectoryInfo( path );
-			activityDirectory.Create();
+			if ( planned == null )
+			{
+				activityDirectory.Create();
+			}
 			DataPaths.Add( new Uri( activityDirectory.FullName ) );
 		}
 
-
+		bool isFirstOpen = true;
 		public void Open()
 		{
 			if ( !IsOpen )
 			{
+				// TODO: Remove after presentation.
+				if ( isFirstOpen )
+				{
+					_openIntervals.Clear();
+					isFirstOpen = false;
+				}
+
 				var now = DateTime.Now;
 				_currentOpenInterval = new Interval<DateTime>( now, now );
 				_openIntervals.Add( _currentOpenInterval );

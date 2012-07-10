@@ -111,9 +111,10 @@ namespace Laevo.Model
 		///   Creates a new activity and sets it as the current activity.
 		/// </summary>
 		/// <returns>The newly created activity.</returns>
-		public Activity CreateNewActivity()
+		/// TODO: Remove 'planned' and 'minutes' after presentation.
+		public Activity CreateNewActivity( string name = null, DateTime? planned = null, int minutes = 0 )
 		{
-			var activity = new Activity( "New Activity" );
+			var activity = new Activity( name ?? "New Activity", planned, minutes );
 			AddActivity( activity );
 
 			CurrentActivity = activity;
