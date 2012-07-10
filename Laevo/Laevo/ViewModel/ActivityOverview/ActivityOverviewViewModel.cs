@@ -99,11 +99,114 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 
+			// TODO: Remove after presenting thesis.
+			ActivityViewModel introductionView = null;
+			if ( existingActivities.Count == 0 )
+			{
+				var blue = ActivityViewModel.PresetColors[ 0 ];
+				var green = ActivityViewModel.PresetColors[ 2 ];
+				var yellow = ActivityViewModel.PresetColors[ 3 ];
+				var red = ActivityViewModel.PresetColors[ 5 ];
+				var gray = ActivityViewModel.PresetColors[ 7 ];
+				double height = (1.0 / _model.Activities.Count) - 0.015;
+				double reduceOffset = height + 0.03;
+				double offset = 1 - reduceOffset;
+				Func<double> getOffset = () =>
+				{
+					var oldOffset = offset;
+					offset -= reduceOffset;
+					return oldOffset;
+				};
+
+				var introduction = _model.Activities[ 0 ];
+				introductionView = new ActivityViewModel( this, introduction, _desktopManager )
+				{
+					Color = blue,
+					Icon = ActivityViewModel.HomeIcon,
+					OffsetPercentage = 1,
+				};
+				existingActivities[ introduction.DateCreated ] = introductionView;
+
+				var problemStatement = _model.Activities[ 1 ];
+				var problemView = new ActivityViewModel( this, problemStatement, _desktopManager )
+				{
+					Color = red,
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "alert.png" ) ),
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ problemStatement.DateCreated ] = problemView;
+
+				var existingResearch = _model.Activities[ 2 ];
+				var existingResearchView = new ActivityViewModel( this, existingResearch, _desktopManager )
+				{
+					Color = gray,
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "tip.png" ) ),
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ existingResearch.DateCreated ] = existingResearchView;
+
+				var activityTheory = _model.Activities[ 3 ];
+				var activityTheoryView = new ActivityViewModel( this, activityTheory, _desktopManager )
+				{
+					Color = gray,
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "tutorial.png" ) ),
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ activityTheory.DateCreated ] = activityTheoryView;
+
+				var laevo = _model.Activities[ 4 ];
+				var laevoView = new ActivityViewModel( this, activityTheory, _desktopManager )
+				{
+					Color = blue,
+					Icon = ActivityViewModel.DefaultIcon,
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ laevo.DateCreated ] = laevoView;
+
+				var userStudies = _model.Activities[ 5 ];
+				var userStudiesView = new ActivityViewModel( this, activityTheory, _desktopManager )
+				{
+					Color = yellow,
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "stats.png" ) ),
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ userStudies.DateCreated ] = userStudiesView;
+
+				var conclusions = _model.Activities[ 6 ];
+				var conclusionsView = new ActivityViewModel( this, activityTheory, _desktopManager )
+				{
+					Color = blue,
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "announcement.png" ) ), 
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ conclusions.DateCreated ] = conclusionsView;
+
+				var discussion = _model.Activities[ 7 ];
+				var discussionView = new ActivityViewModel( this, discussion, _desktopManager )
+				{
+					Color = green,
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "user.png" ) ),
+					OffsetPercentage = getOffset()
+				};
+				existingActivities[ discussion.DateCreated ] = discussionView;
+
+				foreach ( var vm in existingActivities )
+				{
+					vm.Value.HeightPercentage = height;
+				}
+			}
+			else
+			{
+				introductionView = existingActivities[ _model.Activities[ 0 ].DateCreated ];
+			}
+
 			// Initialize a view model for all activities.
 			Activities = new ObservableCollection<ActivityViewModel>();
 			foreach ( var activity in _model.Activities )
 			{
-				bool isFirstActivity = _model.CurrentActivity == activity;
+				// TODO: Revert.
+				bool isFirstActivity = false;
+				//bool isFirstActivity = _model.CurrentActivity == activity;
 
 				// Create view model.
 				ActivityViewModel viewModel;

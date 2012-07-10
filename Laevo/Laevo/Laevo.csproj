@@ -102,6 +102,9 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Laevo.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
@@ -249,7 +252,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\ActivityOverview\Shaders\FadeEffect.ps" />
-    <Resource Include="View\Main\Standby.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
@@ -342,6 +344,15 @@
     <Resource Include="View\Activity\Icons\Web.png" />
     <Resource Include="View\Activity\Icons\Window.png" />
     <Resource Include="View\Activity\Icons\Write.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\Laevo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Main\Laevo_tray.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Laevo.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
