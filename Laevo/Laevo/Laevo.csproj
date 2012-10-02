@@ -131,6 +131,21 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="VirtualDesktopManager, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Libraries\VirtualDesktopManager.dll</HintPath>
+    </Reference>
+    <Reference Include="Whathecode.PresentationFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Libraries\Whathecode\Whathecode.PresentationFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Whathecode.PresentationFramework.Aspects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Libraries\Whathecode\Whathecode.PresentationFramework.Aspects.dll</HintPath>
+    </Reference>
+    <Reference Include="Whathecode.System, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Libraries\Whathecode\Whathecode.System.dll</HintPath>
+    </Reference>
+    <Reference Include="Whathecode.System.Aspects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Libraries\Whathecode\Whathecode.System.Aspects.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -250,28 +265,6 @@
   <ItemGroup>
     <Resource Include="View\ActivityOverview\Shaders\FadeEffect.ps" />
     <Resource Include="View\Main\Standby.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
-      <Project>{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}</Project>
-      <Name>Whathecode.PresentationFramework.Aspects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj">
-      <Project>{9C755F97-8302-4415-AC95-FABFCDCE14B2}</Project>
-      <Name>Whathecode.PresentationFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj">
-      <Project>{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}</Project>
-      <Name>Whathecode.System.Aspects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Framework Class Library Extension\Whathecode.System\Whathecode.System.csproj">
-      <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
-      <Name>Whathecode.System</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VirtualDesktopManager\VirtualDesktopManager.csproj">
-      <Project>{6CA7AB2C-2D8D-422A-9FD4-2992BE62720A}</Project>
-      <Name>VirtualDesktopManager</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="View\ActivityOverview\ActivityOverviewWindow.xaml">
