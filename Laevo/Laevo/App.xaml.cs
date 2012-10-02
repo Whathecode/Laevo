@@ -38,7 +38,7 @@ namespace Laevo
 			}
 
 			// TODO: Support multiple languages, for now force english.
-			CultureInfo english = new CultureInfo( "en-US" );
+			var english = new CultureInfo( "en-US" );
 			Thread.CurrentThread.CurrentCulture = english;
  
 			// Create exception logger.
@@ -55,44 +55,44 @@ namespace Laevo
 				// TODO: Make introduction as last, so it is active.				
 				const int introductionTime = 4;
 				int passedMinutes = 0;
-				var introduction = _model.CreateNewActivity( "Introductie", now, introductionTime );
-				introduction.Name = "Introductie";
+				var introduction = _model.CreateNewActivity( "Introduction", now, introductionTime );
+				introduction.Name = "Introduction";
 				introduction.DateCreated = now;
 
-				const int problemTime = 6;
+				const int problemTime = 3;
 				passedMinutes += introductionTime;
-				var problemStatement = _model.CreateNewActivity( "Probleemstelling", now + TimeSpan.FromMinutes( passedMinutes ), problemTime );
-				problemStatement.Name = "Probleemstelling";
+				var problemStatement = _model.CreateNewActivity( "Problem statement", now + TimeSpan.FromMinutes( passedMinutes ), problemTime );
+				problemStatement.Name = "Problem statement";
 
-				const int researchTime = 6;
+				const int researchTime = 3;
 				passedMinutes += problemTime;
-				var existingResearch = _model.CreateNewActivity( "Bestaand onderzoek", now + TimeSpan.FromMinutes( passedMinutes ), researchTime );
-				existingResearch.Name = "Bestaand onderzoek";
+				var existingResearch = _model.CreateNewActivity( "Existing research", now + TimeSpan.FromMinutes( passedMinutes ), researchTime );
+				existingResearch.Name = "Existing research";
 
 				const int activityTheoryTime = 5;
 				passedMinutes += researchTime;
 				var activityTheory = _model.CreateNewActivity( "Activity Theory", now + TimeSpan.FromMinutes( passedMinutes ), activityTheoryTime );
 				activityTheory.Name = "Activity Theory";
 
-				const int laevoTime = 15;
+				const int laevoTime = 7;
 				passedMinutes += activityTheoryTime;
 				var laevo = _model.CreateNewActivity( "Laevo", now + TimeSpan.FromMinutes( passedMinutes ), laevoTime );
 				laevo.Name = "Laevo";
 
-				const int userStudyTime = 6;
+				const int userStudyTime = 5;
 				passedMinutes += laevoTime;
 				var userStudy = _model.CreateNewActivity( "User Study", now + TimeSpan.FromMinutes( passedMinutes ), userStudyTime );
 				userStudy.Name = "User Study";
 
 				const int conclusionsTime = 3;
 				passedMinutes += userStudyTime;
-				var conclusions = _model.CreateNewActivity( "Conclusies", now + TimeSpan.FromMinutes( passedMinutes ), conclusionsTime );
-				conclusions.Name = "Conclusies";
+				var conclusions = _model.CreateNewActivity( "Conclusions", now + TimeSpan.FromMinutes( passedMinutes ), conclusionsTime );
+				conclusions.Name = "Conclusions";
 
-				const int discussionTime = 15;
+				const int discussionTime = 30;
 				passedMinutes += conclusionsTime;
-				var discussion = _model.CreateNewActivity( "Discussie", now + TimeSpan.FromMinutes( passedMinutes ), discussionTime );
-				discussion.Name = "Discussie";
+				var discussion = _model.CreateNewActivity( "Discussion", now + TimeSpan.FromMinutes( passedMinutes ), discussionTime );
+				discussion.Name = "Discussion";
 			}
 
 			// Add or assign startup activity.

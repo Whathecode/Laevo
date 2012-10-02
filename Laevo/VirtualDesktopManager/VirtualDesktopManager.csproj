@@ -87,13 +87,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Whathecode.System, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>Libraries\Framework Class Library Extension\x86\Whathecode.System.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DesktopManager.cs" />
     <Compile Include="VirtualDesktop.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj">
+      <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
+      <Name>Whathecode.System</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
