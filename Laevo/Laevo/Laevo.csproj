@@ -192,7 +192,7 @@
     <Otherwise>
       <ItemGroup>
         <Reference Include="Whathecode.VirtualDesktopManagerAPI">
-          <HintPath>..\Libraries\Whathecode.VirtualDesktopManagerAPI.dll</HintPath>
+          <HintPath>..\Libraries\VirtualDesktopManagerAPI\Whathecode.VirtualDesktopManagerAPI.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>

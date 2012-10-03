@@ -1,23 +1,12 @@
 syntax: glob
-Laevo/bin/*
-Laevo/obj/*
-Laevo/_ReSharper.Laevo/*
+*/bin/*
+*/obj/*
+*/_ReSharper.*/*
 *.suo
-Laevo/Whathecode.Laevo/bin/*
-Laevo/Whathecode.Laevo/obj/*
-wpf-notifyicon/_ReSharper.NotifyIconWpf/*
 wpf-notifyicon/_UpgradeReport_Files/*
-wpf-notifyicon/NotifyIconWpf/bin/*
 *.user
-wpf-notifyicon/NotifyIconWpf/obj/*
-wpf-notifyicon/Sample Project/bin/*
-wpf-notifyicon/Sample Project/obj/*
 wpf-notifyicon/UpgradeLog.XML
-wpf-notifyicon/WindowsFormsSample/bin/*
-wpf-notifyicon/WindowsFormsSample/obj/*
 Framework Class Library Extension/*
 Laevo/Libraries/MouseKeyboardActivityMonitor/x64/MouseKeyboardActivityMonitor.Demo.exe
 Laevo/Libraries/MouseKeyboardActivityMonitor/x86/MouseKeyboardActivityMonitor.Demo.exe
-Laevo/VirtualDesktopManager/bin/*
-Laevo/VirtualDesktopManager/obj/*
 Laevo AppData.lnk
