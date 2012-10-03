@@ -147,6 +147,9 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Laevo.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
@@ -215,7 +218,7 @@
         <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
           <Project>{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}</Project>
           <Name>Whathecode.PresentationFramework.Aspects</Name>
-        </ProjectReference>		
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -229,13 +232,12 @@
         <Reference Include="Whathecode.PresentationFramework">
           <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.dll</HintPath>
         </Reference>
-		<Reference Include="Whathecode.PresentationFramework.Aspects">
+        <Reference Include="Whathecode.PresentationFramework.Aspects">
           <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.Aspects.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -352,7 +354,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\ActivityOverview\Shaders\FadeEffect.ps" />
-    <Resource Include="View\Main\Standby.ico" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="View\ActivityOverview\ActivityOverviewWindow.xaml">
@@ -423,6 +424,15 @@
     <Resource Include="View\Activity\Icons\Web.png" />
     <Resource Include="View\Activity\Icons\Window.png" />
     <Resource Include="View\Activity\Icons\Write.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Main\LaevoTray.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Laevo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\Icons\Laevo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
