@@ -1,12 +1,34 @@
+# Ignore file for Visual Studio 2008
+
+# use glob syntax
 syntax: glob
-*/bin/*
-*/obj/*
-*/_ReSharper.*/*
-*.suo
-wpf-notifyicon/_UpgradeReport_Files/*
+
+# Ignore Visual Studio 2008 files
+*.obj
+*.exe
+*.pdb
 *.user
-wpf-notifyicon/UpgradeLog.XML
-Framework Class Library Extension/*
-Laevo/Libraries/MouseKeyboardActivityMonitor/x64/MouseKeyboardActivityMonitor.Demo.exe
-Laevo/Libraries/MouseKeyboardActivityMonitor/x86/MouseKeyboardActivityMonitor.Demo.exe
-Laevo AppData.lnk
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.scc
+[Bb]in
+[Dd]ebug*/
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+*.[Pp]ublish.xml
