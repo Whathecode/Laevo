@@ -181,9 +181,9 @@
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
   <Import Project="..\ProjectReferences.txt" />
   <Choose>
-    <When Condition="Exists($(VirtualDesktopManagerAPI))">
+    <When Condition="Exists($(Virtual-Desktop-Manager-API))">
       <ItemGroup>
-        <ProjectReference Include="$(VirtualDesktopManagerAPI)">
+        <ProjectReference Include="$(Virtual-Desktop-Manager-API)\VirtualDesktopManager.csproj">
           <Project>{6CA7AB2C-2D8D-422A-9FD4-2992BE62720A}</Project>
           <Name>VirtualDesktopManager</Name>
         </ProjectReference>
@@ -198,12 +198,24 @@
     </Otherwise>
   </Choose>
   <Choose>
-    <When Condition="Exists($(System))">
+    <When Condition="Exists($(Framework-Class-Library-Extension))">
       <ItemGroup>
-        <ProjectReference Include="$(System)">
+        <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.System\Whathecode.System.csproj">
           <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
           <Name>Whathecode.System</Name>
         </ProjectReference>
+        <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj">
+          <Project>{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}</Project>
+          <Name>Whathecode.System.Aspects</Name>
+        </ProjectReference>
+        <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj">
+          <Project>{9C755F97-8302-4415-AC95-FABFCDCE14B2}</Project>
+          <Name>Whathecode.PresentationFramework</Name>
+        </ProjectReference>
+        <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
+          <Project>{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}</Project>
+          <Name>Whathecode.PresentationFramework.Aspects</Name>
+        </ProjectReference>		
       </ItemGroup>
     </When>
     <Otherwise>
@@ -211,60 +223,19 @@
         <Reference Include="Whathecode.System">
           <HintPath>..\Libraries\Whathecode\Whathecode.System.dll</HintPath>
         </Reference>
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-  <Choose>
-    <When Condition="Exists($(SystemAspects))">
-      <ItemGroup>
-        <ProjectReference Include="$(SystemAspects)">
-          <Project>{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}</Project>
-          <Name>Whathecode.System.Aspects</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
         <Reference Include="Whathecode.System.Aspects">
           <HintPath>..\Libraries\Whathecode\Whathecode.System.Aspects.dll</HintPath>
         </Reference>
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-  <Choose>
-    <When Condition="Exists($(PresentationFramework))">
-      <ItemGroup>
-        <ProjectReference Include="$(PresentationFramework)">
-          <Project>{9C755F97-8302-4415-AC95-FABFCDCE14B2}</Project>
-          <Name>Whathecode.PresentationFramework</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
         <Reference Include="Whathecode.PresentationFramework">
           <HintPath>..\Libraries\Whathecode\Whathecode.PresentationFramework.dll</HintPath>
         </Reference>
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-  <Choose>
-    <When Condition="Exists($(PresentationFrameworkAspects))">
-      <ItemGroup>
-        <ProjectReference Include="$(PresentationFrameworkAspects)">
-          <Project>{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}</Project>
-          <Name>Whathecode.PresentationFramework.Aspects</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Whathecode.PresentationFramework.Aspects">
+		<Reference Include="Whathecode.PresentationFramework.Aspects">
           <HintPath>..\Libraries\Whathecode\Whathecode.PresentationFramework.Aspects.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
+
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
