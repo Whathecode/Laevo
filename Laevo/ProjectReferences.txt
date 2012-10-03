@@ -1,9 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="$(Configuration) == 'Debug With Project References'">
-	<VirtualDesktopManagerAPI>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Virtual-Desktop-Manager-API\VirtualDesktopManager.csproj</VirtualDesktopManagerAPI>
-	<System>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj</System>
-	<SystemAspects>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj</SystemAspects>
-	<PresentationFramework>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj</PresentationFramework>
-	<PresentationFrameworkAspects>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj</PresentationFrameworkAspects>
+	<Virtual-Desktop-Manager-API>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Virtual-Desktop-Manager-API</Virtual-Desktop-Manager-API>
+	<Framework-Class-Library-Extension>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension</Framework-Class-Library-Extension>
   </PropertyGroup>
 </Project>
