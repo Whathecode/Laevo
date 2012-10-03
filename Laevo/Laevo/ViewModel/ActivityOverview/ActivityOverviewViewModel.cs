@@ -9,7 +9,7 @@ using System.Timers;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
-using VirtualDesktopManager;
+using Whathecode.VirtualDesktopManagerAPI;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;

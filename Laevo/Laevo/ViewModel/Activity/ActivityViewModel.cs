@@ -16,7 +16,7 @@ using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Microsoft.WindowsAPICodePack.Shell;
-using VirtualDesktopManager;
+using Whathecode.VirtualDesktopManagerAPI;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
