@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Windows.Input;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
@@ -10,7 +11,6 @@ using Whathecode.System.Windows.Input;
 using Whathecode.System.Windows.Input.InputController;
 using Whathecode.System.Windows.Input.InputController.Condition;
 using Whathecode.System.Windows.Input.InputController.Trigger;
-using WindowsInput;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Timer = System.Timers.Timer;
 
@@ -183,8 +183,7 @@ namespace Laevo.View.Main
 			lock ( this )
 			{
 				_switchingCapsLock = true;
-				// TODO: Add SendInput to own interop classes.
-				InputSimulator.SimulateKeyPress( VirtualKeyCode.CAPITAL );
+				KeyHelper.SimulateKeyPress( Key.CapsLock );
 				_switchingCapsLock = false;
 			}
 
