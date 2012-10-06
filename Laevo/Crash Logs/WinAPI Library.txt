@@ -1,0 +1,43 @@
+System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced. (Exception from HRESULT: 0x80070497)
+   at Microsoft.WindowsAPICodePack.Shell.IShellLibrary.Commit()
+   at Microsoft.WindowsAPICodePack.Shell.ShellLibrary.Add(ShellFileSystemFolder item) in D:\Enlistments\WPFOOB\src\wpfoob\WindowsApiCodePack\Main\Win7\WindowsAPICodePack\Shell\Common\ShellLibrary.cs:line 614
+   at Microsoft.WindowsAPICodePack.Shell.ShellLibrary.Add(String folderPath) in D:\Enlistments\WPFOOB\src\wpfoob\WindowsApiCodePack\Main\Win7\WindowsAPICodePack\Shell\Common\ShellLibrary.cs:line 628
+   at System.Array.ForEach[T](T[] array, Action`1 action)
+   at Laevo.ViewModel.Activity.ActivityViewModel.InitializeLibrary() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Activity\ActivityViewModel.cs:line 402
+   at Laevo.ViewModel.Activity.ActivityViewModel.OpenActivity() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Activity\ActivityViewModel.cs:line 322
+   at Laevo.ViewModel.ActivityOverview.ActivityOverviewViewModel..ctor(Laevo model) in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\ActivityOverview\ActivityOverviewViewModel.cs:line 147
+   at Laevo.ViewModel.Main.MainViewModel.EnsureActivityOverview() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Main\MainViewModel.cs:line 202
+   at Laevo.ViewModel.Main.MainViewModel..ctor(Laevo model) in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Main\MainViewModel.cs:line 35
+   at Laevo.App.OnStartup(StartupEventArgs e) in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\App.xaml.cs:line 69
+   at System.Windows.Application.<.ctor>b__1(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at MS.Internal.Threading.ExceptionFilterHelper.TryCatchWhen(Object source, Delegate method, Object args, Int32 numArgs, Delegate catchHandler)
+   
+   
+   
+                                                                                                         
+                                             
+System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced. (Exception from HRESULT: 0x80070497)
+   at Microsoft.WindowsAPICodePack.Shell.IShellLibrary.Commit()
+   at Microsoft.WindowsAPICodePack.Shell.ShellLibrary.Add(ShellFileSystemFolder item) in D:\Enlistments\WPFOOB\src\wpfoob\WindowsApiCodePack\Main\Win7\WindowsAPICodePack\Shell\Common\ShellLibrary.cs:line 614
+   at Microsoft.WindowsAPICodePack.Shell.ShellLibrary.Add(String folderPath) in D:\Enlistments\WPFOOB\src\wpfoob\WindowsApiCodePack\Main\Win7\WindowsAPICodePack\Shell\Common\ShellLibrary.cs:line 628
+   at System.Array.ForEach[T](T[] array, Action`1 action)
+   at Laevo.ViewModel.Activity.ActivityViewModel.InitializeLibrary() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Activity\ActivityViewModel.cs:line 402
+   at Laevo.ViewModel.Activity.ActivityViewModel.OpenActivity() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Activity\ActivityViewModel.cs:line 322
+   at Laevo.ViewModel.ActivityOverview.ActivityOverviewViewModel..ctor(Laevo model) in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\ActivityOverview\ActivityOverviewViewModel.cs:line 147
+   at Laevo.ViewModel.Main.MainViewModel.EnsureActivityOverview() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Main\MainViewModel.cs:line 202
+   at Laevo.ViewModel.Main.MainViewModel..ctor(Laevo model) in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Main\MainViewModel.cs:line 35
+   at Laevo.App.OnStartup(StartupEventArgs e) in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\App.xaml.cs:line 69
+   at System.Windows.Application.<.ctor>b__1(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at MS.Internal.Threading.ExceptionFilterHelper.TryCatchWhen(Object source, Delegate method, Object args, Int32 numArgs, Delegate catchHandler)System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced. (Exception from HRESULT: 0x80070497)
+   at Microsoft.WindowsAPICodePack.Shell.IShellLibrary.Commit()
+   at Microsoft.WindowsAPICodePack.Shell.ShellLibrary.Add(ShellFileSystemFolder item) in D:\Enlistments\WPFOOB\src\wpfoob\WindowsApiCodePack\Main\Win7\WindowsAPICodePack\Shell\Common\ShellLibrary.cs:line 614
+   at Microsoft.WindowsAPICodePack.Shell.ShellLibrary.Add(String folderPath) in D:\Enlistments\WPFOOB\src\wpfoob\WindowsApiCodePack\Main\Win7\WindowsAPICodePack\Shell\Common\ShellLibrary.cs:line 628
+   at System.Array.ForEach[T](T[] array, Action`1 action)
+   at Laevo.ViewModel.Activity.ActivityViewModel.InitializeLibrary() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Activity\ActivityViewModel.cs:line 402
+   at Laevo.ViewModel.Activity.ActivityViewModel.OpenActivity() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Activity\ActivityViewModel.cs:line 322
+   at Laevo.ViewModel.ActivityOverview.ActivityOverviewViewModel.NewActivity() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\ActivityOverview\ActivityOverviewViewModel.cs:line 169
+   at Laevo.ViewModel.Main.MainViewModel.NewActivity() in C:\Users\Steven\Documents\Whathecode\Laevo\Laevo\Laevo\ViewModel\Main\MainViewModel.cs:line 169
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at MS.Internal.Threading.ExceptionFilterHelper.TryCatchWhen(Object source, Delegate method, Object args, Int32 numArgs, Delegate catchHandler)
