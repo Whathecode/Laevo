@@ -81,7 +81,6 @@ namespace Laevo.ViewModel.Main
 			};
 			
 			settingsWindow.Show();
-
 		}
 
 		[CommandExecute( Commands.ShowActivityOverview )]

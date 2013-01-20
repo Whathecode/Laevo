@@ -104,7 +104,6 @@ namespace Laevo.View.ActivityOverview
 		/// </summary>
 		public static readonly DependencyProperty OffsetProperty
 			= DependencyProperty.RegisterAttached( "Offset", typeof( double ), typeof( TimeLineControl ) );
-
 		public static double GetOffset( FrameworkElement element )
 		{
 			return (double)element.GetValue( OffsetProperty );
