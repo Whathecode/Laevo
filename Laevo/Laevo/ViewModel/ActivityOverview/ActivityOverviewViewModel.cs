@@ -271,6 +271,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.Stop();
 			Activities.ForEach( a => a.Dispose() );
 
+			// Show all cut windows again.
+			_windowClipboard.ForEach( w => w.Show() );
+
 			_desktopManager.Close();
 		}
 	}
