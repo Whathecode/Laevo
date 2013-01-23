@@ -25,7 +25,7 @@ namespace Laevo.View.Main
 		const int UpdatesPerSecond = 25;		
 
 		readonly Timer _updateLoop = new Timer();
-		readonly KeyboardHookListener _keyboardListener = new KeyboardHookListener( new GlobalHooker() );		
+		readonly KeyboardHookListener _keyboardListener = new KeyboardHookListener( new GlobalHooker() );
 
 		readonly InputController _inputController = new InputController();
 		readonly Dictionary<Keys, bool> _keyStates = new Dictionary<Keys, bool>();
@@ -108,7 +108,7 @@ namespace Laevo.View.Main
 		{
 			_updateLoop.Elapsed -= OnUpdate;
 			_keyboardListener.KeyDown -= OnKeyDown;
-			_keyboardListener.KeyUp -= OnKeyUp;			
+			_keyboardListener.KeyUp -= OnKeyUp;
 			_updateLoop.Stop();
 		}
 
@@ -134,6 +134,12 @@ namespace Laevo.View.Main
 		readonly Dictionary<Keys, bool> _newInput = new Dictionary<Keys, bool>();
 		void OnKeyDown( object sender, KeyEventArgs e )
 		{
+			// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
+			if ( e.KeyCode == Keys.None )
+			{
+				return;
+			}
+
 			lock ( this )
 			{
 				if ( _switchingCapsLock )
@@ -160,6 +166,12 @@ namespace Laevo.View.Main
 
 		void OnKeyUp( object sender, KeyEventArgs e )
 		{
+			// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
+			if ( e.KeyCode == Keys.None )
+			{
+				return;
+			}
+
 			lock ( _newInput )
 			{
 				_newInput[ e.KeyCode ] = false;
