@@ -11,6 +11,7 @@ using Whathecode.System.Windows.Input;
 using Whathecode.System.Windows.Input.InputController;
 using Whathecode.System.Windows.Input.InputController.Condition;
 using Whathecode.System.Windows.Input.InputController.Trigger;
+using Whathecode.System.Windows.Threading;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Timer = System.Timers.Timer;
 
@@ -25,28 +26,29 @@ namespace Laevo.View.Main
 		const int UpdatesPerSecond = 25;		
 
 		readonly Timer _updateLoop = new Timer();
-		readonly KeyboardHookListener _keyboardListener = new KeyboardHookListener( new GlobalHooker() );
+		KeyboardHookListener _keyboardListener;
 
 		readonly InputController _inputController = new InputController();
 		readonly Dictionary<Keys, bool> _keyStates = new Dictionary<Keys, bool>();
 
 		const string TurnCapsLockText = "Turn Caps Lock ";
+		bool _isCapsLockEnabled;		
 		bool _switchingCapsLock;
+		object _switchingCapsLockLock = new object();
 
 
 		public TrayIconControl()
 		{
 			InitializeComponent();
 
-			SetCapsLockMenuText( KeyHelper.IsCapsLockEnabled() );
-
 			// Capture system-wide keyboard events.
-			_keyboardListener.KeyDown += OnKeyDown;
-			_keyboardListener.KeyUp += OnKeyUp;
-			_keyboardListener.Start();
+			_isCapsLockEnabled = KeyHelper.IsCapsLockEnabled();
+			InitializeKeyboardListener();
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
 			_updateLoop.Elapsed += OnUpdate;
 			_updateLoop.Start();			
+
+			UpdateCapsLockState();
 
 			// Add triggers for desired system-wide commands.			
 			new[] // Prevent exception when looking up a non-existent key.
@@ -66,13 +68,27 @@ namespace Laevo.View.Main
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
 			var switchCapsLock = new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger(
-				new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, () => SwitchCapsLock( this, null ) );
+				new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, () => SwitchCapsLock() );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
 			var resetExclusiveTriggers = new EventTrigger( anyKeyDown );
 			resetExclusiveTriggers.ConditionsMet += () => _exclusiveConditions.ForEach( c => c.Reset() );
 			_inputController.AddTrigger( resetExclusiveTriggers );
+		}
+
+		void InitializeKeyboardListener()
+		{
+			if ( _keyboardListener != null )
+			{
+				_keyboardListener.KeyDown -= OnKeyDown;
+				_keyboardListener.KeyUp -= OnKeyUp;
+			}
+
+			_keyboardListener = new KeyboardHookListener( new GlobalHooker() );
+			_keyboardListener.KeyDown += OnKeyDown;
+			_keyboardListener.KeyUp += OnKeyUp;
+			_keyboardListener.Start();
 		}
 
 		readonly List<ExclusiveCondition> _exclusiveConditions = new List<ExclusiveCondition>();
@@ -115,6 +131,24 @@ namespace Laevo.View.Main
 
 		void OnUpdate( object sender, EventArgs e )
 		{
+			// HACK: Verify whether caps lock was enabled/disabled without SwitchCapsLock being called. This indicates the global keyboard hook was silently removed.
+			//       http://msdn.microsoft.com/en-us/library/windows/desktop/ms646293(v=vs.85).aspx
+			bool keyboardHookLost = false;
+			bool isCapsEnabled = KeyHelper.IsCapsLockEnabled();
+			lock ( _switchingCapsLockLock )
+			{
+				if ( isCapsEnabled != _isCapsLockEnabled )
+				{
+					keyboardHookLost = true;
+					_isCapsLockEnabled = isCapsEnabled;
+				}
+			}
+			if ( keyboardHookLost )
+			{								
+				InitializeKeyboardListener();				
+				SwitchCapsLock();	// Reset caps lock to its previous position.
+			}
+
 			lock ( _inputController )
 			{
 				lock ( _newInput )
@@ -140,7 +174,7 @@ namespace Laevo.View.Main
 				return;
 			}
 
-			lock ( this )
+			lock ( _switchingCapsLockLock )
 			{
 				if ( _switchingCapsLock )
 				{
@@ -190,22 +224,25 @@ namespace Laevo.View.Main
 
 		void SwitchCapsLock( object sender, System.Windows.RoutedEventArgs e )
 		{
-			bool isCapsEnabled = KeyHelper.IsCapsLockEnabled();
-
-			lock ( this )
+			SwitchCapsLock();
+		}
+		void SwitchCapsLock()
+		{
+			lock ( _switchingCapsLockLock )
 			{
 				_switchingCapsLock = true;
 				KeyHelper.SimulateKeyPress( Key.CapsLock );
 				_switchingCapsLock = false;
+				_isCapsLockEnabled = !_isCapsLockEnabled;
 			}
 
-			SetCapsLockMenuText( !isCapsEnabled );
+			UpdateCapsLockState();
 		}
 
-		void SetCapsLockMenuText( bool isCapsLockEnabled )
-		{
-			string headerText = TurnCapsLockText + (isCapsLockEnabled ? "Off" : "On");
-			CapsLockMenuItem.Header = headerText;
+		void UpdateCapsLockState()
+		{			
+			string headerText = TurnCapsLockText + (_isCapsLockEnabled ? "Off" : "On");
+			DispatcherHelper.SafeDispatch( CapsLockMenuItem.Dispatcher, () => CapsLockMenuItem.Header = headerText );
 		}
 	}
 }
