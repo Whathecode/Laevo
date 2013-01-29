@@ -5,6 +5,7 @@
 	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:Binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
 	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
+	xmlns:Options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
 	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
 	xmlns:Shaders="clr-namespace:Laevo.View.ActivityOverview.Shaders"
 	Title="Laevo Activity Time Line"
@@ -12,7 +13,7 @@
 	WindowState="Maximized"
 	ShowInTaskbar="False"
 	FontFamily="Segoe UI Light">
-	
+
 	<Window.Topmost>
 		<Binding Path="ActivityMode">
 			<Binding.Converter>
@@ -20,7 +21,7 @@
 			</Binding.Converter>
 		</Binding>
 	</Window.Topmost>
-	
+
 	<Window.CommandBindings>
 		<CommandBinding
 			Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"
@@ -28,11 +29,11 @@
 	</Window.CommandBindings>
 	
 	<Window.Resources>
-		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1" Options:Freeze="True">
 			<GradientStop Color="#606c88" Offset="0" />
 			<GradientStop Color="#282944" Offset="1" />
 		</LinearGradientBrush>
-		<SolidColorBrush x:Key="TimeLineBrush" Color="Transparent" />
+		<SolidColorBrush x:Key="TimeLineBrush" Color="Transparent" Options:Freeze="True" />
 		
 		<Converters:AspectRatioToGeometryConverter x:Key="AspectRatioToPositions" />
 		<Converters:AspectRatioToFovConverter x:Key="AspectRatioToFov" />
@@ -40,13 +41,17 @@
 		<Converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
 		<Converters:TimeLineHeightConverter x:Key="TimeLineHeightConverter" />
 	</Window.Resources>
-		
+	
 	<Grid
 		x:Name="TimeLineContainer"
 		Background="{StaticResource BackgroundBrush}"
 		Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
 		Behaviors:MouseBehavior.DragCapturesMouse="True"
 		MouseWheel="OnMouseWheel">
+
+		<Grid.CacheMode>
+			<BitmapCache />
+		</Grid.CacheMode>
 
 		<!-- Blur effect for popups. -->
 		<Grid.Effect>
@@ -89,6 +94,10 @@
 		<Viewport3D
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
+			
+			<Viewport3D.CacheMode>
+				<BitmapCache />
+			</Viewport3D.CacheMode>
 
 			<Viewport3D.Camera>
 				<PerspectiveCamera
@@ -112,9 +121,9 @@
 				</ModelUIElement3D>
 			</ContainerUIElement3D>
 
-			<Viewport2DVisual3D>									
+			<Viewport2DVisual3D>
 				<Viewport2DVisual3D.CacheMode>
-					<BitmapCache RenderAtScale="1.0" />
+					<BitmapCache />
 				</Viewport2DVisual3D.CacheMode>
 
 				<Viewport2DVisual3D.Transform>
@@ -158,6 +167,10 @@
 						<Shaders:FadeEffect />
 					</Grid.Effect>
 
+					<Grid.CacheMode>
+						<BitmapCache />
+					</Grid.CacheMode>
+
 					<Grid
 						ClipToBounds="True"
 						Background="{StaticResource TimeLineBrush}">
@@ -188,37 +201,42 @@
 		</Viewport3D>
 
 		<!-- No 3D. -->
-		<!--<Grid
-			ClipToBounds="True"
-			Background="{StaticResource TimeLineBrush}"
-			Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
-			Behaviors:MouseBehavior.DragCapturesMouse="False"
-			MouseWheel="OnMouseWheel">
+		<!--
+		<Grid>
+			<Grid.Effect>
+				<Shaders:FadeEffect />
+			</Grid.Effect>
 
-			<Grid.Resources>
-				<System:Double x:Key="Angle">0</System:Double>
-			</Grid.Resources>
-			
-			<Grid.Width>
-				<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
-					<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-					<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-					<Binding Source="{StaticResource Angle}" />
-					<Binding Path="TimeLineRenderScale" />
-				</MultiBinding>
-			</Grid.Width>
+			<Grid.CacheMode>
+				<BitmapCache />
+			</Grid.CacheMode>
 
-			<Grid.Height>
-				<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
-					<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-					<Binding Path="TimeLineRenderScale" />
-				</MultiBinding>
-			</Grid.Height>
+			<Grid
+				ClipToBounds="True"
+				Background="{StaticResource TimeLineBrush}">
 
-			<ActivityOverview:TimeLineControl
+				<Grid.Width>
+					<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
+						<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
+						<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+						<Binding ElementName="RotationTransform" Path="Angle" />
+						<Binding Path="TimeLineRenderScale" />
+					</MultiBinding>
+				</Grid.Width>
+
+				<Grid.Height>
+					<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
+						<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+						<Binding Path="TimeLineRenderScale" />
+					</MultiBinding>
+				</Grid.Height>
+
+				<ActivityOverview:TimeLineControl
 					x:Name="TimeLine"
 					Focusable="True" />
-		</Grid>-->
+			</Grid>
+		</Grid>
+		-->
 
 		<!-- Clock -->
 		<ActivityOverview:ClockControl
