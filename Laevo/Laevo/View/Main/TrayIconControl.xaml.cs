@@ -33,7 +33,6 @@ namespace Laevo.View.Main
 
 		const string TurnCapsLockText = "Turn Caps Lock ";
 		bool _isCapsLockEnabled;		
-		bool _switchingCapsLock;
 		object _switchingCapsLockLock = new object();
 
 
@@ -81,10 +80,9 @@ namespace Laevo.View.Main
 		{
 			if ( _keyboardListener != null )
 			{
-				_keyboardListener.KeyDown -= OnKeyDown;
-				_keyboardListener.KeyUp -= OnKeyUp;
+				_keyboardListener.Dispose();
 			}
-
+			
 			_keyboardListener = new KeyboardHookListener( new GlobalHooker() );
 			_keyboardListener.KeyDown += OnKeyDown;
 			_keyboardListener.KeyUp += OnKeyUp;
@@ -123,8 +121,7 @@ namespace Laevo.View.Main
 		~TrayIconControl()
 		{
 			_updateLoop.Elapsed -= OnUpdate;
-			_keyboardListener.KeyDown -= OnKeyDown;
-			_keyboardListener.KeyUp -= OnKeyUp;
+			_keyboardListener.Dispose();
 			_updateLoop.Stop();
 		}
 
@@ -133,19 +130,20 @@ namespace Laevo.View.Main
 		{
 			// HACK: Verify whether caps lock was enabled/disabled without SwitchCapsLock being called. This indicates the global keyboard hook was silently removed.
 			//       http://msdn.microsoft.com/en-us/library/windows/desktop/ms646293(v=vs.85).aspx
-			bool keyboardHookLost = false;
-			bool isCapsEnabled = KeyHelper.IsCapsLockEnabled();
+			bool keyboardHookLost = false;			
 			lock ( _switchingCapsLockLock )
 			{
+				bool isCapsEnabled = KeyHelper.IsCapsLockEnabled();
 				if ( isCapsEnabled != _isCapsLockEnabled )
 				{
 					keyboardHookLost = true;
 					_isCapsLockEnabled = isCapsEnabled;
 				}
 			}
+
 			if ( keyboardHookLost )
-			{								
-				InitializeKeyboardListener();				
+			{
+				Dispatcher.Invoke( InitializeKeyboardListener );	// Dispatcher needs to be used since this is executed from the timer thread.
 				SwitchCapsLock();	// Reset caps lock to its previous position.
 			}
 
@@ -172,14 +170,6 @@ namespace Laevo.View.Main
 			if ( e.KeyCode == Keys.None )
 			{
 				return;
-			}
-
-			lock ( _switchingCapsLockLock )
-			{
-				if ( _switchingCapsLock )
-				{
-					return;
-				}
 			}
 
 			lock ( _newInput )
@@ -230,9 +220,11 @@ namespace Laevo.View.Main
 		{
 			lock ( _switchingCapsLockLock )
 			{
-				_switchingCapsLock = true;
+				_keyboardListener.KeyDown -= OnKeyDown;
+				_keyboardListener.KeyUp -= OnKeyUp;
 				KeyHelper.SimulateKeyPress( Key.CapsLock );
-				_switchingCapsLock = false;
+				_keyboardListener.KeyDown += OnKeyDown;
+				_keyboardListener.KeyUp += OnKeyUp;
 				_isCapsLockEnabled = !_isCapsLockEnabled;
 			}
 
