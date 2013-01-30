@@ -13,7 +13,7 @@ namespace Laevo.View.Main
 	[MarkupExtensionReturnType( typeof( ICommand ) )]
 	public class TrayCommandBindingExtension : CommandBindingExtension
 	{
-		readonly IGate _skipFirst = new SkipGate( 1 );
+		readonly AbstractGate _skipFirst = new SkipGate( 1 );
 
 
 		public TrayCommandBindingExtension( object commandId )
