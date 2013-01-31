@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -78,15 +79,30 @@ namespace Laevo.View.Main
 
 		void InitializeKeyboardListener()
 		{
-			if ( _keyboardListener != null )
-			{
-				_keyboardListener.Dispose();
-			}
+			SafeKeyboardHookListenerDispose();
 			
 			_keyboardListener = new KeyboardHookListener( new GlobalHooker() );
 			_keyboardListener.KeyDown += OnKeyDown;
 			_keyboardListener.KeyUp += OnKeyUp;
 			_keyboardListener.Start();
+		}
+
+		void SafeKeyboardHookListenerDispose()
+		{
+			if ( _keyboardListener == null )
+			{
+				return;
+			}
+
+			try
+			{
+				_keyboardListener.Dispose();
+			}
+			catch ( Win32Exception )
+			{
+				// HACK: Sometimes the internal hook of the KeyboardHookListener is no longer valid (unhooked?).
+				//       This might be due to a bug in the library used: http://globalmousekeyhook.codeplex.com/workitem/929
+			}
 		}
 
 		readonly List<ExclusiveCondition> _exclusiveConditions = new List<ExclusiveCondition>();
@@ -121,7 +137,7 @@ namespace Laevo.View.Main
 		~TrayIconControl()
 		{
 			_updateLoop.Elapsed -= OnUpdate;
-			_keyboardListener.Dispose();
+			SafeKeyboardHookListenerDispose();
 			_updateLoop.Stop();
 		}
 

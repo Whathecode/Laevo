@@ -233,24 +233,15 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 		}
-
-		readonly Stack<WindowInfo> _windowClipboard = new Stack<WindowInfo>();
+		
 		public void CutWindow()
 		{
-			WindowInfo cutWindow = WindowManager.GetForegroundWindow();
-			if ( _desktopManager.IsValidWindow( cutWindow ) )
-			{
-				_windowClipboard.Push( cutWindow );
-				CurrentActivityViewModel.RemoveWindow( cutWindow );
-			}
+			_desktopManager.CutWindow( WindowManager.GetForegroundWindow() );
 		}
 
 		public void PasteWindows()
 		{
-			while ( _windowClipboard.Count > 0 )
-			{
-				CurrentActivityViewModel.AddWindow( _windowClipboard.Pop() );
-			}
+			_desktopManager.PasteWindows();
 		}
 
 		public override void Persist()
@@ -270,9 +261,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_updateTimer.Stop();
 			Activities.ForEach( a => a.Dispose() );
-
-			// Show all cut windows again.
-			_windowClipboard.ForEach( w => w.Show() );
 
 			_desktopManager.Close();
 		}
