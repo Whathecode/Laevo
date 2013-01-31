@@ -448,16 +448,6 @@ namespace Laevo.ViewModel.Activity
 			_activity.Name = Label;
 		}
 
-		public void RemoveWindow( WindowInfo toRemove )
-		{
-			_virtualDesktop.RemoveWindow( toRemove );
-		}
-
-		public void AddWindow( WindowInfo toAdd )
-		{
-			_virtualDesktop.AddWindow( toAdd );
-		}
-
 		protected override void FreeUnmanagedResources()
 		{
 			// Nothing to do.
