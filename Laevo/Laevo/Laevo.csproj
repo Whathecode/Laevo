@@ -264,7 +264,7 @@
     <Compile Include="Model\ProcessTracker.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
-    <Compile Include="ViewModel\ActivityOverview\DataContractSurrogate.cs" />
+    <Compile Include="ViewModel\ActivityOverview\ActivityDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Binding.cs" />
     <Compile Include="ViewModel\Activity\Binding\Binding.cs" />

@@ -21,7 +21,6 @@ using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
-using Whathecode.System.Windows.Interop;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
@@ -30,6 +29,7 @@ namespace Laevo.ViewModel.Activity
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
+	[KnownType( typeof( StoredSession ) )]
 	class ActivityViewModel : AbstractViewModel
 	{		
 		readonly ActivityOverviewViewModel _overview;
@@ -99,6 +99,7 @@ namespace Laevo.ViewModel.Activity
 
 		readonly Model.Activity _activity;
 		readonly DesktopManager _desktopManager;
+		[DataMember]
 		VirtualDesktop _virtualDesktop;
 
 
@@ -228,7 +229,7 @@ namespace Laevo.ViewModel.Activity
 			_activity = activity;
 
 			_desktopManager = desktopManager;
-			_virtualDesktop = desktopManager.CreateEmptyDesktop();
+			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
 
 			Label = activity.Name;
 			Icon = storedViewModel.Icon;
@@ -287,7 +288,7 @@ namespace Laevo.ViewModel.Activity
 		///   When it is the first activity opened, the current open windows will merge with the stored ones.
 		/// </summary>
 		[CommandExecute( Commands.OpenActivity )]
-		public void OpenActivity()
+		public void OpenActivity( bool switchToActivity = true )
 		{
 			OpeningActivityEvent( this );
 
@@ -317,9 +318,12 @@ namespace Laevo.ViewModel.Activity
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
 			_activity.Open();
-			_desktopManager.SwitchToDesktop( _virtualDesktop );
 
-			InitializeLibrary();
+			if ( switchToActivity )
+			{
+				_desktopManager.SwitchToDesktop( _virtualDesktop );
+				InitializeLibrary();
+			}
 			
 			OpenedActivityEvent( this );
 		}
@@ -374,6 +378,11 @@ namespace Laevo.ViewModel.Activity
 		{
 			_desktopManager.UpdateWindowAssociations();
 			return _virtualDesktop.Windows.Count == 0;
+		}
+
+		public bool HasOpenWindows()
+		{
+			return _virtualDesktop.Windows.Count > 0;
 		}
 
 		[CommandExecute( Commands.ChangeColor )]

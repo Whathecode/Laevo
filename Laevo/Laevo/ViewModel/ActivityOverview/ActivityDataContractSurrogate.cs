@@ -6,11 +6,12 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Whathecode.VirtualDesktopManagerAPI;
 
 
 namespace Laevo.ViewModel.ActivityOverview
 {
-	public class DataContractSurrogate : IDataContractSurrogate
+	public class ActivityDataContractSurrogate : IDataContractSurrogate
 	{
 		[DataContract]
 		class SerializedBitmap
@@ -25,12 +26,23 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
+		readonly DesktopManager _desktopManager;
+
+
+		public ActivityDataContractSurrogate( DesktopManager desktopManager )
+		{
+			_desktopManager = desktopManager;
+		}
+
+
 		public Type GetDataContractType( Type type )
 		{
 			var convertTypes = new Dictionary<Type, Type>
 			{
 				{ typeof( ImageSource ), typeof( SerializedBitmap ) },
-				{ typeof( SerializedBitmap ), typeof( BitmapImage ) }
+				{ typeof( SerializedBitmap ), typeof( BitmapImage ) },
+				{ typeof( VirtualDesktop ), typeof( StoredSession ) },
+				{ typeof( StoredSession ), typeof( VirtualDesktop ) }
 			};
 
 			return convertTypes.ContainsKey( type ) ? convertTypes[ type ] : type;
@@ -42,16 +54,23 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				return new SerializedBitmap( ((BitmapImage)obj).UriSource );
 			}
+			else if ( targetType == typeof( StoredSession ) )
+			{
+				return ((VirtualDesktop)obj).Store();
+			}
 
 			return obj;
 		}
 
 		public object GetDeserializedObject( object obj, Type targetType )
 		{
-			SerializedBitmap bitmap = obj as SerializedBitmap;
-			if ( bitmap != null )
+			if ( targetType == typeof( ImageSource ) )
 			{
-				return new BitmapImage( bitmap.Source );
+				return new BitmapImage( ((SerializedBitmap)obj).Source );
+			}
+			else if ( targetType == typeof( VirtualDesktop ) )
+			{
+				return _desktopManager.CreateDesktopFromSession( (StoredSession)obj );
 			}
 
 			return obj;

@@ -9,12 +9,12 @@ using System.Timers;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
-using Whathecode.VirtualDesktopManagerAPI;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Interop;
+using Whathecode.VirtualDesktopManagerAPI;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -71,10 +71,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.Activities )]
 		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
 
-		static readonly DataContractSerializer ActivitySerializer = new DataContractSerializer(
-			typeof( Dictionary<DateTime, ActivityViewModel> ),
-			null, Int32.MaxValue, true, false,
-			new DataContractSurrogate() );
+		readonly DataContractSerializer ActivitySerializer;
 
 
 		public ActivityOverviewViewModel( Model.Laevo model )
@@ -90,7 +87,11 @@ namespace Laevo.ViewModel.ActivityOverview
 				} );
 
 			// Check for stored presentation options for existing activities.
-			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
+			ActivitySerializer = new DataContractSerializer(
+				typeof( Dictionary<DateTime, ActivityViewModel> ),
+				null, Int32.MaxValue, true, false,
+				new ActivityDataContractSurrogate( _desktopManager ) );
+				var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
 			if ( File.Exists( ActivitiesFile ) )
 			{
 				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
@@ -144,9 +145,12 @@ namespace Laevo.ViewModel.ActivityOverview
 				// The first activity needs to be opened at startup.
 				if ( isFirstActivity )
 				{
-					viewModel.OpenActivity();					
+					viewModel.OpenActivity();
 				}
 			}
+
+			// Activate activities which have windows assigned to them at startup so it seems as if those sessions simply continue since when the application was closed.
+			Activities.Where( a => a.HasOpenWindows() ).ForEach( a => a.OpenActivity( false ) );
 
 			// Hook up timer.
 			_updateTimer.Elapsed += UpdateData;
