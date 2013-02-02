@@ -52,7 +52,7 @@ namespace Laevo
 			if ( _model.Activities.Any() )
 			{
 				MessageBoxResult result = MessageBox.Show(
-					"Do you wish to assign the currently open windows to an existing activity, instead of creating a new activity for them?",
+					"Do you wish to assign the currently unassigned open windows to an existing activity, instead of creating a new activity for them?",
 					"Assign startup activity",
 					MessageBoxButton.YesNo,
 					MessageBoxImage.Question );
