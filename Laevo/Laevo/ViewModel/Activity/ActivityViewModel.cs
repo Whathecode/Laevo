@@ -290,15 +290,18 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity( bool switchToActivity = true )
 		{
-			OpeningActivityEvent( this );
-
-			if ( this == _overview.CurrentActivityViewModel )
+			if ( switchToActivity )
 			{
-				// Activity is already open.
-				// The event is still necessary to indicate the user is no longer selecting an activity.
-				OpenedActivityEvent( this );
-				return;
-			}			
+				OpeningActivityEvent( this );
+
+				if ( this == _overview.CurrentActivityViewModel )
+				{
+					// Activity is already open.
+					// The event is still necessary to indicate the user is no longer selecting an activity.
+					OpenedActivityEvent( this );
+					return;
+				}
+			}
 
 			// The first opened activity should include the currently open windows.
 			if ( _firstActivity )
@@ -307,25 +310,25 @@ namespace Laevo.ViewModel.Activity
 				_firstActivity = false;
 			}
 
-			// Activity also becomes active when it is opened.
-			IsActive = true;
-			if ( ActiveTimeSpans == null )
-			{
-				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
-			}
-			DateTime now = DateTime.Now;
-			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
-			ActiveTimeSpans.Add( _currentActiveTimeSpan );
-
 			_activity.Open();
 
+			// Activity also becomes active when it is opened.
 			if ( switchToActivity )
-			{
+			{				
+				IsActive = true;
+				if ( ActiveTimeSpans == null )
+				{
+					ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+				}
+				DateTime now = DateTime.Now;
+				_currentActiveTimeSpan = new Interval<DateTime>( now, now );
+				ActiveTimeSpans.Add( _currentActiveTimeSpan );
+
 				_desktopManager.SwitchToDesktop( _virtualDesktop );
 				InitializeLibrary();
-			}
-			
-			OpenedActivityEvent( this );
+
+				OpenedActivityEvent( this );
+			}			
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]

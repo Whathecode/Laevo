@@ -163,7 +163,10 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public void NewActivity()
 		{
-			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _desktopManager );
+			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _desktopManager )
+			{
+				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines
+			};
 			lock ( Activities )
 			{
 				Activities.Add( newActivity );
