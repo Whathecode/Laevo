@@ -88,6 +88,18 @@ namespace Laevo.Model
 		}
 
 
+		public void Activate()
+		{
+			// Activating an activity also opens it.
+			Open();
+
+			if ( !IsActive )
+			{
+				IsActive = true;
+				ActivatedEvent( this );
+			}
+		}
+
 		public void Open()
 		{
 			if ( !IsOpen )
@@ -100,13 +112,6 @@ namespace Laevo.Model
 				{
 					OpenedEvent( this );
 				}
-			}
-
-			// Opening an activity also activates it.
-			if ( !IsActive )
-			{
-				IsActive = true;
-				ActivatedEvent( this );
 			}
 		}
 

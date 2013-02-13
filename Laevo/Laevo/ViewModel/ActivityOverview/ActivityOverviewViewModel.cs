@@ -28,7 +28,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
-		public event ActivityViewModel.ActivityEventHandler OpenedActivityEvent;
+		public event ActivityViewModel.ActivityEventHandler ActivatedActivityEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is selected.
@@ -145,12 +145,12 @@ namespace Laevo.ViewModel.ActivityOverview
 				// The first activity needs to be opened at startup.
 				if ( isFirstActivity )
 				{
-					viewModel.OpenActivity();
+					viewModel.ActivateActivity();
 				}
 			}
 
-			// Activate activities which have windows assigned to them at startup so it seems as if those sessions simply continue since when the application was closed.
-			Activities.Where( a => a.HasOpenWindows() ).ForEach( a => a.OpenActivity( false ) );
+			// Open activities which have windows assigned to them at startup so it seems as if those sessions simply continue since when the application was closed.
+			Activities.Where( a => a.HasOpenWindows() ).ForEach( a => a.OpenActivity() );
 
 			// Hook up timer.
 			_updateTimer.Elapsed += UpdateData;
@@ -173,22 +173,22 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			HookActivityEvents( newActivity );
-			newActivity.OpenActivity();
+			newActivity.ActivateActivity();
 		}
 
 		void HookActivityEvents( ActivityViewModel activity )
 		{
-			activity.OpeningActivityEvent += OnActivityOpening;
-			activity.OpenedActivityEvent += OnActivityOpened;
+			activity.ActivatingActivityEvent += OnActivityActivating;
+			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += a => ActivityMode = Mode.Edit;
-			activity.ActivityEditFinishedEvent += a => ActivityMode = Mode.Open;
+			activity.ActivityEditFinishedEvent += a => ActivityMode = Mode.Activate;
 			activity.ActivityClosedEvent += OnActivityClosed;
 		}
 
-		void OnActivityOpening( ActivityViewModel viewModel )
+		void OnActivityActivating( ActivityViewModel viewModel )
 		{
-			// Indicate an activity is no longer active (visible).
+			// Indicate the previously active activity is no longer active (visible).
 			if ( CurrentActivityViewModel != null && viewModel != CurrentActivityViewModel )
 			{
 				CurrentActivityViewModel.Deactivated();
@@ -196,10 +196,10 @@ namespace Laevo.ViewModel.ActivityOverview
 			
 		}
 
-		void OnActivityOpened( ActivityViewModel viewModel )
+		void OnActivityActivated( ActivityViewModel viewModel )
 		{
 			CurrentActivityViewModel = viewModel;
-			OpenedActivityEvent( viewModel );
+			ActivatedActivityEvent( viewModel );
 		}
 
 		void OnActivityClosed( ActivityViewModel viewModel )

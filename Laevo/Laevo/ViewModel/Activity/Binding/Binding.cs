@@ -18,7 +18,7 @@
 
 	public enum Commands
 	{
-		OpenActivity,
+		ActivateActivity,
 		OpenActivityLibrary,
 		SelectActivity,
 		EditActivity,
