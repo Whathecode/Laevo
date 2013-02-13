@@ -69,7 +69,7 @@ namespace Laevo
 			if ( !createStartupActivity )
 			{
 				//  When no startup activity is created, the user needs to select an existing activity to assign the current desktop to.
-				_viewModel.SelectActivity( a => a.OpenActivity() );
+				_viewModel.SelectActivity( a => a.ActivateActivity() );
 			}
 
 			// Create View.

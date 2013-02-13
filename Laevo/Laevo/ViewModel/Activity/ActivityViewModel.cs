@@ -68,14 +68,14 @@ namespace Laevo.ViewModel.Activity
 
 
 		/// <summary>
-		///   Event which is triggered when an activity is being opened.
+		///   Event which is triggered when an activity is being activated.
 		/// </summary>
-		public event ActivityEventHandler OpeningActivityEvent;
+		public event ActivityEventHandler ActivatingActivityEvent;
 
 		/// <summary>
-		///   Event which is triggered when an activity is opened.
+		///   Event which is triggered when an activity is activated.
 		/// </summary>
-		public event ActivityEventHandler OpenedActivityEvent;
+		public event ActivityEventHandler ActivatedActivityEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is selected.
@@ -284,51 +284,50 @@ namespace Laevo.ViewModel.Activity
 
 		static bool _firstActivity = true;
 		/// <summary>
-		///   Open the activity.
-		///   When it is the first activity opened, the current open windows will merge with the stored ones.
+		///   Activates the activity.
+		///   When it is the first activity activated, the current open windows will merge with the stored ones.
 		/// </summary>
-		[CommandExecute( Commands.OpenActivity )]
-		public void OpenActivity( bool switchToActivity = true )
+		[CommandExecute( Commands.ActivateActivity )]
+		public void ActivateActivity()
 		{
-			if ( switchToActivity )
-			{
-				OpeningActivityEvent( this );
+			ActivatingActivityEvent( this );
 
-				if ( this == _overview.CurrentActivityViewModel )
-				{
-					// Activity is already open.
-					// The event is still necessary to indicate the user is no longer selecting an activity.
-					OpenedActivityEvent( this );
-					return;
-				}
+			// Check whether activity is already active.
+			if ( this == _overview.CurrentActivityViewModel )
+			{
+				// The event is still necessary to indicate the user is no longer selecting an activity.
+				ActivatedActivityEvent( this );
+				return;
 			}
 
-			// The first opened activity should include the currently open windows.
+			// The first activated activity should include the currently open windows.
 			if ( _firstActivity )
 			{
 				_virtualDesktop = _desktopManager.Merge( _virtualDesktop, _desktopManager.CurrentDesktop );
 				_firstActivity = false;
-			}
-
-			_activity.Open();
-
-			// Activity also becomes active when it is opened.
-			if ( switchToActivity )
-			{				
-				IsActive = true;
-				if ( ActiveTimeSpans == null )
-				{
-					ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
-				}
-				DateTime now = DateTime.Now;
-				_currentActiveTimeSpan = new Interval<DateTime>( now, now );
-				ActiveTimeSpans.Add( _currentActiveTimeSpan );
-
-				_desktopManager.SwitchToDesktop( _virtualDesktop );
-				InitializeLibrary();
-
-				OpenedActivityEvent( this );
 			}			
+
+			// Activate. (model logic)
+			_activity.Activate();
+			IsActive = true;
+			if ( ActiveTimeSpans == null )
+			{
+				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+			}
+			DateTime now = DateTime.Now;
+			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
+			ActiveTimeSpans.Add( _currentActiveTimeSpan );
+
+			// Initialize desktop.
+			_desktopManager.SwitchToDesktop( _virtualDesktop );
+			InitializeLibrary();
+
+			ActivatedActivityEvent( this );
+		}
+
+		public void OpenActivity()
+		{
+			_activity.Open();
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]
@@ -346,8 +345,8 @@ namespace Laevo.ViewModel.Activity
 				case Mode.Select:
 					SelectedActivityEvent( this );
 					break;
-				case Mode.Open:
-					OpenActivity();
+				case Mode.Activate:
+					ActivateActivity();
 					break;
 			}			
 		}

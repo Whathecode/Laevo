@@ -104,7 +104,7 @@ namespace Laevo.ViewModel.Main
 			awaitOpen.Subscribe( a =>
 			{
 				selectedActivity( a );
-				_activityOverviewViewModel.ActivityMode = Mode.Open;
+				_activityOverviewViewModel.ActivityMode = Mode.Activate;
 				HideActivityOverview();
 			} );
 			ShowActivityOverview();
@@ -134,7 +134,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode == Mode.Open;
+			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
 		}
 
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
@@ -200,7 +200,7 @@ namespace Laevo.ViewModel.Main
 					EnableAttentionLines = _model.Settings.EnableAttentionLines
 				};
 			}
-			_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
+			_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 			_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow
 			{
@@ -208,7 +208,7 @@ namespace Laevo.ViewModel.Main
 			};
 		}
 
-		void OnOpenedActivityEvent( ActivityViewModel viewModel )
+		void OnActivatedActivityEvent( ActivityViewModel viewModel )
 		{
 			HideActivityOverview();
 		}
@@ -216,7 +216,7 @@ namespace Laevo.ViewModel.Main
 		void OnClosedActivityEvent( ActivityViewModel viewModel )
 		{
 			// Open time line in order to select a new activity to continue work on.
-			SelectActivity( a => a.OpenActivity() );
+			SelectActivity( a => a.ActivateActivity() );
 		}
 
 		public override void Persist()
