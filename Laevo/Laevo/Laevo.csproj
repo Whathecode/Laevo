@@ -323,12 +323,11 @@
     <Compile Include="View\Activity\ActivityControl.xaml.cs">
       <DependentUpon>ActivityControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Activity\Converters\ActivityBorderConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityColorConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
-    <Compile Include="View\Activity\Converters\AttentionLinesVisibilityConverter.cs" />
+    <Compile Include="View\Activity\Converters\ActivityCornerRadiusConverter.cs" />
     <Compile Include="View\Activity\Converters\EditActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\TimeSpanConverter.cs" />
     <Compile Include="View\Activity\EditActivityPopup.xaml.cs">

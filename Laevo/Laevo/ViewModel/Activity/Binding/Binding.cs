@@ -13,7 +13,8 @@
 		OffsetPercentage,
 		PossibleColors,
 		PossibleIcons,
-		IsActive
+		IsActive,
+		IsOpen
 	}
 
 	public enum Commands
