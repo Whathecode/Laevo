@@ -2,12 +2,17 @@
 	x:Class="Laevo.View.ActivityOverview.ActivityOverviewWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
-	xmlns:Binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
-	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
-	xmlns:Options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
-	xmlns:Converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
-	xmlns:Shaders="clr-namespace:Laevo.View.ActivityOverview.Shaders"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
+	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
+	xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+	xmlns:converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
+	xmlns:shaders="clr-namespace:Laevo.View.ActivityOverview.Shaders"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"
+	mc:Ignorable="d"
+	d:DataContext="{d:DesignInstance Type=vm:ActivityOverviewViewModel}"
 	Title="Laevo Activity Time Line"
 	WindowStyle="None"
 	WindowState="Maximized"
@@ -17,36 +22,36 @@
 	<Window.Topmost>
 		<Binding Path="ActivityMode">
 			<Binding.Converter>
-				<Converters:ActivityModeToTopMostConverter />
+				<converters:ActivityModeToTopMostConverter />
 			</Binding.Converter>
 		</Binding>
 	</Window.Topmost>
 
 	<Window.CommandBindings>
 		<CommandBinding
-			Command="ActivityOverview:ActivityOverviewWindow.MouseDragged"
+			Command="activityOverview:ActivityOverviewWindow.MouseDragged"
 			Executed="MoveTimeLine" />	
 	</Window.CommandBindings>
 	
 	<Window.Resources>
-		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1" Options:Freeze="True">
+		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
 			<GradientStop Color="#606c88" Offset="0" />
 			<GradientStop Color="#282944" Offset="1" />
 		</LinearGradientBrush>
-		<SolidColorBrush x:Key="TimeLineBrush" Color="Transparent" Options:Freeze="True" />
+		<SolidColorBrush x:Key="TimeLineBrush" Color="Transparent" options:Freeze="True" />
 		
-		<Converters:AspectRatioToGeometryConverter x:Key="AspectRatioToPositions" />
-		<Converters:AspectRatioToFovConverter x:Key="AspectRatioToFov" />
-		<Converters:AspectRatioToTransformOffset x:Key="AspectRatioToTransformOffset" />
-		<Converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
-		<Converters:TimeLineHeightConverter x:Key="TimeLineHeightConverter" />
+		<converters:AspectRatioToGeometryConverter x:Key="AspectRatioToPositions" />
+		<converters:AspectRatioToFovConverter x:Key="AspectRatioToFov" />
+		<converters:AspectRatioToTransformOffset x:Key="AspectRatioToTransformOffset" />
+		<converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
+		<converters:TimeLineHeightConverter x:Key="TimeLineHeightConverter" />
 	</Window.Resources>
 	
 	<Grid
 		x:Name="TimeLineContainer"
 		Background="{StaticResource BackgroundBrush}"
-		Behaviors:MouseBehavior.LeftClickDragCommand="ActivityOverview:ActivityOverviewWindow.MouseDragged"
-		Behaviors:MouseBehavior.DragCapturesMouse="True"
+		behaviors:MouseBehavior.LeftClickDragCommand="activityOverview:ActivityOverviewWindow.MouseDragged"
+		behaviors:MouseBehavior.DragCapturesMouse="True"
 		MouseWheel="OnMouseWheel">
 
 		<Grid.CacheMode>
@@ -62,7 +67,7 @@
 				<Style.Triggers>
 					<DataTrigger Binding="{Binding ActivityMode}">
 						<DataTrigger.Value>
-							<Binding:Mode>Edit</Binding:Mode>
+							<binding:Mode>Edit</binding:Mode>
 						</DataTrigger.Value>		
 						<DataTrigger.Setters>
 							<Setter Property="UIElement.IsHitTestVisible" Value="False" />
@@ -164,7 +169,7 @@
 
 				<Grid>
 					<Grid.Effect>
-						<Shaders:FadeEffect />
+						<shaders:FadeEffect />
 					</Grid.Effect>
 
 					<Grid.CacheMode>
@@ -191,7 +196,7 @@
 							</MultiBinding>
 						</Grid.Height>
 
-						<ActivityOverview:TimeLineControl
+						<activityOverview:TimeLineControl
 							x:Name="TimeLine"
 							Focusable="True" />
 					</Grid>
@@ -239,7 +244,7 @@
 		-->
 
 		<!-- Clock -->
-		<ActivityOverview:ClockControl
+		<activityOverview:ClockControl
 			Time="{Binding CurrentTime}"
 			HorizontalAlignment="Right"
 			VerticalAlignment="Bottom" />
@@ -256,7 +261,7 @@
 					<Style.Triggers>
 						<DataTrigger Binding="{Binding ActivityMode}">
 							<DataTrigger.Value>
-								<Binding:Mode>Edit</Binding:Mode>
+								<binding:Mode>Edit</binding:Mode>
 							</DataTrigger.Value>
 							<DataTrigger.EnterActions>
 								<BeginStoryboard>
@@ -274,7 +279,7 @@
 											Storyboard.TargetProperty="Opacity"
 											To="0" Duration="0:0:0.3" />
 									</Storyboard>
-								</BeginStoryboard>								
+								</BeginStoryboard>
 							</DataTrigger.ExitActions>
 						</DataTrigger>
 					</Style.Triggers>

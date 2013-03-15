@@ -41,7 +41,7 @@ namespace Laevo.ViewModel.Activity
 		{			
 			Color.FromRgb( 86, 124, 212 ),	// Blue
 			Color.FromRgb( 121, 234, 255 ),	// Cyan
-			Color.FromRgb( 88, 160, 2 ),	// Green			
+			Color.FromRgb( 88, 160, 2 ),	// Green
 			Color.FromRgb( 227, 220, 0 ),	// Yellow
 			Color.FromRgb( 212, 131, 0 ),	// Orange
 			Color.FromRgb( 212, 50, 38 ),	// Red
@@ -171,11 +171,16 @@ namespace Laevo.ViewModel.Activity
 		public double OffsetPercentage { get; set; }
 
 		/// <summary>
-		///   Determines whether or not the activity is active.
-		///   This means it is open and being used.
+		///   Determines whether or not the activity is currently active (working on it).
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsActive )]
 		public bool IsActive { get; set; }
+
+		/// <summary>
+		///   Determines whether or not the activity is currently open, but not necessarily active (working on it).
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsOpen )]
+		public bool IsOpen { get; set; }
 
 		[NotifyProperty( Binding.Properties.PossibleColors )]
 		public ObservableCollection<Color> PossibleColors { get; set; }
@@ -186,7 +191,7 @@ namespace Laevo.ViewModel.Activity
 
 		static ActivityViewModel()
 		{
-			// Load icons.			
+			// Load icons.
 			var assembly = Assembly.GetExecutingAssembly();
 			var resourcesName = assembly.GetName().Name + ".g";
 			var manager = new ResourceManager( resourcesName, assembly );
@@ -198,7 +203,7 @@ namespace Laevo.ViewModel.Activity
 				.ToList();
 
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
-			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );			
+			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
 		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager )
@@ -215,7 +220,7 @@ namespace Laevo.ViewModel.Activity
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
 
-			CommonInitialize();			
+			CommonInitialize();
 		}
 
 		public ActivityViewModel(
@@ -276,9 +281,14 @@ namespace Laevo.ViewModel.Activity
 
 		void CommonInitialize()
 		{
+			_activity.ActivatedEvent += a => IsActive = true;
+			_activity.DeactivatedEvent += a => IsActive = false;
+			_activity.OpenedEvent += a => IsOpen = true;
+			_activity.ClosedEvent += a => IsOpen = false;
+
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
-			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();			
+			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();	
 		}
 
 
@@ -309,7 +319,6 @@ namespace Laevo.ViewModel.Activity
 
 			// Activate. (model logic)
 			_activity.Activate();
-			IsActive = true;
 			if ( ActiveTimeSpans == null )
 			{
 				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
@@ -449,7 +458,6 @@ namespace Laevo.ViewModel.Activity
 				}				
 			}
 
-			IsActive = false;
 			_activity.Deactivate();
 			_currentActiveTimeSpan = null;
 		}

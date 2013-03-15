@@ -5,23 +5,25 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:Converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
-	xmlns:Behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
-	xmlns:ActivityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
+	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
+	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
 	Panel.ZIndex="10"	
-	ActivityOverview:TimeLineControl.Occurance="{Binding Occurance}"
-	ActivityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
+	activityOverview:TimeLineControl.Occurance="{Binding Occurance}"
+	activityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
 	ClipToBounds="False">
 	
-	<ActivityOverview:TimeLineControl.Offset>
+	<activityOverview:TimeLineControl.Offset>
 		<MultiBinding Mode="TwoWay">
 			<MultiBinding.Converter>
-				<Converters:ActivityOffsetConverter />
+				<converters:ActivityOffsetConverter />
 			</MultiBinding.Converter>
 			<Binding Path="OffsetPercentage" Mode="TwoWay" />
 			<Binding Path="ActualHeight">
@@ -31,15 +33,12 @@
 			</Binding>
 			<Binding Path="HeightPercentage" />
 		</MultiBinding>
-	</ActivityOverview:TimeLineControl.Offset>	
+	</activityOverview:TimeLineControl.Offset>	
 	
 	<UserControl.Resources>
-		<Converters:ActivityColorConverter x:Key="ActivityColorConverter" />
-		<Converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
-		<Converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />	
-		<wtcConverters:CalculateValueConverter x:Key="DivideByTwoConverter" Operation="Division" Value="2" />
-		<Converters:ActivityBorderConverter x:Key="BorderBrushConverter" />
-		<Converters:AttentionLinesVisibilityConverter x:Key="AttentionLineConverter" />
+		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
+		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
+		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 	</UserControl.Resources>
 
 	<StackPanel Orientation="Vertical">
@@ -47,7 +46,7 @@
 		<Canvas
 			x:Name="Header"
 			Panel.ZIndex="20"
-			Height="{Binding ElementName=Image, Path=ActualHeight, Converter={StaticResource DivideByTwoConverter}}">
+			Height="{Binding ElementName=Image, Path=ActualHeight, Converter={wtcConverters:CalculateValueConverter Operation=Division, Value=2}}">
 			<StackPanel Orientation="Horizontal">
 				<Image
 					x:Name="Image"
@@ -55,7 +54,7 @@
 					Stretch="None"
 					Cursor="Hand"
 					PreviewMouseDown="OnStartEditActivity"
-					Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}">
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
@@ -83,11 +82,11 @@
 
 		<Border
 			x:Name="Container"
-			CornerRadius="3"
-			BorderThickness="2"
-			BorderBrush="{Binding IsActive, Converter={StaticResource BorderBrushConverter}}"
-			Behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
-			Behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
+			CornerRadius="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='3, 0, 0, 3', IfFalse=3}}"
+			BorderThickness="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='3, 3, 0, 3', IfFalse=2}}"
+			BorderBrush="{Binding IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Brushes.Yellow}, IfFalse={x:Static Brushes.White}}}"
+			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
+			behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 			Cursor="Hand"
 			Panel.ZIndex="15"
 			ClipToBounds="True">
@@ -113,7 +112,7 @@
 			</Border.Background>
 			
 			<Border.Resources>
-				<Converters:TimeSpanConverter x:Key="TimeSpanConverter" />
+				<converters:TimeSpanConverter x:Key="TimeSpanConverter" />
 				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="3" Operation="Subtraction" />
 				<DataTemplate x:Key="TimeSpanTemplate">
 					<Line
@@ -147,7 +146,7 @@
 
 			<!-- Attention time spans. -->
 			<ItemsControl
-				Visibility="{Binding ShowActiveTimeSpans, Converter={StaticResource AttentionLineConverter}}"
+				Visibility="{Binding ShowActiveTimeSpans, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
 				ItemTemplate="{StaticResource TimeSpanTemplate}">
 				
 				<ItemsControl.Style>

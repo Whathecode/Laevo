@@ -21,8 +21,10 @@ namespace Laevo.Model
 			= Path.Combine( Laevo.ProgramDataFolder, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
+		public event Action<Activity> ClosedEvent;
 
 		public event Action<Activity> ActivatedEvent;
+		public event Action<Activity> DeactivatedEvent;
 
 		/// <summary>
 		///   A name describing this activity.
@@ -87,12 +89,11 @@ namespace Laevo.Model
 			DataPaths.Add( new Uri( activityDirectory.FullName ) );
 		}
 
-
-		public void Activate()
+		/// <summary>
+		///   Make an activity active (look at it) without opening it. It won't be made part of the current multitasking session.
+		/// </summary>
+		public void View()
 		{
-			// Activating an activity also opens it.
-			Open();
-
 			if ( !IsActive )
 			{
 				IsActive = true;
@@ -100,26 +101,50 @@ namespace Laevo.Model
 			}
 		}
 
-		public void Open()
+		/// <summary>
+		///   Activating an activity opens it, thus making it part of the current multitasking session, and also makes it active (look at it).
+		/// </summary>
+		public void Activate()
 		{
-			if ( !IsOpen )
+			Open();
+			View();
+		}
+
+		/// <summary>
+		///   Deactivating an activity indicates it is no longer being looked at.
+		/// </summary>
+		public void Deactivate()
+		{
+			if ( IsActive )
 			{
-				var now = DateTime.Now;
-				_currentOpenInterval = new Interval<DateTime>( now, now );
-				_openIntervals.Add( _currentOpenInterval );
-				IsOpen = true;
-				if ( OpenedEvent != null )	// HACK: Why does OpenedEvent become null? The aspect should prevent that!
-				{
-					OpenedEvent( this );
-				}
+				IsActive = false;
+				DeactivatedEvent( this );
 			}
 		}
 
-		public void Deactivate()
+		/// <summary>
+		///   Opening an activity makes it part of the current multitasking session.
+		/// </summary>
+		public void Open()
 		{
-			IsActive = false;
+			if ( IsOpen )
+			{
+				return;
+			}
+
+			var now = DateTime.Now;
+			_currentOpenInterval = new Interval<DateTime>( now, now );
+			_openIntervals.Add( _currentOpenInterval );
+			IsOpen = true;
+			//if ( OpenedEvent != null )	// HACK: Why does OpenedEvent become null? The aspect should prevent that!
+			//{
+				OpenedEvent( this );
+			//}
 		}
 
+		/// <summary>
+		///   Closing an activity removes it from the currently ongoing multitasking session.
+		/// </summary>
 		public void Close()
 		{
 			if ( !IsOpen )
@@ -130,7 +155,7 @@ namespace Laevo.Model
 			_currentOpenInterval.ExpandTo( DateTime.Now );
 			_currentOpenInterval = null;
 			IsOpen = false;
-			IsActive = false;
+			ClosedEvent( this );
 		}
 
 		internal void Update( DateTime now )
