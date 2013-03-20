@@ -5,7 +5,7 @@ using Laevo.ViewModel.ActivityOverview.Binding;
 
 namespace Laevo.View.ActivityOverview.Converters
 {
-	public class ActivityModeToTopMostConverter : AbstractGenericValueConverter<Mode, bool>
+	public class ActivityModeToTopMostConverter : AbstractValueConverter<Mode, bool>
 	{
 		public override bool Convert( Mode value )
 		{

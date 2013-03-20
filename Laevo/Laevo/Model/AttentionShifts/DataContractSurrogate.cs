@@ -56,7 +56,7 @@ namespace Laevo.Model.AttentionShifts
 
 		public object GetDeserializedObject( object obj, Type targetType )
 		{
-			SerializedActivity activity = obj as SerializedActivity;
+			var activity = obj as SerializedActivity;
 			if ( activity != null )
 			{
 				return _activities.First( a => a.DateCreated == activity.DateCreated );

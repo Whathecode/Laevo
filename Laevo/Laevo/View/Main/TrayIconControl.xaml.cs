@@ -33,8 +33,8 @@ namespace Laevo.View.Main
 		readonly Dictionary<Keys, bool> _keyStates = new Dictionary<Keys, bool>();
 
 		const string TurnCapsLockText = "Turn Caps Lock ";
-		bool _isCapsLockEnabled;		
-		object _switchingCapsLockLock = new object();
+		bool _isCapsLockEnabled;
+		readonly object _switchingCapsLockLock = new object();
 
 
 		public TrayIconControl()
@@ -68,7 +68,7 @@ namespace Laevo.View.Main
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
 			var switchCapsLock = new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger(
-				new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, () => SwitchCapsLock() );
+				new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
@@ -178,7 +178,7 @@ namespace Laevo.View.Main
 			}
 		}
 
-		bool _suppressKeys = false;
+		bool _suppressKeys;
 		readonly Dictionary<Keys, bool> _newInput = new Dictionary<Keys, bool>();
 		void OnKeyDown( object sender, KeyEventArgs e )
 		{

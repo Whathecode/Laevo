@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using Laevo.Model.AttentionShifts;
+using Whathecode.System.Extensions;
 
 
 namespace Laevo.Model
@@ -122,10 +124,22 @@ namespace Laevo.Model
 
 		void AddActivity( Activity activity )
 		{
-			// TODO: Unhook event once activities can be deleted.
-			activity.ActivatedEvent += a => _attentionShifts.Add( new ActivityAttentionShift( a ) );
-
+			activity.ActivatedEvent += OnActivityActivated;
 			_activities.Add( activity );
+		}
+
+		void OnActivityActivated( Activity activity )
+		{
+			_attentionShifts.Add( new ActivityAttentionShift( activity ) );
+		}
+
+		public void RemoveActivity( Activity activity )
+		{
+			activity.ActivatedEvent -= OnActivityActivated;
+
+			_attentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity == activity ).ForEach( a => a.ActivityRemoved() );
+
+			_activities.Remove( activity );
 		}
 
 		public void Persist()

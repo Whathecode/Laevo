@@ -68,11 +68,6 @@ namespace Laevo.ViewModel.Activity
 
 
 		/// <summary>
-		///   Event which is triggered when an activity is being activated.
-		/// </summary>
-		public event ActivityEventHandler ActivatingActivityEvent;
-
-		/// <summary>
 		///   Event which is triggered when an activity is activated.
 		/// </summary>
 		public event ActivityEventHandler ActivatedActivityEvent;
@@ -97,7 +92,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public event ActivityEventHandler ActivityClosedEvent;
 
-		readonly Model.Activity _activity;
+		internal readonly Model.Activity Activity;
 		readonly DesktopManager _desktopManager;
 		[DataMember]
 		VirtualDesktop _virtualDesktop;
@@ -108,7 +103,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public DateTime DateCreated
 		{
-			get { return _activity.DateCreated; }
+			get { return Activity.DateCreated; }
 		}
 
 		/// <summary>
@@ -182,6 +177,9 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsOpen )]
 		public bool IsOpen { get; set; }
 
+		[NotifyProperty( Binding.Properties.HasOpenWindows )]
+		public bool HasOpenWindows { get; private set; }
+
 		[NotifyProperty( Binding.Properties.PossibleColors )]
 		public ObservableCollection<Color> PossibleColors { get; set; }
 
@@ -209,7 +207,7 @@ namespace Laevo.ViewModel.Activity
 		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager )
 		{
 			_overview = overview;
-			_activity = activity;
+			Activity = activity;
 
 			_desktopManager = desktopManager;
 			_virtualDesktop = desktopManager.CreateEmptyDesktop();
@@ -231,7 +229,7 @@ namespace Laevo.ViewModel.Activity
 			IEnumerable<ActivityAttentionShift> activitySwitches )
 		{
 			_overview = overview;
-			_activity = activity;
+			Activity = activity;
 
 			_desktopManager = desktopManager;
 			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
@@ -281,10 +279,10 @@ namespace Laevo.ViewModel.Activity
 
 		void CommonInitialize()
 		{
-			_activity.ActivatedEvent += a => IsActive = true;
-			_activity.DeactivatedEvent += a => IsActive = false;
-			_activity.OpenedEvent += a => IsOpen = true;
-			_activity.ClosedEvent += a => IsOpen = false;
+			Activity.ActivatedEvent += a => IsActive = true;
+			Activity.DeactivatedEvent += a => IsActive = false;
+			Activity.OpenedEvent += a => IsOpen = true;
+			Activity.ClosedEvent += a => IsOpen = false;
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
@@ -298,10 +296,8 @@ namespace Laevo.ViewModel.Activity
 		///   When it is the first activity activated, the current open windows will merge with the stored ones.
 		/// </summary>
 		[CommandExecute( Commands.ActivateActivity )]
-		public void ActivateActivity()
+		public void ActivateActivity( bool alsoOpen = true )
 		{
-			ActivatingActivityEvent( this );
-
 			// Check whether activity is already active.
 			if ( this == _overview.CurrentActivityViewModel )
 			{
@@ -318,7 +314,14 @@ namespace Laevo.ViewModel.Activity
 			}			
 
 			// Activate. (model logic)
-			_activity.Activate();
+			if ( alsoOpen )
+			{
+				Activity.Activate();
+			}
+			else
+			{
+				Activity.View();
+			}
 			if ( ActiveTimeSpans == null )
 			{
 				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
@@ -332,11 +335,6 @@ namespace Laevo.ViewModel.Activity
 			InitializeLibrary();
 
 			ActivatedActivityEvent( this );
-		}
-
-		public void OpenActivity()
-		{
-			_activity.Open();
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]
@@ -355,9 +353,9 @@ namespace Laevo.ViewModel.Activity
 					SelectedActivityEvent( this );
 					break;
 				case Mode.Activate:
-					ActivateActivity();
+					ActivateActivity( Activity.IsOpen );
 					break;
-			}			
+			}
 		}
 
 		[CommandExecute( Commands.EditActivity )]
@@ -373,27 +371,36 @@ namespace Laevo.ViewModel.Activity
 			popup.Show();
 		}
 
+		[CommandExecute( Commands.OpenActivity )]
+		public void OpenActivity()
+		{
+			Activity.Open();
+		}
+
 		[CommandExecute( Commands.CloseActivity )]
 		public void CloseActivity()
 		{
-			_activity.Close();
 			Deactivated();
-
-			_currentActiveTimeSpan = null;
-
+			Activity.Close();
 			ActivityClosedEvent( this );
 		}
 
-		[CommandCanExecute( Commands.CloseActivity )]
-		public bool CanCloseActivity()
+		[CommandExecute( Commands.RemoveActivity )]
+		public void RemoveActivity()
 		{
-			_desktopManager.UpdateWindowAssociations();
-			return _virtualDesktop.Windows.Count == 0;
+			_overview.RemoveActivity( this );
 		}
 
-		public bool HasOpenWindows()
+		[CommandCanExecute( Commands.RemoveActivity )]
+		public bool CanRemoveActivity()
 		{
-			return _virtualDesktop.Windows.Count > 0;
+			return !HasOpenWindows && !IsOpen && !IsActive;
+		}
+
+		public bool UpdateHasOpenWindows()
+		{
+			HasOpenWindows = _virtualDesktop.Windows.Count > 0;
+			return HasOpenWindows;
 		}
 
 		[CommandExecute( Commands.ChangeColor )]
@@ -415,7 +422,7 @@ namespace Laevo.ViewModel.Activity
 		{
 			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
 
-			var dataPaths = _activity.DataPaths.Select( p => p.LocalPath ).ToArray();
+			var dataPaths = Activity.DataPaths.Select( p => p.LocalPath ).ToArray();
 			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
 			{
 				// TODO: Handle DirectoryNotFoundException when the folder no longer exists.
@@ -426,14 +433,14 @@ namespace Laevo.ViewModel.Activity
 		public void Update( DateTime now )
 		{
 			// Update the interval which indicates when the activity was open.
-			if ( _activity.OpenIntervals.Count > 0 )
+			if ( Activity.OpenIntervals.Count > 0 )
 			{
-				Occurance = _activity.OpenIntervals.First().Start;
-				TimeSpan = _activity.OpenIntervals.Last().End - _activity.OpenIntervals.First().Start;
+				Occurance = Activity.OpenIntervals.First().Start;
+				TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.First().Start;
 			}
 			else
 			{
-				Occurance = _activity.DateCreated;
+				Occurance = Activity.DateCreated;
 			}
 
 			// Update the intervals which indicate when the activity was active.
@@ -448,23 +455,30 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		internal void Deactivated()
 		{
+			if ( !IsActive )
+			{
+				return;
+			}
+
+			UpdateHasOpenWindows();
+
 			// Store activity context paths.
 			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
 			{
-				_activity.DataPaths.Clear();
+				Activity.DataPaths.Clear();
 				foreach ( var folder in activityContext )
 				{
-					_activity.DataPaths.Add( new Uri( folder.Path ) );
+					Activity.DataPaths.Add( new Uri( folder.Path ) );
 				}				
 			}
 
-			_activity.Deactivate();
+			Activity.Deactivate();
 			_currentActiveTimeSpan = null;
 		}
 
 		public override void Persist()
 		{
-			_activity.Name = Label;
+			Activity.Name = Label;
 		}
 
 		protected override void FreeUnmanagedResources()

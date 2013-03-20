@@ -61,5 +61,11 @@ namespace Laevo.View.Activity
 			// Moving focus also updates the source.
 			element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 		}
+
+		void OnMouseMoved( object sender, MouseEventArgs e )
+		{
+			double xOffset = e.GetPosition( this ).X - Buttons.ActualWidth / 2;
+			Buttons.Margin = new Thickness( xOffset, Container.ActualHeight, 0, 0 );
+		}
 	}
 }

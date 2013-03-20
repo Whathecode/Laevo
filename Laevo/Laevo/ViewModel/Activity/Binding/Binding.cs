@@ -14,7 +14,8 @@
 		PossibleColors,
 		PossibleIcons,
 		IsActive,
-		IsOpen
+		IsOpen,
+		HasOpenWindows
 	}
 
 	public enum Commands
@@ -23,7 +24,9 @@
 		OpenActivityLibrary,
 		SelectActivity,
 		EditActivity,
+		OpenActivity,
 		CloseActivity,
+		RemoveActivity,
 		ChangeColor,
 		ChangeIcon
 	}

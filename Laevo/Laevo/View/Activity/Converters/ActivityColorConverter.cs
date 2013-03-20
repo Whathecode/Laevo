@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Globalization;
-using System.Windows.Data;
 using System.Windows.Media;
+using Whathecode.System.Windows.Data;
 using Whathecode.System.Windows.Media.Extensions;
 
 
 namespace Laevo.View.Activity.Converters
 {
-	class ActivityColorConverter : IValueConverter
+	class ActivityColorConverter : AbstractValueConverter<Color, Color>
 	{
-		public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+		public override Color Convert( Color value )
 		{
-			var color = (Color)value;
-
-			return color.Darken( 0.2 );
+			return value.Darken( 0.2 );
 		}
 
-		public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+		public override Color ConvertBack( Color value )
 		{
 			throw new NotSupportedException();
 		}

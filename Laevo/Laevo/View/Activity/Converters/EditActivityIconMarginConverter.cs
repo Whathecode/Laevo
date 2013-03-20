@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
+using Whathecode.System.Windows.Data;
 
 
 namespace Laevo.View.Activity.Converters
 {
-	public class EditActivityIconMarginConverter : IMultiValueConverter
+	public class EditActivityIconMarginConverter : AbstractMultiValueConverter<double, Thickness>
 	{
 		public Thickness AddMargin { get; set; }
 
-		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
+
+		public override Thickness Convert( double[] values )
 		{
-			double width = (double)values[ 0 ];
-			double height = (double)values[ 1 ];
+			double width = values[ 0 ];
+			double height = values[ 1 ];
 
 			return new Thickness(
 				(-width / 2) - AddMargin.Left,
@@ -21,7 +21,7 @@ namespace Laevo.View.Activity.Converters
 				0, 0 );
 		}
 
-		public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
+		public override double[] ConvertBack( Thickness value )
 		{
 			throw new NotSupportedException();
 		}
