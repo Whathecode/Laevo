@@ -100,7 +100,7 @@ namespace Laevo.ViewModel.Main
 			_activityOverviewViewModel.ActivityMode = Mode.Select;
 			var awaitOpen = Observable.FromEvent<ActivityViewModel.ActivityEventHandler, ActivityViewModel>(
 				h => _activityOverviewViewModel.SelectedActivityEvent += h,
-				h => _activityOverviewViewModel.SelectedActivityEvent -= h );
+				h => _activityOverviewViewModel.SelectedActivityEvent -= h ).Take( 1 );
 			awaitOpen.Subscribe( a =>
 			{
 				selectedActivity( a );
@@ -155,7 +155,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.CloseActivity )]
 		public bool CanCloseActivity()
 		{
-			return _activityOverviewViewModel.CurrentActivityViewModel != null && _activityOverviewViewModel.CurrentActivityViewModel.CanCloseActivity();
+			return _activityOverviewViewModel.CurrentActivityViewModel != null;
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -206,6 +206,7 @@ namespace Laevo.ViewModel.Main
 			{
 				DataContext = _activityOverviewViewModel
 			};
+			_activityOverview.Activated += ( sender, args ) => _activityOverviewViewModel.OnOverviewActivated();
 		}
 
 		void OnActivatedActivityEvent( ActivityViewModel viewModel )
@@ -216,7 +217,7 @@ namespace Laevo.ViewModel.Main
 		void OnClosedActivityEvent( ActivityViewModel viewModel )
 		{
 			// Open time line in order to select a new activity to continue work on.
-			SelectActivity( a => a.ActivateActivity() );
+			SelectActivity( a => a.ActivateActivity( a.IsOpen ) );
 		}
 
 		public override void Persist()

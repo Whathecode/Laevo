@@ -71,7 +71,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.Activities )]
 		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
 
-		readonly DataContractSerializer ActivitySerializer;
+		readonly DataContractSerializer _activitySerializer;
 
 
 		public ActivityOverviewViewModel( Model.Laevo model )
@@ -87,7 +87,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				} );
 
 			// Check for stored presentation options for existing activities.
-			ActivitySerializer = new DataContractSerializer(
+			_activitySerializer = new DataContractSerializer(
 				typeof( Dictionary<DateTime, ActivityViewModel> ),
 				null, Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( _desktopManager ) );
@@ -96,7 +96,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
 				{
-					existingActivities = (Dictionary<DateTime, ActivityViewModel>)ActivitySerializer.ReadObject( activityFileStream );
+					existingActivities = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( activityFileStream );
 				}
 			}
 
@@ -150,7 +150,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			// Open activities which have windows assigned to them at startup so it seems as if those sessions simply continue since when the application was closed.
-			Activities.Where( a => a.HasOpenWindows() ).ForEach( a => a.OpenActivity() );
+			Activities.Where( a => a.UpdateHasOpenWindows() ).ForEach( a => a.OpenActivity() );
 
 			// Hook up timer.
 			_updateTimer.Elapsed += UpdateData;
@@ -176,28 +176,38 @@ namespace Laevo.ViewModel.ActivityOverview
 			newActivity.ActivateActivity();
 		}
 
+		public void RemoveActivity( ActivityViewModel activity )
+		{
+			_model.RemoveActivity( activity.Activity );
+			lock ( Activities )
+			{
+				Activities.Remove( activity );
+			}
+
+			activity.ActivatedActivityEvent -= OnActivityActivated;
+			activity.SelectedActivityEvent -= OnActivitySelected;
+			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
+			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
+			activity.ActivityClosedEvent -= OnActivityClosed;
+		}
+
 		void HookActivityEvents( ActivityViewModel activity )
 		{
-			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
-			activity.ActivityEditStartedEvent += a => ActivityMode = Mode.Edit;
-			activity.ActivityEditFinishedEvent += a => ActivityMode = Mode.Activate;
+			activity.ActivityEditStartedEvent += OnActivityEditStarted;
+			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
 			activity.ActivityClosedEvent += OnActivityClosed;
 		}
 
-		void OnActivityActivating( ActivityViewModel viewModel )
+		void OnActivityActivated( ActivityViewModel viewModel )
 		{
 			// Indicate the previously active activity is no longer active (visible).
 			if ( CurrentActivityViewModel != null && viewModel != CurrentActivityViewModel )
 			{
 				CurrentActivityViewModel.Deactivated();
 			}
-			
-		}
 
-		void OnActivityActivated( ActivityViewModel viewModel )
-		{
 			CurrentActivityViewModel = viewModel;
 			ActivatedActivityEvent( viewModel );
 		}
@@ -211,6 +221,16 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivitySelected( ActivityViewModel viewModel )
 		{
 			SelectedActivityEvent( viewModel );
+		}
+
+		void OnActivityEditStarted( ActivityViewModel viewModel )
+		{
+			ActivityMode = Mode.Edit;
+		}
+
+		void OnActivityEditFinished( ActivityViewModel viewModel )
+		{
+			ActivityMode = Mode.Activate;
 		}
 
 		// ReSharper disable UnusedMember.Local
@@ -240,6 +260,11 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 		}
+
+		public void OnOverviewActivated()
+		{
+			_desktopManager.UpdateWindowAssociations();
+		}
 		
 		public void CutWindow()
 		{
@@ -260,7 +285,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
 			{
-				ActivitySerializer.WriteObject( activityFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
+				_activitySerializer.WriteObject( activityFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
 			}
 		}
 

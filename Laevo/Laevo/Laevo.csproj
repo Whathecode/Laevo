@@ -178,6 +178,8 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Reactive Extensions SDK\v1.0.10621\Binaries\.NETFramework\v3.5\System.Reactive.dll</HintPath>
@@ -327,7 +329,7 @@
     <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityCornerRadiusConverter.cs" />
+    <Compile Include="View\Activity\Converters\ActivityBorderConverter.cs" />
     <Compile Include="View\Activity\Converters\EditActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\TimeSpanConverter.cs" />
     <Compile Include="View\Activity\EditActivityPopup.xaml.cs">
@@ -392,6 +394,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="View\Activity\ActionIcons\delete.png" />
+    <Resource Include="View\Activity\ActionIcons\view.png" />
     <Resource Include="View\Activity\Icons\Address_Book.png" />
     <Resource Include="View\Activity\Icons\Alert.png" />
     <Resource Include="View\Activity\Icons\Announcement.png" />
@@ -439,6 +443,17 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\Activity\Icons\Laevo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\ActionIcons\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\ActionIcons\close.png" />
+    <Resource Include="View\Activity\ActionIcons\collaborator.png" />
+    <Resource Include="View\Activity\ActionIcons\plan.png" />
+    <Resource Include="View\Activity\ActionIcons\relate.png" />
+    <Resource Include="View\Activity\ActionIcons\start.png" />
+    <Resource Include="View\Activity\ActionIcons\tag.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

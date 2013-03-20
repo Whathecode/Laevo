@@ -12,6 +12,7 @@
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
@@ -37,6 +38,7 @@
 	
 	<UserControl.Resources>
 		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
+		<converters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 	</UserControl.Resources>
@@ -47,14 +49,15 @@
 			x:Name="Header"
 			Panel.ZIndex="20"
 			Height="{Binding ElementName=Image, Path=ActualHeight, Converter={wtcConverters:CalculateValueConverter Operation=Division, Value=2}}">
+			
+			<!-- Icon and text. -->
 			<StackPanel Orientation="Horizontal">
 				<Image
 					x:Name="Image"
 					Source="{Binding Path=Icon}"
 					Stretch="None"
 					Cursor="Hand"
-					PreviewMouseDown="OnStartEditActivity"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}">
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
@@ -78,18 +81,82 @@
 					</TextBox.Template>
 				</TextBox>
 			</StackPanel>
+			
+			<!-- Action buttons -->
+			<StackPanel
+				x:Name="Buttons"
+				Orientation="Horizontal">
+				
+				<StackPanel.Visibility>
+					<MultiBinding
+						Converter="{wtcConverters:ConditionConverter Expression='[0] || [1]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
+						<Binding ElementName="Container" Path="IsMouseOver" />
+						<Binding ElementName="Buttons" Path="IsMouseOver" />
+					</MultiBinding>
+				</StackPanel.Visibility>
+				
+				<StackPanel.Resources>
+					<ScaleTransform
+						x:Key="ResizeActionIcon"
+						ScaleX="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}"
+						ScaleY="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}" />
+				</StackPanel.Resources>
+				
+				<Image
+					Source="../Activity/ActionIcons/delete.png"
+					Cursor="Hand"
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.RemoveActivity}}"
+					RenderTransformOrigin="0.5, 0.5"
+					RenderTransform="{StaticResource ResizeActionIcon}">
+					<Image.Opacity>
+						<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1] || [2]', IfTrue=0.3, IfFalse=1}">
+							<Binding Path="HasOpenWindows" />
+							<Binding Path="IsOpen" />
+							<Binding Path="IsActive" />
+						</MultiBinding>
+					</Image.Opacity>
+				</Image>
+				<Image
+					Source="../Activity/ActionIcons/edit.png"
+					Cursor="Hand"
+					PreviewMouseDown="OnStartEditActivity"
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
+				<Image
+					Source="../Activity/ActionIcons/start.png"
+					Cursor="Hand"
+					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+					RenderTransformOrigin="0.5, 0.5"
+					RenderTransform="{StaticResource ResizeActionIcon}" />
+				<Image
+					Source="../Activity/ActionIcons/close.png"
+					Cursor="Hand"
+					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.CloseActivity}}"
+					RenderTransformOrigin="0.5, 0.5"
+					RenderTransform="{StaticResource ResizeActionIcon}" />
+			</StackPanel>
+			
 		</Canvas>
-
+		
 		<Border
 			x:Name="Container"
-			CornerRadius="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='3, 0, 0, 3', IfFalse=3}}"
-			BorderThickness="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='3, 3, 0, 3', IfFalse=2}}"
-			BorderBrush="{Binding IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Brushes.Yellow}, IfFalse={x:Static Brushes.White}}}"
+			CornerRadius="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='5, 0, 0, 5', IfFalse=5}}"
+			BorderThickness="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='4, 4, 0, 4', IfFalse=2}}"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
+			MouseMove="OnMouseMoved"
 			Cursor="Hand"
 			Panel.ZIndex="15"
 			ClipToBounds="True">
+			
+			<Border.BorderBrush>
+				<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+					<Binding Path="IsActive" />
+					<Binding Path="IsOpen" />
+					<Binding Path="HasOpenWindows" />
+				</MultiBinding>
+			</Border.BorderBrush>
 			
 			<Border.Height>
 				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">
@@ -101,7 +168,7 @@
 						</Binding.RelativeSource>
 					</Binding>
 				</MultiBinding>
-			</Border.Height>			
+			</Border.Height>
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 					<GradientStop
@@ -170,8 +237,8 @@
 						<Canvas />
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
-			</ItemsControl>	
-		</Border>		
+			</ItemsControl>
+		</Border>
 
 	</StackPanel>
 

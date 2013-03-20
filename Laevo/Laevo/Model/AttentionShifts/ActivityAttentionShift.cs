@@ -20,5 +20,11 @@ namespace Laevo.Model.AttentionShifts
 		{
 			Activity = activity;
 		}
+
+
+		public void ActivityRemoved()
+		{
+			Activity = null;
+		}
 	}
 }

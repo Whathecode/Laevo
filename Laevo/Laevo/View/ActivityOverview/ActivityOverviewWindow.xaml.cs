@@ -191,7 +191,10 @@ namespace Laevo.View.ActivityOverview
 			}
 
 			// Add new items.
-			e.NewItems.Cast<ActivityViewModel>().ForEach( NewActivity );
+			if ( e.NewItems != null )
+			{
+				e.NewItems.Cast<ActivityViewModel>().ForEach( NewActivity );
+			}
 		}
 
 		void NewActivity( ActivityViewModel viewModel )
