@@ -66,6 +66,10 @@ namespace Laevo.ViewModel.Activity
 
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
+		/// <summary>
+		///   Event which is triggered at the start when an acitvity is being activated.
+		/// </summary>
+		public event ActivityEventHandler ActivatingActivityEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is activated.
@@ -150,6 +154,13 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Label )]
 		public string Label { get; set; }
+
+		[NotifyPropertyChanged( Binding.Properties.Label )]
+		public void OnLabelChanged( string oldLabel, string newLabel )
+		{
+			Activity.Name = newLabel;
+			InitializeLibrary();
+		}
 
 		/// <summary>
 		///   The percentage of the available height the activity box occupies.
@@ -306,6 +317,8 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
+			ActivatingActivityEvent( this );
+
 			// The first activated activity should include the currently open windows.
 			if ( _firstActivity )
 			{
@@ -330,11 +343,12 @@ namespace Laevo.ViewModel.Activity
 			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
+			// It is important to first send out this event 
+			ActivatedActivityEvent( this );
+
 			// Initialize desktop.
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 			InitializeLibrary();
-
-			ActivatedActivityEvent( this );
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]
@@ -420,13 +434,12 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		void InitializeLibrary()
 		{
+			// Initialize the shell library.
 			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
-
-			var dataPaths = Activity.DataPaths.Select( p => p.LocalPath ).ToArray();
+			var dataPaths = Activity.GetUpdatedDataPaths().ToArray();
 			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
 			{
-				// TODO: Handle DirectoryNotFoundException when the folder no longer exists.
-				Array.ForEach( dataPaths, activityContext.Add );
+				Array.ForEach( dataPaths, p => activityContext.Add( p.LocalPath ) );
 			}
 		}
 
@@ -451,7 +464,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		///   Called by ActivityOverviewModel once the user has opened an activity other than this one.
+		///   Called by ActivityOverviewModel once the user has opened an activity other than this one, or when the application shuts down.
 		/// </summary>
 		internal void Deactivated()
 		{
@@ -463,13 +476,15 @@ namespace Laevo.ViewModel.Activity
 			UpdateHasOpenWindows();
 
 			// Store activity context paths.
+			// This can't be done in Persist(), since the same library is shared across activities.
 			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
 			{
-				Activity.DataPaths.Clear();
+				var dataPaths = new List<Uri>();
 				foreach ( var folder in activityContext )
 				{
-					Activity.DataPaths.Add( new Uri( folder.Path ) );
+					dataPaths.Add( new Uri( folder.Path ) );
 				}				
+				Activity.SetNewDataPaths( dataPaths );
 			}
 
 			Activity.Deactivate();
@@ -478,7 +493,7 @@ namespace Laevo.ViewModel.Activity
 
 		public override void Persist()
 		{
-			Activity.Name = Label;
+			// Nothing to do.
 		}
 
 		protected override void FreeUnmanagedResources()

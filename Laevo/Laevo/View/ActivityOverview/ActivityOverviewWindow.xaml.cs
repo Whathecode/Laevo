@@ -48,8 +48,8 @@ namespace Laevo.View.ActivityOverview
 			WindowStyle = WindowStyle.None;
 			WindowState = WindowState.Normal;
 			Topmost = false;
-			Width = 1000;
-			Height = 500;
+			Width = 1280;
+			Height = 720;
 #endif
 
 			// Set the time line's position around the current time when first starting the application.
