@@ -184,6 +184,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				Activities.Remove( activity );
 			}
 
+			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
@@ -193,6 +194,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void HookActivityEvents( ActivityViewModel activity )
 		{
+			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
@@ -200,14 +202,17 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityClosedEvent += OnActivityClosed;
 		}
 
-		void OnActivityActivated( ActivityViewModel viewModel )
+		void OnActivityActivating( ActivityViewModel viewModel )
 		{
 			// Indicate the previously active activity is no longer active (visible).
 			if ( CurrentActivityViewModel != null && viewModel != CurrentActivityViewModel )
 			{
 				CurrentActivityViewModel.Deactivated();
 			}
+		}
 
+		void OnActivityActivated( ActivityViewModel viewModel )
+		{
 			CurrentActivityViewModel = viewModel;
 			ActivatedActivityEvent( viewModel );
 		}
@@ -276,8 +281,16 @@ namespace Laevo.ViewModel.ActivityOverview
 			_desktopManager.PasteWindows();
 		}
 
+		public void Exit()
+		{
+			// Ensure that operations which are performed at deactivation are still executed.
+			CurrentActivityViewModel.Deactivated();
+		}
+
 		public override void Persist()
 		{
+			CurrentActivityViewModel.Persist();
+
 			lock ( Activities )
 			{
 				Activities.ForEach( a => a.Persist() );

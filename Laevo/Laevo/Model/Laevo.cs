@@ -142,34 +142,29 @@ namespace Laevo.Model
 			_activities.Remove( activity );
 		}
 
-		public void Persist()
-		{
-			// Settings.
-			using ( var settingsFileStream = new FileStream( SettingsFile, FileMode.Create ) )
-			{
-				SettingsSerializer.WriteObject( settingsFileStream, Settings );
-			}
-
-			// Activities.
-			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
-			{
-				ActivitySerializer.WriteObject( activityFileStream, _activities );
-			}
-
-			// Attention shifts.
-			using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Create ) )
-			{
-				_attentionShiftSerializer.WriteObject( attentionFileStream, _attentionShifts );
-			}
-		}
-
 		public void Exit()
 		{
 			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
 
 			_processTracker.Stop();
 
-			Persist();
+			// Persist settings.
+			using ( var settingsFileStream = new FileStream( SettingsFile, FileMode.Create ) )
+			{
+				SettingsSerializer.WriteObject( settingsFileStream, Settings );
+			}
+
+			// Persist activities.
+			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
+			{
+				ActivitySerializer.WriteObject( activityFileStream, _activities );
+			}
+
+			// Persist attention shifts.
+			using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Create ) )
+			{
+				_attentionShiftSerializer.WriteObject( attentionFileStream, _attentionShifts );
+			}
 		}
 	}
 }

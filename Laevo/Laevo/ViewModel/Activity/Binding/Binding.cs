@@ -14,7 +14,7 @@
 		PossibleColors,
 		PossibleIcons,
 		IsActive,
-		IsOpen,
+		IsOpen,		
 		HasOpenWindows
 	}
 

@@ -58,6 +58,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
+			_activityOverviewViewModel.Exit();
 			Persist();
 			_model.Exit();
 

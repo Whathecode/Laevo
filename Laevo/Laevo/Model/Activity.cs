@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
@@ -17,7 +18,7 @@ namespace Laevo.Model
 	[DataContract]
 	class Activity
 	{
-		readonly string _activityContextPath 
+		static readonly string ActivityContextPath 
 			= Path.Combine( Laevo.ProgramDataFolder, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
@@ -61,10 +62,17 @@ namespace Laevo.Model
 		}
 
 		/// <summary>
+		///   The specific folder created for this activity when it was first created. This is the default location where it's context is stored.
+		///   It can become null once it is removed by the user. This folder will be removed when the activity is deleted.
+		/// </summary>
+		[DataMember]
+		public Uri SpecificFolder { get; private set; }
+
+		/// <summary>
 		///   All paths to relevant data sources which are part of this activity context.
 		/// </summary>
 		[DataMember]
-		public List<Uri> DataPaths { get; private set; }
+		List<Uri> _dataPaths;
 
 
 		public Activity()
@@ -73,20 +81,27 @@ namespace Laevo.Model
 		public Activity( string name )
 		{
 			Name = name;
-			DataPaths = new List<Uri>();
+			_dataPaths = new List<Uri>();
 			DateCreated = DateTime.Now;
 
 			// Create initial data path.
-			string folderName = name;
-			if ( folderName.Length == 0 )
-			{
-				folderName = DateTime.Now.ToString( "g" );
-			}
-			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
-			string path = Path.Combine( _activityContextPath, safeName ).MakeUnique( p => !Directory.Exists( p ), "_i" );
-			var activityDirectory = new DirectoryInfo( path );
+			var activityDirectory = new DirectoryInfo( CreateSafeFolderName() );
 			activityDirectory.Create();
-			DataPaths.Add( new Uri( activityDirectory.FullName ) );
+			SpecificFolder = new Uri( activityDirectory.FullName );
+			_dataPaths.Add( SpecificFolder );
+		}
+
+		string CreateSafeFolderName()
+		{
+			return Path.Combine( ActivityContextPath, CreateFolderName() ).MakeUnique( p => !Directory.Exists( p ), "_i" );
+		}
+
+		string CreateFolderName()
+		{
+			string folderName = DateCreated.ToString( "d" ) + " " + Name;
+			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
+
+			return safeName;
 		}
 
 		/// <summary>
@@ -136,10 +151,8 @@ namespace Laevo.Model
 			_currentOpenInterval = new Interval<DateTime>( now, now );
 			_openIntervals.Add( _currentOpenInterval );
 			IsOpen = true;
-			//if ( OpenedEvent != null )	// HACK: Why does OpenedEvent become null? The aspect should prevent that!
-			//{
-				OpenedEvent( this );
-			//}
+
+			OpenedEvent( this );
 		}
 
 		/// <summary>
@@ -156,6 +169,81 @@ namespace Laevo.Model
 			_currentOpenInterval = null;
 			IsOpen = false;
 			ClosedEvent( this );
+		}
+
+		/// <summary>
+		///   Return all paths to relevant data sources which are part of this activity context.
+		/// </summary>
+		public ReadOnlyCollection<Uri> GetUpdatedDataPaths()
+		{
+			var existingPaths = _dataPaths.Where( p => Directory.Exists( p.LocalPath ) ).ToList();
+			_dataPaths = existingPaths;
+
+			if ( SpecificFolder != null && !Directory.Exists( SpecificFolder.LocalPath ) )
+			{
+				SpecificFolder = null;
+			}
+			else
+			{
+				AttemptActivityFolderRename();
+			}
+
+			return _dataPaths.AsReadOnly();
+		}
+
+		/// <summary>
+		///   Update the data sources which are part of this activity context. The existing paths will be replaced by the new ones.
+		///   Additionally, the activity-specific folder will be attempted to be renamed to the latest activity name.
+		/// </summary>
+		/// <param name = "paths">The paths to replace the existing context paths with.</param>
+		public void SetNewDataPaths( List<Uri> paths )
+		{
+			_dataPaths = new List<Uri>();
+			_dataPaths.AddRange( paths );
+
+			// Check whether the activity-specific folder was removed.
+			if ( !paths.Contains( SpecificFolder ) )
+			{
+				SpecificFolder = null;
+			}
+			else
+			{
+				AttemptActivityFolderRename();
+			}
+		}
+
+		/// <summary>
+		///   Attempt to rename the activity-specific folder representing the activity name.
+		/// </summary>
+		public void AttemptActivityFolderRename()
+		{
+			// No activity-specific folder set?
+			if ( SpecificFolder == null )
+			{
+				return;
+			}
+
+			// No new name set?
+			string desiredName = CreateFolderName();
+			if ( desiredName == SpecificFolder.LocalPath.Split( Path.DirectorySeparatorChar ).Last() )
+			{
+				return;
+			}
+
+			// Attempt rename.
+			string newFolder = CreateSafeFolderName();
+			var currentPath = new DirectoryInfo( SpecificFolder.LocalPath );
+			try
+			{
+				currentPath.MoveTo( newFolder );
+				_dataPaths.Remove( SpecificFolder );
+				SpecificFolder = new Uri( newFolder );
+				_dataPaths.Add( SpecificFolder );
+			}
+			catch ( IOException )
+			{
+				// Try again next time. The directoy might be in use.
+			}
 		}
 
 		internal void Update( DateTime now )
