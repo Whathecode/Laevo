@@ -13,6 +13,7 @@ using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
+using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Whathecode.System.Windows.Interop;
 using Whathecode.VirtualDesktopManagerAPI;
 
@@ -23,6 +24,7 @@ namespace Laevo.ViewModel.ActivityOverview
 	class ActivityOverviewViewModel : AbstractViewModel
 	{
 		static readonly string ActivitiesFile = Path.Combine( Model.Laevo.ProgramDataFolder, "ActivityRepresentations.xml" );
+		static readonly string TasksFile = Path.Combine( Model.Laevo.ProgramDataFolder, "TaskRepresentations.xml" );
 
 
 		/// <summary>
@@ -71,6 +73,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.Activities )]
 		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
 
+		[NotifyProperty( Binding.Properties.Tasks )]
+		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
+
 		readonly DataContractSerializer _activitySerializer;
 
 
@@ -86,19 +91,29 @@ namespace Laevo.ViewModel.ActivityOverview
 					return process != null && !(process.ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" ));
 				} );
 
-			// Check for stored presentation options for existing activities.
+			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(
 				typeof( Dictionary<DateTime, ActivityViewModel> ),
 				null, Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( _desktopManager ) );
-				var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
+			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
 			if ( File.Exists( ActivitiesFile ) )
 			{
-				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
+				using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
 				{
-					existingActivities = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( activityFileStream );
+					existingActivities = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( activitiesFileStream );
 				}
 			}
+			var existingTasks = new Dictionary<DateTime, ActivityViewModel>();
+			if ( File.Exists( TasksFile ) )
+			{
+				using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Open ) )
+				{
+					existingTasks = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( tasksFileStream );
+				}
+			}
+
+			// Check for stored presentation options for existing tasks.
 
 			// Initialize a view model for all activities.
 			Activities = new ObservableCollection<ActivityViewModel>();
@@ -107,7 +122,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				bool isFirstActivity = _model.CurrentActivity == activity;
 
 				// Create view model.
-				ActivityViewModel viewModel;
+				ActivityViewModel viewModel = null;
 				if ( isFirstActivity )
 				{
 					// Ensure current (first) activity is assigned to the correct desktop.
@@ -117,7 +132,7 @@ namespace Laevo.ViewModel.ActivityOverview
 						Color = ActivityViewModel.DefaultColor,
 						HeightPercentage = 0.2,
 						OffsetPercentage = 1
-					};					
+					};
 				}
 				else if ( existingActivities.ContainsKey( activity.DateCreated ) )
 				{
@@ -133,20 +148,36 @@ namespace Laevo.ViewModel.ActivityOverview
 						existingActivities[ activity.DateCreated ],
 						attentionShifts );
 				}
-				else
-				{
-					// Newly added activities at startup.
-					viewModel = new ActivityViewModel( this, activity, _desktopManager );
-				}
-				HookActivityEvents( viewModel );
 
-				Activities.Add( viewModel );
-
-				// The first activity needs to be opened at startup.
-				if ( isFirstActivity )
+				// Incorporate view model in overview.
+				if ( viewModel != null )
 				{
-					viewModel.ActivateActivity();
+					HookActivityEvents( viewModel );
+					Activities.Add( viewModel );
+
+					// The first activity needs to be opened at startup.
+					if ( isFirstActivity )
+					{
+						viewModel.ActivateActivity();
+					}
 				}
+			}
+
+			// Initialize tasks from previous sessions.
+			Tasks = new ObservableCollection<ActivityViewModel>();
+			// ReSharper disable ImplicitlyCapturedClosure
+			var taskViewModels =
+				from task in _model.Tasks
+				where existingTasks.ContainsKey( task.DateCreated )
+				select new ActivityViewModel(
+					this, task, _desktopManager,
+					existingTasks[ task.DateCreated ],
+					new ActivityAttentionShift[] { } );
+			// ReSharper restore ImplicitlyCapturedClosure
+			foreach ( var task in taskViewModels )
+			{
+				HookActivityEvents( task );
+				Tasks.Add( task );
 			}
 
 			// Open activities which have windows assigned to them at startup so it seems as if those sessions simply continue since when the application was closed.
@@ -176,12 +207,39 @@ namespace Laevo.ViewModel.ActivityOverview
 			newActivity.ActivateActivity();
 		}
 
-		public void RemoveActivity( ActivityViewModel activity )
+		[CommandExecute( Commands.NewTask )]
+		public void NewTask()
 		{
-			_model.RemoveActivity( activity.Activity );
-			lock ( Activities )
+			var newTask = new ActivityViewModel( this, _model.CreateNewTask(), _desktopManager );
+			lock ( Tasks )
 			{
-				Activities.Remove( activity );
+				Tasks.Add( newTask );
+			}
+
+			HookActivityEvents( newTask );
+		}
+
+		/// <summary>
+		///   Remove a task or activity.
+		/// </summary>
+		/// <param name = "activity">The task or activity to remove.</param>
+		public void Remove( ActivityViewModel activity )
+		{
+			_model.Remove( activity.Activity );
+
+			if ( Activities.Contains( activity ) )
+			{
+				lock ( Activities )
+				{
+					Activities.Remove( activity );
+				}
+			}
+			else
+			{
+				lock ( Tasks )
+				{
+					Tasks.Remove( activity );
+				}
 			}
 
 			activity.ActivatingActivityEvent -= OnActivityActivating;
@@ -239,6 +297,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 		// ReSharper disable UnusedMember.Local
+		// ReSharper disable UnusedParameter.Local
 		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
 		void OnEnableAttentionLinesChanged( bool oldIsEnabled, bool newIsEnabled )
 		{
@@ -248,6 +307,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 		}
 		// ReSharper restore UnusedMember.Local
+		// ReSharper restore UnusedParameter.Local
 
 		void UpdateData( object sender, ElapsedEventArgs e )
 		{
@@ -283,22 +343,33 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public void Exit()
 		{
-			// Ensure that operations which are performed at deactivation are still executed.
-			CurrentActivityViewModel.Deactivated();
+			if ( CurrentActivityViewModel != null )
+			{
+				// Ensure that operations which are performed at deactivation are still executed.
+				CurrentActivityViewModel.Deactivated();
+			}
 		}
 
 		public override void Persist()
 		{
-			CurrentActivityViewModel.Persist();
-
+			// Persist activities.
 			lock ( Activities )
 			{
 				Activities.ForEach( a => a.Persist() );
 			}
-
-			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
+			using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
 			{
-				_activitySerializer.WriteObject( activityFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
+				_activitySerializer.WriteObject( activitiesFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
+			}
+
+			// Persist tasks.
+			lock ( Tasks )
+			{
+				Tasks.ForEach( t => t.Persist() );
+			}
+			using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Create ) )
+			{
+				_activitySerializer.WriteObject( tasksFileStream, Tasks.ToDictionary( t => t.DateCreated, t => t ) );
 			}
 		}
 

@@ -31,7 +31,7 @@ namespace Laevo.ViewModel.Activity
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
 	class ActivityViewModel : AbstractViewModel
-	{		
+	{
 		readonly ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
@@ -259,7 +259,7 @@ namespace Laevo.ViewModel.Activity
 			foreach ( var s in activitySwitches )
 			{
 				if ( s.Activity == activity )
-				{					
+				{
 					if ( _currentActiveTimeSpan != null && lastShift != null )
 					{
 						// Activity reopened. First close previous open interval.
@@ -269,13 +269,13 @@ namespace Laevo.ViewModel.Activity
 
 					// Activity opened.
 					_currentActiveTimeSpan = new Interval<DateTime>( s.Time, s.Time );
-					ActiveTimeSpans.Add( _currentActiveTimeSpan );						
+					ActiveTimeSpans.Add( _currentActiveTimeSpan );
 				}
 				else if ( _currentActiveTimeSpan != null )
 				{
 					// Switched from this activity, to other activity.
 					_currentActiveTimeSpan.ExpandTo( s.Time );
-					_currentActiveTimeSpan = null;					
+					_currentActiveTimeSpan = null;
 				}
 				lastShift = s;
 				lastActivity = s.Activity;
@@ -399,13 +399,13 @@ namespace Laevo.ViewModel.Activity
 			ActivityClosedEvent( this );
 		}
 
-		[CommandExecute( Commands.RemoveActivity )]
-		public void RemoveActivity()
+		[CommandExecute( Commands.Remove )]
+		public void Remove()
 		{
-			_overview.RemoveActivity( this );
+			_overview.Remove( this );
 		}
 
-		[CommandCanExecute( Commands.RemoveActivity )]
+		[CommandCanExecute( Commands.Remove )]
 		public bool CanRemoveActivity()
 		{
 			return !HasOpenWindows && !IsOpen && !IsActive;

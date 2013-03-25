@@ -37,7 +37,7 @@ namespace Laevo
 			}
 
 			// TODO: Support multiple languages, for now force english.
-			CultureInfo english = new CultureInfo( "en-US" );
+			var english = new CultureInfo( "en-US" );
 			Thread.CurrentThread.CurrentCulture = english;
 
 			// Create exception logger.

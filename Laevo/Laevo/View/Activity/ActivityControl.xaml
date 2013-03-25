@@ -12,7 +12,7 @@
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
-	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:activity="clr-namespace:Laevo.View.Activity"
 	mc:Ignorable="d" 
 	d:DesignHeight="118" d:DesignWidth="206"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
@@ -72,7 +72,6 @@
 					CaretBrush="White"
 					FontSize="20"
 					Text="{Binding Path=Label}"
-					PreviewKeyDown="LabelKeyDown"
 					Margin="5, -13, 0, 0">
 					<TextBox.Template>
 						<ControlTemplate TargetType="{x:Type TextBox}">
@@ -82,60 +81,16 @@
 				</TextBox>
 			</StackPanel>
 			
-			<!-- Action buttons -->
-			<StackPanel
-				x:Name="Buttons"
-				Orientation="Horizontal">
-				
-				<StackPanel.Visibility>
+			<!-- Action buttons. -->
+			<activity:ActionButtons x:Name="Buttons">
+				<activity:ActionButtons.Visibility>
 					<MultiBinding
 						Converter="{wtcConverters:ConditionConverter Expression='[0] || [1]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
 						<Binding ElementName="Container" Path="IsMouseOver" />
 						<Binding ElementName="Buttons" Path="IsMouseOver" />
 					</MultiBinding>
-				</StackPanel.Visibility>
-				
-				<StackPanel.Resources>
-					<ScaleTransform
-						x:Key="ResizeActionIcon"
-						ScaleX="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}"
-						ScaleY="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}" />
-				</StackPanel.Resources>
-				
-				<Image
-					Source="../Activity/ActionIcons/delete.png"
-					Cursor="Hand"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.RemoveActivity}}"
-					RenderTransformOrigin="0.5, 0.5"
-					RenderTransform="{StaticResource ResizeActionIcon}">
-					<Image.Opacity>
-						<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1] || [2]', IfTrue=0.3, IfFalse=1}">
-							<Binding Path="HasOpenWindows" />
-							<Binding Path="IsOpen" />
-							<Binding Path="IsActive" />
-						</MultiBinding>
-					</Image.Opacity>
-				</Image>
-				<Image
-					Source="../Activity/ActionIcons/edit.png"
-					Cursor="Hand"
-					PreviewMouseDown="OnStartEditActivity"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
-				<Image
-					Source="../Activity/ActionIcons/start.png"
-					Cursor="Hand"
-					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
-					RenderTransformOrigin="0.5, 0.5"
-					RenderTransform="{StaticResource ResizeActionIcon}" />
-				<Image
-					Source="../Activity/ActionIcons/close.png"
-					Cursor="Hand"
-					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.CloseActivity}}"
-					RenderTransformOrigin="0.5, 0.5"
-					RenderTransform="{StaticResource ResizeActionIcon}" />
-			</StackPanel>
+				</activity:ActionButtons.Visibility>
+			</activity:ActionButtons>
 			
 		</Canvas>
 		

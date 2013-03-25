@@ -4,13 +4,14 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
+	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"	
 	xmlns:binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
+	xmlns:taskList="clr-namespace:Laevo.View.TaskList"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
 	xmlns:converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
 	xmlns:shaders="clr-namespace:Laevo.View.ActivityOverview.Shaders"
-	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"	
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityOverviewViewModel}"
 	Title="Laevo Activity Time Line"
@@ -61,14 +62,14 @@
 		<!-- Blur effect for popups. -->
 		<Grid.Effect>
 			<BlurEffect Radius="0" />
-		</Grid.Effect>		
+		</Grid.Effect>
 		<Grid.Style>
 			<Style>
 				<Style.Triggers>
 					<DataTrigger Binding="{Binding ActivityMode}">
 						<DataTrigger.Value>
 							<binding:Mode>Edit</binding:Mode>
-						</DataTrigger.Value>		
+						</DataTrigger.Value>
 						<DataTrigger.Setters>
 							<Setter Property="UIElement.IsHitTestVisible" Value="False" />
 						</DataTrigger.Setters>
@@ -88,9 +89,9 @@
 										Storyboard.TargetProperty="(Grid.Effect).(BlurEffect.Radius)"
 										To="0" Duration="0:0:0.3" />
 								</Storyboard>
-							</BeginStoryboard>							
+							</BeginStoryboard>
 						</DataTrigger.ExitActions>
-					</DataTrigger>				
+					</DataTrigger>
 				</Style.Triggers>
 			</Style>
 		</Grid.Style>
@@ -242,12 +243,22 @@
 			</Grid>
 		</Grid>
 		-->
-
-		<!-- Clock -->
-		<activityOverview:ClockControl
-			Time="{Binding CurrentTime}"
+		
+		<StackPanel
+			Orientation="Horizontal"
 			HorizontalAlignment="Right"
-			VerticalAlignment="Bottom" />
+			VerticalAlignment="Bottom"
+			Margin="0, 0, 10, 10">
+			
+			<taskList:TaskListControl
+				VerticalAlignment="Bottom"
+				Margin="0, 0, 20, 2"
+				Height="35" />
+			
+			<activityOverview:ClockControl
+				VerticalAlignment="Bottom"
+				Time="{Binding CurrentTime}" />
+		</StackPanel>
 
 		<!-- Background drop for popups. -->
 		<Grid

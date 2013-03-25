@@ -4,10 +4,14 @@
 	{
 		CurrentTime,
 		Activities,
+		Tasks,
 		Mode,
 		TimeLineRenderScale,
 		EnableAttentionLines
 	}
 
-	public enum Commands { }
+	public enum Commands
+	{
+		NewTask
+	}
 }
