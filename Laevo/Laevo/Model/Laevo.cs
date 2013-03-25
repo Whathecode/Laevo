@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System.Extensions;
+using Whathecode.System.Linq;
 
 
 namespace Laevo.Model
@@ -18,7 +19,7 @@ namespace Laevo.Model
 	{
 		public static readonly string ProgramName = "Laevo";
 		public static readonly string ProgramDataFolder 
-			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );		
+			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );
 		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
 		static readonly string TasksFile = Path.Combine( ProgramDataFolder, "Tasks.xml" );
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
@@ -43,6 +44,8 @@ namespace Laevo.Model
 		{
 			get { return _tasks.AsReadOnly(); }
 		}
+
+		public Activity HomeActivity { get; private set; }
 
 		public Activity CurrentActivity { get; private set; }
 
@@ -81,6 +84,12 @@ namespace Laevo.Model
 					existingActivities.ForEach( AddActivity );
 				}
 			}
+
+			// Find home activity and set as current activity.
+			HomeActivity = Activities.Count > 0
+				? Activities.MinBy( a => a.DateCreated )
+				: CreateNewActivity( "Home" );
+			CurrentActivity = HomeActivity;
 
 			// Add tasks from previous sessions.
 			if ( File.Exists( TasksFile ) )
@@ -130,9 +139,9 @@ namespace Laevo.Model
 		///   Creates a new activity and sets it as the current activity.
 		/// </summary>
 		/// <returns>The newly created activity.</returns>
-		public Activity CreateNewActivity()
+		public Activity CreateNewActivity( string name = "New Activity" )
 		{
-			var activity = new Activity( "New Activity" );
+			var activity = new Activity( name );
 			AddActivity( activity );
 
 			CurrentActivity = activity;

@@ -30,7 +30,7 @@ namespace Laevo.ViewModel.Main
 		{			
 			_model = model;
 			_dispatcher = Dispatcher.CurrentDispatcher;
-			_model.LogonScreenExited += () => _dispatcher.Invoke( new Action( ResetGui ) );
+			_model.LogonScreenExited += () => _dispatcher.Invoke( ResetGui );
 
 			EnsureActivityOverview();
 		}

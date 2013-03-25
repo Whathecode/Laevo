@@ -72,7 +72,8 @@
 					CaretBrush="White"
 					FontSize="20"
 					Text="{Binding Path=Label}"
-					Margin="5, -13, 0, 0">
+					Margin="5, -13, 0, 0"
+					PreviewKeyDown="LabelKeyDown">
 					<TextBox.Template>
 						<ControlTemplate TargetType="{x:Type TextBox}">
 							<ScrollViewer Name="PART_ContentHost" />
@@ -135,12 +136,12 @@
 			
 			<Border.Resources>
 				<converters:TimeSpanConverter x:Key="TimeSpanConverter" />
-				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="3" Operation="Subtraction" />
+				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
 				<DataTemplate x:Key="TimeSpanTemplate">
 					<Line
 						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-						Stroke="Yellow" StrokeThickness="5">
+						Stroke="Yellow" StrokeThickness="4">
 						
 						<Line.X1>
 							<MultiBinding

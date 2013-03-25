@@ -70,6 +70,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
 
+		[NotifyProperty( Binding.Properties.HomeActivity )]
+		public ActivityViewModel HomeActivity { get; private set; }
+
 		[NotifyProperty( Binding.Properties.Activities )]
 		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
 
@@ -113,54 +116,33 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 
-			// Check for stored presentation options for existing tasks.
+			// Ensure current (first) activity is assigned to the correct desktop.
+			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager );
+			HookActivityEvents( HomeActivity );
+			HomeActivity.ActivateActivity();			
 
-			// Initialize a view model for all activities.
+			// Initialize a view model for all activities from previous sessions.
 			Activities = new ObservableCollection<ActivityViewModel>();
-			foreach ( var activity in _model.Activities )
+			foreach ( var activity in _model.Activities.Where( a => a != _model.HomeActivity ) )
 			{
-				bool isFirstActivity = _model.CurrentActivity == activity;
-
-				// Create view model.
-				ActivityViewModel viewModel = null;
-				if ( isFirstActivity )
+				if ( !existingActivities.ContainsKey( activity.DateCreated ) )
 				{
-					// Ensure current (first) activity is assigned to the correct desktop.
-					viewModel = new ActivityViewModel( this, activity, _desktopManager )
-					{
-						Icon = ActivityViewModel.HomeIcon,
-						Color = ActivityViewModel.DefaultColor,
-						HeightPercentage = 0.2,
-						OffsetPercentage = 1
-					};
-				}
-				else if ( existingActivities.ContainsKey( activity.DateCreated ) )
-				{
-					// Activities from previous sessions.
-					// Find the attention shifts which occured while the activity was open.
-					ReadOnlyCollection<Interval<DateTime>> openIntervals = activity.OpenIntervals;
-					var attentionShifts = _model.AttentionShifts
-						.OfType<ActivityAttentionShift>()
-						.Where( shift => openIntervals.Any( i => i.LiesInInterval( shift.Time ) ) );
-
-					viewModel = new ActivityViewModel(
-						this, activity, _desktopManager,
-						existingActivities[ activity.DateCreated ],
-						attentionShifts );
+					continue;
 				}
 
-				// Incorporate view model in overview.
-				if ( viewModel != null )
-				{
-					HookActivityEvents( viewModel );
-					Activities.Add( viewModel );
+				// Find the attention shifts which occured while the activity was open.
+				ReadOnlyCollection<Interval<DateTime>> openIntervals = activity.OpenIntervals;
+				var attentionShifts = _model.AttentionShifts
+					.OfType<ActivityAttentionShift>()
+					.Where( shift => openIntervals.Any( i => i.LiesInInterval( shift.Time ) ) );
 
-					// The first activity needs to be opened at startup.
-					if ( isFirstActivity )
-					{
-						viewModel.ActivateActivity();
-					}
-				}
+				// Create and hook up the view model.
+				var viewModel = new ActivityViewModel(
+					this, activity, _desktopManager,
+					existingActivities[ activity.DateCreated ],
+					attentionShifts );
+				HookActivityEvents( viewModel );
+				Activities.Add( viewModel );
 			}
 
 			// Initialize tasks from previous sessions.
@@ -217,7 +199,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			HookActivityEvents( newTask );
-		}
+		}	
 
 		/// <summary>
 		///   Remove a task or activity.
@@ -294,6 +276,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivityEditFinished( ActivityViewModel viewModel )
 		{
 			ActivityMode = Mode.Activate;
+		}
+
+		[CommandExecute( Commands.OpenHome )]
+		public void OpenHome()
+		{
+			HomeActivity.ActivateActivity();
 		}
 
 		// ReSharper disable UnusedMember.Local
