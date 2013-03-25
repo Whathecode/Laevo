@@ -26,7 +26,7 @@
 		EditActivity,
 		OpenActivity,
 		CloseActivity,
-		RemoveActivity,
+		Remove,
 		ChangeColor,
 		ChangeIcon
 	}

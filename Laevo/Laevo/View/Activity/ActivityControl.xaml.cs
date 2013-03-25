@@ -45,21 +45,8 @@ namespace Laevo.View.Activity
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				ForceUpdateSource( e );
+				Common.ForceUpdateSource( e );
 			}
-		}
-
-		void OnStartEditActivity( object sender, MouseButtonEventArgs e )
-		{
-			ForceUpdateSource( e );
-		}
-
-		static void ForceUpdateSource( RoutedEventArgs e )
-		{			
-			var element = (UIElement)e.Source;
-
-			// Moving focus also updates the source.
-			element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 		}
 
 		void OnMouseMoved( object sender, MouseEventArgs e )

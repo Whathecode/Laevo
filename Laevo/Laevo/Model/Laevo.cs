@@ -20,6 +20,7 @@ namespace Laevo.Model
 		public static readonly string ProgramDataFolder 
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );		
 		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
+		static readonly string TasksFile = Path.Combine( ProgramDataFolder, "Tasks.xml" );
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
 		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
 
@@ -35,6 +36,12 @@ namespace Laevo.Model
 		public ReadOnlyCollection<Activity> Activities
 		{
 			get { return _activities.AsReadOnly(); }
+		}
+
+		readonly List<Activity> _tasks = new List<Activity>();
+		public ReadOnlyCollection<Activity> Tasks
+		{
+			get { return _tasks.AsReadOnly(); }
 		}
 
 		public Activity CurrentActivity { get; private set; }
@@ -68,10 +75,20 @@ namespace Laevo.Model
 			// Add activities from previous sessions.
 			if ( File.Exists( ActivitiesFile ) )
 			{
-				using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
+				using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
 				{
-					var existingActivities = (List<Activity>)ActivitySerializer.ReadObject( activityFileStream );
+					var existingActivities = (List<Activity>)ActivitySerializer.ReadObject( activitiesFileStream );
 					existingActivities.ForEach( AddActivity );
+				}
+			}
+
+			// Add tasks from previous sessions.
+			if ( File.Exists( TasksFile ) )
+			{
+				using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Open ) )
+				{
+					var existingTasks = (List<Activity>)ActivitySerializer.ReadObject( tasksFileStream );
+					existingTasks.ForEach( AddTask );
 				}
 			}
 
@@ -79,7 +96,7 @@ namespace Laevo.Model
 			_attentionShiftSerializer = new DataContractSerializer(
 				typeof( List<AbstractAttentionShift> ), new [] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
 				int.MaxValue, true, false,
-				new DataContractSurrogate( _activities ) );
+				new DataContractSurrogate( _activities.Concat( _tasks ).ToList() ) );
 			if ( File.Exists( AttentionShiftsFile ) )
 			{
 				using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Open ) )
@@ -131,15 +148,41 @@ namespace Laevo.Model
 		void OnActivityActivated( Activity activity )
 		{
 			_attentionShifts.Add( new ActivityAttentionShift( activity ) );
+			CurrentActivity = activity;
 		}
 
-		public void RemoveActivity( Activity activity )
+		/// <summary>
+		///   Remove a task or activity.
+		/// </summary>
+		/// <param name = "activity">The task or activity to remove.</param>
+		public void Remove( Activity activity )
 		{
 			activity.ActivatedEvent -= OnActivityActivated;
 
 			_attentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity == activity ).ForEach( a => a.ActivityRemoved() );
 
-			_activities.Remove( activity );
+			if ( _activities.Contains( activity ) )
+			{
+				_activities.Remove( activity );
+			}
+			else
+			{
+				_tasks.Remove( activity );
+			}
+		}
+
+		public Activity CreateNewTask()
+		{
+			var task = new Activity( "New Task" );
+			AddTask( task );
+
+			return task;
+		}
+
+		void AddTask( Activity task )
+		{
+			task.ActivatedEvent += OnActivityActivated;
+			_tasks.Add( task );
 		}
 
 		public void Exit()
@@ -155,9 +198,15 @@ namespace Laevo.Model
 			}
 
 			// Persist activities.
-			using ( var activityFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
+			using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
 			{
-				ActivitySerializer.WriteObject( activityFileStream, _activities );
+				ActivitySerializer.WriteObject( activitiesFileStream, _activities );
+			}
+
+			// Persist tasks.
+			using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Create ) )
+			{
+				ActivitySerializer.WriteObject( tasksFileStream, _tasks );
 			}
 
 			// Persist attention shifts.

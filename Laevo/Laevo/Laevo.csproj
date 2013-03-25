@@ -178,8 +178,6 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Reactive Extensions SDK\v1.0.10621\Binaries\.NETFramework\v3.5\System.Reactive.dll</HintPath>
@@ -294,6 +292,14 @@
     <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Mode.cs" />
     <Compile Include="View\ActivityOverview\Converters\VectorLine.cs" />
+    <Compile Include="View\Activity\ActionButtons.xaml.cs">
+      <DependentUpon>ActionButtons.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Common.cs" />
+    <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
+    <Compile Include="View\TaskList\TaskListControl.xaml.cs">
+      <DependentUpon>TaskListControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ActivityOverview\TimeLineControl.ActivityWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
     <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
@@ -369,6 +375,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ActivityOverview\ClockControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Activity\ActionButtons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TaskList\TaskListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -454,6 +468,9 @@
     <Resource Include="View\Activity\ActionIcons\relate.png" />
     <Resource Include="View\Activity\ActionIcons\start.png" />
     <Resource Include="View\Activity\ActionIcons\tag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\TaskList\add.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

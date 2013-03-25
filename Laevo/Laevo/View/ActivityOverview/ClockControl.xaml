@@ -8,9 +8,7 @@
 	d:DesignHeight="94" d:DesignWidth="200"
 	x:Name="Control">
 	
-	<StackPanel
-		Orientation="Vertical"
-		Margin="0, 0, 10, 10">
+	<StackPanel Orientation="Vertical">
 		
 		<TextBlock
 			HorizontalAlignment="Right"

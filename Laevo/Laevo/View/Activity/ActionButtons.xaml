@@ -1,0 +1,72 @@
+﻿<UserControl
+	x:Class="Laevo.View.Activity.ActionButtons"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
+	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
+	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
+	mc:Ignorable="d"
+	x:Name="Control">
+	
+	<StackPanel
+		x:Name="Buttons"
+		Orientation="Horizontal">
+		
+		<StackPanel.Resources>
+			<ScaleTransform
+				x:Key="ResizeActionIcon"
+				ScaleX="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}"
+				ScaleY="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}" />
+		</StackPanel.Resources>
+
+		<Image
+			Source="../Activity/ActionIcons/delete.png"
+			Cursor="Hand"
+			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
+			RenderTransformOrigin="0.5, 0.5"
+			RenderTransform="{StaticResource ResizeActionIcon}">
+			<Image.Opacity>
+				<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1] || [2]', IfTrue=0.3, IfFalse=1}">
+					<Binding Path="HasOpenWindows" />
+					<Binding Path="IsOpen" />
+					<Binding Path="IsActive" />
+				</MultiBinding>
+			</Image.Opacity>
+		</Image>
+		
+		<Image
+			Source="../Activity/ActionIcons/edit.png"
+			Cursor="Hand"
+			PreviewMouseDown="OnStartEditActivity"
+			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
+		
+		<StackPanel
+			Visibility="{Binding
+				ElementName=Control,
+				Path=ShowStartButton,
+				Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+			<Image
+				Source="../Activity/ActionIcons/start.png"
+				Cursor="Hand"
+				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+				RenderTransformOrigin="0.5, 0.5"
+				RenderTransform="{StaticResource ResizeActionIcon}" />
+			<Image
+				Source="../Activity/ActionIcons/close.png"
+				Cursor="Hand"
+				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.CloseActivity}}"
+				RenderTransformOrigin="0.5, 0.5"
+				RenderTransform="{StaticResource ResizeActionIcon}" />
+		</StackPanel>
+		
+	</StackPanel>
+	
+</UserControl>
