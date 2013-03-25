@@ -3,6 +3,7 @@
 	public enum Properties
 	{
 		CurrentTime,
+		HomeActivity,
 		Activities,
 		Tasks,
 		Mode,
@@ -12,6 +13,7 @@
 
 	public enum Commands
 	{
-		NewTask
+		NewTask,
+		OpenHome
 	}
 }

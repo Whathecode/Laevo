@@ -11,7 +11,9 @@
 	xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
 	xmlns:converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
 	xmlns:shaders="clr-namespace:Laevo.View.ActivityOverview.Shaders"
-	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"	
+	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"
+	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityOverviewViewModel}"
 	Title="Laevo Activity Time Line"
@@ -249,13 +251,32 @@
 			HorizontalAlignment="Right"
 			VerticalAlignment="Bottom"
 			Margin="0, 0, 10, 10">
-			
+
 			<taskList:TaskListControl
 				VerticalAlignment="Bottom"
 				Margin="0, 0, 20, 2"
 				Height="35" />
-			
+
+			<Border
+				Width="55"
+				Height="55"
+				Margin="0, 0, 20, 0"
+				VerticalAlignment="Bottom"
+				CornerRadius="5"
+				BorderThickness="0, 0, 0, 2"
+				BorderBrush="{Binding HomeActivity.IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue=Yellow, IfFalse=Transparent}}">
+
+				<Button
+					Cursor="Hand"
+					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+					Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}">
+					<Image Source="Home.png" />
+				</Button>
+
+			</Border>
+
 			<activityOverview:ClockControl
+				x:Name="Clock"
 				VerticalAlignment="Bottom"
 				Time="{Binding CurrentTime}" />
 		</StackPanel>
