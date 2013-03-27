@@ -473,7 +473,13 @@
     <Resource Include="View\TaskList\add.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="View\ActivityOverview\Home.png" />
+    <Resource Include="View\ActivityOverview\Images\Home.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\ActivityOverview\Images\OpenTask.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\ActivityOverview\Images\PlanActivity.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

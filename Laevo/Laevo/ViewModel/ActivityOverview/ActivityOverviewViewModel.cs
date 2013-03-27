@@ -329,6 +329,31 @@ namespace Laevo.ViewModel.ActivityOverview
 			_desktopManager.PasteWindows();
 		}
 
+		public void TaskDropped( ActivityViewModel task, DateTime atTime )
+		{
+			// Ensure it is a task being dropped.
+			if ( !Tasks.Contains( task ) )
+			{
+				return;
+			}
+
+			// Convert to activity.
+			_model.CreateActivityFromTask( task.Activity );
+			task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
+			Tasks.Remove( task );
+			Activities.Add( task );
+
+			// Based on where the task is dropped, open, or plan it.
+			if ( atTime <= DateTime.Now )
+			{
+				task.OpenActivity();
+			}
+			else
+			{
+				task.Plan( atTime );
+			}
+		}
+
 		public void Exit()
 		{
 			if ( CurrentActivityViewModel != null )

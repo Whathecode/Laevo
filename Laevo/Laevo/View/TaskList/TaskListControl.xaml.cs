@@ -1,8 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
+using Whathecode.System.Xaml.Behaviors;
 
 
 namespace Laevo.View.TaskList
@@ -13,6 +15,7 @@ namespace Laevo.View.TaskList
 	[WpfControl( typeof( Properties ) )]
 	partial class TaskListControl
 	{
+		[Flags]
 		public enum Properties
 		{
 			TaskHasFocus
@@ -29,6 +32,11 @@ namespace Laevo.View.TaskList
 		}
 
 
+		void OnTaskDragged( MouseBehavior.ClickDragInfo clickDragInfo )
+		{
+			DragDrop.DoDragDrop( clickDragInfo.Sender, clickDragInfo.Sender.DataContext, DragDropEffects.Move );
+		}
+
 		void OnTaskNameFocusChanged( object sender, DependencyPropertyChangedEventArgs e )
 		{
 			TaskHasFocus = (bool)e.NewValue;
@@ -41,6 +49,23 @@ namespace Laevo.View.TaskList
 				Common.ForceUpdateSource( e );
 				e.Handled = true;
 			}
+		}
+
+		void OnTaskDraggedPreview( object sender, MouseEventArgs e )
+		{
+			if ( e.LeftButton == MouseButtonState.Pressed )
+			{
+				var element = (FrameworkElement)sender;
+				DragDrop.DoDragDrop( element, element.DataContext, DragDropEffects.Move );
+			}
+		}
+
+		void DragTaskFeedback( object sender, GiveFeedbackEventArgs e )
+		{
+			// Hide default cursors in order to enable specialized visualizations.
+			/*e.UseDefaultCursors = false;
+			Mouse.SetCursor( Cursors.None );
+			e.Handled = true;*/
 		}
 	}
 }

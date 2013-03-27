@@ -429,6 +429,11 @@ namespace Laevo.ViewModel.Activity
 			Icon = newIcon;
 		}
 
+		public void Plan( DateTime atTime )
+		{
+			Activity.Plan( atTime );
+		}
+
 		/// <summary>
 		///   Initialize the library which contains all the context files.
 		/// </summary>

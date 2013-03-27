@@ -177,7 +177,7 @@ namespace Laevo.View.ActivityOverview
 						positionBinding.Converter = new ActivityPositionConverter();
 						// TODO: Is the TranslateTransform faster?
 						//e.SetBinding( Canvas.LeftProperty, positionBinding );
-						var transform = new TranslateTransform( 0, 0 );						
+						var transform = new TranslateTransform( 0, 0 );
 						BindingOperations.SetBinding( transform, TranslateTransform.XProperty, positionBinding );
 						e.RenderTransform = transform;
 
@@ -190,7 +190,7 @@ namespace Laevo.View.ActivityOverview
 						e.SetBinding( Canvas.BottomProperty, bottom );
 
 						// Resize width.
-						var widthBinding = new MultiBinding();						
+						var widthBinding = new MultiBinding();
 						widthBinding.Bindings.Add( timeLineWidth );
 						widthBinding.Bindings.Add( viewport );
 						var timeSpan = new Binding { Path = new PropertyPath( TimeSpanProperty ), Source = e };
@@ -225,13 +225,13 @@ namespace Laevo.View.ActivityOverview
 			}
 			if ( changeInternalInterval )
 			{
-				control.InternalVisibleInterval = newTicksInterval;										
+				control.InternalVisibleInterval = newTicksInterval;
 			}
 
 			// Set required transform based on difference between the internal interval and the actual interval.
 			var transform = (TranslateTransform)control.RenderTransform;
 			long ticksDifference = control.InternalVisibleInterval.Start - control.VisibleInterval.Start.Ticks;
-			transform.X = (double)ticksDifference / control.InternalVisibleInterval.Size * control.ActualWidth;			
+			transform.X = (double)ticksDifference / control.InternalVisibleInterval.Size * control.ActualWidth;
 
 			control.VisibleIntervalChangedEvent( control.VisibleInterval );
 		}
