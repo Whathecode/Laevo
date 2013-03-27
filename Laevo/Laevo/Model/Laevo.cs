@@ -13,6 +13,7 @@ namespace Laevo.Model
 {
 	/// <summary>
 	///   The main model of the Laevo Virtual Desktop Manager.
+	///   TODO: Make tasks typesafe?
 	/// </summary>
 	/// <author>Steven Jeuris</author>
 	class Laevo
@@ -136,7 +137,7 @@ namespace Laevo.Model
 		}
 
 		/// <summary>
-		///   Creates a new activity and sets it as the current activity.
+		///   Create and add a new activity and sets it as the current activity.
 		/// </summary>
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name = "New Activity" )
@@ -192,6 +193,18 @@ namespace Laevo.Model
 		{
 			task.ActivatedEvent += OnActivityActivated;
 			_tasks.Add( task );
+		}
+
+		public void CreateActivityFromTask( Activity task )
+		{
+			// Ensure it is a task which is passed.
+			if ( !_tasks.Contains( task ) )
+			{
+				throw new InvalidOperationException( "The passed activity is not a task from the task list." );
+			}
+
+			_tasks.Remove( task );
+			_activities.Add( task );
 		}
 
 		public void Exit()

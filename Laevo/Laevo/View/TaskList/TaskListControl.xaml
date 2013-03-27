@@ -11,6 +11,7 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
 	xmlns:ab="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:taskList="clr-namespace:Laevo.View.TaskList" xmlns:activity="clr-namespace:Laevo.View.Activity"
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=activityOverview:ActivityOverviewViewModel}"
@@ -21,6 +22,11 @@
 	<UserControl.Resources>
 		<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
 		<taskList:TaskInformationOffsetConverter x:Key="TaskInformationOffsetConverter" />
+
+		<!-- Cursors embedded in dummy elements to allow relative loading: http://stackoverflow.com/a/410517/590790 -->
+		<!-- ReSharper disable Xaml.RedundantResource -->
+		<FrameworkElement x:Key="OpenTaskCursor" Cursor="OpenTask.cur" />
+		<!-- ReSharper restore Xaml.RedundantResource -->
 	</UserControl.Resources>
 
 	<StackPanel
@@ -105,7 +111,11 @@
 							x:Name="Container"
 							CornerRadius="5"
 							BorderThickness="2"
-							Margin="0, 0, 3, 0">
+							Margin="0, 0, 3, 0"
+							Padding="3"
+							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static ab:Commands.SelectActivity}}"
+							PreviewMouseMove="OnTaskDraggedPreview"
+							GiveFeedback="DragTaskFeedback">
 						
 							<Border.Background>
 								<SolidColorBrush Color="{Binding Color}" />
@@ -119,13 +129,9 @@
 								</MultiBinding>
 							</Border.BorderBrush>
 
-							<Button
-								Command="{wtc:CommandBinding {x:Static ab:Commands.SelectActivity}}"
+							<Image
 								Cursor="Hand"
-								Background="Transparent"
-								Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-								<Image Source="{Binding Path=Icon}" />
-							</Button>
+								Source="{Binding Path=Icon}" />
 						</Border>
 					</Grid>
 				</DataTemplate>

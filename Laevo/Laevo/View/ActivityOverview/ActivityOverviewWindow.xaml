@@ -1,4 +1,5 @@
 ﻿<Window
+	x:Name="Control"
 	x:Class="Laevo.View.ActivityOverview.ActivityOverviewWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -51,7 +52,7 @@
 	</Window.Resources>
 	
 	<Grid
-		x:Name="TimeLineContainer"
+		x:Name="Container2D"
 		Background="{StaticResource BackgroundBrush}"
 		behaviors:MouseBehavior.LeftClickDragCommand="activityOverview:ActivityOverviewWindow.MouseDragged"
 		behaviors:MouseBehavior.DragCapturesMouse="True"
@@ -100,6 +101,11 @@
 
 		<!-- Time Line 3D -->
 		<Viewport3D
+			AllowDrop="True"
+			DragEnter="OnTimeLineDragEnter"
+			DragLeave="OnTimeLineDragLeave"
+			DragOver="OnTimeLineDragOver"
+			Drop="OnTimeLineDragDropped"
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
 			
@@ -114,8 +120,8 @@
 					UpDirection="0 1 0">
 					<PerspectiveCamera.FieldOfView>
 						<MultiBinding Converter="{StaticResource AspectRatioToFov}">
-							<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-							<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+							<Binding ElementName="Container2D" Path="ActualWidth" />
+							<Binding ElementName="Container2D" Path="ActualHeight" />
 						</MultiBinding>
 					</PerspectiveCamera.FieldOfView>
 				</PerspectiveCamera>
@@ -139,8 +145,8 @@
 						<RotateTransform3D>
 							<RotateTransform3D.CenterX>
 								<MultiBinding Converter="{StaticResource AspectRatioToTransformOffset}">
-									<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-									<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+									<Binding ElementName="Container2D" Path="ActualWidth" />
+									<Binding ElementName="Container2D" Path="ActualHeight" />
 								</MultiBinding>
 							</RotateTransform3D.CenterX>
 							<RotateTransform3D.Rotation>
@@ -158,8 +164,8 @@
 						TextureCoordinates="0 0, 0 1, 1 1, 1 0">
 						<MeshGeometry3D.Positions>
 							<MultiBinding Converter="{StaticResource AspectRatioToPositions}">
-								<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-								<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+								<Binding ElementName="Container2D" Path="ActualWidth" />
+								<Binding ElementName="Container2D" Path="ActualHeight" />
 								<Binding ElementName="RotationTransform" Path="Angle" />
 							</MultiBinding>
 						</MeshGeometry3D.Positions>
@@ -180,13 +186,14 @@
 					</Grid.CacheMode>
 
 					<Grid
+						x:Name="TimeLineContainer"
 						ClipToBounds="True"
 						Background="{StaticResource TimeLineBrush}">
 
 						<Grid.Width>
 							<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
-								<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-								<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+								<Binding ElementName="Container2D" Path="ActualWidth" />
+								<Binding ElementName="Container2D" Path="ActualHeight" />
 								<Binding ElementName="RotationTransform" Path="Angle" />
 								<Binding Path="TimeLineRenderScale" />
 							</MultiBinding>
@@ -194,14 +201,27 @@
 
 						<Grid.Height>
 							<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
-								<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
+								<Binding ElementName="Container2D" Path="ActualHeight" />
 								<Binding Path="TimeLineRenderScale" />
 							</MultiBinding>
 						</Grid.Height>
-
+						
 						<activityOverview:TimeLineControl
 							x:Name="TimeLine"
 							Focusable="True" />
+
+						<!-- Drag and drop icons. -->
+						<!-- Setting IsHitTestVisible to false prevents the icon getting in the way of the dragging operation. -->
+						<Canvas
+							IsHitTestVisible="False" 
+							Visibility="{Binding
+							ElementName=Control,
+							Path=IsTimeLineDraggedOver,
+							Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+
+							<Image x:Name="DragDropCursor" />
+							
+						</Canvas>
 					</Grid>
 				</Grid>
 
@@ -270,7 +290,7 @@
 					Cursor="Hand"
 					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
 					Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}">
-					<Image Source="Home.png" />
+					<Image Source="Images\Home.png" />
 				</Button>
 
 			</Border>

@@ -4,10 +4,13 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
@@ -19,6 +22,8 @@ using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Collections.Generic;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory;
+using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
+using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 using Whathecode.System.Xaml.Behaviors;
 
 
@@ -27,8 +32,16 @@ namespace Laevo.View.ActivityOverview
 	/// <summary>
 	/// Interaction logic for ActivityOverviewWindow.xaml
 	/// </summary>
+	[WpfControl( typeof( Properties ) )]
 	public partial class ActivityOverviewWindow
 	{
+		[Flags]
+		public enum Properties
+		{
+			IsTimeLineDraggedOver
+		}
+
+
 		public const double TopOffset = 105;
 		public const double BottomOffset = 45;
 		const double ZoomPercentage = 0.001;
@@ -39,10 +52,21 @@ namespace Laevo.View.ActivityOverview
 		readonly List<ILabels> _labels = new List<ILabels>();
 		readonly Dictionary<ActivityViewModel, ActivityControl> _activities = new Dictionary<ActivityViewModel, ActivityControl>();
 
+		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
+		public bool IsTimeLineDraggedOver { get; private set; }
+
+		readonly TimeIndicator _timeIndicator;
+		readonly ImageSource _openTaskCursor;
+		readonly ImageSource _planActivityCursor;
 
 		public ActivityOverviewWindow()
 		{
 			InitializeComponent();
+
+			// Initialize cursors.
+			const string cursorLocation = "pack://application:,,/view/activityoverview/images/";
+			_openTaskCursor = new BitmapImage( new Uri( cursorLocation + "opentask.png", UriKind.Absolute ) );
+			_planActivityCursor = new BitmapImage( new Uri( cursorLocation + "planactivity.png", UriKind.Absolute ) );
 
 #if DEBUG
 			WindowStyle = WindowStyle.None;
@@ -59,10 +83,10 @@ namespace Laevo.View.ActivityOverview
 			TimeLine.VisibleInterval = new Interval<DateTime>( start, end );
 
 			// Create the line which indicates the current time.
-			var currentTime = new TimeIndicator { Width = 20 };
-			currentTime.SetBinding( HeightProperty, new Binding( "ActualHeight" ) { Source = TimeLine } );
-			currentTime.SetBinding( TimeLineControl.OccuranceProperty, "CurrentTime" );
-			TimeLine.Children.Add( currentTime );
+			_timeIndicator = new TimeIndicator { Width = 20 };
+			_timeIndicator.SetBinding( HeightProperty, new Binding( "ActualHeight" ) { Source = TimeLine } );
+			_timeIndicator.SetBinding( TimeLineControl.OccuranceProperty, "CurrentTime" );
+			TimeLine.Children.Add( _timeIndicator );
 			Activated += ( s, e ) => TimeLine.Focus();
 
 			// Create desired intervals to show.
@@ -208,7 +232,7 @@ namespace Laevo.View.ActivityOverview
 			TimeLine.Children.Add( activity );
 		}
 
-		Interval<long> _startDrag;
+		Interval<DateTime> _startDrag;
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
 		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
@@ -216,6 +240,7 @@ namespace Laevo.View.ActivityOverview
 			TimeLine.Focus();	// TODO: Is this needed?
 
 			var info = (MouseBehavior.ClickDragInfo)e.Parameter;
+			double mouseX = Mouse.GetPosition( this ).X;
 
 			// Stop current time line animation.
 			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
@@ -223,8 +248,8 @@ namespace Laevo.View.ActivityOverview
 
 			if ( info.State == MouseBehavior.ClickDragState.Start )
 			{
-				_startDrag = ToTicksInterval( TimeLine.VisibleInterval );
-				_startDragFocus = GetFocusedTime( _startDrag );
+				_startDrag = TimeLine.VisibleInterval;
+				_startDragFocus = GetFocusedTime( _startDrag, mouseX );
 			}
 			else if ( info.State == MouseBehavior.ClickDragState.Stop )
 			{
@@ -243,9 +268,9 @@ namespace Laevo.View.ActivityOverview
 			}
 			else
 			{
-				DateTime currentFocus = GetFocusedTime( _startDrag );
+				DateTime currentFocus = GetFocusedTime( _startDrag, mouseX );
 				var ticksOffset = currentFocus.Ticks - _startDragFocus.Ticks;
-				var interval = (Interval<long>)_startDrag.Clone();
+				var interval = ToTicksInterval( _startDrag );
 				if ( interval.Start - ticksOffset > DateTime.MinValue.Ticks && interval.End - ticksOffset < DateTime.MaxValue.Ticks )
 				{
 					interval.Move( -ticksOffset );
@@ -254,14 +279,16 @@ namespace Laevo.View.ActivityOverview
 			}
 		}
 
-		DateTime GetFocusedTime( Interval<long> ticksInterval )
+		DateTime GetFocusedTime( Interval<DateTime> interval, double mouseXPosition )
 		{
+			Interval<long> ticksInterval = ToTicksInterval( interval );
+
 			// Find intersection of the ray along which is viewed, with the plane which shows the time line.
-			double ratio = TimeLineContainer.ActualWidth / TimeLineContainer.ActualHeight;
+			double ratio = Container2D.ActualWidth / Container2D.ActualHeight;
 			Vector leftFieldOfView = new Vector( -ratio, 0 );
 			double angleRadians = MathHelper.DegreesToRadians( RotationTransform.Angle );
 			VectorLine planeLine = new VectorLine( leftFieldOfView, new Vector( 0, Math.Tan( angleRadians ) * -ratio ) );
-			double viewPercentage = Mouse.GetPosition( this ).X / TimeLineContainer.ActualWidth;
+			double viewPercentage = mouseXPosition / Container2D.ActualWidth;
 			double viewWidth = 2 * ratio;
 			VectorLine viewRay = new VectorLine( new Vector( 0, 1 ), new Vector( -ratio + (viewWidth * viewPercentage), 0 ) );
 			Vector viewIntersection = planeLine.Intersection( viewRay );
@@ -299,11 +326,12 @@ namespace Laevo.View.ActivityOverview
 			StopDragAnimation();
 
 			// Calculate which time is focused.
-			Interval<long> ticksInterval = ToTicksInterval( TimeLine.VisibleInterval );
-			var focusedTime = GetFocusedTime( ticksInterval );
+			Interval<DateTime> visibleInterval = TimeLine.VisibleInterval;
+			Interval<long> ticksInterval = ToTicksInterval( visibleInterval );
+			var focusedTime = GetFocusedTime( visibleInterval, Mouse.GetPosition( this ).X );
 
 			// Zoom the currently visible interval in/out.
-			double zoom = 1.0 - (-e.Delta * ZoomPercentage);			
+			double zoom = 1.0 - ( -e.Delta * ZoomPercentage );
 			double focusPercentage = ticksInterval.GetPercentageFor( focusedTime.Ticks );
 			ticksInterval.Scale( zoom, focusPercentage );
 			TimeLine.VisibleInterval = ToTimeInterval( ticksInterval );
@@ -332,6 +360,61 @@ namespace Laevo.View.ActivityOverview
 			return new Interval<DateTime>(
 				new DateTime( interval.Start < minTicks ? minTicks : interval.Start ),
 				new DateTime( interval.End > maxTicks ? maxTicks : interval.End ) );
+		}
+
+		double _timeLinePosition;
+		void OnTimeLineDragEnter( object sender, DragEventArgs e )
+		{
+			IsTimeLineDraggedOver = true;
+			_timeLinePosition = _timeIndicator.TranslatePoint( new Point( 0, 0 ), TimeLineContainer ).X;
+		}
+
+		void OnTimeLineDragLeave( object sender, DragEventArgs e )
+		{
+			IsTimeLineDraggedOver = false;
+		}
+
+		void OnTimeLineDragOver( object sender, DragEventArgs e )
+		{
+			// Position cursor correctly.
+			Point mouse = e.GetPosition( TimeLineContainer );
+			double x = mouse.X;
+			double y = mouse.Y;
+
+			if ( x <= _timeLinePosition )
+			{
+				DragDropCursor.Source = _openTaskCursor;
+				x -= DragDropCursor.ActualWidth;
+			}
+			else
+			{
+				DragDropCursor.Source = _planActivityCursor;
+			}
+
+			y -= DragDropCursor.ActualHeight / 2;
+			DragDropCursor.SetValue( Canvas.LeftProperty, x );
+			DragDropCursor.SetValue( Canvas.TopProperty, y );
+		}
+
+		void OnTimeLineDragDropped( object sender, DragEventArgs e )
+		{
+			var draggedTask = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
+			var overview = (ActivityOverviewViewModel)DataContext;
+
+			if ( draggedTask != null && overview != null )
+			{
+				// Calculate where to position the task vertically.
+				var percentageInterval = new Interval<double>( 0, 1 );
+				var activitySpace = new Interval<double>( TimeLineContainer.ActualHeight - BottomOffset, TopOffset );
+				double yPercentage = activitySpace.Map( e.GetPosition( TimeLineContainer ).Y, percentageInterval );
+				var offsetRange = new Interval<double>( draggedTask.HeightPercentage, 1 );
+				draggedTask.OffsetPercentage = offsetRange.Map( yPercentage, percentageInterval ).Clamp( 0, 1 );
+
+				DateTime focusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
+				overview.TaskDropped( draggedTask, focusedTime );
+			}
+
+			IsTimeLineDraggedOver = false;
 		}
 	}
 }
