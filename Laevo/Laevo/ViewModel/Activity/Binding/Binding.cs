@@ -14,8 +14,9 @@
 		PossibleColors,
 		PossibleIcons,
 		IsActive,
-		IsOpen,		
-		HasOpenWindows
+		IsOpen,
+		HasOpenWindows,
+		IsPlannedActivity
 	}
 
 	public enum Commands

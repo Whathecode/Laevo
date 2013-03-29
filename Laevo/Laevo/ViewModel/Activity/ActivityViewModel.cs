@@ -111,16 +111,37 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		///   The time when the activity started.
+		///   The time when the activity started or will start.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Occurance )]
 		public DateTime Occurance { get; private set; }
+
+		[NotifyPropertyChanged( Binding.Properties.Occurance )]
+		public void OnOccuranceChanged( DateTime oldOccurance, DateTime newOccurance )
+		{
+			if ( IsPlannedActivity )
+			{
+				Activity.Plan( newOccurance, TimeSpan );
+			}
+		}
+
+		[NotifyProperty( Binding.Properties.IsPlannedActivity )]
+		public bool IsPlannedActivity { get; private set; }
 
 		/// <summary>
 		///   The entire timespan during which the activity has been open, regardless of whether it was closed in between.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.TimeSpan )]
 		public TimeSpan TimeSpan { get; private set; }
+
+		[NotifyPropertyChanged( Binding.Properties.TimeSpan )]
+		public void OnTimeSpanChanged( TimeSpan oldDuration, TimeSpan newDuration )
+		{
+			if ( IsPlannedActivity )
+			{
+				Activity.Plan( Occurance, newDuration );
+			}
+		}
 
 		Interval<DateTime> _currentActiveTimeSpan;
 		/// <summary>
@@ -431,7 +452,9 @@ namespace Laevo.ViewModel.Activity
 
 		public void Plan( DateTime atTime )
 		{
-			Activity.Plan( atTime );
+			Occurance = atTime;
+			TimeSpan = TimeSpan.FromHours( 1 );
+			Activity.Plan( atTime, TimeSpan );
 		}
 
 		/// <summary>
@@ -450,6 +473,8 @@ namespace Laevo.ViewModel.Activity
 
 		public void Update( DateTime now )
 		{
+			IsPlannedActivity = Occurance > DateTime.Now;
+
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
 			{

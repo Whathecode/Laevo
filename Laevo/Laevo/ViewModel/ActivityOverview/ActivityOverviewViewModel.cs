@@ -9,6 +9,7 @@ using System.Timers;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
+using Whathecode.System;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -119,7 +120,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			// Ensure current (first) activity is assigned to the correct desktop.
 			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager );
 			HookActivityEvents( HomeActivity );
-			HomeActivity.ActivateActivity();			
+			HomeActivity.ActivateActivity();
 
 			// Initialize a view model for all activities from previous sessions.
 			Activities = new ObservableCollection<ActivityViewModel>();
@@ -342,6 +343,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
 			Tasks.Remove( task );
 			Activities.Add( task );
+
+			// Snap time to 15 minutes.
+			atTime = atTime.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( atTime.Minute % 15 ) );
 
 			// Based on where the task is dropped, open, or plan it.
 			if ( atTime <= DateTime.Now )

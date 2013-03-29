@@ -234,9 +234,9 @@
 											ElementName=Control,
 											Path=IsFocusedTimeBeforeNow,
 											Converter={wtcConverters:FromBooleanConverter IfTrue={StaticResource OpenTaskCursor}, IfFalse={StaticResource PlanActivityCursor}}}" />
-									
+
 									<TextBlock
-										Text="{Binding ElementName=Control, Path=FocusedTimeFormatted}"
+										Text="{Binding ElementName=Control, Path=FocusedTime, StringFormat='dddd, MMMM d, HH:mm'}"
 										Margin="10, 0, 0, 0"
 										Visibility="{Binding
 											ElementName=Control,

@@ -9,7 +9,8 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"	
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
-	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
 	WindowStyle="None"
 	ShowInTaskbar="False"
@@ -53,7 +54,7 @@
 				<GradientStop
 						Color="{Binding Color}" Offset="1" />
 				<GradientStop
-						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />			
+						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
 			</LinearGradientBrush>
 		</Border.Background>
 		
@@ -67,8 +68,8 @@
 				<RowDefinition Height="30" />
 				<RowDefinition Height="80"/>
 				<RowDefinition Height="*"/>
-				<RowDefinition Height="40" />
-			</Grid.RowDefinitions>		
+				<RowDefinition Height="60" />
+			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
@@ -80,7 +81,7 @@
 							<Binding ElementName="Image" Path="ActualWidth" />
 							<Binding ElementName="Image" Path="ActualHeight" />
 						</MultiBinding>
-					</Image.Margin>					
+					</Image.Margin>
 				</Image>
 			</Canvas>
 
@@ -94,7 +95,7 @@
 					Text="{Binding Label}" />
 			</DockPanel>
 
-			<DockPanel Grid.Row="1" Grid.Column="0">				
+			<DockPanel Grid.Row="1" Grid.Column="0">
 				<Label DockPanel.Dock="Top">Color</Label>
 				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
 					<ItemsControl ItemsSource="{Binding PossibleColors}">
@@ -149,12 +150,64 @@
 				</ScrollViewer>
 			</DockPanel>
 
-			<StackPanel
-				Grid.Row="3" Grid.Column="0"
-				HorizontalAlignment="Right"
-				Margin="0, 10, 0, 0">
-				<Button Click="OnCloseButtonClicked">Save</Button>
-			</StackPanel>			
+			<DockPanel
+				Grid.Row="3"
+				Grid.Column="0"
+				LastChildFill="False">
+
+				<StackPanel
+					Orientation="Vertical"
+					DockPanel.Dock="Left"
+					Visibility="{Binding IsPlannedActivity, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Width="50">From: </TextBlock>
+						<xctk:DateTimePicker
+							x:Name="OccurancePicker"
+							Value="{Binding Occurance}"
+							Format="Custom"
+							FormatString="HH:mm"
+							Margin="0, 0, 10, 0"
+							ValueChanged="OnOccuranceChanged" />
+						<TextBlock Text="{Binding Occurance, StringFormat=D}" />
+					</StackPanel>
+
+					<StackPanel Orientation="Horizontal">
+						<StackPanel.Resources>
+							<converters:OccuranceEndConverter x:Key="OccuranceEndConverter" />
+						</StackPanel.Resources>
+						
+						<TextBlock Width="50">To: </TextBlock>
+						<xctk:DateTimePicker
+							x:Name="DurationPicker"
+							Format="Custom"
+							FormatString="HH:mm"
+							Margin="0, 0, 10, 0">
+							<xctk:DateTimePicker.Value>
+								<MultiBinding Converter="{StaticResource OccuranceEndConverter}">
+									<Binding Path="Occurance" />
+									<Binding Path="TimeSpan" />
+								</MultiBinding>
+							</xctk:DateTimePicker.Value>
+						</xctk:DateTimePicker>
+						<TextBlock>
+							<TextBlock.Text>
+								<MultiBinding Converter="{StaticResource OccuranceEndConverter}" StringFormat="D">
+									<Binding Path="Occurance" />
+									<Binding Path="TimeSpan" />
+								</MultiBinding>
+							</TextBlock.Text>
+						</TextBlock>
+					</StackPanel>
+				</StackPanel>
+
+				<Button
+					Click="OnCloseButtonClicked"
+					Content="Save"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Bottom"
+					DockPanel.Dock="Right" />
+
+			</DockPanel>
 		</Grid>
 	</Border>
 
