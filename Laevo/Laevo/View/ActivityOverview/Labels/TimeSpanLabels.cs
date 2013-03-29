@@ -21,7 +21,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		}
 
 
-		protected override bool ShouldShowLabels()
+		public override bool ShouldShowLabels()
 		{
 			return LabelsFitScreen();
 		}

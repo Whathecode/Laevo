@@ -119,7 +119,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		/// <summary>
 		///   Determines whether or not the labels should be shown.
 		/// </summary>
-		protected abstract bool ShouldShowLabels();
+		public abstract bool ShouldShowLabels();
 
 		protected abstract bool IsVisible( T label, DateTime occurance );
 

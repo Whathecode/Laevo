@@ -351,6 +351,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			else
 			{
 				task.Plan( atTime );
+				task.EditActivity();
+
 			}
 		}
 

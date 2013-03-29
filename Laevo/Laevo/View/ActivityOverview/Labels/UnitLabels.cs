@@ -10,7 +10,7 @@ namespace Laevo.View.ActivityOverview.Labels
 	{
 		const double HorizontalLabelOffset = 5.0;
 
-		readonly string _formatString;
+		public string FormatString { get; private set; }
 		readonly Func<bool> _predicate;
 		readonly double _offset;
 		readonly double _fontSize;
@@ -19,14 +19,14 @@ namespace Laevo.View.ActivityOverview.Labels
 		public UnitLabels( TimeLineControl timeLine, IInterval interval, string formatString, Func<bool> predicate, double offset = 0, double fontSize = 20 )
 			: base( timeLine, interval, d => true, interval.MinimumInterval )
 		{
-			_formatString = formatString;
+			FormatString = formatString;
 			_predicate = predicate;
 			_offset = offset;
 			_fontSize = fontSize;
 		}
 
 
-		protected override bool ShouldShowLabels()
+		public override bool ShouldShowLabels()
 		{
 			return LabelsFitScreen() && _predicate();
 		}
@@ -45,7 +45,7 @@ namespace Laevo.View.ActivityOverview.Labels
 
 		protected override void InitializeLabel( TextBlock label, DateTime occurance )
 		{
-			label.Text = occurance.ToString( _formatString );
+			label.Text = occurance.ToString( FormatString );
 			label.FontSize = _fontSize;
 			label.SetValue( TimeLineControl.OffsetProperty, _offset );
 		}
