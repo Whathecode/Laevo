@@ -21,7 +21,9 @@
 	WindowStyle="None"
 	WindowState="Maximized"
 	ShowInTaskbar="False"
-	FontFamily="Segoe UI Light">
+	FontFamily="Segoe UI Light"
+	FontSize="20"
+	Foreground="White">
 
 	<Window.Topmost>
 		<Binding Path="ActivityMode">
@@ -219,8 +221,30 @@
 							Path=IsTimeLineDraggedOver,
 							Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
-							<Image x:Name="DragDropCursor" />
-							
+							<Canvas x:Name="DragDropCursorPosition">
+								<StackPanel
+									Orientation ="Horizontal">
+									<StackPanel.Resources>
+										<BitmapImage x:Key="OpenTaskCursor" UriSource="Images\OpenTask.png" />
+										<BitmapImage x:Key="PlanActivityCursor" UriSource="Images\PlanActivity.png" />
+									</StackPanel.Resources>
+									<Image
+										x:Name="DragDropCursor"
+										Source="{Binding
+											ElementName=Control,
+											Path=IsFocusedTimeBeforeNow,
+											Converter={wtcConverters:FromBooleanConverter IfTrue={StaticResource OpenTaskCursor}, IfFalse={StaticResource PlanActivityCursor}}}" />
+									
+									<TextBlock
+										Text="{Binding ElementName=Control, Path=FocusedTimeFormatted}"
+										Margin="10, 0, 0, 0"
+										Visibility="{Binding
+											ElementName=Control,
+											Path=IsFocusedTimeBeforeNow,
+											Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
+								</StackPanel>
+							</Canvas>
+
 						</Canvas>
 					</Grid>
 				</Grid>

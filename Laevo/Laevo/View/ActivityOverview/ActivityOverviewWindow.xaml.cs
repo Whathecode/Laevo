@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,6 +16,7 @@ using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
+using Whathecode.System.Algorithm;
 using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Collections.Generic;
@@ -38,7 +38,10 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
-			IsTimeLineDraggedOver
+			IsTimeLineDraggedOver,
+			FocusedTime,
+			FocusedTimeFormatted,
+			IsFocusedTimeBeforeNow
 		}
 
 
@@ -49,24 +52,28 @@ namespace Laevo.View.ActivityOverview
 
 		public static readonly ICommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
 
+		readonly List<UnitLabels> _unitLabels = new List<UnitLabels>(); 
 		readonly List<ILabels> _labels = new List<ILabels>();
 		readonly Dictionary<ActivityViewModel, ActivityControl> _activities = new Dictionary<ActivityViewModel, ActivityControl>();
 
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
 
+		[DependencyProperty( Properties.FocusedTime )]
+		public DateTime FocusedTime { get; private set; }
+
+		[DependencyProperty( Properties.FocusedTimeFormatted )]
+		public string FocusedTimeFormatted { get; private set; }
+
+		[DependencyProperty( Properties.IsFocusedTimeBeforeNow )]
+		public bool IsFocusedTimeBeforeNow { get; private set; }
+
 		readonly TimeIndicator _timeIndicator;
-		readonly ImageSource _openTaskCursor;
-		readonly ImageSource _planActivityCursor;
+
 
 		public ActivityOverviewWindow()
 		{
 			InitializeComponent();
-
-			// Initialize cursors.
-			const string cursorLocation = "pack://application:,,/view/activityoverview/images/";
-			_openTaskCursor = new BitmapImage( new Uri( cursorLocation + "opentask.png", UriKind.Absolute ) );
-			_planActivityCursor = new BitmapImage( new Uri( cursorLocation + "planactivity.png", UriKind.Absolute ) );
 
 #if DEBUG
 			WindowStyle = WindowStyle.None;
@@ -117,23 +124,24 @@ namespace Laevo.View.ActivityOverview
 
 			// Create unit labels near interval lines.
 			var quarterUnits = new UnitLabels( TimeLine, quarters, "HH:mm", () => true );
-			_labels.Add( quarterUnits );
+			_unitLabels.Add( quarterUnits );
 			var hourUnits = new UnitLabels( TimeLine, hours, "HH:mm", () => !quarterUnits.LabelsFitScreen() );
-			_labels.Add( hourUnits );
+			_unitLabels.Add( hourUnits );
 			var sixHourUnits = new UnitLabels( TimeLine, everySixHours, "HH:mm", () => !hourUnits.LabelsFitScreen() );
-			_labels.Add( sixHourUnits );
+			_unitLabels.Add( sixHourUnits );
 			var dayUnits = new UnitLabels( TimeLine, days, @"d\t\h", () => !sixHourUnits.LabelsFitScreen() );
-			_labels.Add( dayUnits );
+			_unitLabels.Add( dayUnits );
 			var dayNameUnits = new UnitLabels( TimeLine, days, "dddd", () => !sixHourUnits.LabelsFitScreen(), 25, 18 );
-			_labels.Add( dayNameUnits );
+			_unitLabels.Add( dayNameUnits );
 			var dayCompleteUnits = new UnitLabels( TimeLine, days, @"dddd d\t\h", () => sixHourUnits.LabelsFitScreen() && dayUnits.LabelsFitScreen(), 25, 18 );
-			_labels.Add( dayCompleteUnits );
+			_unitLabels.Add( dayCompleteUnits );
 			var weekUnits = new UnitLabels( TimeLine, weeks, @"d\t\h", () => !dayUnits.LabelsFitScreen() );
-			_labels.Add( weekUnits );
+			_unitLabels.Add( weekUnits );
 			var monthSmallUnits = new UnitLabels( TimeLine, months, "MMMM", () => !dayUnits.LabelsFitScreen() && weekUnits.LabelsFitScreen(), 25, 30 );
-			_labels.Add( monthSmallUnits );
+			_unitLabels.Add( monthSmallUnits );
 			var monthUnits = new UnitLabels( TimeLine, months, "MMMM", () => !weekUnits.LabelsFitScreen() );
-			_labels.Add( monthUnits );
+			_unitLabels.Add( monthUnits );
+			_labels.AddRange( _unitLabels );
 
 			// Add header labels.
 			var headerLabels = new HeaderLabels( TimeLine );
@@ -374,26 +382,33 @@ namespace Laevo.View.ActivityOverview
 			IsTimeLineDraggedOver = false;
 		}
 
+		readonly TimeGate _throttleDragEvents = new TimeGate( TimeSpan.FromMilliseconds( 15 ), true );
 		void OnTimeLineDragOver( object sender, DragEventArgs e )
 		{
-			// Position cursor correctly.
+			// TODO: GetPosition on the 3D viewport seems to be so expensive that it locks up the rendering thread.
+			//       Throttling the events somehwat resolves this, but is there a cleaner solution?
+			if ( !_throttleDragEvents.TryEnter() )
+			{
+				return;
+			}
+
+			// Update focused time.
+			FocusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
+			IsFocusedTimeBeforeNow = FocusedTime <= DateTime.Now;
+			FocusedTimeFormatted = FocusedTime.ToString( _unitLabels.Where( l => l.ShouldShowLabels() ).Select( l => l.FormatString ).Aggregate( "", (s1, s2) => s1 + " " + s2 ) );
+
+			// Update cursor.
+			// TODO: The reverse calculation of GetFocusedTime might speed up things.
 			Point mouse = e.GetPosition( TimeLineContainer );
 			double x = mouse.X;
 			double y = mouse.Y;
-
 			if ( x <= _timeLinePosition )
 			{
-				DragDropCursor.Source = _openTaskCursor;
 				x -= DragDropCursor.ActualWidth;
 			}
-			else
-			{
-				DragDropCursor.Source = _planActivityCursor;
-			}
-
 			y -= DragDropCursor.ActualHeight / 2;
-			DragDropCursor.SetValue( Canvas.LeftProperty, x );
-			DragDropCursor.SetValue( Canvas.TopProperty, y );
+			DragDropCursorPosition.SetValue( Canvas.LeftProperty, x );
+			DragDropCursorPosition.SetValue( Canvas.TopProperty, y );
 		}
 
 		void OnTimeLineDragDropped( object sender, DragEventArgs e )
@@ -410,8 +425,8 @@ namespace Laevo.View.ActivityOverview
 				var offsetRange = new Interval<double>( draggedTask.HeightPercentage, 1 );
 				draggedTask.OffsetPercentage = offsetRange.Map( yPercentage, percentageInterval ).Clamp( 0, 1 );
 
-				DateTime focusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
-				overview.TaskDropped( draggedTask, focusedTime );
+				FocusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
+				overview.TaskDropped( draggedTask, FocusedTime );
 			}
 
 			IsTimeLineDraggedOver = false;

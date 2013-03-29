@@ -62,7 +62,7 @@ namespace Laevo.View.TaskList
 
 		void DragTaskFeedback( object sender, GiveFeedbackEventArgs e )
 		{
-			// Hide default cursors in order to enable specialized visualizations.
+			// TODO: Optionally hide default cursors in order to enable specialized visualizations.
 			/*e.UseDefaultCursors = false;
 			Mouse.SetCursor( Cursors.None );
 			e.Handled = true;*/

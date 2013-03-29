@@ -76,7 +76,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			return newLabel;
 		}
 
-		protected override bool ShouldShowLabels()
+		public override bool ShouldShowLabels()
 		{
 			// These labels are always visible.
 			return true;

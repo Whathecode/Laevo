@@ -42,7 +42,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			long minimumTicks = Interval.MinimumInterval.Ticks;
 			int maximumLabels = (int)Math.Ceiling( TimeLine.ActualWidth / MinimumSpaceBetweenLabels );
-			return TimeLine.GetVisibleTicks() / minimumTicks < maximumLabels;			
+			return TimeLine.GetVisibleTicks() / minimumTicks < maximumLabels;
 		}
 	}
 }
