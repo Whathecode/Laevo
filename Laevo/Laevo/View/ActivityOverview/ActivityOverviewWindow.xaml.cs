@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
@@ -40,7 +39,6 @@ namespace Laevo.View.ActivityOverview
 		{
 			IsTimeLineDraggedOver,
 			FocusedTime,
-			FocusedTimeFormatted,
 			IsFocusedTimeBeforeNow
 		}
 
@@ -61,9 +59,6 @@ namespace Laevo.View.ActivityOverview
 
 		[DependencyProperty( Properties.FocusedTime )]
 		public DateTime FocusedTime { get; private set; }
-
-		[DependencyProperty( Properties.FocusedTimeFormatted )]
-		public string FocusedTimeFormatted { get; private set; }
 
 		[DependencyProperty( Properties.IsFocusedTimeBeforeNow )]
 		public bool IsFocusedTimeBeforeNow { get; private set; }
@@ -393,9 +388,10 @@ namespace Laevo.View.ActivityOverview
 			}
 
 			// Update focused time.
-			FocusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
-			IsFocusedTimeBeforeNow = FocusedTime <= DateTime.Now;
-			FocusedTimeFormatted = FocusedTime.ToString( _unitLabels.Where( l => l.ShouldShowLabels() ).Select( l => l.FormatString ).Aggregate( "", (s1, s2) => s1 + " " + s2 ) );
+			// TODO: The 'snapping' behavior to 15 minutes is duplicated across view and viewmodel, so should probably be in viewmodel.
+			DateTime focusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
+			IsFocusedTimeBeforeNow = focusedTime <= DateTime.Now;
+			FocusedTime = focusedTime.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( focusedTime.Minute % 15 ) );
 
 			// Update cursor.
 			// TODO: The reverse calculation of GetFocusedTime might speed up things.

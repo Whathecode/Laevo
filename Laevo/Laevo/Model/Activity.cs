@@ -171,9 +171,11 @@ namespace Laevo.Model
 			ClosedEvent( this );
 		}
 
-		public void Plan( DateTime atTime )
+		public void Plan( DateTime atTime, TimeSpan duration )
 		{
-			_currentOpenInterval = new Interval<DateTime>( atTime, atTime + TimeSpan.FromDays( 1 ) );
+			// Set the planned time as an interval when the activity will be open.
+			_openIntervals.Clear();
+			_currentOpenInterval = new Interval<DateTime>( atTime, atTime + duration );
 			_openIntervals.Add( _currentOpenInterval );
 		}
 

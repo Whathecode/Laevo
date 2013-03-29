@@ -222,6 +222,7 @@ namespace Laevo.Model
 			// Persist activities.
 			using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
 			{
+				// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
 				ActivitySerializer.WriteObject( activitiesFileStream, _activities );
 			}
 
