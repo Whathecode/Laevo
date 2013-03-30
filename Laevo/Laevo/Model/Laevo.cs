@@ -247,7 +247,10 @@ namespace Laevo.Model
 			}
 			catch ( Exception )
 			{
-				File.Copy( backupFile, file );
+				if ( File.Exists( backupFile ) )
+				{
+					File.Move( backupFile, file );
+				}
 				MessageBox.Show( "Serialization of data to file \"" + file + "\" failed. Recent data will be lost.", "Saving data failed", MessageBoxButton.OK );
 			}
 
