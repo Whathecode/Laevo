@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Windows;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System.Extensions;
 using Whathecode.System.Linq;
@@ -214,28 +215,46 @@ namespace Laevo.Model
 			_processTracker.Stop();
 
 			// Persist settings.
-			using ( var settingsFileStream = new FileStream( SettingsFile, FileMode.Create ) )
-			{
-				SettingsSerializer.WriteObject( settingsFileStream, Settings );
-			}
+			Persist( SettingsFile, SettingsSerializer, Settings );
 
 			// Persist activities.
-			using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
-			{
-				// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
-				ActivitySerializer.WriteObject( activitiesFileStream, _activities );
-			}
+			// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
+			Persist( ActivitiesFile, ActivitySerializer, _activities );
 
 			// Persist tasks.
-			using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Create ) )
-			{
-				ActivitySerializer.WriteObject( tasksFileStream, _tasks );
-			}
+			Persist( TasksFile, ActivitySerializer, _tasks );
 
 			// Persist attention shifts.
-			using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Create ) )
+			Persist( AttentionShiftsFile, _attentionShiftSerializer, _attentionShifts );
+		}
+
+		static void Persist( string file, DataContractSerializer serializer, object toSerialize )
+		{
+			// Make a backup first, so if serialization fails, no data is lost.
+			string backupFile = file + ".backup";
+			if ( File.Exists( file ) )
 			{
-				_attentionShiftSerializer.WriteObject( attentionFileStream, _attentionShifts );
+				File.Copy( file, backupFile );
+			}
+
+			// Serialize the data.
+			try
+			{
+				using ( var fileStream = new FileStream( file, FileMode.Create ) )
+				{
+					serializer.WriteObject( fileStream, toSerialize );
+				}
+			}
+			catch ( Exception )
+			{
+				File.Copy( backupFile, file );
+				MessageBox.Show( "Serialization of data to file \"" + file + "\" failed. Recent data will be lost.", "Saving data failed", MessageBoxButton.OK );
+			}
+
+			// Remove temporary backup file.
+			if ( File.Exists( backupFile ) )
+			{
+				File.Delete( backupFile );
 			}
 		}
 	}
