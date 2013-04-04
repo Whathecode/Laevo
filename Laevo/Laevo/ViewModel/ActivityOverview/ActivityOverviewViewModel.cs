@@ -9,7 +9,6 @@ using System.Timers;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
-using Whathecode.System;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -70,6 +69,15 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
+
+		/// <summary>
+		///   The time which currently has input focus and can be acted upon.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.FocusedTime )]
+		public DateTime FocusedTime { get; private set; }
+
+		[NotifyProperty( Binding.Properties.FocusedOffsetPercentage )]
+		public double FocusedOffsetPercentage { get; set; }
 
 		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; private set; }
@@ -173,9 +181,9 @@ namespace Laevo.ViewModel.ActivityOverview
 
 
 		/// <summary>
-		///   Create a new activity and open it.
+		///   Create a new activity and optionally open it.
 		/// </summary>
-		public void NewActivity()
+		public ActivityViewModel NewActivity()
 		{
 			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _desktopManager )
 			{
@@ -187,7 +195,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			HookActivityEvents( newActivity );
-			newActivity.ActivateActivity();
+
+			return newActivity;
 		}
 
 		[CommandExecute( Commands.NewTask )]
@@ -200,7 +209,22 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			HookActivityEvents( newTask );
-		}	
+		}
+
+		[CommandExecute( Commands.PlanActivity )]
+		public void PlanActivity()
+		{
+			ActivityViewModel activity = NewActivity();
+			PositionActivityAtCurrentOffset( activity );
+			activity.Plan( FocusedTime );
+			activity.EditActivity();
+		}
+
+		[CommandCanExecute( Commands.PlanActivity )]
+		public bool CanPlanActivity()
+		{
+			return FocusedTime > DateTime.Now;
+		}
 
 		/// <summary>
 		///   Remove a task or activity.
@@ -282,7 +306,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.OpenHome )]
 		public void OpenHome()
 		{
-			HomeActivity.ActivateActivity();
+			HomeActivity.SelectActivity();
 		}
 
 		// ReSharper disable UnusedMember.Local
@@ -330,7 +354,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_desktopManager.PasteWindows();
 		}
 
-		public void TaskDropped( ActivityViewModel task, DateTime atTime )
+		public void TaskDropped( ActivityViewModel task )
 		{
 			// Ensure it is a task being dropped.
 			if ( !Tasks.Contains( task ) )
@@ -344,20 +368,35 @@ namespace Laevo.ViewModel.ActivityOverview
 			Tasks.Remove( task );
 			Activities.Add( task );
 
-			// Snap time to 15 minutes.
-			atTime = atTime.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( atTime.Minute % 15 ) );
+			PositionActivityAtCurrentOffset( task );
 
 			// Based on where the task is dropped, open, or plan it.
-			if ( atTime <= DateTime.Now )
+			if ( FocusedTime <= DateTime.Now )
 			{
 				task.OpenActivity();
 			}
 			else
 			{
-				task.Plan( atTime );
+				task.Plan( FocusedTime );
 				task.EditActivity();
-
 			}
+		}
+
+		void PositionActivityAtCurrentOffset( ActivityViewModel task )
+		{
+			var offsetRange = new Interval<double>( task.HeightPercentage, 1 );
+			var percentageInterval = new Interval<double>( 0, 1 );
+			task.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
+		}
+
+		public void FocusedTimeChanged( DateTime focusedTime )
+		{
+			DateTime focused = Model.Laevo.GetNearestTime( focusedTime );
+			if ( focused < DateTime.Now )
+			{
+				focused = focused.SafeAdd( TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes ) );
+			}
+			FocusedTime = focused;
 		}
 
 		public void Exit()

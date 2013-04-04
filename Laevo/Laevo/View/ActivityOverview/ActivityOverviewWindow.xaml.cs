@@ -38,7 +38,6 @@ namespace Laevo.View.ActivityOverview
 		public enum Properties
 		{
 			IsTimeLineDraggedOver,
-			FocusedTime,
 			IsFocusedTimeBeforeNow
 		}
 
@@ -56,9 +55,6 @@ namespace Laevo.View.ActivityOverview
 
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
-
-		[DependencyProperty( Properties.FocusedTime )]
-		public DateTime FocusedTime { get; private set; }
 
 		[DependencyProperty( Properties.IsFocusedTimeBeforeNow )]
 		public bool IsFocusedTimeBeforeNow { get; private set; }
@@ -387,11 +383,7 @@ namespace Laevo.View.ActivityOverview
 				return;
 			}
 
-			// Update focused time.
-			// TODO: The 'snapping' behavior to 15 minutes is duplicated across view and viewmodel, so should probably be in viewmodel.
-			DateTime focusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
-			IsFocusedTimeBeforeNow = focusedTime <= DateTime.Now;
-			FocusedTime = focusedTime.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( focusedTime.Minute % 15 ) );
+			UpdateFocusedTime( e.GetPosition( this ).X );
 
 			// Update cursor.
 			// TODO: The reverse calculation of GetFocusedTime might speed up things.
@@ -407,6 +399,24 @@ namespace Laevo.View.ActivityOverview
 			DragDropCursorPosition.SetValue( Canvas.TopProperty, y );
 		}
 
+		void UpdateFocusedTime( double mouseX )
+		{
+			var overview = (ActivityOverviewViewModel)DataContext;
+
+			DateTime focusedTime = GetFocusedTime( TimeLine.VisibleInterval, mouseX );
+			overview.FocusedTimeChanged( focusedTime );
+			IsFocusedTimeBeforeNow = focusedTime <= DateTime.Now;
+		}
+
+		void UpdateOffsetPercentage( double mouseY )
+		{
+			var overview = (ActivityOverviewViewModel)DataContext;
+
+			var percentageInterval = new Interval<double>( 0, 1 );
+			var activitySpace = new Interval<double>( TimeLineContainer.ActualHeight - BottomOffset, TopOffset );
+			overview.FocusedOffsetPercentage = activitySpace.Map( mouseY, percentageInterval );
+		}
+
 		void OnTimeLineDragDropped( object sender, DragEventArgs e )
 		{
 			var draggedTask = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
@@ -414,18 +424,18 @@ namespace Laevo.View.ActivityOverview
 
 			if ( draggedTask != null && overview != null )
 			{
-				// Calculate where to position the task vertically.
-				var percentageInterval = new Interval<double>( 0, 1 );
-				var activitySpace = new Interval<double>( TimeLineContainer.ActualHeight - BottomOffset, TopOffset );
-				double yPercentage = activitySpace.Map( e.GetPosition( TimeLineContainer ).Y, percentageInterval );
-				var offsetRange = new Interval<double>( draggedTask.HeightPercentage, 1 );
-				draggedTask.OffsetPercentage = offsetRange.Map( yPercentage, percentageInterval ).Clamp( 0, 1 );
-
-				FocusedTime = GetFocusedTime( TimeLine.VisibleInterval, e.GetPosition( this ).X );
-				overview.TaskDropped( draggedTask, FocusedTime );
+				UpdateFocusedTime( e.GetPosition( this ).X );
+				UpdateOffsetPercentage( e.GetPosition( TimeLineContainer ).Y );
+				overview.TaskDropped( draggedTask );
 			}
 
 			IsTimeLineDraggedOver = false;
+		}
+
+		void OnContextMenuOpening( object sender, ContextMenuEventArgs e )
+		{
+			UpdateFocusedTime( Mouse.GetPosition( this ).X );
+			UpdateOffsetPercentage( Mouse.GetPosition( TimeLineContainer ).Y );
 		}
 	}
 }
