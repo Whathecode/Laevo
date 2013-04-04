@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
 using Laevo.Model.AttentionShifts;
+using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Linq;
 
@@ -131,6 +132,14 @@ namespace Laevo.Model
 			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
 		}
 
+
+		public const int SnapToMinutes = 15;
+		public static DateTime GetNearestTime( DateTime near )
+		{
+			const int snapToMinutes = 15;
+
+			return near.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( near.Minute % snapToMinutes ) );
+		}
 
 		public void Update( DateTime now )
 		{

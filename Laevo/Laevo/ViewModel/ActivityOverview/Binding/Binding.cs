@@ -3,6 +3,8 @@
 	public enum Properties
 	{
 		CurrentTime,
+		FocusedTime,
+		FocusedOffsetPercentage,
 		HomeActivity,
 		Activities,
 		Tasks,
@@ -14,6 +16,7 @@
 	public enum Commands
 	{
 		NewTask,
+		PlanActivity,
 		OpenHome
 	}
 }

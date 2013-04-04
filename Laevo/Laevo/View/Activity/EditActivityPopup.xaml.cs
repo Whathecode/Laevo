@@ -2,6 +2,7 @@
 using System.Windows;
 using Whathecode.System;
 using Whathecode.System.Extensions;
+using Xceed.Wpf.Toolkit;
 
 
 namespace Laevo.View.Activity
@@ -21,14 +22,15 @@ namespace Laevo.View.Activity
 			Close();
 		}
 
-		bool _overridingOccuranceChanged;
-		void OnOccuranceChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
+		bool _overridingDateTimePickerChanged;
+		void OnDateTimePickerChanged( object sender, RoutedPropertyChangedEventArgs<object> e )
 		{
 			// TODO: Limiting possible values can possibly be done better through coerce or something?
 
-			if ( _overridingOccuranceChanged )
+			var picker = (DateTimePicker)sender;
+			if ( _overridingDateTimePickerChanged )
 			{
-				_overridingOccuranceChanged = false;
+				_overridingDateTimePickerChanged = false;
 				return;
 			}
 
@@ -41,18 +43,25 @@ namespace Laevo.View.Activity
 			var newTime = (DateTime)e.NewValue;
 
 			// Only allow steps of 15 minutes when minutes are changed.
-			TimeSpan diff = newTime - oldTime;
-			if ( Math.Abs( diff.TotalMinutes ) < 2 )	// Changing minutes.
+			int diffMinutes = (int)(newTime - oldTime).TotalMinutes;
+			// TODO: This is a hackish check to see whether minutes are changed. What is really needed is an event to see whether the up or down button is pressed.
+			if ( Math.Abs( diffMinutes ) == 1 )
 			{
-				oldTime = oldTime.Round( DateTimePart.Minute );
-				newTime = diff.TotalMinutes < 0
-					? oldTime.SafeSubtract( TimeSpan.FromMinutes( 15 ) )
-					: oldTime.SafeAdd( TimeSpan.FromMinutes( 15 ) );
+				if ( diffMinutes > 0 )
+				{
+					newTime = oldTime.SafeAdd( TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes ) );
+				}
+				newTime = Model.Laevo.GetNearestTime( newTime );
 			}
 
 			// Prevent the time from being set in the past.
-			_overridingOccuranceChanged = true;
-			OccurancePicker.Value = newTime < DateTime.Now ? oldTime : newTime;
+			DateTime newValue = newTime < DateTime.Now ? oldTime : newTime;
+			if ( picker.Value != newValue )
+			{
+				_overridingDateTimePickerChanged = true;
+				picker.Value = newValue;
+			}
 		}
+
 	}
 }

@@ -167,7 +167,7 @@
 							Format="Custom"
 							FormatString="HH:mm"
 							Margin="0, 0, 10, 0"
-							ValueChanged="OnOccuranceChanged" />
+							ValueChanged="OnDateTimePickerChanged" />
 						<TextBlock Text="{Binding Occurance, StringFormat=D}" />
 					</StackPanel>
 
@@ -181,7 +181,8 @@
 							x:Name="DurationPicker"
 							Format="Custom"
 							FormatString="HH:mm"
-							Margin="0, 0, 10, 0">
+							Margin="0, 0, 10, 0"
+							ValueChanged="OnDateTimePickerChanged">
 							<xctk:DateTimePicker.Value>
 								<MultiBinding Converter="{StaticResource OccuranceEndConverter}">
 									<Binding Path="Occurance" />

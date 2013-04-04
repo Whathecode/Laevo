@@ -108,8 +108,21 @@
 			DragLeave="OnTimeLineDragLeave"
 			DragOver="OnTimeLineDragOver"
 			Drop="OnTimeLineDragDropped"
+			ContextMenuOpening="OnContextMenuOpening"
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
+			
+			<Viewport3D.ContextMenu>
+				<ContextMenu>
+					<MenuItem
+						Header="_Plan Activity"
+						Command="{wtc:CommandBinding {x:Static binding:Commands.PlanActivity}}">
+						<MenuItem.Icon>
+							<Image Source="Images\PlanActivity.png" Width="20" Height="20" />
+						</MenuItem.Icon>
+					</MenuItem>
+				</ContextMenu>
+			</Viewport3D.ContextMenu>
 			
 			<Viewport3D.CacheMode>
 				<BitmapCache />
@@ -236,7 +249,7 @@
 											Converter={wtcConverters:FromBooleanConverter IfTrue={StaticResource OpenTaskCursor}, IfFalse={StaticResource PlanActivityCursor}}}" />
 
 									<TextBlock
-										Text="{Binding ElementName=Control, Path=FocusedTime, StringFormat='dddd, MMMM d, HH:mm'}"
+										Text="{Binding FocusedTime, StringFormat='dddd, MMMM d, HH:mm'}"
 										Margin="10, 0, 0, 0"
 										Visibility="{Binding
 											ElementName=Control,
