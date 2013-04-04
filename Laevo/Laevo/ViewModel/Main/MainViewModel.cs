@@ -162,7 +162,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
-			ActivityViewModel activity = _activityOverviewViewModel.NewActivity();
+			ActivityViewModel activity = _activityOverviewViewModel.CreateNewActivity();
 			activity.ActivateActivity();
 		}
 

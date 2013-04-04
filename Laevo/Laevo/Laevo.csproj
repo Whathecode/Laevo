@@ -472,7 +472,6 @@
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\close.png" />
     <Resource Include="View\Activity\ActionIcons\collaborator.png" />
-    <Resource Include="View\Activity\ActionIcons\plan.png" />
     <Resource Include="View\Activity\ActionIcons\relate.png" />
     <Resource Include="View\Activity\ActionIcons\start.png" />
     <Resource Include="View\Activity\ActionIcons\tag.png" />
@@ -491,6 +490,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\start_planned.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\ActivityOverview\Images\NewActivity.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
