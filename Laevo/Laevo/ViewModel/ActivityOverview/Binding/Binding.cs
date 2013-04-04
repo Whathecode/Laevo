@@ -16,6 +16,7 @@
 	public enum Commands
 	{
 		NewTask,
+		NewActivity,
 		PlanActivity,
 		OpenHome
 	}

@@ -171,8 +171,8 @@ namespace Laevo.ViewModel.ActivityOverview
 				Tasks.Add( task );
 			}
 
-			// Open activities which have windows assigned to them at startup so it seems as if those sessions simply continue since when the application was closed.
-			Activities.Where( a => a.UpdateHasOpenWindows() ).ForEach( a => a.OpenActivity() );
+			// Update the activity states now that the VDM has been initialized.
+			Activities.Concat( Tasks ).ForEach( a => a.UpdateHasOpenWindows() );
 
 			// Hook up timer.
 			_updateTimer.Elapsed += UpdateData;
@@ -181,9 +181,9 @@ namespace Laevo.ViewModel.ActivityOverview
 
 
 		/// <summary>
-		///   Create a new activity and optionally open it.
+		///   Create a new activity.
 		/// </summary>
-		public ActivityViewModel NewActivity()
+		public ActivityViewModel CreateNewActivity()
 		{
 			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _desktopManager )
 			{
@@ -211,10 +211,19 @@ namespace Laevo.ViewModel.ActivityOverview
 			HookActivityEvents( newTask );
 		}
 
+		[CommandExecute( Commands.NewActivity )]
+		public void NewActivity()
+		{
+			ActivityViewModel activity = CreateNewActivity();
+			PositionActivityAtCurrentOffset( activity );
+			activity.OpenActivity();
+			activity.EditActivity();
+		}
+
 		[CommandExecute( Commands.PlanActivity )]
 		public void PlanActivity()
 		{
-			ActivityViewModel activity = NewActivity();
+			ActivityViewModel activity = CreateNewActivity();
 			PositionActivityAtCurrentOffset( activity );
 			activity.Plan( FocusedTime );
 			activity.EditActivity();

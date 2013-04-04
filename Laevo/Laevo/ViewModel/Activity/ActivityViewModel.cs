@@ -432,10 +432,9 @@ namespace Laevo.ViewModel.Activity
 			return !HasOpenWindows && !IsOpen && !IsActive;
 		}
 
-		public bool UpdateHasOpenWindows()
+		public void UpdateHasOpenWindows()
 		{
 			HasOpenWindows = _virtualDesktop.Windows.Count > 0;
-			return HasOpenWindows;
 		}
 
 		[CommandExecute( Commands.ChangeColor )]
