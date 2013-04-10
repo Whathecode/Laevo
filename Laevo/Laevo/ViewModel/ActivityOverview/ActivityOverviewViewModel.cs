@@ -125,8 +125,8 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 
-			// Ensure current (first) activity is assigned to the correct desktop.
-			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager );
+			// Create home activity, which uses the first created desktop by the desktop manager.
+			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager, _desktopManager.CurrentDesktop );
 			HookActivityEvents( HomeActivity );
 			HomeActivity.ActivateActivity();
 
