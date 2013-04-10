@@ -237,12 +237,17 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager )
+			: this( overview, activity, desktopManager, desktopManager.CreateEmptyDesktop() )
+		{
+		}
+
+		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager, VirtualDesktop desktop )
 		{
 			_overview = overview;
 			Activity = activity;
 
 			_desktopManager = desktopManager;
-			_virtualDesktop = desktopManager.CreateEmptyDesktop();
+			_virtualDesktop = desktop;
 
 			Label = activity.Name;
 			Icon = DefaultIcon;
@@ -250,7 +255,7 @@ namespace Laevo.ViewModel.Activity
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
 
-			CommonInitialize();
+			CommonInitialize();			
 		}
 
 		public ActivityViewModel(
@@ -322,7 +327,6 @@ namespace Laevo.ViewModel.Activity
 		}
 
 
-		static bool _firstActivity = true;
 		/// <summary>
 		///   Activates the activity.
 		///   When it is the first activity activated, the current open windows will merge with the stored ones.
@@ -338,14 +342,7 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
-			ActivatingActivityEvent( this );
-
-			// The first activated activity should include the currently open windows.
-			if ( _firstActivity )
-			{
-				_virtualDesktop = _desktopManager.Merge( _virtualDesktop, _desktopManager.CurrentDesktop );
-				_firstActivity = false;
-			}			
+			ActivatingActivityEvent( this );		
 
 			// Activate. (model logic)
 			if ( alsoOpen )
