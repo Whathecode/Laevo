@@ -51,7 +51,7 @@ namespace Laevo
 			_viewModel = new MainViewModel( _model );
 
 			// Create View.
-			new TrayIconControl { DataContext = _viewModel };
+			new TrayIconControl( _viewModel ) { DataContext = _viewModel };
 		}
 
 		protected override void OnExit( ExitEventArgs e )

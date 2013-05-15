@@ -1,5 +1,6 @@
 ﻿<UserControl 
 	x:Class="Laevo.View.Main.TrayIconControl"
+	x:ClassModifier="internal"
 	x:Name="Control"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -28,8 +29,7 @@
 				<Separator />
 				<MenuItem
 					Header="New Activity"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}"
-					/>
+					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}" />
 				<MenuItem
 					Header="Open Current Activity Context"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenCurrentActivityLibrary}}" />

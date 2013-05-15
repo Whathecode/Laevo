@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Laevo.ViewModel.Main;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
@@ -22,9 +23,9 @@ namespace Laevo.View.Main
 	/// <summary>
 	/// Interaction logic for TrayIconControl.xaml
 	/// </summary>
-	public partial class TrayIconControl
+	partial class TrayIconControl
 	{
-		const int UpdatesPerSecond = 25;		
+		const int UpdatesPerSecond = 25;
 
 		readonly Timer _updateLoop = new Timer();
 		KeyboardHookListener _keyboardListener;
@@ -37,8 +38,10 @@ namespace Laevo.View.Main
 		readonly object _switchingCapsLockLock = new object();
 
 
-		public TrayIconControl()
+		public TrayIconControl( MainViewModel viewModel )
 		{
+			viewModel.GuiReset += ResetKeyStates;
+
 			InitializeComponent();
 
 			// Capture system-wide keyboard events.
@@ -50,9 +53,8 @@ namespace Laevo.View.Main
 
 			UpdateCapsLockState();
 
-			// Add triggers for desired system-wide commands.			
-			new[] // Prevent exception when looking up a non-existent key.
-				{ Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A }.ForEach( k => _keyStates[ k ] = false );
+			// Add triggers for desired system-wide commands.
+			ResetKeyStates();
 			var capsLockDown = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );			
@@ -75,6 +77,21 @@ namespace Laevo.View.Main
 			var resetExclusiveTriggers = new EventTrigger( anyKeyDown );
 			resetExclusiveTriggers.ConditionsMet += () => _exclusiveConditions.ForEach( c => c.Reset() );
 			_inputController.AddTrigger( resetExclusiveTriggers );
+		}
+
+		void ResetKeyStates()
+		{
+			lock ( _inputController )
+			{
+				_keyStates.Clear();
+
+				// Prevent exception when looking up a non-existent key.
+				new[] { Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A }.ForEach( k => _keyStates[ k ] = false );
+
+				// Set keystate of all keys which are currently down to true.
+				List<Key> downKeys = KeyHelper.GetNonToggleKeysState();
+				downKeys.ForEach( k => _keyStates[ (Keys)KeyInterop.VirtualKeyFromKey( k ) ] = true );
+			}
 		}
 
 		void InitializeKeyboardListener()

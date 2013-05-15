@@ -44,6 +44,7 @@ namespace Laevo.View.ActivityOverview
 
 		public const double TopOffset = 105;
 		public const double BottomOffset = 45;
+
 		const double ZoomPercentage = 0.001;
 		const double DragMomentum = 0.0000001;
 
