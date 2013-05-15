@@ -16,6 +16,7 @@ using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Whathecode.System.Windows.Interop;
 using Whathecode.VirtualDesktopManagerAPI;
+using Whathecode.VirtualDesktopManagerAPI.Settings;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -43,7 +44,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler ClosedActivityEvent;
 
 		readonly Model.Laevo _model;
-		readonly DesktopManager _desktopManager = new DesktopManager();
+		readonly DesktopManager _desktopManager;
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -95,13 +96,21 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_model = model;
 
-			// Setup desktop manager.
-			_desktopManager.AddWindowFilter(
-				w =>
+			// Initialize desktop manager.
+			var vdmSettings = new DefaultSettings( w =>
+			{
+				Process process = w.GetProcess();
+				if ( process == null )
 				{
-					Process process = w.GetProcess();
-					return process != null && !(process.ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" ));
-				} );
+					return false;
+				}
+
+				bool isLaevo =
+					process.ProcessName.StartsWith( "Laevo" ) &&
+					( w.GetClassName().Contains( "Laevo" ) || w.GetClassName().Contains( "CiceroUIWndFrame" ) );
+				return !isLaevo;
+			} );
+			_desktopManager = new DesktopManager( vdmSettings );
 
 			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(

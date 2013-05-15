@@ -22,7 +22,7 @@ fcl_dlls = [
 	]
 fcl_dlls.each do |d|
 	FileUtils.cp(
-		fcl + '\\' + d + '\\bin\\x86\\Release\\' + d + '.dll',
+		fcl + '\\' + d + '\\bin\\Release\\' + d + '.dll',
 		fcl_library + d + '.dll')
 end
 
@@ -30,6 +30,6 @@ end
 vdm_dlls = [ 'Whathecode.System', 'Whathecode.VirtualDesktopManagerAPI' ]
 vdm_dlls.each do |d|
 	FileUtils.cp(
-		vdm + '\\bin\\x86\\Release\\' + d + '.dll',
+		vdm + '\\bin\\Release\\' + d + '.dll',
 		'..\\Libraries\\VirtualDesktopManagerAPI\\' + d + '.dll')
 end
