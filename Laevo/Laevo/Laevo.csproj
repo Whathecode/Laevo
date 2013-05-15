@@ -172,7 +172,7 @@
     </Reference>
     <Reference Include="MouseKeyboardActivityMonitor, Version=3.0.1.9579, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\MouseKeyboardActivityMonitor\x86\MouseKeyboardActivityMonitor.dll</HintPath>
+      <HintPath>..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
     </Reference>
     <Reference Include="PostSharp, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL" />
     <Reference Include="PresentationCore" />
