@@ -25,6 +25,8 @@ namespace Laevo.ViewModel.Main
 		ActivityOverviewViewModel _activityOverviewViewModel;
 		readonly Dispatcher _dispatcher;
 
+		public event Action GuiReset;
+
 
 		public MainViewModel( Model.Laevo model )
 		{			
@@ -52,6 +54,8 @@ namespace Laevo.ViewModel.Main
 					ShowActivityOverview();
 				}
 			}
+
+			GuiReset();
 		}
 
 
