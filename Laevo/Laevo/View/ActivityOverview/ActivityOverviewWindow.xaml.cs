@@ -23,6 +23,7 @@ using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
+using Whathecode.System.Windows.Input;
 using Whathecode.System.Xaml.Behaviors;
 
 
@@ -37,6 +38,7 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
+			MoveTimeLine,
 			IsTimeLineDraggedOver,
 			IsFocusedTimeBeforeNow
 		}
@@ -48,11 +50,12 @@ namespace Laevo.View.ActivityOverview
 		const double ZoomPercentage = 0.001;
 		const double DragMomentum = 0.0000001;
 
-		public static readonly ICommand MouseDragged = new RoutedCommand( "MouseDragged", typeof( ActivityOverviewWindow ) );
-
 		readonly List<UnitLabels> _unitLabels = new List<UnitLabels>(); 
 		readonly List<ILabels> _labels = new List<ILabels>();
 		readonly Dictionary<ActivityViewModel, ActivityControl> _activities = new Dictionary<ActivityViewModel, ActivityControl>();
+
+		[DependencyProperty( Properties.MoveTimeLine )]
+		public ICommand MoveTimeLineCommand { get; private set; }
 
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
@@ -66,6 +69,8 @@ namespace Laevo.View.ActivityOverview
 		public ActivityOverviewWindow()
 		{
 			InitializeComponent();
+
+			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveTimeLine );
 
 #if DEBUG
 			WindowStyle = WindowStyle.None;
@@ -235,11 +240,8 @@ namespace Laevo.View.ActivityOverview
 		Interval<DateTime> _startDrag;
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
-		void MoveTimeLine( object sender, ExecutedRoutedEventArgs e )
+		void MoveTimeLine( MouseBehavior.ClickDragInfo info )
 		{
-			TimeLine.Focus();	// TODO: Is this needed?
-
-			var info = (MouseBehavior.ClickDragInfo)e.Parameter;
 			double mouseX = Mouse.GetPosition( this ).X;
 
 			// Stop current time line animation.
