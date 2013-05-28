@@ -275,6 +275,22 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityClosedEvent -= OnActivityClosed;
 		}
 
+		public void SwapTaskOrder( ActivityViewModel task1, ActivityViewModel task2 )
+		{
+			// Update viewmodel.
+			int draggedIndex = Tasks.IndexOf( task1 );
+			int currentIndex = Tasks.IndexOf( task2 );
+			var reordered = Tasks
+				.Select( ( t, i ) => i == draggedIndex ? currentIndex : i == currentIndex ? draggedIndex : i )
+				.Select( toAdd => Tasks[ toAdd ] )
+				.ToArray();
+			Tasks.Clear();
+			reordered.ForEach( Tasks.Add );
+
+			// Update order in model as well.
+			_model.SwapTaskOrder( task1.Activity, task2.Activity );
+		}
+
 		void HookActivityEvents( ActivityViewModel activity )
 		{
 			activity.ActivatingActivityEvent += OnActivityActivating;

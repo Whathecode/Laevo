@@ -7,12 +7,13 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityOverview="clr-namespace:Laevo.ViewModel.ActivityOverview"
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:taskList="clr-namespace:Laevo.View.TaskList"
+	xmlns:activity="clr-namespace:Laevo.View.Activity"	
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
 	xmlns:ab="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
-	xmlns:taskList="clr-namespace:Laevo.View.TaskList" xmlns:activity="clr-namespace:Laevo.View.Activity"
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=activityOverview:ActivityOverviewViewModel}"
 	FontFamily="Segoe UI Light"
@@ -42,6 +43,8 @@
 
 		<ItemsControl
 			x:Name="Tasks"
+			AllowDrop="True"
+			DragOver="OnDragTask"
 			ItemsSource="{Binding Tasks}">
 
 			<ItemsControl.ItemsPanel>
@@ -116,7 +119,7 @@
 							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static ab:Commands.SelectActivity}}"
 							PreviewMouseMove="OnTaskDraggedPreview"
 							GiveFeedback="DragTaskFeedback">
-						
+							
 							<Border.Background>
 								<SolidColorBrush Color="{Binding Color}" />
 							</Border.Background>
