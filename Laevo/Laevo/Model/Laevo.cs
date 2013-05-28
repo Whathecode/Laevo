@@ -217,6 +217,11 @@ namespace Laevo.Model
 			_activities.Add( task );
 		}
 
+		public void SwapTaskOrder( Activity task1, Activity task2 )
+		{
+			_tasks.Swap( task1, task2 );
+		}
+
 		public void Exit()
 		{
 			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );

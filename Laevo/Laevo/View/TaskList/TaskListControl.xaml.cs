@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
-using Whathecode.System.Xaml.Behaviors;
 
 
 namespace Laevo.View.TaskList
@@ -32,11 +35,6 @@ namespace Laevo.View.TaskList
 		}
 
 
-		void OnTaskDragged( MouseBehavior.ClickDragInfo clickDragInfo )
-		{
-			DragDrop.DoDragDrop( clickDragInfo.Sender, clickDragInfo.Sender.DataContext, DragDropEffects.Move );
-		}
-
 		void OnTaskNameFocusChanged( object sender, DependencyPropertyChangedEventArgs e )
 		{
 			TaskHasFocus = (bool)e.NewValue;
@@ -51,12 +49,34 @@ namespace Laevo.View.TaskList
 			}
 		}
 
+		ActivityViewModel _draggedTaskViewModel;
 		void OnTaskDraggedPreview( object sender, MouseEventArgs e )
 		{
-			if ( e.LeftButton == MouseButtonState.Pressed )
+			if ( e.LeftButton != MouseButtonState.Pressed )
 			{
-				var element = (FrameworkElement)sender;
-				DragDrop.DoDragDrop( element, element.DataContext, DragDropEffects.Move );
+				return;
+			}
+
+			// Start the drag operation.
+			var draggedTask = (FrameworkElement)sender;
+			_draggedTaskViewModel = (ActivityViewModel)draggedTask.DataContext;
+			DragDrop.DoDragDrop( draggedTask, draggedTask.DataContext, DragDropEffects.Move );
+
+			// Finish the drag operation.
+			_draggedTaskViewModel = null;
+		}
+
+		void OnDragTask( object sender, DragEventArgs e )
+		{
+			// Reposition tasks while dragging.
+			Point currentPosition = e.GetPosition( Tasks );
+			var viewModel = (ActivityOverviewViewModel)DataContext;
+			ObservableCollection<ActivityViewModel> tasks = viewModel.Tasks;
+			int draggedIndex = tasks.IndexOf( _draggedTaskViewModel );
+			int currentIndex = (int)Math.Floor( currentPosition.X / ( Tasks.ActualWidth / tasks.Count ) );
+			if ( draggedIndex != currentIndex )
+			{
+				viewModel.SwapTaskOrder( _draggedTaskViewModel, tasks[ currentIndex ] );
 			}
 		}
 
