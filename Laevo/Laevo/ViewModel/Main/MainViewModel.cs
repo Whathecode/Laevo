@@ -93,7 +93,10 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			_activityOverview.Show();
+			_activityOverview.Visibility = Visibility.Visible;
+			// TODO: Using Show() and Hide() instead of Visibility for some reason introduces a weird bug. Is the problem really fixed?
+			//       http://stackoverflow.com/questions/16835423/wrong-window-shows-up-on-taskbar-when-calling-show
+			//_activityOverview.Show();
 		}
 
 		/// <summary>
@@ -118,7 +121,10 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityOverview )]
 		public void HideActivityOverview()
 		{
-			_activityOverview.Hide();
+			_activityOverview.Visibility = Visibility.Hidden;
+			// TODO: Using Show() and Hide() instead of Visibility for some reason introduces a weird bug. Is the problem really fixed?
+			//       http://stackoverflow.com/questions/16835423/wrong-window-shows-up-on-taskbar-when-calling-show
+			//_activityOverview.Hide();			
 		}
 
 		[CommandExecute( Commands.SwitchActivityOverview )]
