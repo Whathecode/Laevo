@@ -105,9 +105,7 @@ namespace Laevo.ViewModel.ActivityOverview
 					return false;
 				}
 
-				bool isLaevo =
-					process.ProcessName.StartsWith( "Laevo" ) &&
-					( w.GetClassName().Contains( "Laevo" ) || w.GetClassName().Contains( "CiceroUIWndFrame" ) );
+				bool isLaevo = process.ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" );
 				return !isLaevo;
 			} );
 			_desktopManager = new DesktopManager( vdmSettings );
