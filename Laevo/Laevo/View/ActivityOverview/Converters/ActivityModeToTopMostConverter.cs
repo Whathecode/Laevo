@@ -9,7 +9,7 @@ namespace Laevo.View.ActivityOverview.Converters
 	{
 		public override bool Convert( Mode value )
 		{
-			return value == Mode.Edit ? false : true;
+			return value != Mode.Edit;
 		}
 
 		public override Mode ConvertBack( bool value )
