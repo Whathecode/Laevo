@@ -13,6 +13,7 @@
 		CloseActivity,
 		NewActivity,
 		CutWindow,
-		PasteWindows
+		PasteWindows,
+		SwitchActivity
 	}
 }

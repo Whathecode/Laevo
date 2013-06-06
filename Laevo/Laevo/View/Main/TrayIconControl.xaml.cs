@@ -69,8 +69,9 @@ namespace Laevo.View.Main
 			var pasteWindows = new KeyInputCondition( () => _keyStates[ Keys.V ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
 			var switchCapsLock = new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger(
-				new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
+			var switchActivity = new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, switchActivity ), Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
@@ -79,6 +80,7 @@ namespace Laevo.View.Main
 			_inputController.AddTrigger( resetExclusiveTriggers );
 		}
 
+
 		void ResetKeyStates()
 		{
 			lock ( _inputController )
@@ -86,7 +88,7 @@ namespace Laevo.View.Main
 				_keyStates.Clear();
 
 				// Prevent exception when looking up a non-existent key.
-				new[] { Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A }.ForEach( k => _keyStates[ k ] = false );
+				new[] { Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A, Keys.Tab }.ForEach( k => _keyStates[ k ] = false );
 
 				// Set keystate of all keys which are currently down to true.
 				List<Key> downKeys = KeyHelper.GetNonToggleKeysState();

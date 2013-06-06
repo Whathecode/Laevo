@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -24,6 +25,8 @@ namespace Laevo.ViewModel.Main
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
 		readonly Dispatcher _dispatcher;
+
+		readonly Queue<ActivityViewModel> _lastActivatedActivities = new Queue<ActivityViewModel>();
 
 		public event Action GuiReset;
 
@@ -187,6 +190,13 @@ namespace Laevo.ViewModel.Main
 			_activityOverviewViewModel.PasteWindows();
 		}
 
+		[CommandExecute( Commands.SwitchActivity )]
+		public void SwitchActivity()
+		{
+			ActivityViewModel lastActivity = _lastActivatedActivities.Dequeue();
+			lastActivity.ActivateActivity( lastActivity.IsOpen );
+		}
+
 		/// <summary>
 		///   Ensure that the activity overview window is created.
 		/// </summary>
@@ -205,6 +215,7 @@ namespace Laevo.ViewModel.Main
 					EnableAttentionLines = _model.Settings.EnableAttentionLines
 				};
 			}
+			_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
 			_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 			_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow
@@ -213,9 +224,16 @@ namespace Laevo.ViewModel.Main
 			};
 			_activityOverview.Activated += ( sender, args ) => _activityOverviewViewModel.OnOverviewActivated();
 		}
-
+		
 		void OnActivatedActivityEvent( ActivityViewModel viewModel )
 		{
+			// Keep track of last 2 actived activities.
+			_lastActivatedActivities.Enqueue( viewModel );
+			if ( _lastActivatedActivities.Count > 2 )
+			{
+				_lastActivatedActivities.Dequeue();
+			}
+
 			HideActivityOverview();
 		}
 
