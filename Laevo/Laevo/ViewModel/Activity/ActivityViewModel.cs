@@ -342,7 +342,7 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
-			ActivatingActivityEvent( this );		
+			ActivatingActivityEvent( this );
 
 			// Activate. (model logic)
 			if ( alsoOpen )
