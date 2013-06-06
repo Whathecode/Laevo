@@ -245,15 +245,13 @@
 									<Image
 										x:Name="DragDropCursor"
 										Source="{Binding
-											ElementName=Control,
 											Path=IsFocusedTimeBeforeNow,
 											Converter={wtcConverters:FromBooleanConverter IfTrue={StaticResource OpenTaskCursor}, IfFalse={StaticResource PlanActivityCursor}}}" />
 
 									<TextBlock
-										Text="{Binding FocusedTime, StringFormat='dddd, MMMM d, HH:mm'}"
+										Text="{Binding FocusedRoundedTime, StringFormat='dddd, MMMM d, HH:mm'}"
 										Margin="10, 0, 0, 0"
 										Visibility="{Binding
-											ElementName=Control,
 											Path=IsFocusedTimeBeforeNow,
 											Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
 								</StackPanel>

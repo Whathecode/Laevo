@@ -39,8 +39,7 @@ namespace Laevo.View.ActivityOverview
 		public enum Properties
 		{
 			MoveTimeLine,
-			IsTimeLineDraggedOver,
-			IsFocusedTimeBeforeNow
+			IsTimeLineDraggedOver
 		}
 
 
@@ -59,9 +58,6 @@ namespace Laevo.View.ActivityOverview
 
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
-
-		[DependencyProperty( Properties.IsFocusedTimeBeforeNow )]
-		public bool IsFocusedTimeBeforeNow { get; private set; }
 
 		readonly TimeIndicator _timeIndicator;
 
@@ -408,7 +404,6 @@ namespace Laevo.View.ActivityOverview
 
 			DateTime focusedTime = GetFocusedTime( TimeLine.VisibleInterval, mouseX );
 			overview.FocusedTimeChanged( focusedTime );
-			IsFocusedTimeBeforeNow = focusedTime <= DateTime.Now;
 		}
 
 		void UpdateOffsetPercentage( double mouseY )

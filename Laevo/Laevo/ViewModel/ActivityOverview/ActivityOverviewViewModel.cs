@@ -72,10 +72,16 @@ namespace Laevo.ViewModel.ActivityOverview
 		public DateTime CurrentTime { get; private set; }
 
 		/// <summary>
-		///   The time which currently has input focus and can be acted upon.
+		///   Whether or not the currently focused (non-rounded) time lies before the current actual time.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.FocusedTime )]
-		public DateTime FocusedTime { get; private set; }
+		[NotifyProperty( Binding.Properties.IsFocusedTimeBeforeNow )]
+		public bool IsFocusedTimeBeforeNow { get; private set; }
+
+		/// <summary>
+		///   The time which currently has input focus and can be acted upon. This is rounded to nearest values.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.FocusedRoundedTime )]
+		public DateTime FocusedRoundedTime { get; private set; }
 
 		[NotifyProperty( Binding.Properties.FocusedOffsetPercentage )]
 		public double FocusedOffsetPercentage { get; set; }
@@ -232,14 +238,14 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			ActivityViewModel activity = CreateNewActivity();
 			PositionActivityAtCurrentOffset( activity );
-			activity.Plan( FocusedTime );
+			activity.Plan( FocusedRoundedTime );
 			activity.EditActivity();
 		}
 
 		[CommandCanExecute( Commands.PlanActivity )]
 		public bool CanPlanActivity()
 		{
-			return FocusedTime > DateTime.Now;
+			return FocusedRoundedTime > DateTime.Now;
 		}
 
 		/// <summary>
@@ -403,13 +409,13 @@ namespace Laevo.ViewModel.ActivityOverview
 			PositionActivityAtCurrentOffset( task );
 
 			// Based on where the task is dropped, open, or plan it.
-			if ( FocusedTime <= DateTime.Now )
+			if ( IsFocusedTimeBeforeNow )
 			{
 				task.OpenActivity();
 			}
 			else
 			{
-				task.Plan( FocusedTime );
+				task.Plan( FocusedRoundedTime );
 				task.EditActivity();
 			}
 		}
@@ -423,12 +429,15 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public void FocusedTimeChanged( DateTime focusedTime )
 		{
+			IsFocusedTimeBeforeNow = focusedTime <= DateTime.Now;
+
+			// Set rounded focus time.
 			DateTime focused = Model.Laevo.GetNearestTime( focusedTime );
 			if ( focused < DateTime.Now )
 			{
 				focused = focused.SafeAdd( TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes ) );
 			}
-			FocusedTime = focused;
+			FocusedRoundedTime = focused;			
 		}
 
 		public void Exit()
