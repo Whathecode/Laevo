@@ -3,7 +3,8 @@
 	public enum Properties
 	{
 		CurrentTime,
-		FocusedTime,
+		IsFocusedTimeBeforeNow,
+		FocusedRoundedTime,
 		FocusedOffsetPercentage,
 		HomeActivity,
 		Activities,
