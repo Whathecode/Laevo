@@ -194,6 +194,11 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivity )]
 		public void SwitchActivity()
 		{
+			if ( _lastActivatedActivities.Count == 0 )
+			{
+				return;
+			}
+
 			ActivityViewModel lastActivity = _lastActivatedActivities.Dequeue();
 			lastActivity.ActivateActivity( lastActivity.IsOpen );
 		}
@@ -226,13 +231,16 @@ namespace Laevo.ViewModel.Main
 			_activityOverview.Activated += ( sender, args ) => _activityOverviewViewModel.OnOverviewActivated();
 		}
 		
-		void OnActivatedActivityEvent( ActivityViewModel viewModel )
+		void OnActivatedActivityEvent( ActivityViewModel oldActivity, ActivityViewModel newActivity )
 		{
-			// Keep track of last 2 actived activities.
-			_lastActivatedActivities.Enqueue( viewModel );
-			if ( _lastActivatedActivities.Count > 2 )
+			if ( oldActivity != newActivity )
 			{
-				_lastActivatedActivities.Dequeue();
+				// Keep track of last 2 actived activities.
+				_lastActivatedActivities.Enqueue( newActivity );
+				if ( _lastActivatedActivities.Count > 2 )
+				{
+					_lastActivatedActivities.Dequeue();
+				}
 			}
 
 			HideActivityOverview();
