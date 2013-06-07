@@ -28,10 +28,13 @@ namespace Laevo.ViewModel.ActivityOverview
 		static readonly string TasksFile = Path.Combine( Model.Laevo.ProgramDataFolder, "TaskRepresentations.xml" );
 
 
+		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
+
+
 		/// <summary>
 		///   Event which is triggered when an activity is opened.
 		/// </summary>
-		public event ActivityViewModel.ActivityEventHandler ActivatedActivityEvent;
+		public event ActivitySwitchEventHandler ActivatedActivityEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is selected.
@@ -316,8 +319,9 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnActivityActivated( ActivityViewModel viewModel )
 		{
+			ActivityViewModel oldActivity = CurrentActivityViewModel;
 			CurrentActivityViewModel = viewModel;
-			ActivatedActivityEvent( viewModel );
+			ActivatedActivityEvent( oldActivity, CurrentActivityViewModel );
 		}
 
 		void OnActivityClosed( ActivityViewModel viewModel )

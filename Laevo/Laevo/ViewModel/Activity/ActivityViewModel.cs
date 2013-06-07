@@ -67,7 +67,7 @@ namespace Laevo.ViewModel.Activity
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
 		/// <summary>
-		///   Event which is triggered at the start when an acitvity is being activated.
+		///   Event which is triggered at the start when an acitvity is being activated when it wasn't activated before.
 		/// </summary>
 		public event ActivityEventHandler ActivatingActivityEvent;
 
