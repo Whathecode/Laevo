@@ -96,6 +96,7 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 			_activityOverview.Show();
+			_activityOverview.Activate();
 		}
 
 		/// <summary>
@@ -120,7 +121,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityOverview )]
 		public void HideActivityOverview()
 		{
-			_activityOverview.Hide();			
+			_activityOverview.Hide();
 		}
 
 		[CommandExecute( Commands.SwitchActivityOverview )]

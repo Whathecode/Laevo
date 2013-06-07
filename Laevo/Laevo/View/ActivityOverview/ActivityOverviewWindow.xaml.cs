@@ -87,7 +87,6 @@ namespace Laevo.View.ActivityOverview
 			_timeIndicator.SetBinding( HeightProperty, new Binding( "ActualHeight" ) { Source = TimeLine } );
 			_timeIndicator.SetBinding( TimeLineControl.OccuranceProperty, "CurrentTime" );
 			TimeLine.Children.Add( _timeIndicator );
-			Activated += ( s, e ) => TimeLine.Focus();
 
 			// Create desired intervals to show.
 			// TODO: This logic seems abstract enough to move to the model.
