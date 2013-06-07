@@ -26,7 +26,7 @@ namespace Laevo.View.Activity
 		[DependencyProperty( Properties.MouseDragged )]
 		public DelegateCommand<MouseBehavior.ClickDragInfo> MouseDragged { get; private set; }
 
-		
+
 		public ActivityControl()
 		{
 			InitializeComponent();
