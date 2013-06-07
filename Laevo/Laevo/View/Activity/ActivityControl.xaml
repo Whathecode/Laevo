@@ -5,6 +5,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
@@ -34,11 +35,21 @@
 			</Binding>
 			<Binding Path="HeightPercentage" />
 		</MultiBinding>
-	</activityOverview:TimeLineControl.Offset>	
+	</activityOverview:TimeLineControl.Offset>
+	
+	<UserControl.MinWidth>
+		<MultiBinding
+			Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">			
+			<Binding ElementName="Container" Path="IsMouseOver" />
+			<Binding ElementName="Buttons" Path="IsMouseOver" />
+			<Binding ElementName="Control" Path="ActualWidth" />
+		</MultiBinding>
+	</UserControl.MinWidth>
 	
 	<UserControl.Resources>
 		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<converters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+		<converters:ActivityBorderThicknessConverter x:Key="ActivityBorderThicknessConverter" />
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 	</UserControl.Resources>
@@ -97,14 +108,32 @@
 		
 		<Border
 			x:Name="Container"
-			CornerRadius="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='5, 0, 0, 5', IfFalse=5}}"
-			BorderThickness="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue='4, 4, 0, 4', IfFalse=2}}"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 			MouseMove="OnMouseMoved"
 			Cursor="Hand"
 			Panel.ZIndex="15"
 			ClipToBounds="True">
+			
+			<Border.CornerRadius>
+				<MultiBinding
+					Converter="{wtcConverters:ConditionConverter Expression='[0] and !(([1] || [2]) and ([3] > 2))', IfTrue='5, 0, 0, 5', IfFalse='5', Type={x:Type CornerRadius}}">
+					<Binding Path="IsOpen" />
+					<Binding ElementName="Container" Path="IsMouseOver" />
+					<Binding ElementName="Buttons" Path="IsMouseOver" />
+					<Binding ElementName="Control" Path="MinWidth" />
+				</MultiBinding>
+			</Border.CornerRadius>
+			
+			<Border.BorderThickness>
+				<MultiBinding
+					Converter="{StaticResource ActivityBorderThicknessConverter}">
+					<Binding Path="IsOpen" />
+					<Binding ElementName="Container" Path="IsMouseOver" />
+					<Binding ElementName="Buttons" Path="IsMouseOver" />
+					<Binding ElementName="Control" Path="MinWidth" />
+				</MultiBinding>
+			</Border.BorderThickness>
 			
 			<Border.BorderBrush>
 				<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
