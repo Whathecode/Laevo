@@ -26,6 +26,7 @@ namespace Laevo.ViewModel.ActivityOverview
 	{
 		static readonly string ActivitiesFile = Path.Combine( Model.Laevo.ProgramDataFolder, "ActivityRepresentations.xml" );
 		static readonly string TasksFile = Path.Combine( Model.Laevo.ProgramDataFolder, "TaskRepresentations.xml" );
+		static readonly string VdmSettings = Path.Combine( Model.Laevo.ProgramDataFolder, "VdmSettings" );
 
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
@@ -106,17 +107,25 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 
 			// Initialize desktop manager.
-			var vdmSettings = new DefaultSettings( w =>
+			if ( !Directory.Exists( VdmSettings ) )
 			{
-				Process process = w.GetProcess();
-				if ( process == null )
+				Directory.CreateDirectory( VdmSettings );
+			}
+			LoadedSettings vdmSettings = new LoadedSettings();
+			foreach ( string file in Directory.EnumerateFiles( VdmSettings ) )
+			{
+				try
 				{
-					return false;
+					using ( var stream = new FileStream( file, FileMode.Open ) )
+					{
+						vdmSettings.AddSettingsFile( stream );
+					}					
 				}
-
-				bool isLaevo = process.ProcessName.StartsWith( "Laevo" ) && w.GetClassName().Contains( "Laevo" );
-				return !isLaevo;
-			} );
+				catch ( InvalidOperationException )
+				{
+					// Simply ignore invalid files.
+				}
+			}
 			_desktopManager = new DesktopManager( vdmSettings );
 
 			// Check for stored presentation options for existing activities and tasks.
