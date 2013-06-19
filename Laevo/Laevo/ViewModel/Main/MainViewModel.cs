@@ -220,10 +220,10 @@ namespace Laevo.ViewModel.Main
 					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale,
 					EnableAttentionLines = _model.Settings.EnableAttentionLines
 				};
+				_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
+				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
+				_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			}
-			_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
-			_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
-			_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
 			_activityOverview = new ActivityOverviewWindow
 			{
 				DataContext = _activityOverviewViewModel
