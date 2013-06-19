@@ -26,7 +26,7 @@ namespace Laevo.Model
 		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
 		static readonly string TasksFile = Path.Combine( ProgramDataFolder, "Tasks.xml" );
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
-		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
+		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );		
 
 		readonly ProcessTracker _processTracker = new ProcessTracker();
 		/// <summary>
