@@ -110,7 +110,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				Directory.CreateDirectory( VdmSettings );
 			}
-			var vdmSettings = new LoadedSettings( false );
+			var vdmSettings = new LoadedSettings();
 			foreach ( string file in Directory.EnumerateFiles( VdmSettings ) )
 			{
 				try
