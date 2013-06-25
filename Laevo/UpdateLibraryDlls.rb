@@ -10,7 +10,7 @@ namespace = 'msbuild:http://schemas.microsoft.com/developer/msbuild/2003'
 Dir.chdir('Laevo')
 
 fcl = doc.find_first('//msbuild:Framework-Class-Library-Extension', namespace).first.to_s()
-vdm = doc.find_first('//msbuild:Virtual-Desktop-Manager-API', namespace).first.to_s()
+abc = doc.find_first('//msbuild:ABC-Toolkit', namespace).first.to_s()
 
 # Copy Framework Class Library Extension DLLs.
 fcl_library = '..\\Libraries\\Framework Class Library Extension\\'
@@ -26,10 +26,14 @@ fcl_dlls.each do |d|
 		fcl_library + d + '.dll')
 end
 
-# Copy Virtual Desktop Manager API DLLs.
-vdm_dlls = [ 'Whathecode.System', 'Whathecode.VirtualDesktopManagerAPI' ]
-vdm_dlls.each do |d|
+# Copy ABC Toolkit DLLs.
+abc_toolkit = '..\\Libraries\\ABC Toolkit\\'
+abc_dlls = [
+	'ABC.Windows',
+	'ABC.PInvoke'
+	]
+abc_dlls.each do |d|
 	FileUtils.cp(
-		vdm + '\\bin\\Release\\' + d + '.dll',
-		'..\\Libraries\\VirtualDesktopManagerAPI\\' + d + '.dll')
+		abc + '\\' + d + '\\bin\\Release\\' + d + '.dll',
+		abc_toolkit + d + '.dll')
 end

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Whathecode.VirtualDesktopManagerAPI;
+using ABC.Windows.Desktop;
 
 
 namespace Laevo.ViewModel.ActivityOverview
