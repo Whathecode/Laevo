@@ -197,18 +197,25 @@
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
   <Import Project="..\ProjectReferences.txt" />
   <Choose>
-    <When Condition="Exists($(Virtual-Desktop-Manager-API))">
+    <When Condition="Exists($(ABC-Toolkit))">
       <ItemGroup>
-        <ProjectReference Include="$(Virtual-Desktop-Manager-API)\Whathecode.VirtualDesktopManagerAPI.csproj">
-          <Project>{6CA7AB2C-2D8D-422A-9FD4-2992BE62720A}</Project>
-          <Name>Whathecode.VirtualDesktopManagerAPI</Name>
+        <ProjectReference Include="$(ABC-Toolkit)\ABC.Windows\ABC.Windows.csproj">
+          <Project>{DB8DBDF2-70BF-4712-86DA-06674986BC12}</Project>
+          <Name>ABC.Windows</Name>
+		</ProjectReference>
+        <ProjectReference Include="$(ABC-Toolkit)\ABC.PInvoke\ABC.PInvoke.csproj">
+          <Project>{072142C4-284E-4F1A-A1FE-F886E8ECF728}</Project>
+          <Name>ABC.PInvoke</Name>
         </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Whathecode.VirtualDesktopManagerAPI">
-          <HintPath>..\Libraries\VirtualDesktopManagerAPI\Whathecode.VirtualDesktopManagerAPI.dll</HintPath>
+        <Reference Include="ABC.Windows">
+          <HintPath>..\Libraries\ABC Toolkit\ABC.Windows.dll</HintPath>
+        </Reference>
+        <Reference Include="ABC.PInvoke">
+          <HintPath>..\Libraries\ABC Toolkit\ABC.PInvoke.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>

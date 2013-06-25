@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Timers;
+using ABC.Windows;
+using ABC.Windows.Desktop;
+using ABC.Windows.Desktop.Settings;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -13,9 +16,6 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
-using Whathecode.System.Windows.Interop;
-using Whathecode.VirtualDesktopManagerAPI;
-using Whathecode.VirtualDesktopManagerAPI.Settings;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -118,7 +118,7 @@ namespace Laevo.ViewModel.ActivityOverview
 					using ( var stream = new FileStream( file, FileMode.Open ) )
 					{
 						vdmSettings.AddSettingsFile( stream );
-					}					
+					}
 				}
 				catch ( InvalidOperationException )
 				{
