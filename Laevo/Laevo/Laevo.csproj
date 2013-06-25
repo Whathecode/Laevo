@@ -202,7 +202,7 @@
         <ProjectReference Include="$(ABC-Toolkit)\ABC.Windows\ABC.Windows.csproj">
           <Project>{DB8DBDF2-70BF-4712-86DA-06674986BC12}</Project>
           <Name>ABC.Windows</Name>
-		</ProjectReference>
+        </ProjectReference>
         <ProjectReference Include="$(ABC-Toolkit)\ABC.PInvoke\ABC.PInvoke.csproj">
           <Project>{072142C4-284E-4F1A-A1FE-F886E8ECF728}</Project>
           <Name>ABC.PInvoke</Name>
