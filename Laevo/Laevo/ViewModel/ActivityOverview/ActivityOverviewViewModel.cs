@@ -229,7 +229,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			var newTask = new ActivityViewModel( this, _model.CreateNewTask(), _desktopManager );
 			lock ( Tasks )
 			{
-				Tasks.Add( newTask );
+				Tasks.Insert( 0, newTask );
 			}
 
 			HookActivityEvents( newTask );
