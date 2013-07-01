@@ -194,7 +194,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivity )]
 		public void SwitchActivity()
 		{
-			if ( _lastActivatedActivities.Count == 0 )
+			if ( _lastActivatedActivities.Count < 2 )
 			{
 				return;
 			}
