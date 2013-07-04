@@ -5,10 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
+using System.Windows.Threading;
 using Laevo.Model.AttentionShifts;
+using Laevo.Model.Interruptions;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Linq;
+using Whathecode.System.Windows.Threading;
 
 
 namespace Laevo.Model
@@ -26,7 +29,9 @@ namespace Laevo.Model
 		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
 		static readonly string TasksFile = Path.Combine( ProgramDataFolder, "Tasks.xml" );
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
-		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );		
+		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
+
+		readonly Dispatcher _dispatcher;
 
 		readonly ProcessTracker _processTracker = new ProcessTracker();
 		/// <summary>
@@ -42,6 +47,7 @@ namespace Laevo.Model
 			get { return _activities.AsReadOnly(); }
 		}
 
+		public event Action<Activity> TaskAdded;
 		readonly List<Activity> _tasks = new List<Activity>();
 		public ReadOnlyCollection<Activity> Tasks
 		{
@@ -58,6 +64,8 @@ namespace Laevo.Model
 		{
 			get { return _attentionShifts.AsReadOnly(); }
 		}
+
+		readonly InterruptionAggregator _interruptionAggregator;
 		
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 		public Settings Settings { get; private set; }
@@ -65,6 +73,8 @@ namespace Laevo.Model
 
 		public Laevo()
 		{
+			_dispatcher = Dispatcher.CurrentDispatcher;
+
 			// Load settings.
 			if ( File.Exists( SettingsFile ) )
 			{
@@ -100,6 +110,7 @@ namespace Laevo.Model
 				using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Open ) )
 				{
 					var existingTasks = (List<Activity>)ActivitySerializer.ReadObject( tasksFileStream );
+					existingTasks.Reverse();  // Tasks are saved in the order they should show up, but each time added to the front of the list. Reverse to maintain the correct ordering.
 					existingTasks.ForEach( AddTask );
 				}
 			}
@@ -117,6 +128,14 @@ namespace Laevo.Model
 					_attentionShifts.AddRange( existingAttentionShifts );
 				}
 			}
+
+			// Set up interruption handlers.
+			_interruptionAggregator = new InterruptionAggregator();
+			_interruptionAggregator.InterruptionReceived += name =>
+			{
+				var interruption = new Activity( name );
+				DispatcherHelper.SafeDispatch( _dispatcher, () => AddTask( interruption ) );
+			};
 
 			// Start tracking processes.
 			_processTracker.Start();
@@ -143,7 +162,8 @@ namespace Laevo.Model
 
 		public void Update( DateTime now )
 		{
-			_activities.ForEach( a => a.Update( now ) );
+			_activities.Cast<IUpdatable>().ForEach( a => a.Update( now ) );
+			_interruptionAggregator.Update( now );
 		}
 
 		/// <summary>
@@ -202,7 +222,9 @@ namespace Laevo.Model
 		void AddTask( Activity task )
 		{
 			task.ActivatedEvent += OnActivityActivated;
-			_tasks.Add( task );
+			_tasks.Insert( 0, task );
+
+			TaskAdded( task );
 		}
 
 		public void CreateActivityFromTask( Activity task )

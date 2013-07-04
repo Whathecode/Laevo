@@ -16,7 +16,7 @@ namespace Laevo.Model
 	/// </summary>
 	/// <author>Steven Jeuris</author>
 	[DataContract]
-	class Activity
+	class Activity : IUpdatable
 	{
 		static readonly string ActivityContextPath 
 			= Path.Combine( Laevo.ProgramDataFolder, "Activities" );
@@ -254,7 +254,7 @@ namespace Laevo.Model
 			}
 		}
 
-		internal void Update( DateTime now )
+		public void Update( DateTime now )
 		{
 			if ( IsOpen )
 			{

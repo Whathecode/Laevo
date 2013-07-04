@@ -178,6 +178,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Management" />
     <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Reactive Extensions SDK\v1.0.10621\Binaries\.NETFramework\v3.5\System.Reactive.dll</HintPath>
@@ -272,6 +273,9 @@
     <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\ApplicationAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\DataContractSurrogate.cs" />
+    <Compile Include="Model\Interruptions\AbstractInterruptionHandler.cs" />
+    <Compile Include="Model\Interruptions\InterruptionAggregator.cs" />
+    <Compile Include="Model\IUpdatable.cs" />
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="Model\ProcessInfo.cs" />
     <Compile Include="Model\ProcessTracker.cs" />
