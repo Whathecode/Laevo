@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Timers;
+using System.Windows.Media;
 using ABC.Windows;
 using ABC.Windows.Desktop;
 using ABC.Windows.Desktop.Settings;
@@ -189,11 +190,27 @@ namespace Laevo.ViewModel.ActivityOverview
 					existingTasks[ task.DateCreated ],
 					new ActivityAttentionShift[] { } );
 			// ReSharper restore ImplicitlyCapturedClosure
-			foreach ( var task in taskViewModels )
+			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
 			{
-				HookActivityEvents( task );
-				Tasks.Add( task );
+				AddTask( task );
 			}
+
+			// Listen for new tasks being added.
+			_model.TaskAdded += task =>
+			{
+				if ( Tasks.Any( t => t.Activity.Equals( task ) ) )
+				{
+					return;
+				}
+
+				var taskViewModel = new ActivityViewModel( this, task, _desktopManager )
+				{
+					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
+					Color = ActivityViewModel.PresetColors[ 5 ],
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "mail_read.png" ) )
+				};
+				AddTask( taskViewModel );
+			};
 
 			// Update the activity states now that the VDM has been initialized.
 			Activities.Concat( Tasks ).ForEach( a => a.UpdateHasOpenWindows() );
@@ -227,12 +244,17 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void NewTask()
 		{
 			var newTask = new ActivityViewModel( this, _model.CreateNewTask(), _desktopManager );
+			AddTask( newTask );
+		}
+
+		void AddTask( ActivityViewModel task )
+		{
 			lock ( Tasks )
 			{
-				Tasks.Insert( 0, newTask );
+				Tasks.Insert( 0, task );
 			}
 
-			HookActivityEvents( newTask );
+			HookActivityEvents( task );
 		}
 
 		[CommandExecute( Commands.NewActivity )]

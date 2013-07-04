@@ -255,7 +255,7 @@ namespace Laevo.ViewModel.Activity
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
 
-			CommonInitialize();			
+			CommonInitialize();
 		}
 
 		public ActivityViewModel(
