@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Timers;
-using System.Windows.Media;
 using ABC.Windows;
 using ABC.Windows.Desktop;
 using ABC.Windows.Desktop.Settings;
