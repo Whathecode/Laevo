@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Threading;
 using Laevo.Model.AttentionShifts;
-using Laevo.Model.Interruptions;
+using ABC.Interruptions;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Linq;
@@ -30,6 +30,7 @@ namespace Laevo.Model
 		static readonly string TasksFile = Path.Combine( ProgramDataFolder, "Tasks.xml" );
 		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
 		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
+		static readonly string PluginLibrary = Path.Combine( ProgramDataFolder, "InterruptionHandlers" );
 
 		readonly Dispatcher _dispatcher;
 
@@ -65,7 +66,7 @@ namespace Laevo.Model
 			get { return _attentionShifts.AsReadOnly(); }
 		}
 
-		readonly InterruptionAggregator _interruptionAggregator;
+		readonly InterruptionAggregator _interruptionAggregator = new InterruptionAggregator( PluginLibrary );
 		
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 		public Settings Settings { get; private set; }
@@ -130,7 +131,6 @@ namespace Laevo.Model
 			}
 
 			// Set up interruption handlers.
-			_interruptionAggregator = new InterruptionAggregator();
 			_interruptionAggregator.InterruptionReceived += name =>
 			{
 				var interruption = new Activity( name );
@@ -162,7 +162,7 @@ namespace Laevo.Model
 
 		public void Update( DateTime now )
 		{
-			_activities.Cast<IUpdatable>().ForEach( a => a.Update( now ) );
+			_activities.ForEach( a => a.Update( now ) );
 			_interruptionAggregator.Update( now );
 		}
 
