@@ -11,7 +11,8 @@
 	<tb:TaskbarIcon
 		IconSource="/View/Main/LaevoTray.ico"
 		ToolTipText="Laevo"
-		DataContext="{Binding ElementName=Control, Path=DataContext, Mode=OneWay}">
+		DataContext="{Binding ElementName=Control, Path=DataContext, Mode=OneWay}"
+		DoubleClickCommand="{view:TrayCommandBinding {x:Static b:Commands.ShowActivityOverview}}">
 		
 		<tb:TaskbarIcon.ContextMenu>
 			<ContextMenu>
@@ -21,7 +22,7 @@
 				<Separator />
 				<MenuItem
 					Header="Settings"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenSettings}}" />				
+					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenSettings}}" />
 				<MenuItem
 					x:Name="CapsLockMenuItem"
 					Header="Turn Caps Lock On/Off"
