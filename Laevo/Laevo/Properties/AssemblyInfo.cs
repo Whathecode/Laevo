@@ -8,9 +8,9 @@ using System.Windows;
 [assembly: AssemblyTitle( "Laevo" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "Logica" )]
+[assembly: AssemblyCompany( "Whathecode" )]
 [assembly: AssemblyProduct( "Whathecode.Laevo" )]
-[assembly: AssemblyCopyright( "Copyright © Logica 2012" )]
+[assembly: AssemblyCopyright( "Copyright © Whathecode 2012" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
