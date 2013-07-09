@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using ABC.Interruptions;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.IO;
@@ -56,12 +57,23 @@ namespace Laevo.Model
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
-		public ReadOnlyCollection<Interval<DateTime>> OpenIntervals
+		public IReadOnlyCollection<Interval<DateTime>> OpenIntervals
 		{
-			get { return _openIntervals.AsReadOnly(); }
+			get { return _openIntervals; }
 		}
 
+		[DataMember]
+		readonly List<AbstractInterruption> _interruptions = new List<AbstractInterruption>(); 
+
 		/// <summary>
+		///   Interruptions which interrupted the activity.
+		/// </summary>
+		public IReadOnlyCollection<AbstractInterruption> Interruptions
+		{
+			get { return _interruptions; }
+		}
+
+			/// <summary>
 		///   The specific folder created for this activity when it was first created. This is the default location where it's context is stored.
 		///   It can become null once it is removed by the user. This folder will be removed when the activity is deleted.
 		/// </summary>
@@ -250,7 +262,7 @@ namespace Laevo.Model
 			}
 			catch ( IOException )
 			{
-				// Try again next time. The directoy might be in use.
+				// Try again next time. The directory might be in use.
 			}
 		}
 
@@ -260,6 +272,11 @@ namespace Laevo.Model
 			{
 				_currentOpenInterval.ExpandTo( now );
 			}
+		}
+
+		public void AddInterruption( AbstractInterruption interruption )
+		{
+			_interruptions.Add( interruption );
 		}
 	}
 }

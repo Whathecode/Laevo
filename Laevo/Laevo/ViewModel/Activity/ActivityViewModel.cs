@@ -212,6 +212,9 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
 
+		[NotifyProperty( Binding.Properties.HasUnattendedInterruptions )]
+		public bool HasUnattendedInterruptions { get; private set; }
+
 		[NotifyProperty( Binding.Properties.PossibleColors )]
 		public ObservableCollection<Color> PossibleColors { get; set; }
 
@@ -470,6 +473,7 @@ namespace Laevo.ViewModel.Activity
 		public void Update( DateTime now )
 		{
 			IsPlannedActivity = Occurance > DateTime.Now;
+			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
 
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
