@@ -41,7 +41,7 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		static readonly DataContractSerializer ActivitySerializer = new DataContractSerializer( typeof( List<Activity> ) );
+		readonly DataContractSerializer _activitySerializer;
 		readonly List<Activity> _activities = new List<Activity>();
 		public ReadOnlyCollection<Activity> Activities
 		{
@@ -89,12 +89,16 @@ namespace Laevo.Model
 				Settings = new Settings();
 			}
 
+			// Initialize activity serializer.
+			// It needs to be aware about the interruption types loaded by the interruption aggregator.
+			_activitySerializer = new DataContractSerializer( typeof( List<Activity> ), _interruptionAggregator.GetInterruptionTypes() );
+
 			// Add activities from previous sessions.
 			if ( File.Exists( ActivitiesFile ) )
 			{
 				using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
 				{
-					var existingActivities = (List<Activity>)ActivitySerializer.ReadObject( activitiesFileStream );
+					var existingActivities = (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream );
 					existingActivities.ForEach( AddActivity );
 				}
 			}
@@ -110,7 +114,7 @@ namespace Laevo.Model
 			{
 				using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Open ) )
 				{
-					var existingTasks = (List<Activity>)ActivitySerializer.ReadObject( tasksFileStream );
+					var existingTasks = (List<Activity>)_activitySerializer.ReadObject( tasksFileStream );
 					existingTasks.Reverse();  // Tasks are saved in the order they should show up, but each time added to the front of the list. Reverse to maintain the correct ordering.
 					existingTasks.ForEach( AddTask );
 				}
@@ -131,10 +135,12 @@ namespace Laevo.Model
 			}
 
 			// Set up interruption handlers.
-			_interruptionAggregator.InterruptionReceived += name =>
+			_interruptionAggregator.InterruptionReceived += interruption =>
 			{
-				var interruption = new Activity( name );
-				DispatcherHelper.SafeDispatch( _dispatcher, () => AddTask( interruption ) );
+				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
+				var newActivity = new Activity( interruption.Name );
+				newActivity.AddInterruption( interruption );
+				DispatcherHelper.SafeDispatch( _dispatcher, () => AddTask( newActivity ) );
 			};
 
 			// Start tracking processes.
@@ -255,10 +261,10 @@ namespace Laevo.Model
 
 			// Persist activities.
 			// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
-			Persist( ActivitiesFile, ActivitySerializer, _activities );
+			Persist( ActivitiesFile, _activitySerializer, _activities );
 
 			// Persist tasks.
-			Persist( TasksFile, ActivitySerializer, _tasks );
+			Persist( TasksFile, _activitySerializer, _tasks );
 
 			// Persist attention shifts.
 			Persist( AttentionShiftsFile, _attentionShiftSerializer, _attentionShifts );
@@ -285,6 +291,7 @@ namespace Laevo.Model
 			{
 				if ( File.Exists( backupFile ) )
 				{
+					File.Delete( file );
 					File.Move( backupFile, file );
 				}
 				MessageBox.Show( "Serialization of data to file \"" + file + "\" failed. Recent data will be lost.", "Saving data failed", MessageBoxButton.OK );

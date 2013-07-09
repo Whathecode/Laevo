@@ -140,6 +140,7 @@
 					<Binding Path="IsActive" />
 					<Binding Path="IsOpen" />
 					<Binding Path="HasOpenWindows" />
+					<Binding Path="HasUnattendedInterruptions" />
 				</MultiBinding>
 			</Border.BorderBrush>
 			

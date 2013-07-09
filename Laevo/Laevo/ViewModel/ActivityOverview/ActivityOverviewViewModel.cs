@@ -164,7 +164,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 
 				// Find the attention shifts which occured while the activity was open.
-				ReadOnlyCollection<Interval<DateTime>> openIntervals = activity.OpenIntervals;
+				IReadOnlyCollection<Interval<DateTime>> openIntervals = activity.OpenIntervals;
 				var attentionShifts = _model.AttentionShifts
 					.OfType<ActivityAttentionShift>()
 					.Where( shift => openIntervals.Any( i => i.LiesInInterval( shift.Time ) ) );
@@ -406,6 +406,13 @@ namespace Laevo.ViewModel.ActivityOverview
 				if ( Activities != null )
 				{
 					Activities.ForEach( a => a.Update( CurrentTime ) );
+				}
+			}
+			lock ( Tasks )
+			{
+				if ( Tasks != null )
+				{
+					Tasks.ForEach( t => t.Update( CurrentTime ) );
 				}
 			}
 		}

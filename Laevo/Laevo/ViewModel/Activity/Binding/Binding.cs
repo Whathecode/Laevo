@@ -16,6 +16,7 @@
 		IsActive,
 		IsOpen,
 		HasOpenWindows,
+		HasUnattendedInterruptions,
 		IsPlannedActivity
 	}
 
