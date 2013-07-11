@@ -48,7 +48,7 @@ namespace Laevo.Model
 			get { return _activities.AsReadOnly(); }
 		}
 
-		public event Action<Activity> TaskAdded;
+		public event Action<Activity> InterruptionAdded;
 		readonly List<Activity> _tasks = new List<Activity>();
 		public ReadOnlyCollection<Activity> Tasks
 		{
@@ -140,13 +140,17 @@ namespace Laevo.Model
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				var newActivity = new Activity( interruption.Name );
 				newActivity.AddInterruption( interruption );
-				DispatcherHelper.SafeDispatch( _dispatcher, () => AddTask( newActivity ) );
+				DispatcherHelper.SafeDispatch( _dispatcher, () =>
+				{
+					AddTask( newActivity ); 
+					InterruptionAdded( newActivity );	// TODO: This event should probably be removed and some other mechanism should be used.
+				} );
 			};
 
 			// Start tracking processes.
 			_processTracker.Start();
 			_processTracker.ProcessStopped += p =>
-			{				
+			{
 				// TODO: Improved verification, rather than just name.
 				if ( p.Name == "LogonUI.exe" )
 				{
@@ -229,8 +233,6 @@ namespace Laevo.Model
 		{
 			task.ActivatedEvent += OnActivityActivated;
 			_tasks.Insert( 0, task );
-
-			TaskAdded( task );
 		}
 
 		public void CreateActivityFromTask( Activity task )

@@ -194,14 +194,10 @@ namespace Laevo.ViewModel.ActivityOverview
 				AddTask( task );
 			}
 
-			// Listen for new tasks being added.
-			_model.TaskAdded += task =>
+			// Listen for new interruption tasks being added.
+			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
+			_model.InterruptionAdded += task =>
 			{
-				if ( Tasks.Any( t => t.Activity.Equals( task ) ) )
-				{
-					return;
-				}
-
 				var taskViewModel = new ActivityViewModel( this, task, _desktopManager )
 				{
 					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
