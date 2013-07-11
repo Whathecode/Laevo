@@ -97,7 +97,7 @@ namespace Laevo.ViewModel.Activity
 		public event ActivityEventHandler ActivityClosedEvent;
 
 		internal readonly Model.Activity Activity;
-		readonly DesktopManager _desktopManager;
+		readonly VirtualDesktopManager _desktopManager;
 		[DataMember]
 		VirtualDesktop _virtualDesktop;
 
@@ -239,12 +239,12 @@ namespace Laevo.ViewModel.Activity
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
-		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager )
+		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, VirtualDesktopManager desktopManager )
 			: this( overview, activity, desktopManager, desktopManager.CreateEmptyDesktop() )
 		{
 		}
 
-		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, DesktopManager desktopManager, VirtualDesktop desktop )
+		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
 		{
 			_overview = overview;
 			Activity = activity;
@@ -264,7 +264,7 @@ namespace Laevo.ViewModel.Activity
 		public ActivityViewModel(
 			ActivityOverviewViewModel overview,
 			Model.Activity activity,
-			DesktopManager desktopManager,
+			VirtualDesktopManager desktopManager,
 			ActivityViewModel storedViewModel,
 			IEnumerable<ActivityAttentionShift> activitySwitches )
 		{
