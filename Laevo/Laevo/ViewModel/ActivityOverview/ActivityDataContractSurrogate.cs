@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ABC.Windows;
 using ABC.Windows.Desktop;
 
 
@@ -26,10 +27,10 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
-		readonly DesktopManager _desktopManager;
+		readonly VirtualDesktopManager _desktopManager;
 
 
-		public ActivityDataContractSurrogate( DesktopManager desktopManager )
+		public ActivityDataContractSurrogate( VirtualDesktopManager desktopManager )
 		{
 			_desktopManager = desktopManager;
 		}

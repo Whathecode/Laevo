@@ -47,7 +47,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler ClosedActivityEvent;
 
 		readonly Model.Laevo _model;
-		readonly DesktopManager _desktopManager;
+		readonly VirtualDesktopManager _desktopManager;
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -125,7 +125,7 @@ namespace Laevo.ViewModel.ActivityOverview
 					// Simply ignore invalid files.
 				}
 			}
-			_desktopManager = new DesktopManager( vdmSettings );
+			_desktopManager = new VirtualDesktopManager( vdmSettings );
 
 			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(
