@@ -212,6 +212,10 @@
           <Project>{582661FF-FF3D-4CD3-8A52-3C75447E9F69}</Project>
           <Name>ABC.Interruptions</Name>
         </ProjectReference>
+        <ProjectReference Include="$(ABC-Toolkit)\ABC.Applications\ABC.Applications.csproj">
+          <Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
+          <Name>ABC.Applications</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -224,6 +228,9 @@
         </Reference>
         <Reference Include="ABC.Interruptions">
           <HintPath>..\Libraries\ABC Toolkit\ABC.Interruptions.dll</HintPath>
+        </Reference>
+        <Reference Include="ABC.Applications">
+          <HintPath>..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>

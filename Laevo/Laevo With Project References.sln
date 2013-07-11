@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.PInvoke", "..\..\..\Use
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Interruptions", "..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj", "{582661FF-FF3D-4CD3-8A52-3C75447E9F69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Applications", "..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Applications\ABC.Applications.csproj", "{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{582661FF-FF3D-4CD3-8A52-3C75447E9F69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{582661FF-FF3D-4CD3-8A52-3C75447E9F69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{582661FF-FF3D-4CD3-8A52-3C75447E9F69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

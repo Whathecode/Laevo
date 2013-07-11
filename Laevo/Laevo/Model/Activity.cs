@@ -63,14 +63,23 @@ namespace Laevo.Model
 		}
 
 		[DataMember]
-		readonly List<AbstractInterruption> _interruptions = new List<AbstractInterruption>(); 
+		List<AbstractInterruption> _interruptions = new List<AbstractInterruption>(); 
 
 		/// <summary>
 		///   Interruptions which interrupted the activity.
 		/// </summary>
 		public IReadOnlyCollection<AbstractInterruption> Interruptions
 		{
-			get { return _interruptions; }
+			get
+			{
+				// TODO: Why is this check necessary? Isn't the empty collection serialized?
+				if ( _interruptions == null )
+				{
+					_interruptions = new List<AbstractInterruption>();
+				}
+
+				return _interruptions;
+			}
 		}
 
 			/// <summary>
@@ -121,6 +130,10 @@ namespace Laevo.Model
 		/// </summary>
 		public void View()
 		{
+			Interruptions
+				.Where( i => !i.AttendedTo )
+				.ForEach( i => i.Open() );
+
 			if ( !IsActive )
 			{
 				IsActive = true;
