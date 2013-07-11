@@ -31,7 +31,8 @@ abc_toolkit = '..\\Libraries\\ABC Toolkit\\'
 abc_dlls = [
 	'ABC.Windows',
 	'ABC.PInvoke',
-	'ABC.Interruptions'
+	'ABC.Interruptions',
+	'ABC.Applications'
 	]
 abc_dlls.each do |d|
 	FileUtils.cp(
