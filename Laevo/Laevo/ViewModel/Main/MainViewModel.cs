@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -9,6 +10,7 @@ using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Laevo.ViewModel.Settings;
+using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
@@ -30,12 +32,21 @@ namespace Laevo.ViewModel.Main
 
 		public event Action GuiReset;
 
+		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
+		public int UnattendedInterruptions { get; private set; }
+
 
 		public MainViewModel( Model.Laevo model )
 		{			
 			_model = model;
 			_dispatcher = Dispatcher.CurrentDispatcher;
 			_model.LogonScreenExited += () => _dispatcher.Invoke( ResetGui );
+
+			_model.InterruptionAdded += a =>
+			{
+				a.ActivatedEvent += OnActivityActivated;
+				UnattendedInterruptions++;
+			};
 
 			EnsureActivityOverview();
 		}
@@ -61,6 +72,11 @@ namespace Laevo.ViewModel.Main
 			GuiReset();
 		}
 
+		void OnActivityActivated( Model.Activity activity )
+		{
+			activity.ActivatedEvent -= OnActivityActivated;
+			UnattendedInterruptions = _model.Activities.Concat( _model.Tasks ).Sum( a => a.Interruptions.Count( i => !i.AttendedTo ) );
+		}
 
 		[CommandExecute( Commands.Exit )]
 		public void Exit()

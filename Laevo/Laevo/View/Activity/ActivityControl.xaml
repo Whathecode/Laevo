@@ -39,7 +39,7 @@
 	
 	<UserControl.MinWidth>
 		<MultiBinding
-			Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">			
+			Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">
 			<Binding ElementName="Container" Path="IsMouseOver" />
 			<Binding ElementName="Buttons" Path="IsMouseOver" />
 			<Binding ElementName="Control" Path="ActualWidth" />

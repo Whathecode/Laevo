@@ -1,6 +1,9 @@
 ﻿namespace Laevo.ViewModel.Main.Binding
 {
-	public enum Properties { }
+	public enum Properties
+	{
+		UnattendedInterruptions
+	}
 
 	public enum Commands
 	{
