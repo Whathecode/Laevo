@@ -47,6 +47,7 @@ namespace Laevo.ViewModel.Main
 				a.ActivatedEvent += OnActivityActivated;
 				UnattendedInterruptions++;
 			};
+			_model.ActivityRemoved += a => UnattendedInterruptions -= a.Interruptions.Count( i => !i.AttendedTo );
 
 			EnsureActivityOverview();
 		}
