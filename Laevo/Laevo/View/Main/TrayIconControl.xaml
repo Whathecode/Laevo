@@ -8,8 +8,12 @@
 	xmlns:view="clr-namespace:Laevo.View.Main"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Main.Binding">
 
+	<UserControl.Resources>
+		<view:IconConverter x:Key="IconConverter" />
+	</UserControl.Resources>
+	
 	<tb:TaskbarIcon
-		IconSource="/View/Main/LaevoTray.ico"
+		IconSource="{Binding UnattendedInterruptions, Converter={StaticResource IconConverter}}"
 		ToolTipText="Laevo"
 		DataContext="{Binding ElementName=Control, Path=DataContext, Mode=OneWay}"
 		DoubleClickCommand="{view:TrayCommandBinding {x:Static b:Commands.ShowActivityOverview}}">

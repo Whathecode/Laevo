@@ -49,7 +49,7 @@ namespace Laevo.View.Main
 			InitializeKeyboardListener();
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
 			_updateLoop.Elapsed += OnUpdate;
-			_updateLoop.Start();			
+			_updateLoop.Start();
 
 			UpdateCapsLockState();
 
@@ -165,7 +165,7 @@ namespace Laevo.View.Main
 		{
 			// HACK: Verify whether caps lock was enabled/disabled without SwitchCapsLock being called. This indicates the global keyboard hook was silently removed.
 			//       http://msdn.microsoft.com/en-us/library/windows/desktop/ms646293(v=vs.85).aspx
-			bool keyboardHookLost = false;			
+			bool keyboardHookLost = false;
 			lock ( _switchingCapsLockLock )
 			{
 				bool isCapsEnabled = KeyHelper.IsCapsLockEnabled();
@@ -267,7 +267,7 @@ namespace Laevo.View.Main
 		}
 
 		void UpdateCapsLockState()
-		{			
+		{
 			string headerText = TurnCapsLockText + (_isCapsLockEnabled ? "Off" : "On");
 			DispatcherHelper.SafeDispatch( CapsLockMenuItem.Dispatcher, () => CapsLockMenuItem.Header = headerText );
 		}
