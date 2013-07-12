@@ -55,6 +55,8 @@ namespace Laevo.Model
 			get { return _tasks.AsReadOnly(); }
 		}
 
+		public event Action<Activity> ActivityRemoved;
+
 		public Activity HomeActivity { get; private set; }
 
 		public Activity CurrentActivity { get; private set; }
@@ -219,6 +221,8 @@ namespace Laevo.Model
 			{
 				_tasks.Remove( activity );
 			}
+
+			ActivityRemoved( activity );
 		}
 
 		public Activity CreateNewTask()
