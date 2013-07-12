@@ -113,7 +113,9 @@
 			MouseMove="OnMouseMoved"
 			Cursor="Hand"
 			Panel.ZIndex="15"
-			ClipToBounds="True">
+			ClipToBounds="True"
+			AllowDrop="True"
+			Drop="OnTaskDropped">
 			
 			<Border.CornerRadius>
 				<MultiBinding

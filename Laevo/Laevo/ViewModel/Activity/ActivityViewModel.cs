@@ -457,6 +457,26 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
+		///   Merges the passed activity with this activity.
+		///   TODO: For now only merging tasks with activities is supported, but this might need to be extended.
+		/// </summary>
+		/// <param name = "activity">The activity to merge with this activity.</param>
+		public void Merge( ActivityViewModel activity )
+		{
+			_overview.Remove( activity );
+			Activity.Merge( activity.Activity );
+			InitializeLibrary(); // The data paths of the merged activity need to be added to the library.
+
+			// Merge the virtual desktops.
+			if ( _overview.CurrentActivityViewModel == activity )
+			{
+				// A virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
+				ActivateActivity( false );
+			}
+			_desktopManager.Merge( activity._virtualDesktop, _virtualDesktop );
+		}
+
+		/// <summary>
 		///   Initialize the library which contains all the context files.
 		/// </summary>
 		void InitializeLibrary()

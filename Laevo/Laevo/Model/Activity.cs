@@ -82,7 +82,7 @@ namespace Laevo.Model
 			}
 		}
 
-			/// <summary>
+		/// <summary>
 		///   The specific folder created for this activity when it was first created. This is the default location where it's context is stored.
 		///   It can become null once it is removed by the user. This folder will be removed when the activity is deleted.
 		/// </summary>
@@ -202,6 +202,16 @@ namespace Laevo.Model
 			_openIntervals.Clear();
 			_currentOpenInterval = new Interval<DateTime>( atTime, atTime + duration );
 			_openIntervals.Add( _currentOpenInterval );
+		}
+
+		/// <summary>
+		///   Merges the passed activity into this activity.
+		/// </summary>
+		/// <param name = "activity">The activity to merge into this activity.</param>
+		public void Merge( Activity activity )
+		{
+			_interruptions.AddRange( activity.Interruptions );
+			_dataPaths.AddRange( activity._dataPaths );
 		}
 
 		/// <summary>
