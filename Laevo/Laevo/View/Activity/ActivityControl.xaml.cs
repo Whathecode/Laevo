@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Laevo.View.ActivityOverview;
+using Laevo.ViewModel.Activity;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
@@ -53,6 +54,18 @@ namespace Laevo.View.Activity
 		{
 			double xOffset = e.GetPosition( this ).X - Buttons.ActualWidth / 2;
 			Buttons.Margin = new Thickness( xOffset, Container.ActualHeight, 0, 0 );
+		}
+
+		void OnTaskDropped( object sender, DragEventArgs e )
+		{
+			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			if ( draggedTask == null )
+			{
+				return;
+			}
+
+			var dropTarget = (ActivityViewModel)DataContext;
+			dropTarget.Merge( draggedTask );
 		}
 	}
 }

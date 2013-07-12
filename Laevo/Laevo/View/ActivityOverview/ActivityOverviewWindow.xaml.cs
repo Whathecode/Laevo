@@ -56,6 +56,7 @@ namespace Laevo.View.ActivityOverview
 		[DependencyProperty( Properties.MoveTimeLine )]
 		public ICommand MoveTimeLineCommand { get; private set; }
 
+		bool _isDragOverActivity;
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
 
@@ -209,7 +210,10 @@ namespace Laevo.View.ActivityOverview
 			{
 				foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
 				{
-					TimeLine.Children.Remove( _activities[ activity ] );
+					ActivityControl control = _activities[ activity ];
+					control.DragEnter -= OnActivityDragStart;
+					control.DragLeave -= OnActivityDragStop;
+					TimeLine.Children.Remove( control );
 					_activities.Remove( activity );
 				}
 			}
@@ -228,8 +232,20 @@ namespace Laevo.View.ActivityOverview
 				DataContext = viewModel,
 				HorizontalAlignment = HorizontalAlignment.Left,
 			};
+			activity.DragEnter += OnActivityDragStart;
+			activity.DragLeave += OnActivityDragStop;
 			_activities.Add( viewModel, activity );
 			TimeLine.Children.Add( activity );
+		}
+
+		void OnActivityDragStop( object sender, DragEventArgs e )
+		{
+			_isDragOverActivity = false;
+		}
+
+		void OnActivityDragStart( object sender, DragEventArgs e )
+		{
+			_isDragOverActivity = true;
 		}
 
 		Interval<DateTime> _startDrag;
@@ -369,7 +385,7 @@ namespace Laevo.View.ActivityOverview
 				return;
 			}
 
-			IsTimeLineDraggedOver = true;
+			IsTimeLineDraggedOver = !_isDragOverActivity;
 			_timeLinePosition = _timeIndicator.TranslatePoint( new Point( 0, 0 ), TimeLineContainer ).X;
 		}
 
