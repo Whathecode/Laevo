@@ -463,6 +463,9 @@ namespace Laevo.ViewModel.Activity
 		/// <param name = "activity">The activity to merge with this activity.</param>
 		public void Merge( ActivityViewModel activity )
 		{
+			// Make sure that the current selected libraries are up to date, prior to merging the folders of the other activity.
+			UpdateLibrary();
+
 			_overview.Remove( activity );
 			Activity.Merge( activity.Activity );
 			InitializeLibrary(); // The data paths of the merged activity need to be added to the library.
@@ -477,6 +480,27 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
+		///   Store activity context paths from the shell library to this activity. This only works when this activity is active.
+		/// </summary>
+		void UpdateLibrary()
+		{
+			if ( _overview.CurrentActivityViewModel != this )
+			{
+				return;
+			}
+
+			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
+			{
+				var dataPaths = new List<Uri>();
+				foreach ( var folder in activityContext )
+				{
+					dataPaths.Add( new Uri( folder.Path ) );
+				}
+				Activity.SetNewDataPaths( dataPaths );
+			}
+		}
+
+		/// <summary>
 		///   Initialize the library which contains all the context files.
 		/// </summary>
 		void InitializeLibrary()
@@ -484,9 +508,13 @@ namespace Laevo.ViewModel.Activity
 			// Initialize the shell library.
 			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
 			var dataPaths = Activity.GetUpdatedDataPaths().ToArray();
-			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
+
+			if ( _overview.CurrentActivityViewModel == this )
 			{
-				Array.ForEach( dataPaths, p => activityContext.Add( p.LocalPath ) );
+				using ( var activityContext = new ShellLibrary( LibraryName, true ) )
+				{
+					Array.ForEach( dataPaths, p => activityContext.Add( p.LocalPath ) );
+				}
 			}
 		}
 
@@ -524,6 +552,7 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			UpdateHasOpenWindows();
+			UpdateLibrary();
 
 			// Store activity context paths.
 			// This can't be done in Persist(), since the same library is shared across activities.
@@ -533,7 +562,7 @@ namespace Laevo.ViewModel.Activity
 				foreach ( var folder in activityContext )
 				{
 					dataPaths.Add( new Uri( folder.Path ) );
-				}				
+				}
 				Activity.SetNewDataPaths( dataPaths );
 			}
 

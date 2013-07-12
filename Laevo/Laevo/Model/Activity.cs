@@ -114,7 +114,15 @@ namespace Laevo.Model
 
 		string CreateSafeFolderName()
 		{
-			return Path.Combine( ActivityContextPath, CreateFolderName() ).MakeUnique( p => !Directory.Exists( p ), "_i" );
+			string currentName = SpecificFolder.IfNotNull( f => f.LocalPath.Split( Path.DirectorySeparatorChar ).Last() );
+
+			return Path.Combine( ActivityContextPath, CreateFolderName() ).MakeUnique( p =>
+			{
+				string dirName = new Uri( p ).LocalPath.Split( Path.DirectorySeparatorChar ).Last();
+				return
+					( currentName != null && dirName != null && dirName.Equals( currentName ) ) // The current 'safe' name is already a desired name.
+					|| !Directory.Exists( p );
+			}, "_i" );
 		}
 
 		string CreateFolderName()
@@ -268,13 +276,19 @@ namespace Laevo.Model
 
 			// No new name set?
 			string desiredName = CreateFolderName();
-			if ( desiredName == SpecificFolder.LocalPath.Split( Path.DirectorySeparatorChar ).Last() )
+			string currentName = SpecificFolder.LocalPath.Split( Path.DirectorySeparatorChar ).Last();
+			if ( desiredName == currentName )
 			{
 				return;
 			}
 
 			// Attempt rename.
 			string newFolder = CreateSafeFolderName();
+			if ( newFolder == currentName )
+			{
+				// The current folder name is already a 'safe' desired name.
+				return;
+			}
 			var currentPath = new DirectoryInfo( SpecificFolder.LocalPath );
 			try
 			{
