@@ -362,6 +362,13 @@ namespace Laevo.View.ActivityOverview
 		double _timeLinePosition;
 		void OnTimeLineDragEnter( object sender, DragEventArgs e )
 		{
+			// Check whether a task is being dragged.
+			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			if ( draggedTask == null )
+			{
+				return;
+			}
+
 			IsTimeLineDraggedOver = true;
 			_timeLinePosition = _timeIndicator.TranslatePoint( new Point( 0, 0 ), TimeLineContainer ).X;
 		}
@@ -377,6 +384,11 @@ namespace Laevo.View.ActivityOverview
 			// TODO: GetPosition on the 3D viewport seems to be so expensive that it locks up the rendering thread.
 			//       Throttling the events somehwat resolves this, but is there a cleaner solution?
 			if ( !_throttleDragEvents.TryEnter() )
+			{
+				return;
+			}
+
+			if ( !IsTimeLineDraggedOver )
 			{
 				return;
 			}
@@ -416,7 +428,7 @@ namespace Laevo.View.ActivityOverview
 
 		void OnTimeLineDragDropped( object sender, DragEventArgs e )
 		{
-			var draggedTask = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
+			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
 			var overview = (ActivityOverviewViewModel)DataContext;
 
 			if ( draggedTask != null && overview != null )
