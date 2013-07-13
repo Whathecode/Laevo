@@ -33,11 +33,11 @@ namespace ABC.Interruptions.Google
 			set { this[ "password" ] = value; }
 		}
 
-		[ConfigurationProperty( "lastIssued" )]
-		public DateTime? LastIssued
+		[ConfigurationProperty( "lastModified" )]
+		public DateTime? LastModified
 		{
-			get { return (DateTime?)this[ "lastIssued" ]; }
-			set { this[ "lastIssued" ] = value; }
+			get { return (DateTime?)this[ "lastModified" ]; }
+			set { this[ "lastModified" ] = value; }
 		}
 	}
 }
