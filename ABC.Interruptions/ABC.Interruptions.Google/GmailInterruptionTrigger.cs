@@ -112,11 +112,27 @@ namespace ABC.Interruptions.Google
 				return;
 			}
 
-			// Trigger an interruption for every unread email.
+			// Open op the atom feed.
 			var doc = new XmlDocument();
 			doc.Load( mailStream );
 			var namespaceManager = new XmlNamespaceManager( doc.NameTable );
 			namespaceManager.AddNamespace( "atom", "http://purl.org/atom/ns#" );
+
+			// Check whether there are any new unread emails.
+			XmlNode modifiedNode = doc.SelectSingleNode( "//atom:modified", namespaceManager );
+			if ( modifiedNode == null )
+			{
+				return;
+			}
+			DateTime modified = ParseDate( modifiedNode.InnerText );
+			if ( _settings.LastModified != null && _settings.LastModified >= modified )
+			{
+				return;
+			}
+			_settings.LastModified = modified;
+			_config.Save();
+
+			// Trigger an interruption for every unread email.
 			XmlNodeList entries = doc.SelectNodes( "//atom:entry", namespaceManager );
 			if ( entries == null )
 			{
@@ -124,20 +140,6 @@ namespace ABC.Interruptions.Google
 			}
 			foreach ( XmlNode entry in entries )
 			{
-				XmlNode issuedNode = entry[ "issued" ];
-				if ( issuedNode == null )
-				{
-					return;
-				}
-				DateTime issued = ParseDate( issuedNode.InnerText );
-				if ( _settings.LastIssued != null && _settings.LastIssued >= issued )
-				{
-					// This mail has already been sent out as an interruption.
-					return;
-				}
-				_settings.LastIssued = issued;
-				_config.Save();
-
 				XmlNode titleNode = entry[ "title" ];
 				if ( titleNode == null )
 				{
