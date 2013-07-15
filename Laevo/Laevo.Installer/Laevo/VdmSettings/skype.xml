@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+	xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+	<!-- Skype is a single instance application. For now ignore it entirely. -->
+	<Process Name="Skype" CompanyName="Skype Technologies S.A.">
+		<IgnoreWindows Mode="AllExcept" />
+	</Process>
+
+</ProcessBehaviors>

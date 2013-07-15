@@ -325,7 +325,9 @@
 				<Button
 					Cursor="Hand"
 					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-					Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}">
+					Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}"
+					AllowDrop="True"
+					Drop="OnHomeDrop">
 					<Image Source="Images\Home.png" />
 				</Button>
 

@@ -67,6 +67,13 @@ namespace Laevo.View.TaskList
 
 		void OnDragTask( object sender, DragEventArgs e )
 		{
+			// Is it a task being dragged?
+			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			if ( draggedTask == null )
+			{
+				return;
+			}
+
 			// Reposition tasks while dragging.
 			Point currentPosition = e.GetPosition( Tasks );
 			var viewModel = (ActivityOverviewViewModel)DataContext;

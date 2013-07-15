@@ -87,9 +87,29 @@ namespace ABC.Interruptions.Google
 			_config.Save();
 		}
 
+		static bool HasInternetConnection()
+		{
+			try
+			{
+				using ( var client = new WebClient() )
+				using ( var stream = client.OpenRead( "http://www.google.com" ) )
+				{
+					return true;
+				}
+			}
+			catch
+			{
+				return false;
+			}
+		}
 
 		protected override void IntervalUpdate( DateTime now )
 		{
+			if ( !HasInternetConnection() )
+			{
+				return;
+			}
+
 			// Try retrieving the unread email stream until the correct login is specified, or decided not to log in.
 			Stream mailStream = null;
 			while ( _settings.IsEnabled && mailStream == null )

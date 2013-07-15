@@ -462,5 +462,16 @@ namespace Laevo.View.ActivityOverview
 			UpdateFocusedTime( Mouse.GetPosition( this ).X );
 			UpdateOffsetPercentage( Mouse.GetPosition( TimeLineContainer ).Y );
 		}
+
+		void OnHomeDrop( object sender, DragEventArgs e )
+		{
+			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			var overview = (ActivityOverviewViewModel)DataContext;
+
+			if ( draggedTask != null && overview != null )
+			{
+				overview.HomeActivity.Merge( draggedTask );
+			}
+		}
 	}
 }
