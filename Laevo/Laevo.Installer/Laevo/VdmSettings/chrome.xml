@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- Chrome. -->
+  <Process Name="chrome" CompanyName="Google Inc.">
+    <IgnoreWindows>
+	  <!-- Status bar. -->
+      <Window ClassName="Chrome_WidgetWin_0" />	  
+	  
+	  <!-- TODO: What is this? -->
+	  <Window ClassName="Messaging" />
+	  <Window ClassName="Base_PowerMessageWindow" />
+    </IgnoreWindows>
+    <HideBehavior>
+      <Default Hide="SelectedWindow" />
+	  <!-- Also take into account the currently visible status bar. -->
+      <Include ConsiderWindows="AllWindows">
+        <Window ClassName="Chrome_WidgetWin_0" Visible="True" />
+      </Include>
+    </HideBehavior>
+  </Process>
+
+</ProcessBehaviors>

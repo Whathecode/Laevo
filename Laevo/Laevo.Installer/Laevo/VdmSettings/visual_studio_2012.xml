@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- Visual Studio 2012. -->
+  <Process Name="devenv" CompanyName="Microsoft Corporation" Version="11.0">
+    <IgnoreWindows>
+      <Window ClassName="VsSolutionFileChangeTimerWindow" />
+    </IgnoreWindows>
+  </Process>
+
+</ProcessBehaviors> 
