@@ -23,7 +23,7 @@ namespace Laevo.View.Main
 	/// <summary>
 	/// Interaction logic for TrayIconControl.xaml
 	/// </summary>
-	partial class TrayIconControl
+	partial class TrayIconControl : IDisposable
 	{
 		const int UpdatesPerSecond = 25;
 
@@ -41,6 +41,7 @@ namespace Laevo.View.Main
 		public TrayIconControl( MainViewModel viewModel )
 		{
 			viewModel.GuiReset += ResetKeyStates;
+			//viewModel.Exiting += () => { Icon.Dispose(); };
 
 			InitializeComponent();
 
@@ -153,11 +154,30 @@ namespace Laevo.View.Main
 			_exclusiveConditions.Add( exclusiveCondition );
 		}
 
+		bool _isDisposed = false;
 		~TrayIconControl()
 		{
+			Dispose( false );
+		}
+
+		public void Dispose()
+		{
+			Dispose( true );
+		}
+
+		public void Dispose( bool isDisposing )
+		{
+			if ( _isDisposed )
+			{
+				return;
+			}
+
 			_updateLoop.Elapsed -= OnUpdate;
 			SafeKeyboardHookListenerDispose();
 			_updateLoop.Stop();
+			Icon.Dispose();
+
+			_isDisposed = true;
 		}
 
 
