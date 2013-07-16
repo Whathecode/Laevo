@@ -172,7 +172,7 @@ namespace ABC.Interruptions.Google
 				if ( !_settings.ProcessedEmails.Cast<ProcessedEmail>().Select( e => e.Id ).Contains( id ) )
 				{
 					_settings.ProcessedEmails.Add( id );
-					TriggerInterruption( new GmailInterruption( ServiceProvider, title, link ) );
+					TriggerInterruption( new GmailInterruption( title, link ) );
 				}
 			}
 

@@ -11,8 +11,8 @@ namespace ABC.Interruptions.Google
 		readonly string _link;
 
 
-		public GmailInterruption( ServiceProvider serviceProvider, string name, string link )
-			: base( serviceProvider, name )
+		public GmailInterruption( string name, string link )
+			: base( name )
 		{
 			_link = link;
 		}
