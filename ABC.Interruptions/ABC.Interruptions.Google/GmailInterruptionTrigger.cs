@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Configuration;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Security;
@@ -92,7 +93,7 @@ namespace ABC.Interruptions.Google
 			try
 			{
 				using ( var client = new WebClient() )
-				using ( var stream = client.OpenRead( "http://www.google.com" ) )
+				using ( client.OpenRead( "http://www.google.com" ) )
 				{
 					return true;
 				}
@@ -121,7 +122,6 @@ namespace ABC.Interruptions.Google
 				}
 				catch ( WebException )
 				{
-					// TODO: What when no internet is available?
 					DispatcherHelper.SafeDispatch( _dispatcher, AskSettings );
 				}
 			}
@@ -138,21 +138,8 @@ namespace ABC.Interruptions.Google
 			var namespaceManager = new XmlNamespaceManager( doc.NameTable );
 			namespaceManager.AddNamespace( "atom", "http://purl.org/atom/ns#" );
 
-			// Check whether there are any new unread emails.
-			XmlNode modifiedNode = doc.SelectSingleNode( "//atom:modified", namespaceManager );
-			if ( modifiedNode == null )
-			{
-				return;
-			}
-			DateTime modified = ParseDate( modifiedNode.InnerText );
-			if ( _settings.LastModified != null && _settings.LastModified >= modified )
-			{
-				return;
-			}
-			_settings.LastModified = modified;
-			_config.Save();
-
 			// Trigger an interruption for every unread email.
+			List<string> idsInFeed = new List<string>();
 			XmlNodeList entries = doc.SelectNodes( "//atom:entry", namespaceManager );
 			if ( entries == null )
 			{
@@ -163,24 +150,43 @@ namespace ABC.Interruptions.Google
 				XmlNode titleNode = entry[ "title" ];
 				if ( titleNode == null )
 				{
-					return;
+					break;
 				}
 				string title = titleNode.InnerText;
 
 				XmlNode linkNode = entry[ "link" ];
 				if ( linkNode == null || linkNode.Attributes == null )
 				{
-					return;
+					break;
 				}
 				string link = linkNode.Attributes[ "href" ].InnerText;
 
-				TriggerInterruption( new GmailInterruption( ServiceProvider, title, link ) );
+				XmlNode idNode = entry[ "id" ];
+				if ( idNode == null )
+				{
+					break;
+				}
+				string id = idNode.InnerText;
+				idsInFeed.Add( id );
+
+				if ( !_settings.ProcessedEmails.Cast<ProcessedEmail>().Select( e => e.Id ).Contains( id ) )
+				{
+					_settings.ProcessedEmails.Add( id );
+					TriggerInterruption( new GmailInterruption( ServiceProvider, title, link ) );
+				}
 			}
+
+			// Remove all read emails from read cache.
+			var toRemove = _settings.ProcessedEmails.Cast<ProcessedEmail>().Select( e => e.Id ).Where( id => !idsInFeed.Contains( id ) ).ToList();
+			toRemove.ForEach( r => _settings.ProcessedEmails.Remove( r ) );
+
+			_config.Save();
 		}
 
 		/// <summary>
 		///   Apparently the Gmail atom feed sometimes returns incorrect timestamps, after 24:00?
 		///   Added this fix as a precaution: http://stackoverflow.com/q/2000343/590790
+		///   TODO: Will we still need to be able to parse the date later on? I'll keep it here for now.
 		/// </summary>
 		static DateTime ParseDate( string dateTime )
 		{
