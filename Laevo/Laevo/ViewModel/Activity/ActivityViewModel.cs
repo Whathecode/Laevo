@@ -423,13 +423,14 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.Remove )]
 		public void Remove()
 		{
+			CloseActivity();
 			_overview.Remove( this );
 		}
 
 		[CommandCanExecute( Commands.Remove )]
 		public bool CanRemoveActivity()
 		{
-			return !HasOpenWindows && !IsOpen && !IsActive;
+			return !HasOpenWindows && !IsOpen;
 		}
 
 		public void UpdateHasOpenWindows()

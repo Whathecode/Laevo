@@ -243,7 +243,7 @@ namespace Laevo.ViewModel.Main
 				};
 				_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
-				_activityOverviewViewModel.ClosedActivityEvent += OnClosedActivityEvent;
+				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
 				_activityOverviewViewModel.ActivatedActivityEvent += ( activity, newActivity ) => UpdateUnattendedInterruptions();
 			}
 			_activityOverview = new ActivityOverviewWindow
@@ -268,7 +268,7 @@ namespace Laevo.ViewModel.Main
 			HideActivityOverview();
 		}
 
-		void OnClosedActivityEvent( ActivityViewModel viewModel )
+		void OnNoCurrentActiveActivityEvent()
 		{
 			// Open time line in order to select a new activity to continue work on.
 			SelectActivity( a => a.ActivateActivity( a.IsOpen ) );
