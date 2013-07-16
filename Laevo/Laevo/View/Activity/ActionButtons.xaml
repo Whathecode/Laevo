@@ -32,10 +32,9 @@
 			RenderTransformOrigin="0.5, 0.5"
 			RenderTransform="{StaticResource ResizeActionIcon}">
 			<Image.Opacity>
-				<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1] || [2]', IfTrue=0.3, IfFalse=1}">
+				<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1]', IfTrue=0.3, IfFalse=1}">
 					<Binding Path="HasOpenWindows" />
 					<Binding Path="IsOpen" />
-					<Binding Path="IsActive" />
 				</MultiBinding>
 			</Image.Opacity>
 		</Image>

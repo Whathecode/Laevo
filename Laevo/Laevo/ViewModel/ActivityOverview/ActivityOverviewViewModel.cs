@@ -42,9 +42,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler SelectedActivityEvent;
 
 		/// <summary>
-		///   Event which is triggered when an activity is closed.
+		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
-		public event ActivityViewModel.ActivityEventHandler ClosedActivityEvent;
+		public event Action NoCurrentActiveActivityEvent;
 
 		readonly Model.Laevo _model;
 		readonly VirtualDesktopManager _desktopManager;
@@ -282,6 +282,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// <param name = "activity">The task or activity to remove.</param>
 		public void Remove( ActivityViewModel activity )
 		{
+			if ( CurrentActivityViewModel == activity )
+			{
+				CurrentActivityViewModel = null;
+				NoCurrentActiveActivityEvent();
+			}
+
 			_model.Remove( activity.Activity );
 
 			if ( Activities.Contains( activity ) )
@@ -351,8 +357,11 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnActivityClosed( ActivityViewModel viewModel )
 		{
-			CurrentActivityViewModel = null;
-			ClosedActivityEvent( viewModel );
+			if ( viewModel == CurrentActivityViewModel )
+			{
+				CurrentActivityViewModel = null;
+				NoCurrentActiveActivityEvent();
+			}
 		}
 
 		void OnActivitySelected( ActivityViewModel viewModel )
@@ -416,6 +425,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void OnOverviewActivated()
 		{
 			_desktopManager.UpdateWindowAssociations();
+
+			// The currently active activity might have closed windows.
+			CurrentActivityViewModel.UpdateHasOpenWindows();
 		}
 		
 		public void CutWindow()
