@@ -19,8 +19,7 @@ namespace Laevo.Model
 	[DataContract]
 	class Activity
 	{
-		static readonly string ActivityContextPath 
-			= Path.Combine( Laevo.ProgramDataFolder, "Activities" );
+		static readonly string ActivityContextPath = Path.Combine( Laevo.ProgramDataFolder, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
 		public event Action<Activity> ClosedEvent;
@@ -51,9 +50,9 @@ namespace Laevo.Model
 		public DateTime DateCreated { get; private set; }
 
 		Interval<DateTime> _currentOpenInterval;
-		[DataMember]
-		readonly List<Interval<DateTime>> _openIntervals = new List<Interval<DateTime>>();
 
+		[DataMember]
+		List<Interval<DateTime>> _openIntervals;
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
@@ -63,23 +62,13 @@ namespace Laevo.Model
 		}
 
 		[DataMember]
-		List<AbstractInterruption> _interruptions = new List<AbstractInterruption>(); 
-
+		List<AbstractInterruption> _interruptions;
 		/// <summary>
 		///   Interruptions which interrupted the activity.
 		/// </summary>
 		public IReadOnlyCollection<AbstractInterruption> Interruptions
 		{
-			get
-			{
-				// TODO: Why is this check necessary? Isn't the empty collection serialized?
-				if ( _interruptions == null )
-				{
-					_interruptions = new List<AbstractInterruption>();
-				}
-
-				return _interruptions;
-			}
+			get { return _interruptions; }
 		}
 
 		/// <summary>
@@ -101,8 +90,9 @@ namespace Laevo.Model
 
 		public Activity( string name )
 		{
+			SetDefaults();
+
 			Name = name;
-			_dataPaths = new List<Uri>();
 			DateCreated = DateTime.Now;
 
 			// Create initial data path.
@@ -110,6 +100,20 @@ namespace Laevo.Model
 			activityDirectory.Create();
 			SpecificFolder = new Uri( activityDirectory.FullName );
 			_dataPaths.Add( SpecificFolder );
+		}
+
+
+		[OnDeserializing]
+		void OnDeserializing( StreamingContext context )
+		{
+			SetDefaults();
+		}
+
+		void SetDefaults()
+		{
+			_dataPaths = new List<Uri>();
+			_openIntervals = new List<Interval<DateTime>>();
+			_interruptions = new List<AbstractInterruption>();
 		}
 
 		string CreateSafeFolderName()
