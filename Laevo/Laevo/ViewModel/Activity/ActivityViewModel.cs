@@ -19,6 +19,7 @@ using Laevo.ViewModel.ActivityOverview.Binding;
 using Microsoft.WindowsAPICodePack.Shell;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
@@ -340,6 +341,9 @@ namespace Laevo.ViewModel.Activity
 			// Check whether activity is already active.
 			if ( this == _overview.CurrentActivityViewModel )
 			{
+				// Interruptions still need to be opened.
+				OpenInterruptions();
+
 				// The event is still necessary to indicate the user is no longer selecting an activity.
 				ActivatedActivityEvent( this );
 				return;
@@ -364,12 +368,21 @@ namespace Laevo.ViewModel.Activity
 			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
-			// It is important to first send out this event 
+			// It is important to first send out this event.
 			ActivatedActivityEvent( this );
 
 			// Initialize desktop.
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 			InitializeLibrary();
+
+			OpenInterruptions();
+		}
+
+		void OpenInterruptions()
+		{
+			Activity.Interruptions
+				.Where( i => !i.AttendedTo )
+				.ForEach( i => i.Open() );
 		}
 
 		[CommandExecute( Commands.OpenActivityLibrary )]

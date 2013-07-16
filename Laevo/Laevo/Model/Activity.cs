@@ -142,10 +142,6 @@ namespace Laevo.Model
 		/// </summary>
 		public void View()
 		{
-			Interruptions
-				.Where( i => !i.AttendedTo )
-				.ForEach( i => i.Open() );
-
 			if ( !IsActive )
 			{
 				IsActive = true;
