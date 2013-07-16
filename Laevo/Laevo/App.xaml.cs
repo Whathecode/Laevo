@@ -19,6 +19,7 @@ namespace Laevo
 	{
 		Model.Laevo _model;
 		MainViewModel _viewModel;
+		TrayIconControl _trayIcon;
 
 
 		protected override void OnStartup( StartupEventArgs e )
@@ -51,15 +52,13 @@ namespace Laevo
 			_viewModel = new MainViewModel( _model );
 
 			// Create View.
-			new TrayIconControl( _viewModel ) { DataContext = _viewModel };
+			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
 		}
 
 		protected override void OnExit( ExitEventArgs e )
 		{
-			if ( _viewModel != null )
-			{
-				_viewModel.Dispose();
-			}
+			_viewModel.Dispose();
+			_trayIcon.Dispose();
 		}
 	}
 }

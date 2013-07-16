@@ -13,6 +13,7 @@
 	</UserControl.Resources>
 	
 	<tb:TaskbarIcon
+		x:Name="Icon"
 		IconSource="{Binding UnattendedInterruptions, Converter={StaticResource IconConverter}}"
 		ToolTipText="Laevo"
 		DataContext="{Binding ElementName=Control, Path=DataContext, Mode=OneWay}"
