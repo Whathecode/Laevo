@@ -72,12 +72,6 @@ namespace Laevo.ViewModel.Main
 			GuiReset();
 		}
 
-		void OnActivityActivated( Model.Activity activity )
-		{
-			activity.ActivatedEvent -= OnActivityActivated;
-			UpdateUnattendedInterruptions();
-		}
-
 		void UpdateUnattendedInterruptions()
 		{
 			UnattendedInterruptions = _model.Activities.Concat( _model.Tasks ).Sum( a => a.Interruptions.Count( i => !i.AttendedTo ) );
@@ -244,7 +238,6 @@ namespace Laevo.ViewModel.Main
 				_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
-				_activityOverviewViewModel.ActivatedActivityEvent += ( activity, newActivity ) => UpdateUnattendedInterruptions();
 			}
 			_activityOverview = new ActivityOverviewWindow
 			{
@@ -255,6 +248,8 @@ namespace Laevo.ViewModel.Main
 		
 		void OnActivatedActivityEvent( ActivityViewModel oldActivity, ActivityViewModel newActivity )
 		{
+			UpdateUnattendedInterruptions();
+
 			if ( oldActivity != newActivity )
 			{
 				// Keep track of last 2 actived activities.
