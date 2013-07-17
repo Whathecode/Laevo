@@ -477,6 +477,8 @@ namespace Laevo.ViewModel.Activity
 		/// <param name = "activity">The activity to merge with this activity.</param>
 		public void Merge( ActivityViewModel activity )
 		{
+			bool isCurrentActivity = _overview.CurrentActivityViewModel == activity;
+
 			// Make sure that the current selected libraries are up to date, prior to merging the folders of the other activity.
 			UpdateLibrary();
 
@@ -485,7 +487,7 @@ namespace Laevo.ViewModel.Activity
 			InitializeLibrary(); // The data paths of the merged activity need to be added to the library.
 
 			// Merge the virtual desktops.
-			if ( _overview.CurrentActivityViewModel == activity )
+			if ( isCurrentActivity )
 			{
 				// A virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
 				ActivateActivity( false );
