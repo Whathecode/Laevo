@@ -427,7 +427,10 @@ namespace Laevo.ViewModel.ActivityOverview
 			_desktopManager.UpdateWindowAssociations();
 
 			// The currently active activity might have closed windows.
-			CurrentActivityViewModel.UpdateHasOpenWindows();
+			if ( CurrentActivityViewModel != null )
+			{
+				CurrentActivityViewModel.UpdateHasOpenWindows();
+			}
 		}
 		
 		public void CutWindow()
