@@ -529,6 +529,8 @@ namespace Laevo.ViewModel.Activity
 			{
 				using ( var activityContext = new ShellLibrary( LibraryName, true ) )
 				{
+					// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the Laevo icon.
+					activityContext.IconResourceId = new IconReference( Assembly.GetExecutingAssembly().Location, 0 );
 					Array.ForEach( dataPaths, p => activityContext.Add( p.LocalPath ) );
 				}
 			}
