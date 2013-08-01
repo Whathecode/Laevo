@@ -8,7 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ABC.Windows.Desktop;
@@ -529,9 +531,40 @@ namespace Laevo.ViewModel.Activity
 			{
 				using ( var activityContext = new ShellLibrary( LibraryName, true ) )
 				{
-					// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the Laevo icon.
+					// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the icon of the executing assembly.
 					activityContext.IconResourceId = new IconReference( Assembly.GetExecutingAssembly().Location, 0 );
-					Array.ForEach( dataPaths, p => activityContext.Add( p.LocalPath ) );
+
+					int retries = 5;
+					var pathsToAdd = new List<Uri>();
+					pathsToAdd.AddRange( dataPaths );
+					while ( pathsToAdd.Count > 0 && retries > 0 )
+					{
+						foreach ( Uri path in dataPaths )
+						{
+							try
+							{
+								activityContext.Add( path.LocalPath );
+								pathsToAdd.Remove( path );
+							}
+							catch ( COMException )
+							{
+								// TODO: How to handle/prevent the COMException which is sometimes thrown?
+								// System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced.
+							}
+							finally
+							{
+								--retries;
+							}
+						}
+					}
+					if ( pathsToAdd.Count > 0 )
+					{
+						MessageBox.Show(
+							"Something went wrong while initializing the Activity Context library, see whether this error still occurs when reopening this activity.",
+							"Error initializing Activity Context Library",
+							MessageBoxButton.OK,
+							MessageBoxImage.Error );
+					}
 				}
 			}
 		}
