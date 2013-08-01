@@ -21,11 +21,15 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			MouseDragged
+			MouseDragged,
+			IsDraggingActivity
 		}
 
 		[DependencyProperty( Properties.MouseDragged )]
 		public DelegateCommand<MouseBehavior.ClickDragInfo> MouseDragged { get; private set; }
+
+		[DependencyProperty( Properties.IsDraggingActivity )]
+		public bool IsDraggingActivity { get; private set; }
 
 
 		public ActivityControl()
@@ -38,6 +42,15 @@ namespace Laevo.View.Activity
 
 		void MoveActivity( MouseBehavior.ClickDragInfo e )
 		{
+			if ( e.State == MouseBehavior.ClickDragState.Start )
+			{
+				IsDraggingActivity = true;
+			}
+			else if ( e.State == MouseBehavior.ClickDragState.Stop )
+			{
+				IsDraggingActivity = false;
+			}
+
 			double offset = (double)GetValue( TimeLineControl.OffsetProperty );
 			SetValue( TimeLineControl.OffsetProperty, offset - e.Displacement.Y );
 		}

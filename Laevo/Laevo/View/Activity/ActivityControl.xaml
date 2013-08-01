@@ -97,9 +97,10 @@
 			<activity:ActionButtons x:Name="Buttons">
 				<activity:ActionButtons.Visibility>
 					<MultiBinding
-						Converter="{wtcConverters:ConditionConverter Expression='[0] || [1]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
+						Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and ![2]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
 						<Binding ElementName="Container" Path="IsMouseOver" />
 						<Binding ElementName="Buttons" Path="IsMouseOver" />
+						<Binding ElementName="Control" Path="IsDraggingActivity" />
 					</MultiBinding>
 				</activity:ActionButtons.Visibility>
 			</activity:ActionButtons>
