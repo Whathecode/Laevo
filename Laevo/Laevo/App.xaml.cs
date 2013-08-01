@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace Laevo
 
 			// Create exception logger.
 			DispatcherUnhandledException += ( s, a )
-				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramDataFolder, "log.txt" ), a.Exception.ToString() );
+				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramDataFolder, "log.txt" ), a.Exception.ToString() + Environment.NewLine );
 
 			// Create Model.
 			_model = new Model.Laevo();
