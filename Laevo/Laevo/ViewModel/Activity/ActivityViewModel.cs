@@ -183,7 +183,11 @@ namespace Laevo.ViewModel.Activity
 		public void OnLabelChanged( string oldLabel, string newLabel )
 		{
 			Activity.Name = newLabel;
-			InitializeLibrary();
+
+			if ( _overview.CurrentActivityViewModel == this )
+			{
+				InitializeLibrary();
+			}
 		}
 
 		/// <summary>
@@ -370,14 +374,13 @@ namespace Laevo.ViewModel.Activity
 			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
-			// It is important to first send out this event.
-			ActivatedActivityEvent( this );
-
 			// Initialize desktop.
 			_desktopManager.SwitchToDesktop( _virtualDesktop );
 			InitializeLibrary();
 
 			OpenInterruptions();
+
+			ActivatedActivityEvent( this );
 		}
 
 		void OpenInterruptions()
@@ -486,7 +489,10 @@ namespace Laevo.ViewModel.Activity
 
 			_overview.Remove( activity );
 			Activity.Merge( activity.Activity );
-			InitializeLibrary(); // The data paths of the merged activity need to be added to the library.
+			if ( _overview.CurrentActivityViewModel == this )
+			{
+				InitializeLibrary(); // The data paths of the merged activity need to be added to the library.
+			}
 
 			// Merge the virtual desktops.
 			if ( isCurrentActivity )
@@ -519,7 +525,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		///   Initialize the library which contains all the context files.
+		///   Initialize the library which contains all the context files. This should only be called when the activity is currently active.
 		/// </summary>
 		void InitializeLibrary()
 		{
@@ -527,44 +533,41 @@ namespace Laevo.ViewModel.Activity
 			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
 			var dataPaths = Activity.GetUpdatedDataPaths().ToArray();
 
-			if ( _overview.CurrentActivityViewModel == this )
+			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
 			{
-				using ( var activityContext = new ShellLibrary( LibraryName, true ) )
-				{
-					// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the icon of the executing assembly.
-					activityContext.IconResourceId = new IconReference( Assembly.GetExecutingAssembly().Location, 0 );
+				// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the icon of the executing assembly.
+				activityContext.IconResourceId = new IconReference( Assembly.GetExecutingAssembly().Location, 0 );
 
-					int retries = 5;
-					var pathsToAdd = new List<Uri>();
-					pathsToAdd.AddRange( dataPaths );
-					while ( pathsToAdd.Count > 0 && retries > 0 )
+				int retries = 5;
+				var pathsToAdd = new List<Uri>();
+				pathsToAdd.AddRange( dataPaths );
+				while ( pathsToAdd.Count > 0 && retries > 0 )
+				{
+					foreach ( Uri path in dataPaths )
 					{
-						foreach ( Uri path in dataPaths )
+						try
 						{
-							try
-							{
-								activityContext.Add( path.LocalPath );
-								pathsToAdd.Remove( path );
-							}
-							catch ( COMException )
-							{
-								// TODO: How to handle/prevent the COMException which is sometimes thrown?
-								// System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced.
-							}
-							finally
-							{
-								--retries;
-							}
+							activityContext.Add( path.LocalPath );
+							pathsToAdd.Remove( path );
+						}
+						catch ( COMException )
+						{
+							// TODO: How to handle/prevent the COMException which is sometimes thrown?
+							// System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced.
+						}
+						finally
+						{
+							--retries;
 						}
 					}
-					if ( pathsToAdd.Count > 0 )
-					{
-						MessageBox.Show(
-							"Something went wrong while initializing the Activity Context library, see whether this error still occurs when reopening this activity.",
-							"Error initializing Activity Context Library",
-							MessageBoxButton.OK,
-							MessageBoxImage.Error );
-					}
+				}
+				if ( pathsToAdd.Count > 0 )
+				{
+					MessageBox.Show(
+						"Something went wrong while initializing the Activity Context library, see whether this error still occurs when reopening this activity.",
+						"Error initializing Activity Context Library",
+						MessageBoxButton.OK,
+						MessageBoxImage.Error );
 				}
 			}
 		}
