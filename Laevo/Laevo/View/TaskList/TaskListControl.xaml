@@ -84,10 +84,6 @@
 								Padding="0, 0, 0, 10"
 								Background="Transparent">
 								<StackPanel Orientation="Horizontal">
-									<activity:ActionButtons
-										VerticalAlignment="Center"
-										ShowStartButton="False"
-										Margin="0, 0, 10, 0" />
 									<TextBox
 										x:Name="TaskName"
 										IsKeyboardFocusedChanged="OnTaskNameFocusChanged"
@@ -104,6 +100,10 @@
 											</ControlTemplate>
 										</TextBox.Template>
 									</TextBox>
+									<activity:ActionButtons
+										VerticalAlignment="Center"
+										ShowStartButton="False"
+										Margin="0, 0, 0, 0" />
 								</StackPanel>
 
 							</Border>
