@@ -344,9 +344,13 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>ABC.Applications.Primary_output</td><td>{DE79E0B4-7BC4-4760-BBB7-0A85C15DEF58}</td><td>INSTALLDIR</td><td>2</td><td/><td>abc.applications.primary_out</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ABC.Interruptions.Google.dll</td><td>{A22B986A-35F7-4569-862A-364E3315828A}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td>abc.interruptions.google.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ABC.Interruptions.Primary_output</td><td>{C4A56B27-74F1-435F-847D-D6F533E3A03D}</td><td>INSTALLDIR</td><td>2</td><td/><td>abc.interruptions.primary_ou</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ABC.PInvoke.Primary_output</td><td>{87355C4E-8956-47C9-B07B-FF30D2702108}</td><td>INSTALLDIR</td><td>2</td><td/><td>abc.pinvoke.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ABC.PInvoke.dll</td><td>{C2C6F14E-AF1D-490E-A938-184FE3400FB2}</td><td>VDMMONITOR</td><td>2</td><td/><td>abc.pinvoke.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ABC.Windows.Desktop.Monitor.exe</td><td>{30CFC4B2-8C52-4E69-8EDC-F5176B90145A}</td><td>VDMMONITOR</td><td>2</td><td/><td>abc.windows.desktop.monitor.</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ABC.Windows.Primary_output</td><td>{2DBD00BB-FE32-471C-925C-1052F7D79C90}</td><td>INSTALLDIR</td><td>2</td><td/><td>abc.windows.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ABC.Windows.dll</td><td>{CF884AF4-43A6-448C-B449-8D9942C32BFA}</td><td>VDMMONITOR</td><td>2</td><td/><td>abc.windows.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{5BBFCE5C-6C93-46EB-8138-C3DDF4F321A9}</td><td>PersonalFolder</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{2397C176-EBA4-4BE5-9D8D-269931D90ADB}</td><td>LAEVO1</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -356,12 +360,17 @@
 		<row><td>ISX_DEFAULTCOMPONENT5</td><td>{6A0002DE-F162-4996-9334-18CF0370A086}</td><td>VDMMONITOR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Laevo.Primary_output</td><td>{B233E505-66BD-4805-BB18-970C38858CB9}</td><td>INSTALLDIR</td><td>2</td><td/><td>laevo.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NCalc.dll</td><td>{4EA83AB1-7A58-4690-8067-8185E451B31E}</td><td>VDMMONITOR</td><td>2</td><td/><td>ncalc.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NCalc.dll1</td><td>{53EA7530-B791-4CEC-8883-A174BE70AD47}</td><td>INSTALLDIR</td><td>2</td><td/><td>ncalc.dll1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>PostSharp.dll</td><td>{89233C27-C986-4E88-8F33-9C4214D2E349}</td><td>VDMMONITOR</td><td>2</td><td/><td>postsharp.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>PostSharp.dll1</td><td>{868E6F2F-734C-4DC3-89D1-798BF390D2F4}</td><td>INSTALLDIR</td><td>2</td><td/><td>postsharp.dll1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>TriAxis.RunSharp.dll</td><td>{4777A9A8-3F5D-4051-BF06-88C7C12115E1}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td>triaxis.runsharp.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>TriAxis.RunSharp.dll1</td><td>{A45E1E29-678B-453A-A83D-371977C1A823}</td><td>INSTALLDIR</td><td>2</td><td/><td>triaxis.runsharp.dll1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>TriAxis.RunSharp.dll2</td><td>{490BA1FC-9ECA-4ED9-B5AC-0C953E40B7D4}</td><td>VDMMONITOR</td><td>2</td><td/><td>triaxis.runsharp.dll2</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.PresentationFramework.Aspects.Primary_output</td><td>{28788504-818C-4B10-BDC8-16338C95537C}</td><td>INSTALLDIR</td><td>2</td><td/><td>whathecode.presentationframe3</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.PresentationFramework.Aspects.dll</td><td>{FF005225-0597-4A35-85CF-E0EB22DC1826}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.presentationframe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.PresentationFramework.Primary_output</td><td>{F930C541-B750-498B-8E3D-4DBB251F7343}</td><td>INSTALLDIR</td><td>2</td><td/><td>whathecode.presentationframe2</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.PresentationFramework.dll</td><td>{6F4A91D2-156D-40D4-8F4A-A95C9DF71B43}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.presentationframe1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.System.Aspects.Primary_output</td><td>{036B2CAE-578A-4E43-99E1-51CE80DE55F8}</td><td>INSTALLDIR</td><td>2</td><td/><td>whathecode.system.aspects.pr</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.System.Aspects.dll</td><td>{4B839607-4522-4212-B69B-A54F05316A62}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.system.aspects.dl</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.System.Primary_output</td><td>{7EEF4FF0-7269-426A-883E-F58C3EF7EE38}</td><td>INSTALLDIR</td><td>2</td><td/><td>whathecode.system.primary_ou</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.System.dll</td><td>{6C53B945-7841-4B5E-9B1A-324A1B82244B}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td>whathecode.system.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1891,9 +1900,13 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>AlwaysInstall</td><td>ABC.Applications.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>ABC.Interruptions.Google.dll</td></row>
+		<row><td>AlwaysInstall</td><td>ABC.Interruptions.Primary_output</td></row>
+		<row><td>AlwaysInstall</td><td>ABC.PInvoke.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>ABC.PInvoke.dll</td></row>
 		<row><td>AlwaysInstall</td><td>ABC.Windows.Desktop.Monitor.exe</td></row>
+		<row><td>AlwaysInstall</td><td>ABC.Windows.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>ABC.Windows.dll</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
@@ -1903,12 +1916,17 @@
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT5</td></row>
 		<row><td>AlwaysInstall</td><td>Laevo.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>NCalc.dll</td></row>
+		<row><td>AlwaysInstall</td><td>NCalc.dll1</td></row>
 		<row><td>AlwaysInstall</td><td>PostSharp.dll</td></row>
+		<row><td>AlwaysInstall</td><td>PostSharp.dll1</td></row>
 		<row><td>AlwaysInstall</td><td>TriAxis.RunSharp.dll</td></row>
 		<row><td>AlwaysInstall</td><td>TriAxis.RunSharp.dll1</td></row>
 		<row><td>AlwaysInstall</td><td>TriAxis.RunSharp.dll2</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.PresentationFramework.Aspects.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.PresentationFramework.Aspects.dll</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.PresentationFramework.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.PresentationFramework.dll</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.System.Aspects.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.System.Aspects.dll</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.System.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.System.dll</td></row>
@@ -1927,17 +1945,23 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>abc.applications.primary_out</td><td>ABC.Applications.Primary_output</td><td>ABC.Applications.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ABC.Applications&gt;|Built</td><td>3</td><td/></row>
 		<row><td>abc.interruptions.google.dll</td><td>ABC.Interruptions.Google.dll</td><td>ABCINT~1.DLL|ABC.Interruptions.Google.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\InterruptionHandlers\ABC.Interruptions.Google.dll</td><td>1</td><td/></row>
+		<row><td>abc.interruptions.primary_ou</td><td>ABC.Interruptions.Primary_output</td><td>ABC.Interruptions.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ABC.Interruptions&gt;|Built</td><td>3</td><td/></row>
 		<row><td>abc.pinvoke.dll</td><td>ABC.PInvoke.dll</td><td>ABCPIN~1.DLL|ABC.PInvoke.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\ABC.PInvoke.dll</td><td>1</td><td/></row>
+		<row><td>abc.pinvoke.primary_output</td><td>ABC.PInvoke.Primary_output</td><td>ABC.PInvoke.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ABC.PInvoke&gt;|Built</td><td>3</td><td/></row>
 		<row><td>abc.windows.desktop.monitor.</td><td>ABC.Windows.Desktop.Monitor.exe</td><td>ABCWIN~1.EXE|ABC.Windows.Desktop.Monitor.exe</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\ABC.Windows.Desktop.Monitor.exe</td><td>1</td><td/></row>
 		<row><td>abc.windows.dll</td><td>ABC.Windows.dll</td><td>ABCWIN~1.DLL|ABC.Windows.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\ABC.Windows.dll</td><td>1</td><td/></row>
+		<row><td>abc.windows.primary_output</td><td>ABC.Windows.Primary_output</td><td>ABC.Windows.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ABC.Windows&gt;|Built</td><td>3</td><td/></row>
 		<row><td>asus.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>asus.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\asus.xml</td><td>1</td><td/></row>
 		<row><td>chrome.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>chrome.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\chrome.xml</td><td>1</td><td/></row>
 		<row><td>firefox.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>firefox.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\firefox.xml</td><td>1</td><td/></row>
 		<row><td>internet_explorer.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>INTERN~1.XML|internet_explorer.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\internet_explorer.xml</td><td>1</td><td/></row>
 		<row><td>laevo.primary_output</td><td>Laevo.Primary_output</td><td>Laevo.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Laevo&gt;|Built</td><td>3</td><td/></row>
 		<row><td>ncalc.dll</td><td>NCalc.dll</td><td>NCalc.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\NCalc.dll</td><td>1</td><td/></row>
+		<row><td>ncalc.dll1</td><td>NCalc.dll1</td><td>NCalc.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Libraries\Framework Class Library Extension\NCalc.dll</td><td>1</td><td/></row>
 		<row><td>postsharp.dll</td><td>PostSharp.dll</td><td>POSTSH~1.DLL|PostSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\PostSharp.dll</td><td>1</td><td/></row>
+		<row><td>postsharp.dll1</td><td>PostSharp.dll1</td><td>POSTSH~1.DLL|PostSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Libraries\Framework Class Library Extension\PostSharp.dll</td><td>1</td><td/></row>
 		<row><td>postsharp.xml</td><td>ISX_DEFAULTCOMPONENT5</td><td>POSTSH~1.XML|PostSharp.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\PostSharp.xml</td><td>1</td><td/></row>
 		<row><td>skype.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>skype.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\skype.xml</td><td>1</td><td/></row>
 		<row><td>triaxis.runsharp.dll</td><td>TriAxis.RunSharp.dll</td><td>TRIAXI~1.DLL|TriAxis.RunSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\InterruptionHandlers\TriAxis.RunSharp.dll</td><td>1</td><td/></row>
@@ -1946,7 +1970,10 @@
 		<row><td>visual_studio_2012.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>VISUAL~1.XML|visual_studio_2012.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\visual_studio_2012.xml</td><td>1</td><td/></row>
 		<row><td>whathecode.presentationframe</td><td>Whathecode.PresentationFramework.Aspects.dll</td><td>WHATHE~1.DLL|Whathecode.PresentationFramework.Aspects.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.PresentationFramework.Aspects.dll</td><td>1</td><td/></row>
 		<row><td>whathecode.presentationframe1</td><td>Whathecode.PresentationFramework.dll</td><td>WHATHE~1.DLL|Whathecode.PresentationFramework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.PresentationFramework.dll</td><td>1</td><td/></row>
+		<row><td>whathecode.presentationframe2</td><td>Whathecode.PresentationFramework.Primary_output</td><td>Whathecode.PresentationFramework.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Whathecode.PresentationFramework&gt;|Built</td><td>3</td><td/></row>
+		<row><td>whathecode.presentationframe3</td><td>Whathecode.PresentationFramework.Aspects.Primary_output</td><td>Whathecode.PresentationFramework.Aspects.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Whathecode.PresentationFramework.Aspects&gt;|Built</td><td>3</td><td/></row>
 		<row><td>whathecode.system.aspects.dl</td><td>Whathecode.System.Aspects.dll</td><td>WHATHE~1.DLL|Whathecode.System.Aspects.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.System.Aspects.dll</td><td>1</td><td/></row>
+		<row><td>whathecode.system.aspects.pr</td><td>Whathecode.System.Aspects.Primary_output</td><td>Whathecode.System.Aspects.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Whathecode.System.Aspects&gt;|Built</td><td>3</td><td/></row>
 		<row><td>whathecode.system.dll</td><td>Whathecode.System.dll</td><td>WHATHE~1.DLL|Whathecode.System.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\InterruptionHandlers\Whathecode.System.dll</td><td>1</td><td/></row>
 		<row><td>whathecode.system.dll1</td><td>Whathecode.System.dll1</td><td>WHATHE~1.DLL|Whathecode.System.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.System.dll</td><td>1</td><td/></row>
 		<row><td>whathecode.system.primary_ou</td><td>Whathecode.System.Primary_output</td><td>Whathecode.System.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Whathecode.System&gt;|Built</td><td>3</td><td/></row>
@@ -2208,9 +2235,13 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>ABC.Applications.Primary_output</td><td/><td/><td>_32278C11_4ACD_4B18_B814_35DD5C6538EF_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ABC.Interruptions.Google.dll</td><td/><td/><td>_E8E26F41_3007_4CE5_9910_7AF40B928187_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ABC.Interruptions.Primary_output</td><td/><td/><td>_248D495C_E8D0_4558_9965_DCBF46975224_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ABC.PInvoke.Primary_output</td><td/><td/><td>_C386D867_A4DA_4BA2_A15C_590176DCC17B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ABC.PInvoke.dll</td><td/><td/><td>_86DCB365_BA47_4A8D_BB43_DAD3ACE4FE76_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ABC.Windows.Desktop.Monitor.exe</td><td/><td/><td>_9353DDE3_8193_41DA_938E_969CC36CE79A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ABC.Windows.Primary_output</td><td/><td/><td>_AE0B6846_75CB_47A6_ABAB_827A5838B835_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ABC.Windows.dll</td><td/><td/><td>_78ECB6BB_4C61_4B56_886E_B5008B1217CA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_EC49DDA0_A505_4C91_AAE0_57521FE976F8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_4F37B461_9DC8_4FFD_B220_F5417AE90734_FILTER</td><td/><td/><td/><td/></row>
@@ -2220,12 +2251,17 @@
 		<row><td>ISX_DEFAULTCOMPONENT5</td><td/><td/><td>_C4AFCB10_3AE2_485A_B554_4F1010AEE040_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Laevo.Primary_output</td><td/><td/><td>_0D77B240_C2DF_4033_A370_93D0EEEB4AF1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NCalc.dll</td><td/><td/><td>_3A535097_B9F0_4E94_A191_A13AC25CEC93_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NCalc.dll1</td><td/><td/><td>_67390609_E639_4126_AE10_8192BCAEFE37_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>PostSharp.dll</td><td/><td/><td>_22457C01_7CEA_4244_878D_FB26B0AE39CE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>PostSharp.dll1</td><td/><td/><td>_6DD53856_5F71_4977_B168_579486356D9C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>TriAxis.RunSharp.dll</td><td/><td/><td>_78B07BBB_65E8_4962_892C_1F115FCF4BF3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>TriAxis.RunSharp.dll1</td><td/><td/><td>_AD52D276_4F71_48C2_ACEC_A3783B4559EB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>TriAxis.RunSharp.dll2</td><td/><td/><td>_DCB9FAB0_A9A9_43EB_BAC7_2CEBCC3CAF6C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.PresentationFramework.Aspects.Primary_output</td><td/><td/><td>_C7933893_49C4_458A_A25E_FD934F886CAD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.PresentationFramework.Aspects.dll</td><td/><td/><td>_B2BD872A_F79A_4C30_AC77_6BD4B8C680D3_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.PresentationFramework.Primary_output</td><td/><td/><td>_5E4CBC95_D471_4041_8EFC_BBD48B9D6369_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.PresentationFramework.dll</td><td/><td/><td>_220CDAB6_F56D_4D02_B5E4_1CC19D58AC98_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.System.Aspects.Primary_output</td><td/><td/><td>_8C5A555C_2403_4DE8_8089_140E561A78BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.System.Aspects.dll</td><td/><td/><td>_2DBAAB4E_00A8_4122_B90D_2D3A6938E8EC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.System.Primary_output</td><td/><td/><td>_1C4D471B_5F49_4393_A781_EF7690225E6F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.System.dll</td><td/><td/><td>_1496C1C9_E8F1_499B_A4A8_E569EF083FFC_FILTER</td><td/><td/><td/><td/></row>
@@ -2541,6 +2577,11 @@
 		<col def="S255">Value</col>
 		<col def="S255">TestValue</col>
 		<col def="i4">Type</col>
+		<row><td>ABC.Applications</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Applications\ABC.Applications.csproj</td><td/><td>2</td></row>
+		<row><td>ABC.Interruptions</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj</td><td/><td>2</td></row>
+		<row><td>ABC.Interruptions.Google</td><td>..\ABC.Interruptions\ABC.Interruptions.Google\ABC.Interruptions.Google.csproj</td><td/><td>2</td></row>
+		<row><td>ABC.PInvoke</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.PInvoke\ABC.PInvoke.csproj</td><td/><td>2</td></row>
+		<row><td>ABC.Windows</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Windows\ABC.Windows.csproj</td><td/><td>2</td></row>
 		<row><td>CommonFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISPROJECTDIR</td><td/><td/><td>1</td></row>
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
@@ -2549,7 +2590,10 @@
 		<row><td>Laevo</td><td>Laevo\Laevo.csproj</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
+		<row><td>Whathecode.PresentationFramework</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj</td><td/><td>2</td></row>
+		<row><td>Whathecode.PresentationFramework.Aspects</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj</td><td/><td>2</td></row>
 		<row><td>Whathecode.System</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj</td><td/><td>2</td></row>
+		<row><td>Whathecode.System.Aspects</td><td>..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj</td><td/><td>2</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
 	</table>
 

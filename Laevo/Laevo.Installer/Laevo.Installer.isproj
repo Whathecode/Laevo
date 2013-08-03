@@ -36,5 +36,33 @@
 			<Name>Whathecode.System</Name>
 			<Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
 		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj">
+			<Name>Whathecode.PresentationFramework</Name>
+			<Project>{9C755F97-8302-4415-AC95-FABFCDCE14B2}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
+			<Name>Whathecode.PresentationFramework.Aspects</Name>
+			<Project>{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj">
+			<Name>Whathecode.System.Aspects</Name>
+			<Project>{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Applications\ABC.Applications.csproj">
+			<Name>ABC.Applications</Name>
+			<Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj">
+			<Name>ABC.Interruptions</Name>
+			<Project>{582661FF-FF3D-4CD3-8A52-3C75447E9F69}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.PInvoke\ABC.PInvoke.csproj">
+			<Name>ABC.PInvoke</Name>
+			<Project>{072142C4-284E-4F1A-A1FE-F886E8ECF728}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC\ABC.Windows\ABC.Windows.csproj">
+			<Name>ABC.Windows</Name>
+			<Project>{DB8DBDF2-70BF-4712-86DA-06674986BC12}</Project>
+		</ProjectReference>
 	</ItemGroup>
 </Project>
