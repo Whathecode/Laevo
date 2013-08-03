@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using ABC.Applications;
+using Laevo.Model;
 using Laevo.View.ActivityOverview;
 using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
@@ -104,6 +106,13 @@ namespace Laevo.ViewModel.Main
 			};
 			
 			settingsWindow.Show();
+		}
+
+		readonly LaevoServiceProvider _serviceProvider = new LaevoServiceProvider();
+		[CommandExecute( Commands.Help )]
+		public void OpenManual()
+		{
+			_serviceProvider.Browser.OpenWebsite( "http://whathecode.wordpress.com/laevo/" );
 		}
 
 		[CommandExecute( Commands.ShowActivityOverview )]
