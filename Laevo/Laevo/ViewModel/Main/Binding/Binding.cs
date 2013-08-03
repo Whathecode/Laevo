@@ -9,6 +9,7 @@
 	{
 		Exit,
 		OpenSettings,
+		Help,
 		ShowActivityOverview,
 		HideActivityOverview,
 		SwitchActivityOverview,
