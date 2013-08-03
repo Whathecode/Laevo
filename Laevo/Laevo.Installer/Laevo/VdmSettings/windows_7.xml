@@ -34,6 +34,9 @@
       <Window ClassName="Desktop User Picture" />
       <!-- Desktop icons. -->
       <Window ClassName="Progman" />
+	  <!-- View available networks dialog and tooltip. -->
+	  <Window ClassName="NativeHWNDHost" />
+	  <Window ClassName="VANUITooltip" />
 	  
 	  <!-- TODO: Get more information on these windows, what they are, and whether they should really be ignored. -->
       <Window ClassName="_SearchEditBoxFakeWindow" />

@@ -345,16 +345,27 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>ABC.Interruptions.Google.dll</td><td>{A22B986A-35F7-4569-862A-364E3315828A}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td>abc.interruptions.google.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ABC.PInvoke.dll</td><td>{C2C6F14E-AF1D-490E-A938-184FE3400FB2}</td><td>VDMMONITOR</td><td>2</td><td/><td>abc.pinvoke.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ABC.Windows.Desktop.Monitor.exe</td><td>{30CFC4B2-8C52-4E69-8EDC-F5176B90145A}</td><td>VDMMONITOR</td><td>2</td><td/><td>abc.windows.desktop.monitor.</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ABC.Windows.dll</td><td>{CF884AF4-43A6-448C-B449-8D9942C32BFA}</td><td>VDMMONITOR</td><td>2</td><td/><td>abc.windows.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{5BBFCE5C-6C93-46EB-8138-C3DDF4F321A9}</td><td>PersonalFolder</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{2397C176-EBA4-4BE5-9D8D-269931D90ADB}</td><td>LAEVO1</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{91AB4807-6146-4CEF-8410-56245B2B2419}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{AA31926B-D69C-4AAC-9DFA-6FEC442DE158}</td><td>VDMSETTINGS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT4</td><td>{0E72BBEF-BD79-4A9D-8E3D-3B5A7604EE5D}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT5</td><td>{6A0002DE-F162-4996-9334-18CF0370A086}</td><td>VDMMONITOR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Laevo.Primary_output</td><td>{B233E505-66BD-4805-BB18-970C38858CB9}</td><td>INSTALLDIR</td><td>2</td><td/><td>laevo.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NCalc.dll</td><td>{4EA83AB1-7A58-4690-8067-8185E451B31E}</td><td>VDMMONITOR</td><td>2</td><td/><td>ncalc.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>PostSharp.dll</td><td>{89233C27-C986-4E88-8F33-9C4214D2E349}</td><td>VDMMONITOR</td><td>2</td><td/><td>postsharp.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>TriAxis.RunSharp.dll</td><td>{4777A9A8-3F5D-4051-BF06-88C7C12115E1}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td>triaxis.runsharp.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>TriAxis.RunSharp.dll1</td><td>{A45E1E29-678B-453A-A83D-371977C1A823}</td><td>INSTALLDIR</td><td>2</td><td/><td>triaxis.runsharp.dll1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>TriAxis.RunSharp.dll2</td><td>{490BA1FC-9ECA-4ED9-B5AC-0C953E40B7D4}</td><td>VDMMONITOR</td><td>2</td><td/><td>triaxis.runsharp.dll2</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.PresentationFramework.Aspects.dll</td><td>{FF005225-0597-4A35-85CF-E0EB22DC1826}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.presentationframe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.PresentationFramework.dll</td><td>{6F4A91D2-156D-40D4-8F4A-A95C9DF71B43}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.presentationframe1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.System.Aspects.dll</td><td>{4B839607-4522-4212-B69B-A54F05316A62}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.system.aspects.dl</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.System.Primary_output</td><td>{7EEF4FF0-7269-426A-883E-F58C3EF7EE38}</td><td>INSTALLDIR</td><td>2</td><td/><td>whathecode.system.primary_ou</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Whathecode.System.dll</td><td>{6C53B945-7841-4B5E-9B1A-324A1B82244B}</td><td>INTERRUPTIONHANDLERS</td><td>2</td><td/><td>whathecode.system.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Whathecode.System.dll1</td><td>{07B2F7C6-9530-45DA-B868-59270FC9DF5E}</td><td>VDMMONITOR</td><td>2</td><td/><td>whathecode.system.dll1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1184,6 +1195,7 @@
 		<row><td>TempFolder</td><td>TARGETDIR</td><td>.:Temp</td><td/><td>0</td><td/></row>
 		<row><td>TemplateFolder</td><td>TARGETDIR</td><td>.:ShellNew</td><td/><td>0</td><td/></row>
 		<row><td>USERPROFILE</td><td>TARGETDIR</td><td>.:USERPR~1|UserProfile</td><td/><td>0</td><td/></row>
+		<row><td>VDMMONITOR</td><td>LAEVO1</td><td>VDMMON~1|VdmMonitor</td><td/><td>0</td><td/></row>
 		<row><td>VDMSETTINGS</td><td>LAEVO1</td><td>VDMSET~1|VdmSettings</td><td/><td>0</td><td/></row>
 		<row><td>WHATHECODE</td><td>ProgramFilesFolder</td><td>WHATHE~1|Whathecode</td><td/><td>0</td><td/></row>
 		<row><td>WindowsFolder</td><td>TARGETDIR</td><td>.:Windows</td><td/><td>0</td><td/></row>
@@ -1880,16 +1892,27 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>AlwaysInstall</td><td>ABC.Interruptions.Google.dll</td></row>
+		<row><td>AlwaysInstall</td><td>ABC.PInvoke.dll</td></row>
+		<row><td>AlwaysInstall</td><td>ABC.Windows.Desktop.Monitor.exe</td></row>
+		<row><td>AlwaysInstall</td><td>ABC.Windows.dll</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT2</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT3</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT4</td></row>
+		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT5</td></row>
 		<row><td>AlwaysInstall</td><td>Laevo.Primary_output</td></row>
+		<row><td>AlwaysInstall</td><td>NCalc.dll</td></row>
+		<row><td>AlwaysInstall</td><td>PostSharp.dll</td></row>
 		<row><td>AlwaysInstall</td><td>TriAxis.RunSharp.dll</td></row>
 		<row><td>AlwaysInstall</td><td>TriAxis.RunSharp.dll1</td></row>
+		<row><td>AlwaysInstall</td><td>TriAxis.RunSharp.dll2</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.PresentationFramework.Aspects.dll</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.PresentationFramework.dll</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.System.Aspects.dll</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.System.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>Whathecode.System.dll</td></row>
+		<row><td>AlwaysInstall</td><td>Whathecode.System.dll1</td></row>
 	</table>
 
 	<table name="File">
@@ -1905,16 +1928,27 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>abc.interruptions.google.dll</td><td>ABC.Interruptions.Google.dll</td><td>ABCINT~1.DLL|ABC.Interruptions.Google.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\InterruptionHandlers\ABC.Interruptions.Google.dll</td><td>1</td><td/></row>
+		<row><td>abc.pinvoke.dll</td><td>ABC.PInvoke.dll</td><td>ABCPIN~1.DLL|ABC.PInvoke.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\ABC.PInvoke.dll</td><td>1</td><td/></row>
+		<row><td>abc.windows.desktop.monitor.</td><td>ABC.Windows.Desktop.Monitor.exe</td><td>ABCWIN~1.EXE|ABC.Windows.Desktop.Monitor.exe</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\ABC.Windows.Desktop.Monitor.exe</td><td>1</td><td/></row>
+		<row><td>abc.windows.dll</td><td>ABC.Windows.dll</td><td>ABCWIN~1.DLL|ABC.Windows.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\ABC.Windows.dll</td><td>1</td><td/></row>
 		<row><td>asus.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>asus.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\asus.xml</td><td>1</td><td/></row>
 		<row><td>chrome.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>chrome.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\chrome.xml</td><td>1</td><td/></row>
 		<row><td>firefox.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>firefox.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\firefox.xml</td><td>1</td><td/></row>
 		<row><td>internet_explorer.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>INTERN~1.XML|internet_explorer.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\internet_explorer.xml</td><td>1</td><td/></row>
 		<row><td>laevo.primary_output</td><td>Laevo.Primary_output</td><td>Laevo.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Laevo&gt;|Built</td><td>3</td><td/></row>
+		<row><td>ncalc.dll</td><td>NCalc.dll</td><td>NCalc.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\NCalc.dll</td><td>1</td><td/></row>
+		<row><td>postsharp.dll</td><td>PostSharp.dll</td><td>POSTSH~1.DLL|PostSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\PostSharp.dll</td><td>1</td><td/></row>
+		<row><td>postsharp.xml</td><td>ISX_DEFAULTCOMPONENT5</td><td>POSTSH~1.XML|PostSharp.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\PostSharp.xml</td><td>1</td><td/></row>
 		<row><td>skype.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>skype.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\skype.xml</td><td>1</td><td/></row>
 		<row><td>triaxis.runsharp.dll</td><td>TriAxis.RunSharp.dll</td><td>TRIAXI~1.DLL|TriAxis.RunSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\InterruptionHandlers\TriAxis.RunSharp.dll</td><td>1</td><td/></row>
 		<row><td>triaxis.runsharp.dll1</td><td>TriAxis.RunSharp.dll1</td><td>TRIAXI~1.DLL|TriAxis.RunSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Libraries\Framework Class Library Extension\TriAxis.RunSharp.dll</td><td>1</td><td/></row>
+		<row><td>triaxis.runsharp.dll2</td><td>TriAxis.RunSharp.dll2</td><td>TRIAXI~1.DLL|TriAxis.RunSharp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\TriAxis.RunSharp.dll</td><td>1</td><td/></row>
 		<row><td>visual_studio_2012.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>VISUAL~1.XML|visual_studio_2012.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\visual_studio_2012.xml</td><td>1</td><td/></row>
+		<row><td>whathecode.presentationframe</td><td>Whathecode.PresentationFramework.Aspects.dll</td><td>WHATHE~1.DLL|Whathecode.PresentationFramework.Aspects.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.PresentationFramework.Aspects.dll</td><td>1</td><td/></row>
+		<row><td>whathecode.presentationframe1</td><td>Whathecode.PresentationFramework.dll</td><td>WHATHE~1.DLL|Whathecode.PresentationFramework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.PresentationFramework.dll</td><td>1</td><td/></row>
+		<row><td>whathecode.system.aspects.dl</td><td>Whathecode.System.Aspects.dll</td><td>WHATHE~1.DLL|Whathecode.System.Aspects.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.System.Aspects.dll</td><td>1</td><td/></row>
 		<row><td>whathecode.system.dll</td><td>Whathecode.System.dll</td><td>WHATHE~1.DLL|Whathecode.System.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\InterruptionHandlers\Whathecode.System.dll</td><td>1</td><td/></row>
+		<row><td>whathecode.system.dll1</td><td>Whathecode.System.dll1</td><td>WHATHE~1.DLL|Whathecode.System.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\Steven Jeuris\Documents\GitHub\ABC\Tools\Virtual Desktop Monitor\Whathecode.System.dll</td><td>1</td><td/></row>
 		<row><td>whathecode.system.primary_ou</td><td>Whathecode.System.Primary_output</td><td>Whathecode.System.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Whathecode.System&gt;|Built</td><td>3</td><td/></row>
 		<row><td>windows_7.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>WINDOW~1.XML|windows_7.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\windows_7.xml</td><td>1</td><td/></row>
 		<row><td>windows_photo_viewer.xml</td><td>ISX_DEFAULTCOMPONENT3</td><td>WINDOW~1.XML|windows_photo_viewer.xml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Whathecode\Laevo\Laevo\Laevo.Installer\Laevo\VdmSettings\windows_photo_viewer.xml</td><td>1</td><td/></row>
@@ -2175,16 +2209,27 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>ABC.Interruptions.Google.dll</td><td/><td/><td>_E8E26F41_3007_4CE5_9910_7AF40B928187_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ABC.PInvoke.dll</td><td/><td/><td>_86DCB365_BA47_4A8D_BB43_DAD3ACE4FE76_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ABC.Windows.Desktop.Monitor.exe</td><td/><td/><td>_9353DDE3_8193_41DA_938E_969CC36CE79A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ABC.Windows.dll</td><td/><td/><td>_78ECB6BB_4C61_4B56_886E_B5008B1217CA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_EC49DDA0_A505_4C91_AAE0_57521FE976F8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_4F37B461_9DC8_4FFD_B220_F5417AE90734_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_0F282D0A_DDA5_4CF7_8B6F_E3F27B35FE5F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_F1389CAA_1BFC_4296_A9E7_F9B3E9296127_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT4</td><td/><td/><td>_65ABE731_D1AF_475D_8AB9_102563DF6E5B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT5</td><td/><td/><td>_C4AFCB10_3AE2_485A_B554_4F1010AEE040_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Laevo.Primary_output</td><td/><td/><td>_0D77B240_C2DF_4033_A370_93D0EEEB4AF1_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NCalc.dll</td><td/><td/><td>_3A535097_B9F0_4E94_A191_A13AC25CEC93_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>PostSharp.dll</td><td/><td/><td>_22457C01_7CEA_4244_878D_FB26B0AE39CE_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>TriAxis.RunSharp.dll</td><td/><td/><td>_78B07BBB_65E8_4962_892C_1F115FCF4BF3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>TriAxis.RunSharp.dll1</td><td/><td/><td>_AD52D276_4F71_48C2_ACEC_A3783B4559EB_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>TriAxis.RunSharp.dll2</td><td/><td/><td>_DCB9FAB0_A9A9_43EB_BAC7_2CEBCC3CAF6C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.PresentationFramework.Aspects.dll</td><td/><td/><td>_B2BD872A_F79A_4C30_AC77_6BD4B8C680D3_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.PresentationFramework.dll</td><td/><td/><td>_220CDAB6_F56D_4D02_B5E4_1CC19D58AC98_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.System.Aspects.dll</td><td/><td/><td>_2DBAAB4E_00A8_4122_B90D_2D3A6938E8EC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.System.Primary_output</td><td/><td/><td>_1C4D471B_5F49_4393_A781_EF7690225E6F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Whathecode.System.dll</td><td/><td/><td>_1496C1C9_E8F1_499B_A4A8_E569EF083FFC_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Whathecode.System.dll1</td><td/><td/><td>_16E58853_2CE9_4E20_A39B_DD290D40A272_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -4542,7 +4587,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]Laevo.Primary output</td><td/></row>
 		<row><td>ProductCode</td><td>{A96B4A61-9FD9-4CC8-B876-ABF3282E6ACE}</td><td/></row>
 		<row><td>ProductName</td><td>Laevo</td><td/></row>
-		<row><td>ProductVersion</td><td>0.1.2</td><td/></row>
+		<row><td>ProductVersion</td><td>0.1.3</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
