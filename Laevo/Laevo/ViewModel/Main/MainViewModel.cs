@@ -46,7 +46,7 @@ namespace Laevo.ViewModel.Main
 			{
 				UnattendedInterruptions++;
 			};
-			_model.ActivityRemoved += a => UpdateUnattendedInterruptions();			
+			_model.ActivityRemoved += a => UpdateUnattendedInterruptions();
 
 			EnsureActivityOverview();
 		}
@@ -237,6 +237,7 @@ namespace Laevo.ViewModel.Main
 				};
 				_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
+				_activityOverviewViewModel.RemovedActivityEvent += OnRemovedActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
 			}
 			_activityOverview = new ActivityOverviewWindow
@@ -245,7 +246,7 @@ namespace Laevo.ViewModel.Main
 			};
 			_activityOverview.Activated += ( sender, args ) => _activityOverviewViewModel.OnOverviewActivated();
 		}
-		
+
 		void OnActivatedActivityEvent( ActivityViewModel oldActivity, ActivityViewModel newActivity )
 		{
 			UpdateUnattendedInterruptions();
@@ -261,6 +262,20 @@ namespace Laevo.ViewModel.Main
 			}
 
 			HideActivityOverview();
+		}
+
+		void OnRemovedActivityEvent( ActivityViewModel removed )
+		{
+			if ( !_lastActivatedActivities.Contains( removed ) )
+			{
+				return;
+			}
+
+			var lastActivated = _lastActivatedActivities.ToList();
+			_lastActivatedActivities.Clear();
+			lastActivated
+				.Where( a => a != removed )
+				.ForEach( _lastActivatedActivities.Enqueue );
 		}
 
 		void OnNoCurrentActiveActivityEvent()

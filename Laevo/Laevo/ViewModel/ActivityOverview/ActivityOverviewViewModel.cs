@@ -37,6 +37,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivitySwitchEventHandler ActivatedActivityEvent;
 
 		/// <summary>
+		///   Event which is triggered when an activity is removed.
+		/// </summary>
+		public event Action<ActivityViewModel> RemovedActivityEvent;
+
+		/// <summary>
 		///   Event which is triggered when an activity is selected.
 		/// </summary>
 		public event ActivityViewModel.ActivityEventHandler SelectedActivityEvent;
@@ -311,6 +316,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
 			activity.ActivityClosedEvent -= OnActivityClosed;
+
+			RemovedActivityEvent( activity );
 		}
 
 		public void SwapTaskOrder( ActivityViewModel task1, ActivityViewModel task2 )
