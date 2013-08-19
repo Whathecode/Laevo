@@ -366,6 +366,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			if ( viewModel == CurrentActivityViewModel )
 			{
+				// HACK: Since this activity is closed, CurrentActivityViewModel will be set to null next time the overview is activated and its state won't be updated.
+				//       Therefore, already update the window states now. This is a temporary solution.
+				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
+				_desktopManager.UpdateWindowAssociations();
+				viewModel.UpdateHasOpenWindows();
+
 				CurrentActivityViewModel = null;
 				NoCurrentActiveActivityEvent();
 			}
