@@ -1,4 +1,5 @@
 ﻿using System;
+using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System.Windows.Data;
 using Laevo.ViewModel.ActivityOverview.Binding;
 

@@ -1,4 +1,4 @@
-﻿namespace Laevo.ViewModel.ActivityOverview.Binding
+﻿namespace Laevo.ViewModel.ActivityOverview
 {
 	public enum Mode
 	{
