@@ -342,7 +342,7 @@
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="Model\ProcessInfo.cs" />
     <Compile Include="Model\ProcessTracker.cs" />
-    <Compile Include="Model\ServiceProvider.cs" />
+    <Compile Include="Model\LaevoServiceProvider.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="RequiresPostSharp.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
