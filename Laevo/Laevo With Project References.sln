@@ -39,6 +39,11 @@ Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "Laevo.Installer", "Laevo.In
 		{EE753682-D3BD-45EE-9B42-9B8F1902D250} = {EE753682-D3BD-45EE-9B42-9B8F1902D250}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{181414DA-0FC1-44A7-8E56-4FD6EAE37C33}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CD_ROM|Any CPU = CD_ROM|Any CPU
