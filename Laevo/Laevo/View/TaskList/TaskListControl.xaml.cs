@@ -43,7 +43,7 @@ namespace Laevo.View.TaskList
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				Common.ForceUpdateSource( e );
+				Common.ForceUpdate( (UIElement)e.Source );
 				e.Handled = true;
 			}
 		}

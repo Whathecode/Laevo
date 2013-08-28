@@ -77,6 +77,7 @@
 					</Image.Margin>
 				</Image>
 				<TextBox
+					x:Name="ActivityName"
 					Background="Transparent"
 					BorderBrush="Transparent"
 					Foreground="White"
@@ -181,7 +182,7 @@
 								Converter="{StaticResource TimeSpanConverter}"
 								ConverterParameter="Start">
 								<Binding Path="." />
-								<Binding ElementName="Control" Path="DataContext.Occurance" />
+								<Binding ElementName="Control" Path="DataContext.Occurance" />	
 								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
 								<Binding ElementName="Container" Path="ActualWidth" />
 							</MultiBinding>
