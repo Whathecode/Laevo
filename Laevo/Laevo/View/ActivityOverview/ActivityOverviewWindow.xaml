@@ -303,40 +303,47 @@
 		-->
 		
 		<StackPanel
-			Orientation="Horizontal"
-			HorizontalAlignment="Right"
+			HorizontalAlignment="Stretch"
 			VerticalAlignment="Bottom"
-			Margin="0, 0, 10, 10">
-
-			<taskList:TaskListControl
+			ClipToBounds="True">	<!-- Clipping is needed here so grid layout is never stretched too far when the contents of this panel get too wide. -->
+			
+			<StackPanel
+				Orientation="Horizontal"
+				HorizontalAlignment="Right"
 				VerticalAlignment="Bottom"
-				Margin="0, 0, 20, 2"
-				Height="35" />
+				Margin="0, 0, 10, 10">
 
-			<Border
-				Width="55"
-				Height="55"
-				Margin="0, 0, 20, 0"
-				VerticalAlignment="Bottom"
-				CornerRadius="5"
-				BorderThickness="0, 0, 0, 2"
-				BorderBrush="{Binding HomeActivity.IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue=Yellow, IfFalse=Transparent}}">
+				<taskList:TaskListControl
+					VerticalAlignment="Bottom"
+					Margin="0, 0, 20, 2"
+					Height="35" />
 
-				<Button
-					Cursor="Hand"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-					Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}"
-					AllowDrop="True"
-					Drop="OnHomeDrop">
-					<Image Source="Images\Home.png" />
-				</Button>
+				<Border
+					Width="55"
+					Height="55"
+					Margin="0, 0, 20, 0"
+					VerticalAlignment="Bottom"
+					CornerRadius="5"
+					BorderThickness="0, 0, 0, 2"
+					BorderBrush="{Binding HomeActivity.IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue=Yellow, IfFalse=Transparent}}">
 
-			</Border>
+					<Button
+						Cursor="Hand"
+						Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+						Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}"
+						AllowDrop="True"
+						Drop="OnHomeDrop">
+						<Image Source="Images\Home.png" />
+					</Button>
 
-			<activityOverview:ClockControl
-				x:Name="Clock"
-				VerticalAlignment="Bottom"
-				Time="{Binding CurrentTime}" />
+				</Border>
+
+				<activityOverview:ClockControl
+					x:Name="Clock"
+					VerticalAlignment="Bottom"
+					Time="{Binding CurrentTime}" />
+			</StackPanel>
+			
 		</StackPanel>
 
 		<!-- Background drop for popups. -->
