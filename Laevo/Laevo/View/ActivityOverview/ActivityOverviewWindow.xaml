@@ -59,8 +59,9 @@
 		</Grid.CacheMode>
 
 		<!-- Blur effect for popups. -->
-		<Grid.Effect>
-			<BlurEffect Radius="0" />
+		<!-- TODO: Disable based on preferences or system specs. Possibly: http://blogs.msdn.com/b/henryh/archive/2006/08/23/719568.aspx -->
+		<!--<Grid.Effect>
+			<BlurEffect Radius="0" RenderingBias="Performance" />
 		</Grid.Effect>
 		<Grid.Style>
 			<Style>
@@ -93,7 +94,7 @@
 					</DataTrigger>
 				</Style.Triggers>
 			</Style>
-		</Grid.Style>
+		</Grid.Style>-->
 
 		<!-- Time Line 3D -->
 		<Viewport3D
