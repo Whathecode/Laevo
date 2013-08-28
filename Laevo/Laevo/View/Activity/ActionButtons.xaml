@@ -25,7 +25,10 @@
 				ScaleY="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}" />
 		</StackPanel.Resources>
 
+		<!-- Remove button. -->
 		<Image
+			Focusable="True"
+			PreviewMouseDown="SetFocus"
 			Source="../Activity/ActionIcons/delete.png"
 			Cursor="Hand"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
@@ -39,10 +42,12 @@
 			</Image.Opacity>
 		</Image>
 		
+		<!-- Edit button. -->
 		<Image
+			Focusable="True"
+			PreviewMouseDown="SetFocus"
 			Source="../Activity/ActionIcons/edit.png"
 			Cursor="Hand"
-			PreviewMouseDown="OnStartEditActivity"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
 		
 		<StackPanel
@@ -50,7 +55,10 @@
 				ElementName=Control,
 				Path=ShowStartButton,
 				Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+			<!-- 'Start' button. -->
 			<Image
+				Focusable="True"
+				PreviewMouseDown="SetFocus"
 				Source="{Binding
 					IsPlannedActivity,
 					Converter={wtcConverters:FromBooleanConverter IfTrue='../Activity/ActionIcons/start_planned.png', IfFalse='../Activity/ActionIcons/start.png'}}"
@@ -59,7 +67,10 @@
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 				RenderTransformOrigin="0.5, 0.5"
 				RenderTransform="{StaticResource ResizeActionIcon}" />
+			<!-- Close button. -->
 			<Image
+				Focusable="True"
+				PreviewMouseDown="SetFocus"
 				Source="../Activity/ActionIcons/close.png"
 				Cursor="Hand"
 				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"

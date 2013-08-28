@@ -7,13 +7,10 @@ namespace Laevo.View
 	static class Common
 	{
 		/// <summary>
-		///   For the source from an originating event to be updated by moving the focus.
+		///   For the source of an UIelement to be updated by moving the focus.
 		/// </summary>
-		/// <param name="e"></param>
-		public static void ForceUpdateSource( RoutedEventArgs e )
+		public static void ForceUpdate( UIElement element )
 		{
-			var element = (UIElement)e.Source;
-
 			// Moving focus also updates the source.
 			element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 		}

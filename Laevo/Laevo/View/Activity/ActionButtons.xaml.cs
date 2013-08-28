@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Input;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
@@ -27,11 +28,11 @@ namespace Laevo.View.Activity
 		{
 			InitializeComponent();
 		}
+		
 
-
-		void OnStartEditActivity( object sender, MouseButtonEventArgs e )
+		void SetFocus( object sender, MouseButtonEventArgs e )
 		{
-			Common.ForceUpdateSource( e );
+			((UIElement)e.Source).Focus();
 		}
 	}
 }
