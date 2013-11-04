@@ -29,6 +29,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug With Project References|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug With Project References\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="CredentialsDialog.xaml.cs">
       <DependentUpon>CredentialsDialog.xaml</DependentUpon>
@@ -38,6 +47,32 @@
     <Compile Include="GoogleConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <!-- Conditional references. Reference project when available; DLL otherwise. -->
+  <Import Project="..\..\ProjectReferences.txt" />
+  <Choose>
+    <When Condition="Exists($(ABC-Toolkit))">
+      <ItemGroup>
+        <ProjectReference Include="$(ABC-Toolkit)\ABC.Interruptions\ABC.Interruptions.csproj">
+          <Project>{582661FF-FF3D-4CD3-8A52-3C75447E9F69}</Project>
+          <Name>ABC.Interruptions</Name>
+        </ProjectReference>
+        <ProjectReference Include="$(ABC-Toolkit)\ABC.Applications\ABC.Applications.csproj">
+          <Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
+          <Name>ABC.Applications</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="ABC.Applications">
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
+        </Reference>
+        <Reference Include="ABC.Interruptions">
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Interruptions.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -60,14 +95,6 @@
     <Resource Include="gmail.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.Applications\ABC.Applications.csproj">
-      <Project>{4fd0d614-3f1d-4c4b-ae41-69ef8660c94f}</Project>
-      <Name>ABC.Applications</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj">
-      <Project>{582661ff-ff3d-4cd3-8a52-3c75447e9f69}</Project>
-      <Name>ABC.Interruptions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj">
       <Project>{6ff11324-46a9-4ae3-a802-4cfd47c59ba6}</Project>
       <Name>Whathecode.System</Name>

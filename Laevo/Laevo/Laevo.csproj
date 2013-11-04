@@ -279,7 +279,7 @@
     </Reference>
   </ItemGroup>
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
-  <Import Project="..\ProjectReferences.txt" />
+  <Import Project="..\..\ProjectReferences.txt" />
   <Choose>
     <When Condition="Exists($(ABC-Toolkit))">
       <ItemGroup>
@@ -304,16 +304,16 @@
     <Otherwise>
       <ItemGroup>
         <Reference Include="ABC.Windows">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.Windows.dll</HintPath>
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Windows.dll</HintPath>
         </Reference>
         <Reference Include="ABC.PInvoke">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.PInvoke.dll</HintPath>
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.PInvoke.dll</HintPath>
         </Reference>
         <Reference Include="ABC.Interruptions">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.Interruptions.dll</HintPath>
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Interruptions.dll</HintPath>
         </Reference>
         <Reference Include="ABC.Applications">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>
