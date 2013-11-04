@@ -44,7 +44,7 @@ namespace Laevo
 
 			// Create exception logger.
 			DispatcherUnhandledException += ( s, a )
-				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramDataFolder, "log.txt" ), a.Exception.ToString() + Environment.NewLine );
+                => File.AppendAllText(Path.Combine(Model.Laevo.ProgramLocalDataFolder, "log.txt"), a.Exception.ToString() + Environment.NewLine);
 
 			// Create Model.
 			_model = new Model.Laevo();

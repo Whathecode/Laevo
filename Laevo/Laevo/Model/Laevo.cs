@@ -24,13 +24,15 @@ namespace Laevo.Model
 	class Laevo
 	{
 		public static readonly string ProgramName = "Laevo";
-		public static readonly string ProgramDataFolder 
+		public static readonly string ProgramMyDocumentsFolder 
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );
-		static readonly string ActivitiesFile = Path.Combine( ProgramDataFolder, "Activities.xml" );
-		static readonly string TasksFile = Path.Combine( ProgramDataFolder, "Tasks.xml" );
-		static readonly string AttentionShiftsFile = Path.Combine( ProgramDataFolder, "AttentionShifts.xml" );
-		static readonly string SettingsFile = Path.Combine( ProgramDataFolder, "Settings.xml" );
-		static readonly string PluginLibrary = Path.Combine( ProgramDataFolder, "InterruptionHandlers" );
+        public static readonly string ProgramLocalDataFolder
+            = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ProgramName);
+        static readonly string ActivitiesFile = Path.Combine(ProgramLocalDataFolder, "Activities.xml");
+        static readonly string TasksFile = Path.Combine(ProgramLocalDataFolder, "Tasks.xml");
+        static readonly string AttentionShiftsFile = Path.Combine(ProgramLocalDataFolder, "AttentionShifts.xml");
+        static readonly string SettingsFile = Path.Combine(ProgramLocalDataFolder, "Settings.xml");
+        static readonly string PluginLibrary = Path.Combine(ProgramLocalDataFolder, "InterruptionHandlers");
 
 		readonly Dispatcher _dispatcher;
 

@@ -23,9 +23,9 @@ namespace Laevo.ViewModel.ActivityOverview
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class ActivityOverviewViewModel : AbstractViewModel
 	{
-		static readonly string ActivitiesFile = Path.Combine( Model.Laevo.ProgramDataFolder, "ActivityRepresentations.xml" );
-		static readonly string TasksFile = Path.Combine( Model.Laevo.ProgramDataFolder, "TaskRepresentations.xml" );
-		static readonly string VdmSettings = Path.Combine( Model.Laevo.ProgramDataFolder, "VdmSettings" );
+        static readonly string ActivitiesFile = Path.Combine(Model.Laevo.ProgramLocalDataFolder, "ActivityRepresentations.xml");
+        static readonly string TasksFile = Path.Combine(Model.Laevo.ProgramLocalDataFolder, "TaskRepresentations.xml");
+        static readonly string VdmSettings = Path.Combine(Model.Laevo.ProgramLocalDataFolder, "VdmSettings");
 
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
