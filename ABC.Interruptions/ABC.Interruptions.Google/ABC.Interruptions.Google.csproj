@@ -50,7 +50,7 @@
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
   <Import Project="..\..\ProjectReferences.txt" />
   <Choose>
-    <When Condition="Exists($(ABC-Toolkit))">
+    <When Condition="Exists($(ABC-Toolkit)) And '$(Configuration)' != 'Release'">
       <ItemGroup>
         <ProjectReference Include="$(ABC-Toolkit)\ABC.Interruptions\ABC.Interruptions.csproj">
           <Project>{582661FF-FF3D-4CD3-8A52-3C75447E9F69}</Project>
@@ -73,6 +73,23 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
+  <Choose>
+    <When Condition="Exists($(Framework-Class-Library-Extension)) And '$(Configuration)' != 'Release'">
+      <ItemGroup>
+        <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.System\Whathecode.System.csproj">
+          <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
+          <Name>Whathecode.System</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Whathecode.System">
+          <HintPath>..\..\Libraries\Framework Class Library Extension\Whathecode.System.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>  
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -93,12 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="gmail.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj">
-      <Project>{6ff11324-46a9-4ae3-a802-4cfd47c59ba6}</Project>
-      <Name>Whathecode.System</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
