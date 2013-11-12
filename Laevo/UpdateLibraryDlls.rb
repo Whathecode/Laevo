@@ -2,7 +2,7 @@ require 'xml'
 require 'fileutils'
 
 Dir.chdir(ARGV[0].to_s())
-parser = XML::Parser.file('ProjectReferences.txt')
+parser = XML::Parser.file('..\\ProjectReferences.txt')
 doc = parser.parse
 namespace = 'msbuild:http://schemas.microsoft.com/developer/msbuild/2003'
 

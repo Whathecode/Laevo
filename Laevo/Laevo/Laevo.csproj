@@ -281,7 +281,7 @@
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
   <Import Project="..\..\ProjectReferences.txt" />
   <Choose>
-    <When Condition="Exists($(ABC-Toolkit))">
+    <When Condition="Exists($(ABC-Toolkit)) And '$(Configuration)' != 'Release'">
       <ItemGroup>
         <ProjectReference Include="$(ABC-Toolkit)\ABC.Windows\ABC.Windows.csproj">
           <Project>{DB8DBDF2-70BF-4712-86DA-06674986BC12}</Project>
@@ -319,7 +319,7 @@
     </Otherwise>
   </Choose>
   <Choose>
-    <When Condition="Exists($(Framework-Class-Library-Extension))">
+    <When Condition="Exists($(Framework-Class-Library-Extension)) And '$(Configuration)' != 'Release'">
       <ItemGroup>
         <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.System\Whathecode.System.csproj">
           <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
@@ -342,16 +342,16 @@
     <Otherwise>
       <ItemGroup>
         <Reference Include="Whathecode.System">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.System.dll</HintPath>
+          <HintPath>..\..\Libraries\Framework Class Library Extension\Whathecode.System.dll</HintPath>
         </Reference>
         <Reference Include="Whathecode.System.Aspects">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.System.Aspects.dll</HintPath>
+          <HintPath>..\..\Libraries\Framework Class Library Extension\Whathecode.System.Aspects.dll</HintPath>
         </Reference>
         <Reference Include="Whathecode.PresentationFramework">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.dll</HintPath>
+          <HintPath>..\..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.dll</HintPath>
         </Reference>
         <Reference Include="Whathecode.PresentationFramework.Aspects">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.Aspects.dll</HintPath>
+          <HintPath>..\..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.Aspects.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>
@@ -475,7 +475,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="app.config" />
-    <None Include="app.manifest" />
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
