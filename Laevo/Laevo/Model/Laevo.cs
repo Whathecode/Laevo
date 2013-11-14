@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Threading;
 using ABC.Interruptions;
+using Laevo.Data;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System;
 using Whathecode.System.Extensions;
@@ -28,10 +27,6 @@ namespace Laevo.Model
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );
 		public static readonly string ProgramLocalDataFolder
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), ProgramName );
-		static readonly string ActivitiesFile = Path.Combine( ProgramLocalDataFolder, "Activities.xml" );
-		static readonly string TasksFile = Path.Combine( ProgramLocalDataFolder, "Tasks.xml" );
-		static readonly string AttentionShiftsFile = Path.Combine( ProgramLocalDataFolder, "AttentionShifts.xml" );
-		static readonly string SettingsFile = Path.Combine( ProgramLocalDataFolder, "Settings.xml" );
 		static readonly string PluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 
 		readonly Dispatcher _dispatcher;
@@ -43,69 +38,44 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly DataContractSerializer _activitySerializer;
-		readonly List<Activity> _activities = new List<Activity>();
+		readonly InterruptionAggregator _interruptionAggregator = new InterruptionAggregator( PluginLibrary );
+
+		readonly IDataRepository _dataRepository;
+
+		public event Action<Activity> ActivityRemoved;
 		public ReadOnlyCollection<Activity> Activities
 		{
-			get { return _activities.AsReadOnly(); }
+			get { return _dataRepository.Activities; }
 		}
 
 		public event Action<Activity> InterruptionAdded;
-		readonly List<Activity> _tasks = new List<Activity>();
 		public ReadOnlyCollection<Activity> Tasks
 		{
-			get { return _tasks.AsReadOnly(); }
+			get { return _dataRepository.Tasks; }
 		}
 
-		public event Action<Activity> ActivityRemoved;
-
-		public Activity HomeActivity { get; private set; }
-
-		public Activity CurrentActivity { get; private set; }
-
-		readonly DataContractSerializer _attentionShiftSerializer;
-		readonly List<AbstractAttentionShift> _attentionShifts = new List<AbstractAttentionShift>();
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
 		{
-			get { return _attentionShifts.AsReadOnly(); }
+			get { return _dataRepository.AttentionShifts; }
 		}
 
-		readonly InterruptionAggregator _interruptionAggregator = new InterruptionAggregator( PluginLibrary );
-		
-		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
-		public Settings Settings { get; private set; }
+		public Settings Settings
+		{
+			get { return _dataRepository.Settings; }
+		}
+
+		public Activity HomeActivity { get; private set; }
+		public Activity CurrentActivity { get; private set; }
 
 
 		public Laevo()
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
-			// Load settings.
-			if ( File.Exists( SettingsFile ) )
-			{
-				using ( var settingsFileStream = new FileStream( SettingsFile, FileMode.Open ) )
-				{
-					Settings = (Settings)SettingsSerializer.ReadObject( settingsFileStream );
-				}
-			}
-			else
-			{
-				Settings = new Settings();
-			}
+			_dataRepository = new DataContractSerializedRepository( ProgramLocalDataFolder, _interruptionAggregator );
 
-			// Initialize activity serializer.
-			// It needs to be aware about the interruption types loaded by the interruption aggregator.
-			_activitySerializer = new DataContractSerializer( typeof( List<Activity> ), _interruptionAggregator.GetInterruptionTypes() );
-
-			// Add activities from previous sessions.
-			if ( File.Exists( ActivitiesFile ) )
-			{
-				using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
-				{
-					var existingActivities = (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream );
-					existingActivities.ForEach( AddActivity );
-				}
-			}
+			// Handle activities and tasks from previous sessions.
+			_dataRepository.Activities.Concat( _dataRepository.Tasks ).ForEach( HandleActivity );
 
 			// Find home activity and set as current activity.
 			HomeActivity = Activities.Count > 0
@@ -113,40 +83,15 @@ namespace Laevo.Model
 				: CreateNewActivity( "Home" );
 			CurrentActivity = HomeActivity;
 
-			// Add tasks from previous sessions.
-			if ( File.Exists( TasksFile ) )
-			{
-				using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Open ) )
-				{
-					var existingTasks = (List<Activity>)_activitySerializer.ReadObject( tasksFileStream );
-					existingTasks.Reverse();  // Tasks are saved in the order they should show up, but each time added to the front of the list. Reverse to maintain the correct ordering.
-					existingTasks.ForEach( AddTask );
-				}
-			}
-
-			// Add attention spans from previous sessions.
-			_attentionShiftSerializer = new DataContractSerializer(
-				typeof( List<AbstractAttentionShift> ), new [] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
-				int.MaxValue, true, false,
-				new DataContractSurrogate( _activities.Concat( _tasks ).ToList() ) );
-			if ( File.Exists( AttentionShiftsFile ) )
-			{
-				using ( var attentionFileStream = new FileStream( AttentionShiftsFile, FileMode.Open ) )
-				{
-					var existingAttentionShifts = (List<AbstractAttentionShift>)_attentionShiftSerializer.ReadObject( attentionFileStream );
-					_attentionShifts.AddRange( existingAttentionShifts );
-				}
-			}
-
 			// Set up interruption handlers.
 			_interruptionAggregator.InterruptionReceived += interruption =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
-				var newActivity = new Activity( interruption.Name );
+				var newActivity = _dataRepository.CreateNewTask( interruption.Name );
 				newActivity.AddInterruption( interruption );
 				DispatcherHelper.SafeDispatch( _dispatcher, () =>
 				{
-					AddTask( newActivity ); 
+					HandleActivity( newActivity ); 
 					InterruptionAdded( newActivity );	// TODO: This event should probably be removed and some other mechanism should be used.
 				} );
 			};
@@ -162,7 +107,7 @@ namespace Laevo.Model
 				}
 			};
 
-			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
+			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
 		}
 
 
@@ -176,7 +121,7 @@ namespace Laevo.Model
 
 		public void Update( DateTime now )
 		{
-			_activities.ForEach( a => a.Update( now ) );
+			Activities.ForEach( a => a.Update( now ) );
 			_interruptionAggregator.Update( now );
 		}
 
@@ -186,22 +131,21 @@ namespace Laevo.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name = "New Activity" )
 		{
-			var activity = new Activity( name );
-			AddActivity( activity );
+			var activity = _dataRepository.CreateNewActivity( name );
+			HandleActivity( activity );
 
 			CurrentActivity = activity;
 			return activity;
 		}
 
-		void AddActivity( Activity activity )
+		void HandleActivity( Activity activity )
 		{
 			activity.ActivatedEvent += OnActivityActivated;
-			_activities.Add( activity );
 		}
 
 		void OnActivityActivated( Activity activity )
 		{
-			_attentionShifts.Add( new ActivityAttentionShift( activity ) );
+			_dataRepository.AddAttentionShift( new ActivityAttentionShift( activity ) );
 			CurrentActivity = activity;
 		}
 
@@ -213,102 +157,44 @@ namespace Laevo.Model
 		{
 			activity.ActivatedEvent -= OnActivityActivated;
 
-			_attentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity == activity ).ForEach( a => a.ActivityRemoved() );
+			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity == activity ).ForEach( a => a.ActivityRemoved() );
 
-			if ( _activities.Contains( activity ) )
-			{
-				_activities.Remove( activity );
-			}
-			else
-			{
-				_tasks.Remove( activity );
-			}
+			_dataRepository.RemoveActivity( activity );
 
 			ActivityRemoved( activity );
 		}
 
 		public Activity CreateNewTask()
 		{
-			var task = new Activity( "New Task" );
-			AddTask( task );
+			var task = _dataRepository.CreateNewTask();
+			HandleActivity( task );
 
 			return task;
 		}
 
-		void AddTask( Activity task )
-		{
-			task.ActivatedEvent += OnActivityActivated;
-			_tasks.Insert( 0, task );
-		}
-
 		public void CreateActivityFromTask( Activity task )
 		{
-			// Ensure it is a task which is passed.
-			if ( !_tasks.Contains( task ) )
-			{
-				throw new InvalidOperationException( "The passed activity is not a task from the task list." );
-			}
-
-			_tasks.Remove( task );
-			_activities.Add( task );
+			_dataRepository.CreateActivityFromTask( task );
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )
 		{
-			_tasks.Swap( task1, task2 );
+			_dataRepository.SwapTaskOrder( task1, task2 );
 		}
 
 		public void Exit()
 		{
-			_attentionShifts.Add( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
+			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
 
 			_processTracker.Stop();
 
-			// Persist settings.
-			Persist( SettingsFile, SettingsSerializer, Settings );
-
-			// Persist activities.
-			// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
-			Persist( ActivitiesFile, _activitySerializer, _activities );
-
-			// Persist tasks.
-			Persist( TasksFile, _activitySerializer, _tasks );
-
-			// Persist attention shifts.
-			Persist( AttentionShiftsFile, _attentionShiftSerializer, _attentionShifts );
-		}
-
-		static void Persist( string file, DataContractSerializer serializer, object toSerialize )
-		{
-			// Make a backup first, so if serialization fails, no data is lost.
-			string backupFile = file + ".backup";
-			if ( File.Exists( file ) )
-			{
-				File.Copy( file, backupFile );
-			}
-
-			// Serialize the data.
 			try
 			{
-				using ( var fileStream = new FileStream( file, FileMode.Create ) )
-				{
-					serializer.WriteObject( fileStream, toSerialize );
-				}
+				_dataRepository.SaveChanges();
 			}
-			catch ( Exception )
+			catch ( PersistenceException pe )
 			{
-				if ( File.Exists( backupFile ) )
-				{
-					File.Delete( file );
-					File.Move( backupFile, file );
-				}
-				MessageBox.Show( "Serialization of data to file \"" + file + "\" failed. Recent data will be lost.", "Saving data failed", MessageBoxButton.OK );
-			}
-
-			// Remove temporary backup file.
-			if ( File.Exists( backupFile ) )
-			{
-				File.Delete( backupFile );
+				MessageBox.Show( pe.Message, "Saving data failed", MessageBoxButton.OK );
 			}
 		}
 	}

@@ -365,6 +365,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Data\DataContractSerializedRepository.cs" />
+    <Compile Include="Data\IDataRepository.cs" />
+    <Compile Include="Data\PersistenceException.cs" />
+    <Compile Include="Data\AbstractMemoryDataRepository.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
