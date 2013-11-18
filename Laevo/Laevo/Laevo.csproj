@@ -214,17 +214,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
-      <HintPath>..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
+      <HintPath>..\..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack">
-      <HintPath>..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <HintPath>..\..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack.Shell">
-      <HintPath>..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <HintPath>..\..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="MouseKeyboardActivityMonitor, Version=3.0.1.9579, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
+    <Reference Include="MouseKeyboardActivityMonitor">
+      <HintPath>..\..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
     </Reference>
     <Reference Include="PostSharp">
       <HintPath>..\packages\PostSharp.3.0.39\lib\net20\PostSharp.dll</HintPath>
@@ -365,10 +364,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Data\AbstractMemoryDataRepository.cs" />
     <Compile Include="Data\DataContractSerializedRepository.cs" />
     <Compile Include="Data\IDataRepository.cs" />
     <Compile Include="Data\PersistenceException.cs" />
-    <Compile Include="Data\AbstractMemoryDataRepository.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
@@ -632,7 +631,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby $(SolutionDir)UpdateLibraryDlls.rb $(SolutionDir)</PostBuildEvent>
+    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" "$(SolutionDir)</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\PostSharp.3.0.39\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.0.39\tools\PostSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

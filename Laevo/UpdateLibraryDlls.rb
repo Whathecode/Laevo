@@ -1,16 +1,16 @@
-require 'xml'
 require 'fileutils'
+# nokogiri - xml library
+require 'nokogiri'
 
+# Change working directory to the Laevo project folder
 Dir.chdir(ARGV[0].to_s())
-parser = XML::Parser.file('..\\ProjectReferences.txt')
-doc = parser.parse
-namespace = 'msbuild:http://schemas.microsoft.com/developer/msbuild/2003'
 
-# Change working directory to the Laevo project folder, since the paths might be relative paths from there.
-Dir.chdir('Laevo')
+#parse ProjectReferences.txt like XML file
+doc = Nokogiri::XML(open("..\\ProjectReferences.txt"))
 
-fcl = doc.find_first('//msbuild:Framework-Class-Library-Extension', namespace).first.to_s()
-abc = doc.find_first('//msbuild:ABC-Toolkit', namespace).first.to_s()
+#parse ABC and FCL projects absolute paths
+abc = doc.xpath("//nameSpace:PropertyGroup/nameSpace:ABC-Toolkit", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
+fcl = doc.xpath("//nameSpace:PropertyGroup/nameSpace:Framework-Class-Library-Extension", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 
 # Copy Framework Class Library Extension DLLs.
 fcl_library = '..\\Libraries\\Framework Class Library Extension\\'
