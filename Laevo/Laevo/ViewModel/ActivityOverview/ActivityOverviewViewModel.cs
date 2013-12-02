@@ -6,8 +6,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Timers;
 using ABC.Windows;
-using ABC.Windows.Desktop;
-using ABC.Windows.Desktop.Settings;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -25,7 +23,6 @@ namespace Laevo.ViewModel.ActivityOverview
 	{
 		static readonly string ActivitiesFile = Path.Combine(Model.Laevo.ProgramLocalDataFolder, "ActivityRepresentations.xml");
 		static readonly string TasksFile = Path.Combine( Model.Laevo.ProgramLocalDataFolder, "TaskRepresentations.xml" );
-		static readonly string VdmSettings = Path.Combine( Model.Laevo.ProgramLocalDataFolder, "VdmSettings" );
 
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
@@ -52,7 +49,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event Action NoCurrentActiveActivityEvent;
 
 		readonly Model.Laevo _model;
-		readonly VirtualDesktopManager _desktopManager;
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -110,33 +106,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_model = model;
 
-			// Initialize desktop manager.
-			if ( !Directory.Exists( VdmSettings ) )
-			{
-				Directory.CreateDirectory( VdmSettings );
-			}
-			var vdmSettings = new LoadedSettings( true );
-			foreach ( string file in Directory.EnumerateFiles( VdmSettings ) )
-			{
-				try
-				{
-					using ( var stream = new FileStream( file, FileMode.Open ) )
-					{
-						vdmSettings.AddSettingsFile( stream );
-					}
-				}
-				catch ( InvalidOperationException )
-				{
-					// Simply ignore invalid files.
-				}
-			}
-			_desktopManager = new VirtualDesktopManager( vdmSettings );
-
 			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(
 				typeof( Dictionary<DateTime, ActivityViewModel> ),
 				null, Int32.MaxValue, true, false,
-				new ActivityDataContractSurrogate( _desktopManager ) );
+				new ActivityDataContractSurrogate( model.DesktopManager ) );
 			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
 			if ( File.Exists( ActivitiesFile ) )
 			{
@@ -155,7 +129,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager, _desktopManager.CurrentDesktop );
+			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _model.DesktopManager, _model.DesktopManager.CurrentDesktop );
 			HookActivityEvents( HomeActivity );
 			HomeActivity.ActivateActivity();
 
@@ -176,7 +150,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 				// Create and hook up the view model.
 				var viewModel = new ActivityViewModel(
-					this, activity, _desktopManager,
+					this, activity, _model.DesktopManager,
 					existingActivities[ activity.DateCreated ],
 					attentionShifts );
 				HookActivityEvents( viewModel );
@@ -190,7 +164,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				from task in _model.Tasks
 				where existingTasks.ContainsKey( task.DateCreated )
 				select new ActivityViewModel(
-					this, task, _desktopManager,
+					this, task, _model.DesktopManager,
 					existingTasks[ task.DateCreated ],
 					new ActivityAttentionShift[] { } );
 			// ReSharper restore ImplicitlyCapturedClosure
@@ -203,7 +177,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
 			_model.InterruptionAdded += task =>
 			{
-				var taskViewModel = new ActivityViewModel( this, task, _desktopManager )
+				var taskViewModel = new ActivityViewModel( this, task, _model.DesktopManager )
 				{
 					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
 					Color = ActivityViewModel.PresetColors[ 5 ],
@@ -226,7 +200,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _desktopManager )
+			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _model.DesktopManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines
 			};
@@ -243,7 +217,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( this, _model.CreateNewTask(), _desktopManager );
+			var newTask = new ActivityViewModel( this, _model.CreateNewTask(), _model.DesktopManager );
 			AddTask( newTask );
 		}
 
@@ -369,7 +343,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				// HACK: Since this activity is closed, CurrentActivityViewModel will be set to null next time the overview is activated and its state won't be updated.
 				//       Therefore, already update the window states now. This is a temporary solution.
 				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
-				_desktopManager.UpdateWindowAssociations();
+				_model.DesktopManager.UpdateWindowAssociations();
 				viewModel.UpdateHasOpenWindows();
 
 				CurrentActivityViewModel = null;
@@ -437,7 +411,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public void OnOverviewActivated()
 		{
-			_desktopManager.UpdateWindowAssociations();
+			_model.DesktopManager.UpdateWindowAssociations();
 
 			// The currently active activity might have closed windows.
 			if ( CurrentActivityViewModel != null )
@@ -448,12 +422,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		
 		public void CutWindow()
 		{
-			_desktopManager.CutWindow( WindowManager.GetForegroundWindow() );
+			_model.DesktopManager.CutWindow( WindowManager.GetForegroundWindow() );
 		}
 
 		public void PasteWindows()
 		{
-			_desktopManager.PasteWindows();
+			_model.DesktopManager.PasteWindows();
 		}
 
 		public void TaskDropped( ActivityViewModel task )
@@ -501,7 +475,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				focused = focused.SafeAdd( TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes ) );
 			}
-			FocusedRoundedTime = focused;			
+			FocusedRoundedTime = focused;
 		}
 
 		public void Exit()
@@ -541,7 +515,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.Stop();
 			Activities.ForEach( a => a.Dispose() );
 
-			_desktopManager.Close();
+			_model.DesktopManager.Close();
 		}
 	}
 }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using ABC.Interruptions;
+using ABC.Windows.Desktop;
+using ABC.Windows.Desktop.Settings;
 using Laevo.Data;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System;
@@ -28,6 +30,7 @@ namespace Laevo.Model
 		public static readonly string ProgramLocalDataFolder
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), ProgramName );
 		static readonly string PluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
+		static readonly string VdmSettings = Path.Combine( ProgramLocalDataFolder, "VdmSettings" );
 
 		readonly Dispatcher _dispatcher;
 
@@ -39,6 +42,12 @@ namespace Laevo.Model
 		public event Action LogonScreenExited;
 
 		readonly InterruptionAggregator _interruptionAggregator = new InterruptionAggregator( PluginLibrary );
+
+		public VirtualDesktopManager DesktopManager
+		{
+			get;
+			private set;
+		}
 
 		readonly IDataRepository _dataRepository;
 
@@ -71,6 +80,28 @@ namespace Laevo.Model
 		public Laevo()
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
+
+			// Initialize desktop manager.
+			if ( !Directory.Exists( VdmSettings ) )
+			{
+				Directory.CreateDirectory( VdmSettings );
+			}
+			var vdmSettings = new LoadedSettings();
+			foreach ( string file in Directory.EnumerateFiles( VdmSettings ) )
+			{
+				try
+				{
+					using ( var stream = new FileStream( file, FileMode.Open ) )
+					{
+						vdmSettings.AddSettingsFile( stream );
+					}
+				}
+				catch ( InvalidOperationException )
+				{
+					// Simply ignore invalid files.
+				}
+			}
+			DesktopManager = new VirtualDesktopManager( vdmSettings );
 
 			_dataRepository = new DataContractSerializedRepository( ProgramLocalDataFolder, _interruptionAggregator );
 
