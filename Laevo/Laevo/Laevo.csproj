@@ -368,6 +368,7 @@
     <Compile Include="Data\DataContractSerializedRepository.cs" />
     <Compile Include="Data\IDataRepository.cs" />
     <Compile Include="Data\PersistenceException.cs" />
+    <Compile Include="LaevoController.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
@@ -631,7 +632,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" "$(SolutionDir)</PostBuildEvent>
+    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\PostSharp.3.0.39\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.0.39\tools\PostSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
