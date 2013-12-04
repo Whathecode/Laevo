@@ -19,7 +19,8 @@ namespace Laevo.Model
 	[DataContract]
 	class Activity
 	{
-		static readonly string ActivityContextPath = Path.Combine( Laevo.ProgramMyDocumentsFolder, "Activities" );
+		public static readonly string ProgramMyDocumentsFolder = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), "Laevo" );
+		static readonly string ActivityContextPath = Path.Combine( ProgramMyDocumentsFolder, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
 		public event Action<Activity> ClosedEvent;

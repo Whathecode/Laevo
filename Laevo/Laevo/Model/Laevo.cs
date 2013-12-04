@@ -24,14 +24,6 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Laevo
 	{
-		public static readonly string ProgramName = "Laevo";
-		public static readonly string ProgramMyDocumentsFolder
-			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), ProgramName );
-		public static readonly string ProgramLocalDataFolder
-			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), ProgramName );
-		static readonly string PluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
-		static readonly string VdmSettings = Path.Combine( ProgramLocalDataFolder, "VdmSettings" );
-
 		readonly Dispatcher _dispatcher;
 
 		readonly ProcessTracker _processTracker = new ProcessTracker();
@@ -41,15 +33,16 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly InterruptionAggregator _interruptionAggregator = new InterruptionAggregator( PluginLibrary );
+		readonly InterruptionAggregator _interruptionAggregator;
+		readonly IDataRepository _dataRepository;
+
+		public static string ProgramLocalDataFolder { get; private set; }
 
 		public VirtualDesktopManager DesktopManager
 		{
 			get;
 			private set;
 		}
-
-		readonly IDataRepository _dataRepository;
 
 		public event Action<Activity> ActivityRemoved;
 		public ReadOnlyCollection<Activity> Activities
@@ -77,17 +70,23 @@ namespace Laevo.Model
 		public Activity CurrentActivity { get; private set; }
 
 
-		public Laevo()
+		public Laevo( string dataFolder, IDataRepository dataRepository, InterruptionAggregator interruptionAggregator )
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
+			_interruptionAggregator = interruptionAggregator;
+			_dataRepository = dataRepository;
+
+			ProgramLocalDataFolder = dataFolder;
+
 			// Initialize desktop manager.
-			if ( !Directory.Exists( VdmSettings ) )
+			string vdmSettingsPath = Path.Combine( dataFolder, "VdmSettings" );
+			if ( !Directory.Exists( vdmSettingsPath ) )
 			{
-				Directory.CreateDirectory( VdmSettings );
+				Directory.CreateDirectory( vdmSettingsPath );
 			}
 			var vdmSettings = new LoadedSettings();
-			foreach ( string file in Directory.EnumerateFiles( VdmSettings ) )
+			foreach ( string file in Directory.EnumerateFiles( vdmSettingsPath ) )
 			{
 				try
 				{
@@ -102,8 +101,6 @@ namespace Laevo.Model
 				}
 			}
 			DesktopManager = new VirtualDesktopManager( vdmSettings );
-
-			_dataRepository = new DataContractSerializedRepository( ProgramLocalDataFolder, _interruptionAggregator );
 
 			// Handle activities and tasks from previous sessions.
 			_dataRepository.Activities.Concat( _dataRepository.Tasks ).ForEach( HandleActivity );
