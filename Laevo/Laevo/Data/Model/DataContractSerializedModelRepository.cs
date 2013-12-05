@@ -6,28 +6,28 @@ using System.Runtime.Serialization;
 using ABC.Interruptions;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
+using Whathecode.System.Linq;
 
 
-namespace Laevo.Data
+namespace Laevo.Data.Model
 {
 	/// <summary>
-	///   Provides access to persisted data of Laevo, stored in flat files serialized by DataContractSerializer.
+	///   Provides access to persisted model data of Laevo, stored in flat files serialized by DataContractSerializer.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	class DataContractSerializedRepository : AbstractMemoryDataRepository
+	class DataContractSerializedModelRepository : AbstractMemoryModelRepository
 	{
 		readonly string _activitiesFile;
 		readonly string _tasksFile;
 		readonly string _attentionShiftsFile;
 		readonly string _settingsFile;
 
-
 		readonly DataContractSerializer _activitySerializer;
 		readonly DataContractSerializer _attentionShiftSerializer;
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 
 
-		public DataContractSerializedRepository( string programDataFolder, InterruptionAggregator interruptionAggregator )
+		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator )
 		{
 			// Set up file paths.
 			_activitiesFile = Path.Combine( programDataFolder, "Activities.xml" );
@@ -56,6 +56,11 @@ namespace Laevo.Data
 					MemoryActivities.AddRange( (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream ) );
 				}
 			}
+
+			// Set home activity.
+			HomeActivity = Activities.Count > 0
+				? Activities.MinBy( a => a.DateCreated )
+				: CreateNewActivity( "Home" );
 
 			// Add tasks from previous sessions.
 			if ( File.Exists( _tasksFile ) )
@@ -98,7 +103,7 @@ namespace Laevo.Data
 			Persist( _attentionShiftsFile, _attentionShiftSerializer, MemoryAttentionShifts );
 		}
 
-		static void Persist( string file, DataContractSerializer serializer, object toSerialize )
+		static void Persist( string file, XmlObjectSerializer serializer, object toSerialize )
 		{
 			// Make a backup first, so if serialization fails, no data is lost.
 			string backupFile = file + ".backup";

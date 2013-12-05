@@ -8,6 +8,7 @@ using ABC.Interruptions;
 using ABC.Windows.Desktop;
 using ABC.Windows.Desktop.Settings;
 using Laevo.Data;
+using Laevo.Data.Model;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System;
 using Whathecode.System.Extensions;
@@ -33,8 +34,8 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly InterruptionAggregator _interruptionAggregator;
-		readonly IDataRepository _dataRepository;
+		readonly AbstractInterruptionTrigger _interruptionTrigger;
+		readonly IModelRepository _dataRepository;
 
 		public static string ProgramLocalDataFolder { get; private set; }
 
@@ -70,11 +71,11 @@ namespace Laevo.Model
 		public Activity CurrentActivity { get; private set; }
 
 
-		public Laevo( string dataFolder, IDataRepository dataRepository, InterruptionAggregator interruptionAggregator )
+		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger )
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
-			_interruptionAggregator = interruptionAggregator;
+			_interruptionTrigger = interruptionTrigger;
 			_dataRepository = dataRepository;
 
 			ProgramLocalDataFolder = dataFolder;
@@ -102,17 +103,19 @@ namespace Laevo.Model
 			}
 			DesktopManager = new VirtualDesktopManager( vdmSettings );
 
-			// Handle activities and tasks from previous sessions.
-			_dataRepository.Activities.Concat( _dataRepository.Tasks ).ForEach( HandleActivity );
-
 			// Find home activity and set as current activity.
-			HomeActivity = Activities.Count > 0
-				? Activities.MinBy( a => a.DateCreated )
-				: CreateNewActivity( "Home" );
+			HomeActivity = _dataRepository.HomeActivity;
 			CurrentActivity = HomeActivity;
 
+			// Handle activities and tasks from previous sessions.
+			_dataRepository
+				.Activities
+				.Concat( _dataRepository.Tasks )
+				.Concat( new [] { HomeActivity } )
+				.ForEach( HandleActivity );
+
 			// Set up interruption handlers.
-			_interruptionAggregator.InterruptionReceived += interruption =>
+			_interruptionTrigger.InterruptionReceived += interruption =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				var newActivity = _dataRepository.CreateNewTask( interruption.Name );
@@ -150,7 +153,7 @@ namespace Laevo.Model
 		public void Update( DateTime now )
 		{
 			Activities.ForEach( a => a.Update( now ) );
-			_interruptionAggregator.Update( now );
+			_interruptionTrigger.Update( now );
 		}
 
 		/// <summary>

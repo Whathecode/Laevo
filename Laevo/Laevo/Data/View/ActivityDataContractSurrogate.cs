@@ -6,11 +6,10 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC.Windows;
 using ABC.Windows.Desktop;
 
 
-namespace Laevo.ViewModel.ActivityOverview
+namespace Laevo.Data.View
 {
 	public class ActivityDataContractSurrogate : IDataContractSurrogate
 	{

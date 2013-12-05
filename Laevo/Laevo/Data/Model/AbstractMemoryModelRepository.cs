@@ -6,13 +6,13 @@ using Laevo.Model.AttentionShifts;
 using Whathecode.System.Extensions;
 
 
-namespace Laevo.Data
+namespace Laevo.Data.Model
 {
 	/// <summary>
-	///   An abstract class which provides data for Laevo which is held in memory.
+	///   An abstract class which provides model data for Laevo which is held in memory.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	abstract class AbstractMemoryDataRepository : IDataRepository
+	abstract class AbstractMemoryModelRepository : IModelRepository
 	{
 		protected readonly List<Activity> MemoryActivities = new List<Activity>();
 		public ReadOnlyCollection<Activity> Activities
@@ -32,10 +32,11 @@ namespace Laevo.Data
 			get { return MemoryAttentionShifts.AsReadOnly(); }
 		}
 
+		public Activity HomeActivity { get; protected set; }
 		public Settings Settings { get; protected set; }
 
 
-		protected AbstractMemoryDataRepository()
+		protected AbstractMemoryModelRepository()
 		{
 			// Initialize settings by default to prevent extending classes from forgetting to initialize default settings.
 			Settings = new Settings();

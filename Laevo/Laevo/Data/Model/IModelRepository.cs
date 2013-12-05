@@ -3,18 +3,19 @@ using Laevo.Model;
 using Laevo.Model.AttentionShifts;
 
 
-namespace Laevo.Data
+namespace Laevo.Data.Model
 {
 	/// <summary>
-	///   Provides access to the persisted data of Laevo.
+	///   Provides access to the persisted model data of Laevo.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	interface IDataRepository
+	interface IModelRepository
 	{
 		ReadOnlyCollection<Activity> Activities { get; }
 		ReadOnlyCollection<Activity> Tasks { get; }
 		ReadOnlyCollection<AbstractAttentionShift> AttentionShifts { get; }
 
+		Activity HomeActivity { get; }
 		Settings Settings { get; }
 
 		Activity CreateNewActivity( string name );

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using Laevo.Data.View;
 using Laevo.Model;
 using Laevo.View.ActivityOverview;
 using Laevo.View.Settings;
@@ -24,6 +25,7 @@ namespace Laevo.ViewModel.Main
 	class MainViewModel : AbstractViewModel
 	{
 		readonly Model.Laevo _model;
+		readonly IViewRepository _dataRepository;
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
 		readonly Dispatcher _dispatcher;
@@ -36,9 +38,10 @@ namespace Laevo.ViewModel.Main
 		public int UnattendedInterruptions { get; private set; }
 
 
-		public MainViewModel( Model.Laevo model )
+		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{			
 			_model = model;
+			_dataRepository = dataRepository;
 			_dispatcher = Dispatcher.CurrentDispatcher;
 			_model.LogonScreenExited += () => _dispatcher.Invoke( ResetGui );
 
@@ -237,7 +240,7 @@ namespace Laevo.ViewModel.Main
 
 			if ( _activityOverviewViewModel == null )
 			{
-				_activityOverviewViewModel = new ActivityOverviewViewModel( _model )
+				_activityOverviewViewModel = new ActivityOverviewViewModel( _model, _dataRepository )
 				{
 					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale,
 					EnableAttentionLines = _model.Settings.EnableAttentionLines

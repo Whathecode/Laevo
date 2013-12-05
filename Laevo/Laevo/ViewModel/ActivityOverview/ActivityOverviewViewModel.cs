@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Timers;
 using ABC.Windows;
-using Laevo.Model.AttentionShifts;
+using Laevo.Data.View;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Arithmetic.Range;
@@ -21,10 +19,6 @@ namespace Laevo.ViewModel.ActivityOverview
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class ActivityOverviewViewModel : AbstractViewModel
 	{
-		static readonly string ActivitiesFile = Path.Combine(Model.Laevo.ProgramLocalDataFolder, "ActivityRepresentations.xml");
-		static readonly string TasksFile = Path.Combine( Model.Laevo.ProgramLocalDataFolder, "TaskRepresentations.xml" );
-
-
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
 
 
@@ -49,6 +43,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event Action NoCurrentActiveActivityEvent;
 
 		readonly Model.Laevo _model;
+		readonly IViewRepository _dataRepository;
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -93,91 +88,39 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; private set; }
 
-		[NotifyProperty( Binding.Properties.Activities )]
-		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
+		public ObservableCollection<ActivityViewModel> Activities
+		{
+			get { return _dataRepository.Activities; }
+		}
 
-		[NotifyProperty( Binding.Properties.Tasks )]
-		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
+		public ObservableCollection<ActivityViewModel> Tasks
+		{
+			get { return _dataRepository.Tasks; }
+		}
 
-		readonly DataContractSerializer _activitySerializer;
 
-
-		public ActivityOverviewViewModel( Model.Laevo model )
+		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
-
-			// Check for stored presentation options for existing activities and tasks.
-			_activitySerializer = new DataContractSerializer(
-				typeof( Dictionary<DateTime, ActivityViewModel> ),
-				null, Int32.MaxValue, true, false,
-				new ActivityDataContractSurrogate( model.DesktopManager ) );
-			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
-			if ( File.Exists( ActivitiesFile ) )
-			{
-				using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Open ) )
-				{
-					existingActivities = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( activitiesFileStream );
-				}
-			}
-			var existingTasks = new Dictionary<DateTime, ActivityViewModel>();
-			if ( File.Exists( TasksFile ) )
-			{
-				using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Open ) )
-				{
-					existingTasks = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( tasksFileStream );
-				}
-			}
+			_dataRepository = dataRepository;
 
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _model.DesktopManager, _model.DesktopManager.CurrentDesktop );
-			HookActivityEvents( HomeActivity );
+			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.DesktopManager, _model.DesktopManager.CurrentDesktop );
+			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity();
 
-			// Initialize a view model for all activities from previous sessions.
-			Activities = new ObservableCollection<ActivityViewModel>();
-			foreach ( var activity in _model.Activities.Where( a => a != _model.HomeActivity ) )
+			// Initialize the activities and tasks to work with this overview.
+			Activities.Concat( Tasks ).ForEach( a =>
 			{
-				if ( !existingActivities.ContainsKey( activity.DateCreated ) )
-				{
-					continue;
-				}
-
-				// Find the attention shifts which occured while the activity was open.
-				IReadOnlyCollection<Interval<DateTime>> openIntervals = activity.OpenIntervals;
-				var attentionShifts = _model.AttentionShifts
-					.OfType<ActivityAttentionShift>()
-					.Where( shift => openIntervals.Any( i => i.LiesInInterval( shift.Time ) ) );
-
-				// Create and hook up the view model.
-				var viewModel = new ActivityViewModel(
-					this, activity, _model.DesktopManager,
-					existingActivities[ activity.DateCreated ],
-					attentionShifts );
-				HookActivityEvents( viewModel );
-				Activities.Add( viewModel );
-			}
-
-			// Initialize tasks from previous sessions.
-			Tasks = new ObservableCollection<ActivityViewModel>();
-			// ReSharper disable ImplicitlyCapturedClosure
-			var taskViewModels =
-				from task in _model.Tasks
-				where existingTasks.ContainsKey( task.DateCreated )
-				select new ActivityViewModel(
-					this, task, _model.DesktopManager,
-					existingTasks[ task.DateCreated ],
-					new ActivityAttentionShift[] { } );
-			// ReSharper restore ImplicitlyCapturedClosure
-			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
-			{
-				AddTask( task );
-			}
+				HookActivityToOverview( a ); // Hook up activity view models from previous sessions.
+				a.UpdateHasOpenWindows(); // Update the activity states now that the VDM has been initialized.
+			} );
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
 			_model.InterruptionAdded += task =>
 			{
-				var taskViewModel = new ActivityViewModel( this, task, _model.DesktopManager )
+				var taskViewModel = new ActivityViewModel( task, _model.DesktopManager )
 				{
 					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
 					Color = ActivityViewModel.PresetColors[ 5 ],
@@ -185,9 +128,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				};
 				AddTask( taskViewModel );
 			};
-
-			// Update the activity states now that the VDM has been initialized.
-			Activities.Concat( Tasks ).ForEach( a => a.UpdateHasOpenWindows() );
 
 			// Hook up timer.
 			_updateTimer.Elapsed += UpdateData;
@@ -200,7 +140,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel( this, _model.CreateNewActivity(), _model.DesktopManager )
+			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.DesktopManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines
 			};
@@ -209,7 +149,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				Activities.Add( newActivity );
 			}
 
-			HookActivityEvents( newActivity );
+			HookActivityToOverview( newActivity );
 
 			return newActivity;
 		}
@@ -217,7 +157,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( this, _model.CreateNewTask(), _model.DesktopManager );
+			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.DesktopManager );
 			AddTask( newTask );
 		}
 
@@ -228,7 +168,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				Tasks.Insert( 0, task );
 			}
 
-			HookActivityEvents( task );
+			HookActivityToOverview( task );
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -310,8 +250,10 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.SwapTaskOrder( task1.Activity, task2.Activity );
 		}
 
-		void HookActivityEvents( ActivityViewModel activity )
+		void HookActivityToOverview( ActivityViewModel activity )
 		{
+			activity.SetOverviewManager( this );
+
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
@@ -489,25 +431,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public override void Persist()
 		{
-			// Persist activities.
-			lock ( Activities )
-			{
-				Activities.ForEach( a => a.Persist() );
-			}
-			using ( var activitiesFileStream = new FileStream( ActivitiesFile, FileMode.Create ) )
-			{
-				_activitySerializer.WriteObject( activitiesFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
-			}
-
-			// Persist tasks.
-			lock ( Tasks )
-			{
-				Tasks.ForEach( t => t.Persist() );
-			}
-			using ( var tasksFileStream = new FileStream( TasksFile, FileMode.Create ) )
-			{
-				_activitySerializer.WriteObject( tasksFileStream, Tasks.ToDictionary( t => t.DateCreated, t => t ) );
-			}
+			_dataRepository.SaveChanges();
 		}
 
 		protected override void FreeUnmanagedResources()
