@@ -7,8 +7,6 @@
 		FocusedRoundedTime,
 		FocusedOffsetPercentage,
 		HomeActivity,
-		Activities,
-		Tasks,
 		Mode,
 		TimeLineRenderScale,
 		EnableAttentionLines

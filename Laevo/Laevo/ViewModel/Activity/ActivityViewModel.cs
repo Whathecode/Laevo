@@ -34,7 +34,7 @@ namespace Laevo.ViewModel.Activity
 	[KnownType( typeof( StoredSession ) )]
 	class ActivityViewModel : AbstractViewModel
 	{
-		readonly ActivityOverviewViewModel _overview;
+		ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
 		public static List<BitmapImage> PresetIcons { get; private set; }
@@ -183,7 +183,7 @@ namespace Laevo.ViewModel.Activity
 		{
 			Activity.Name = newLabel;
 
-			if ( _overview.CurrentActivityViewModel == this )
+			if ( _overview != null && _overview.CurrentActivityViewModel == this )
 			{
 				InitializeLibrary();
 			}
@@ -245,14 +245,13 @@ namespace Laevo.ViewModel.Activity
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
-		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, VirtualDesktopManager desktopManager )
-			: this( overview, activity, desktopManager, desktopManager.CreateEmptyDesktop() )
+		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
+			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() )
 		{
 		}
 
-		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
+		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
 		{
-			_overview = overview;
 			Activity = activity;
 
 			_desktopManager = desktopManager;
@@ -268,13 +267,11 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel(
-			ActivityOverviewViewModel overview,
 			Model.Activity activity,
 			VirtualDesktopManager desktopManager,
 			ActivityViewModel storedViewModel,
 			IEnumerable<ActivityAttentionShift> activitySwitches )
 		{
-			_overview = overview;
 			Activity = activity;
 
 			_desktopManager = desktopManager;
@@ -335,6 +332,17 @@ namespace Laevo.ViewModel.Activity
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();	
 		}
 
+
+		/// <summary>
+		///   Sets the overview which this activity is displayed in.
+		///   TODO: Before constructor injection was used, but no longer possible due to IViewRepository.
+		///         The dependency between ActivityViewModel and ActivityOverviewModel needs to be properly investigated.
+		/// </summary>
+		/// <param name = "overview">The overview which this activity is displayed in.</param>
+		public void SetOverviewManager( ActivityOverviewViewModel overview )
+		{
+			_overview = overview;
+		}
 
 		/// <summary>
 		///   Activates the activity.

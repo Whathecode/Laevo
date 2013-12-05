@@ -2,6 +2,8 @@
 using System.IO;
 using ABC.Interruptions;
 using Laevo.Data;
+using Laevo.Data.Model;
+using Laevo.Data.View;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
 using Whathecode.System;
@@ -26,13 +28,16 @@ namespace Laevo
 		{
 			// Create Services.
 			var interruptionAggregator = new InterruptionAggregator( PluginLibrary );
-			IDataRepository dataRepository = new DataContractSerializedRepository( ProgramLocalDataFolder, interruptionAggregator );
-
+			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator );
+			
 			// Create Model.
+			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
 			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator );
 
 			// Create ViewModel.
-			_viewModel = new MainViewModel( model );
+			// TODO: Move DesktopManager to ViewModel?
+			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, model.DesktopManager );
+			_viewModel = new MainViewModel( model, viewDataRepository );
 
 			// Create View.
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
