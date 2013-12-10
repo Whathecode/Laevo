@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Timers;
 using ABC.Windows;
@@ -364,7 +363,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		
 		public void CutWindow()
 		{
-			_model.DesktopManager.CutWindow( WindowManager.GetForegroundWindow() );
+			_model.DesktopManager.CutWindow( Window.GetForegroundWindow() );
 		}
 
 		public void PasteWindows()
