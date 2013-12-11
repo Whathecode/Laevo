@@ -1,14 +1,11 @@
 require 'fileutils'
-# nokogiri - xml library
 require 'nokogiri'
 
-# Change working directory to the Laevo project folder
+# Change working directory to the Laevo solution folder.
 Dir.chdir(ARGV[0].to_s())
 
-#parse ProjectReferences.txt like XML file
+# Get ABC and FCL project paths from ProjectReferences.txt.
 doc = Nokogiri::XML(open("..\\ProjectReferences.txt"))
-
-#parse ABC and FCL projects absolute paths
 abc = doc.xpath("//nameSpace:PropertyGroup/nameSpace:ABC-Toolkit", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 fcl = doc.xpath("//nameSpace:PropertyGroup/nameSpace:Framework-Class-Library-Extension", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 
