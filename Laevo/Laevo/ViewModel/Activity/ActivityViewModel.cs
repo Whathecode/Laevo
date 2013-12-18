@@ -227,7 +227,7 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
 
-
+		static readonly ActivityInfoBox ActivityInfoBox;
 		static ActivityViewModel()
 		{
 			// Load icons.
@@ -243,6 +243,11 @@ namespace Laevo.ViewModel.Activity
 
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
+
+			ActivityInfoBox = new ActivityInfoBox
+			{
+				ShowActivated = false
+			};
 		}
 
 		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, VirtualDesktopManager desktopManager )
@@ -392,7 +397,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivityLibrary )]
 		public void OpenActivityLibrary()
 		{
-			string folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
+			var folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
 			Process.Start( "explorer.exe", Path.ChangeExtension( folderName, LibraryExtension ) );
 		}
 
@@ -408,6 +413,10 @@ namespace Laevo.ViewModel.Activity
 					ActivateActivity( Activity.IsOpen );
 					break;
 			}
+
+			// Fills ActivityInfoBox with necesary properties and shows it on the screen sliding down from above the screen.
+			ActivityInfoBox.DataContext = this;
+			ActivityInfoBox.Show();
 		}
 
 		[CommandExecute( Commands.EditActivity )]
@@ -423,7 +432,7 @@ namespace Laevo.ViewModel.Activity
 			popup.Show();
 		}
 
-		[CommandExecute( Commands.OpenActivity )]
+	    [CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
 			Activity.Open();

@@ -234,6 +234,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Reactive.Core, Version=2.1.30214.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -411,10 +412,14 @@
     <Compile Include="View\Activity\ActionButtons.xaml.cs">
       <DependentUpon>ActionButtons.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Activity\ActivityInfoBox.xaml.cs">
+      <DependentUpon>ActivityInfoBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Activity\Converters\ActivityBorderThicknessConverter.cs" />
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Common.cs" />
     <Compile Include="View\Main\IconConverter.cs" />
+    <Compile Include="View\Activity\RGGlassEffect.cs" />
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>
@@ -504,6 +509,14 @@
     <Page Include="View\Activity\ActionButtons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Activity\ActivityInfoBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Activity\GlassButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\TaskList\TaskListControl.xaml">
       <SubType>Designer</SubType>
