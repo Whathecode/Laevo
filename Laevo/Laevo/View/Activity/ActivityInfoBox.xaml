@@ -17,9 +17,10 @@
 		Height="55" Width="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Width}"
 		Topmost="True"
 		Top="-3" Left="-5"
-		activity:GlassEffect.IsEnabled="True" 
-		Deactivated="WindowActivityInfoDeactivatedEventHandler" 
-		IsVisibleChanged="WindowActivityInfoIsVisibleChangedEventHandler">
+		activity:GlassEffect.IsEnabled="True"
+		Activated="ActivityInfoBoxOnActivated"
+		Deactivated="WindowActivityInfoDeactivatedEventHandler"
+		Background="Transparent">
 		
 
 	<!-- TODO: Manage windows theme colors, for later. 
@@ -30,7 +31,7 @@
 			<GradientStop Color="#FF223E4A" Offset="1"/>
 		</LinearGradientBrush>
 	</Window.Background>-->
-
+	
 	<Window.Resources>
 
 		<ResourceDictionary>
@@ -86,7 +87,7 @@
 		<StackPanel Orientation="Horizontal"
 					DockPanel.Dock="Right"
 					HorizontalAlignment="Right">
-			<Image Focusable="True"
+			<!--<Image Focusable="True"
 					Source="../Activity/Icons/clock.png"
 					Cursor="Hand"
 					Margin="0, 0, 5, 0"/>
@@ -97,7 +98,7 @@
 			<Image Focusable="True"
 					Source="../Activity/Icons/clock.png"
 					Cursor="Hand"
-					Margin="0, 0, 5, 0"/>
+					Margin="0, 0, 5, 0"/>-->
 		</StackPanel>
 
 	</DockPanel>

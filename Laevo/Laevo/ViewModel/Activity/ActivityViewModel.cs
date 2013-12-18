@@ -246,7 +246,8 @@ namespace Laevo.ViewModel.Activity
 
 			ActivityInfoBox = new ActivityInfoBox
 			{
-				ShowActivated = false
+				ShowActivated = false,
+				Focusable = false
 			};
 		}
 
@@ -424,7 +425,7 @@ namespace Laevo.ViewModel.Activity
 
 			// Fills ActivityInfoBox with necesary properties and shows it on the screen sliding down from above the screen.
 			ActivityInfoBox.DataContext = this;
-			ActivityInfoBox.Show();
+			ActivityInfoBox.ShowActivityInfoBox();
 		}
 
 		[CommandExecute( Commands.EditActivity )]

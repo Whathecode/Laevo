@@ -16,6 +16,8 @@ namespace Laevo.View.Activity
 	/// 
 	public partial class ActivityInfoBox
 	{
+		readonly TimeSpan _hideTime = TimeSpan.FromSeconds( 4 );
+
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		public static extern IntPtr DefWindowProc(
 			IntPtr hWnd,
@@ -34,23 +36,20 @@ namespace Laevo.View.Activity
 		const int HitTopLeftBorderCorner = 13;
 		const int HitTopRightBorderCorner = 14;
 
-		[DllImport("dwmapi.dll", EntryPoint="#127")]
-		private static extern void DwmGetColorizationParameters(out Dwmcolorizationparams parameters);
+		[DllImport( "dwmapi.dll", EntryPoint = "#127" )]
+		static extern void DwmGetColorizationParameters( out Dwmcolorizationparams parameters );
 
-		// Storyboard to slide down, not used for now, maybe in future.
-		readonly Storyboard _storyboardSlideDown;
-
-		readonly Storyboard _storyboardSlideUp;
+		readonly DoubleAnimation _toUpAnimation;
 
 		public struct Dwmcolorizationparams
 		{
-			public uint ColorizationColor, 
-			ColorizationAfterglow, 
-			ColorizationColorBalance, 
-			ColorizationAfterglowBalance, 
-			ColorizationBlurBalance, 
-			ColorizationGlassReflectionIntensity, 
-			ColorizationOpaqueBlend;
+			public uint ColorizationColor,
+				ColorizationAfterglow,
+				ColorizationColorBalance,
+				ColorizationAfterglowBalance,
+				ColorizationBlurBalance,
+				ColorizationGlassReflectionIntensity,
+				ColorizationOpaqueBlend;
 		}
 
 		public ActivityInfoBox()
@@ -64,33 +63,17 @@ namespace Laevo.View.Activity
 			//10 pixels are added to a taskbar height because of initial top position of ActivityInfoBox outside of the screen.
 			Height = GetTaskBarHeight() + 10; // Probably can be done later by using converter.
 
-			var oneSecondDuration = new Duration(TimeSpan.FromSeconds(1));
-			var toUpAnimation = new DoubleAnimation
+			// Set up animation which hides the info box.
+			_toUpAnimation = new DoubleAnimation
 			{
-				To = -3
+				From = -3,
+				To = -60,
+				Duration = new Duration(TimeSpan.FromSeconds(1)),
+				FillBehavior = FillBehavior.Stop,
+				BeginTime = _hideTime
 			};
-			_storyboardSlideDown = new Storyboard
-			{
-				Duration = oneSecondDuration
-			};
-			_storyboardSlideDown.Children.Add(toUpAnimation);
-			Storyboard.SetTarget(toUpAnimation, this);
-			Storyboard.SetTargetProperty(toUpAnimation, new PropertyPath("(Window.Top)"));
-
-			var toDownAnimation = new DoubleAnimation
-			{
-				To = -60
-			};
-			_storyboardSlideUp = new Storyboard
-			{
-				Duration = oneSecondDuration
-			};
-			toDownAnimation.FillBehavior = FillBehavior.Stop;
-			_storyboardSlideUp.Children.Add(toDownAnimation);
-			Storyboard.SetTarget(toDownAnimation, this);
-			Storyboard.SetTargetProperty(toDownAnimation, new PropertyPath("(Window.Top)"));
-			_storyboardSlideUp.Completed += SlideToTopStoryboardOnCompletedEventHandler;
 		}
+
 
 		/// <summary>
 		/// Gets Windows taskbar height or width depending on its position. 
@@ -187,44 +170,26 @@ namespace Laevo.View.Activity
 		}
 
 		/// <summary>
-		/// Slides out the window when it loses a focus or is inactive
+		/// Resets animation responsible for Activity Info Box slidning up.
+		/// </summary>
+		void ResetToUpAnimation()
+		{
+			_toUpAnimation.Completed -= HideCompleted;
+			BeginAnimation(TopProperty, null);
+			_toUpAnimation.BeginTime = TimeSpan.Zero;
+			Top = -3;
+			_toUpAnimation.Completed += HideCompleted;
+		}
+
+		/// <summary>
+		/// Slides out the window when it loses a focus or is inactive.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		void WindowActivityInfoDeactivatedEventHandler( object sender, EventArgs e )
 		{
-			_storyboardSlideUp.Begin();
-		}
-
-		/// <summary>
-		/// Slides out the window when is not active or clicked more than 4 seconds after showing up.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void WindowActivityInfoIsVisibleChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
-		{
-			var timer = new Timer
-			{
-				Interval = 4000
-			};
-			if (IsVisible)
-			{
-				timer.Start();
-				timer.Tick += (s, args) =>
-				{
-					if (!IsActive)
-					{
-
-						_storyboardSlideUp.Begin();
-						timer.Stop();
-					}
-				};
-			}
-			else
-			{
-				timer.Stop();
-				Top = -3;
-			}
+			ResetToUpAnimation();
+			BeginAnimation(TopProperty, _toUpAnimation);
 		}
 
 		/// <summary>
@@ -232,10 +197,29 @@ namespace Laevo.View.Activity
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		void SlideToTopStoryboardOnCompletedEventHandler( object sender, EventArgs e )
+		void HideCompleted(object sender, EventArgs e)
 		{
 			Hide();
+		}
+
+		/// <summary>
+		/// Custom show method in order to show Acitivty Info Box, reset animation and hide it after 4 seconds being inactive.
+		/// </summary>
+		public void ShowActivityInfoBox()
+		{
+			_toUpAnimation.Completed -= HideCompleted;
+			BeginAnimation( TopProperty, null );
 			Top = -3;
+			Show();
+			_toUpAnimation.Completed += HideCompleted;
+
+			_toUpAnimation.BeginTime = _hideTime;
+			BeginAnimation( TopProperty, _toUpAnimation );
+		}
+
+		void ActivityInfoBoxOnActivated( object sender, EventArgs e )
+		{
+			ResetToUpAnimation();
 		}
 	}
 }
