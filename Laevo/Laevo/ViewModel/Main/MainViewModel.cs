@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data.View;
 using Laevo.Model;
+using Laevo.View.Activity;
 using Laevo.View.ActivityOverview;
 using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
@@ -37,6 +38,7 @@ namespace Laevo.ViewModel.Main
 		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
 		public int UnattendedInterruptions { get; private set; }
 
+		readonly ActivityInfoBox _infoBox;
 
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{			
@@ -52,8 +54,15 @@ namespace Laevo.ViewModel.Main
 			_model.ActivityRemoved += a => UpdateUnattendedInterruptions();
 
 			EnsureActivityOverview();
-		}
 
+			_infoBox = new ActivityInfoBox
+			{
+				ShowActivated = false,
+				Focusable = false
+			};
+
+			ShowInfoBox();
+		}
 
 		/// <summary>
 		///   HACK: This functionality is provided since this is still a prototype and sometimes the GUI seems to hang.
@@ -154,7 +163,8 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) 
+				&& !_infoBox.IsActive)
 			{
 				ShowActivityOverview();
 			}
@@ -168,6 +178,21 @@ namespace Laevo.ViewModel.Main
 		public bool CanSwitchActivityOverview()
 		{
 			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
+		}
+
+		[CommandExecute(Commands.ShowActivityInfoBox)]
+		public void ShowActivityInfoBox()
+		{
+			ShowInfoBox();
+		}
+
+		/// <summary>
+		/// Fills InfoBox with necesary properties and shows it on the screen sliding down from above the screen.
+		/// </summary>
+		void ShowInfoBox()
+		{
+			_infoBox.DataContext = _activityOverviewViewModel.CurrentActivityViewModel;
+			_infoBox.ShowActivityInfoBox();
 		}
 
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
@@ -246,6 +271,7 @@ namespace Laevo.ViewModel.Main
 					EnableAttentionLines = _model.Settings.EnableAttentionLines
 				};
 				_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
+
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.RemovedActivityEvent += OnRemovedActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
@@ -272,6 +298,7 @@ namespace Laevo.ViewModel.Main
 			}
 
 			HideActivityOverview();
+			ShowInfoBox();
 		}
 
 		void OnRemovedActivityEvent( ActivityViewModel removed )

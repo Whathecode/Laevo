@@ -56,23 +56,24 @@ namespace Laevo.View.Main
 
 			// Add triggers for desired system-wide commands.
 			ResetKeyStates();
-			var capsLockDown = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
+			var capsLockPressed = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
+			AddExclusiveKeysTrigger(capsLockPressed, Keys.CapsLock, Commands.ShowActivityInfoBox);
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
-			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );			
+			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );
 			var newActivity = new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, newActivity ), Keys.CapsLock | Keys.N, Commands.NewActivity );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, newActivity ), Keys.CapsLock | Keys.N, Commands.NewActivity );
 			var closeActivity = new KeyInputCondition( () => _keyStates[ Keys.W ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, closeActivity ), Keys.CapsLock | Keys.W, Commands.CloseActivity );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, closeActivity ), Keys.CapsLock | Keys.W, Commands.CloseActivity );
 			var openLibrary = new KeyInputCondition( () => _keyStates[ Keys.L ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, openLibrary ), Keys.CapsLock | Keys.L, Commands.OpenCurrentActivityLibrary );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, openLibrary ), Keys.CapsLock | Keys.L, Commands.OpenCurrentActivityLibrary );
 			var cutWindow = new KeyInputCondition( () => _keyStates[ Keys.X ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, cutWindow ), Keys.CapsLock | Keys.X, Commands.CutWindow );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, cutWindow ), Keys.CapsLock | Keys.X, Commands.CutWindow );
 			var pasteWindows = new KeyInputCondition( () => _keyStates[ Keys.V ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
 			var switchCapsLock = new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
 			var switchActivity = new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockDown, switchActivity ), Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchActivity ), Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );

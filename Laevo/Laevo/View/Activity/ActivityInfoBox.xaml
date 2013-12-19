@@ -78,7 +78,7 @@
 					Source="../Activity/ActionIcons/edit.png"
 					Cursor="Hand"
 					Width="28" Height="28"
-					PreviewMouseDown="SettingsOnPreviewMouseDown"
+					PreviewMouseDown="PassFocus"
 					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"/>
 			</StackPanel>
 

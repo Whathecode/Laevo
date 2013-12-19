@@ -59,10 +59,10 @@ namespace Laevo.View.Activity
 			InitializeComponent();
 			Loaded += MainWindowLoaded;
 
-			// Adds 10 pixels to ActivityInfoBox width beacuse of initial top and left position outside of the screen.
+			// Adds 10 pixels to ActivityInfoBox width beacuse of initial left position outside of the screen.
 			Width += 10; // Probably can be done later by using converter.
 
-			//10 pixels are added to a taskbar height because of initial top position of ActivityInfoBox outside of the screen.
+			//10 pixels are added to ActivityInfoBox height because of initial top position of InfoBox outside of the screen.
 			Height = GetTaskBarHeight() + 10; // Probably can be done later by using converter.
 
 			// Set up animation which hides the info box.
@@ -168,7 +168,8 @@ namespace Laevo.View.Activity
 		/// <param name="e"></param>
 		void ActivityNameOnLoadedEventHandler( object sender, RoutedEventArgs e )
 		{
-			ActivityName.CaretIndex = ActivityName.Text.Length;
+			//TODO: Feature will be used only with newly created activites.
+			//ActivityName.CaretIndex = ActivityName.Text.Length;
 		}
 
 		/// <summary>
@@ -229,7 +230,7 @@ namespace Laevo.View.Activity
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		void SettingsOnPreviewMouseDown( object sender, MouseButtonEventArgs e )
+		void PassFocus( object sender, MouseButtonEventArgs e )
 		{
 			((UIElement)e.Source).Focus();
 		}
