@@ -2,10 +2,12 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Application = System.Windows.Application;
+using TextBox = System.Windows.Controls.TextBox;
 
 
 namespace Laevo.View.Activity
@@ -188,6 +190,7 @@ namespace Laevo.View.Activity
 		/// <param name="e"></param>
 		void WindowActivityInfoDeactivatedEventHandler( object sender, EventArgs e )
 		{
+			ForceBindingUpdate();
 			ResetToUpAnimation();
 			BeginAnimation(TopProperty, _toUpAnimation);
 		}
@@ -220,6 +223,27 @@ namespace Laevo.View.Activity
 		void ActivityInfoBoxOnActivated( object sender, EventArgs e )
 		{
 			ResetToUpAnimation();
+		}
+		/// <summary>
+		/// Passes the focus to settings button to ensure activity name update.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void SettingsOnPreviewMouseDown( object sender, MouseButtonEventArgs e )
+		{
+			((UIElement)e.Source).Focus();
+		}
+
+		/// <summary>
+		/// Forces ActivityName binding to update.
+		/// </summary>
+		private void ForceBindingUpdate()
+		{
+			var nameBinding = ActivityName.GetBindingExpression(TextBox.TextProperty);
+			if (nameBinding != null && !ActivityName.IsReadOnly && ActivityName.IsEnabled)
+			{
+				nameBinding.UpdateSource();
+			}
 		}
 	}
 }
