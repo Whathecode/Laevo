@@ -18,6 +18,7 @@
 		NewActivity,
 		CutWindow,
 		PasteWindows,
-		SwitchActivity
+		SwitchActivity,
+		ShowActivityInfoBox
 	}
 }
