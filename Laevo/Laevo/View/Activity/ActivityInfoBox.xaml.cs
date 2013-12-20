@@ -6,7 +6,9 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Laevo.ViewModel.Activity;
 using Application = System.Windows.Application;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
 
 
@@ -162,21 +164,13 @@ namespace Laevo.View.Activity
 		}
 
 		/// <summary>
-		/// Places the caret on the last position of the name text box in order to allow user to update the name.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		void ActivityNameOnLoadedEventHandler( object sender, RoutedEventArgs e )
-		{
-			//TODO: Feature will be used only with newly created activites.
-			//ActivityName.CaretIndex = ActivityName.Text.Length;
-		}
-
-		/// <summary>
 		/// Resets animation responsible for Activity Info Box slidning up.
 		/// </summary>
 		void ResetToUpAnimation()
 		{
+			//Passes focus to option button- better look, removes bilinking carete from text box after editing.
+			OptionsButton.Focus();
+
 			_toUpAnimation.Completed -= HideCompleted;
 			BeginAnimation(TopProperty, null);
 			_toUpAnimation.BeginTime = TimeSpan.Zero;
@@ -204,6 +198,7 @@ namespace Laevo.View.Activity
 		void HideCompleted(object sender, EventArgs e)
 		{
 			Hide();
+			OptionsButton.Focus();
 		}
 
 		/// <summary>
@@ -215,16 +210,38 @@ namespace Laevo.View.Activity
 			BeginAnimation( TopProperty, null );
 			Top = -3;
 			Show();
+
+			if ( DataContext != null )
+			{
+				var activityViewModel = (ActivityViewModel)DataContext;
+				// Allows user to edit name text box imidiately after activity creation using short cut CapsLock + N.
+				if ( activityViewModel.IsNewShortCutActivity )
+				{
+					Activate();
+					ResetToUpAnimation();
+					ActivityName.CaretIndex = ActivityName.Text.Length;
+					ActivityName.Focus();
+					( (ActivityViewModel)( DataContext ) ).IsNewShortCutActivity = false;
+					return;
+				}
+			}
+
 			_toUpAnimation.Completed += HideCompleted;
 
 			_toUpAnimation.BeginTime = _hideTime;
 			BeginAnimation( TopProperty, _toUpAnimation );
 		}
 
+		/// <summary>
+		/// Event Handler not used for now, only for focus bug tracking.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		void ActivityInfoBoxOnActivated( object sender, EventArgs e )
 		{
-			ResetToUpAnimation();
+			
 		}
+
 		/// <summary>
 		/// Passes the focus to settings button to ensure activity name update.
 		/// </summary>
@@ -245,6 +262,12 @@ namespace Laevo.View.Activity
 			{
 				nameBinding.UpdateSource();
 			}
+		}
+
+		void ActivityInfoBoxOnMousePress( object sender, MouseEventArgs e )
+		{
+			Activate();
+			ResetToUpAnimation();
 		}
 	}
 }
