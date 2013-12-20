@@ -87,7 +87,7 @@ namespace Laevo.View.Activity
 			}
 			else
 			{
-				// TODO: Disable resize mode to hide a window border when aero theme is not used in order to hace better styling.
+				// TODO: Disable resize mode to hide a window border when aero theme is not used in order to have better styling.
 				//window.ResizeMode = ResizeMode.NoResize;
 			}
 		}

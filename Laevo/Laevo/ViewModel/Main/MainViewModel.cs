@@ -58,7 +58,7 @@ namespace Laevo.ViewModel.Main
 			_infoBox = new ActivityInfoBox
 			{
 				ShowActivated = false,
-				Focusable = false
+				Focusable = true
 			};
 
 			ShowInfoBox();
@@ -134,7 +134,7 @@ namespace Laevo.ViewModel.Main
 		}
 
 		/// <summary>
-		///   Opens the activity overview in order to select one of the activities.
+		/// Opens the activity overview in order to select one of the activities.
 		/// </summary>
 		/// <param name="selectedActivity">The action to perform on the selected activity.</param>
 		public void SelectActivity( Action<ActivityViewModel> selectedActivity )
@@ -219,7 +219,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
-			ActivityViewModel activity = _activityOverviewViewModel.CreateNewActivity();
+			ActivityViewModel activity = _activityOverviewViewModel.CreateNewActivity(true);
 			activity.ActivateActivity();
 		}
 

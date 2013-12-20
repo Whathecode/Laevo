@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -226,6 +227,9 @@ namespace Laevo.ViewModel.Activity
 
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
+		
+		[DefaultValue(false)]
+		public bool IsNewShortCutActivity { get; set; }
 
 		static ActivityViewModel()
 		{
@@ -241,12 +245,13 @@ namespace Laevo.ViewModel.Activity
 				.ToList();
 
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
-			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );			
+			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
-		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
+		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, bool isNewShortCutActivity = false )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() )
 		{
+			IsNewShortCutActivity = isNewShortCutActivity;
 		}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )

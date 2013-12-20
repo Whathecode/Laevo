@@ -20,11 +20,12 @@
 		activity:GlassEffect.IsEnabled="True"
 		Activated="ActivityInfoBoxOnActivated"
 		Deactivated="WindowActivityInfoDeactivatedEventHandler"
-		Background="Transparent">
+		Background="Transparent"
+		MouseDown="ActivityInfoBoxOnMousePress">
 		
 
 	<!-- TODO: Manage windows theme colors, for later. 
-	Applies a color with gradient to window to simulate Windows taskbar look when Aero theme is not switched off. 
+	Applies a color with gradient to window to simulate Windows taskbar look when Aero theme is switched off. 
 	<Window.Background>
 		<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
 			<GradientStop Color="#FF324E5A" Offset="0"/>
@@ -47,7 +48,10 @@
 		<StackPanel Orientation="Horizontal"
 					DockPanel.Dock="Left">
 
-			<Button Style="{StaticResource GlassButton}" Width="35" Height="35">
+			<Button Style="{StaticResource GlassButton}"
+					Width="35" Height="35"
+					MouseDown="ActivityInfoBoxOnMousePress">
+				
 				<Button.Background>
 					<SolidColorBrush Color="{Binding Color}"></SolidColorBrush>
 				</Button.Background>
@@ -56,16 +60,17 @@
 			</Button>
 
 			<TextBox x:Name="ActivityName"
-				Background="Transparent"
-				BorderBrush="Transparent"
-				Foreground="White"
-				CaretBrush="White"
-				FontFamily="Segoe UI Light" FontSize="18" 
-				Text="{Binding Label}"
-				Margin="10, 0, 10, 0"
-				HorizontalAlignment="Center"
-				VerticalAlignment="Center"
-				Loaded="ActivityNameOnLoadedEventHandler">
+					 Background="Transparent"
+					 BorderBrush="Transparent"
+					 Foreground="White"
+					 CaretBrush="White"
+					 FontFamily="Segoe UI Light" FontSize="18" 
+					 Text="{Binding Label}"
+					 Margin="10, 0, 10, 0"
+					 HorizontalAlignment="Center"
+					 VerticalAlignment="Center"
+					 PreviewMouseDown="ActivityInfoBoxOnMousePress">
+				
 				<TextBox.Template>
 					<ControlTemplate TargetType="{x:Type TextBox}">
 						<ScrollViewer x:Name="PART_ContentHost" />
@@ -79,7 +84,8 @@
 					Cursor="Hand"
 					Width="28" Height="28"
 					PreviewMouseDown="PassFocus"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"/>
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"
+					   Name="OptionsButton"/>
 			</StackPanel>
 
 		</StackPanel>
