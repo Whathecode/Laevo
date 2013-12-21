@@ -274,7 +274,7 @@ namespace Laevo.View.ActivityOverview
 				{
 					StartVelocity = velocity,
 					ConstantDeceleration = velocity * DragMomentum,
-					TimeLine = TimeLine					
+					TimeLine = TimeLine
 				};
 				_dragAnimation.Completed += DragAnimationCompleted;	
 				TimeLine.BeginAnimation( visibleIntervalProperty, _dragAnimation );
@@ -316,7 +316,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		void DragAnimationCompleted( object sender, EventArgs e )
-		{			
+		{
 			StopDragAnimation();
 		}
 

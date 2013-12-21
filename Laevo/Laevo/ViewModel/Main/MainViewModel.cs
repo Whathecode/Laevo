@@ -18,6 +18,7 @@ using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Application = System.Windows.Application;
 using Commands = Laevo.ViewModel.Main.Binding.Commands;
+using Laevo = Laevo.Model.Laevo;
 
 
 namespace Laevo.ViewModel.Main
@@ -38,10 +39,11 @@ namespace Laevo.ViewModel.Main
 		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
 		public int UnattendedInterruptions { get; private set; }
 
-		readonly ActivityInfoBox _infoBox;
+		readonly ActivityBar _activityBar = new ActivityBar();
+
 
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
-		{			
+		{
 			_model = model;
 			_dataRepository = dataRepository;
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -54,14 +56,7 @@ namespace Laevo.ViewModel.Main
 			_model.ActivityRemoved += a => UpdateUnattendedInterruptions();
 
 			EnsureActivityOverview();
-
-			_infoBox = new ActivityInfoBox
-			{
-				ShowActivated = false,
-				Focusable = true
-			};
-
-			ShowInfoBox();
+			ShowActivityBar();
 		}
 
 		/// <summary>
@@ -163,8 +158,7 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) 
-				&& !_infoBox.IsActive)
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && !_activityBar.IsActive )
 			{
 				ShowActivityOverview();
 			}
@@ -180,19 +174,11 @@ namespace Laevo.ViewModel.Main
 			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
 		}
 
-		[CommandExecute(Commands.ShowActivityInfoBox)]
-		public void ShowActivityInfoBox()
+		[CommandExecute( Commands.ShowActivityBar )]
+		public void ShowActivityBar( bool activate = false )
 		{
-			ShowInfoBox();
-		}
-
-		/// <summary>
-		/// Fills InfoBox with necesary properties and shows it on the screen sliding down from above the screen.
-		/// </summary>
-		void ShowInfoBox()
-		{
-			_infoBox.DataContext = _activityOverviewViewModel.CurrentActivityViewModel;
-			_infoBox.ShowActivityInfoBox();
+			_activityBar.DataContext = _activityOverviewViewModel.CurrentActivityViewModel;
+			_activityBar.ShowActivityBar( activate );
 		}
 
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
@@ -219,7 +205,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
-			ActivityViewModel activity = _activityOverviewViewModel.CreateNewActivity(true);
+			ActivityViewModel activity = _activityOverviewViewModel.CreateNewActivity();
 			activity.ActivateActivity();
 		}
 
@@ -298,7 +284,8 @@ namespace Laevo.ViewModel.Main
 			}
 
 			HideActivityOverview();
-			ShowInfoBox();
+			// TODO: Is there a better way to check whether the name has been set already? Perhaps it's also not desirable to activate the activity bar each time as long as the name isn't changed?
+			ShowActivityBar( newActivity.Label == Model.Laevo.DefaultActivityName );
 		}
 
 		void OnRemovedActivityEvent( ActivityViewModel removed )

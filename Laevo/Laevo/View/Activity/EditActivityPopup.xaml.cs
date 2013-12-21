@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Whathecode.System;
 using Whathecode.System.Extensions;
 using Xceed.Wpf.Toolkit;
 

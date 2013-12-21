@@ -137,9 +137,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// <summary>
 		///   Create a new activity.
 		/// </summary>
-		public ActivityViewModel CreateNewActivity(bool newShortCutActivity = false)
+		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel(_model.CreateNewActivity(), _model.DesktopManager, newShortCutActivity)
+			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.DesktopManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines
 			};

@@ -12,7 +12,6 @@ using Laevo.Data.Model;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System;
 using Whathecode.System.Extensions;
-using Whathecode.System.Linq;
 using Whathecode.System.Windows.Threading;
 
 
@@ -25,6 +24,8 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	class Laevo
 	{
+		public const string DefaultActivityName = "New Activity";
+
 		readonly Dispatcher _dispatcher;
 
 		readonly ProcessTracker _processTracker = new ProcessTracker();
@@ -160,7 +161,7 @@ namespace Laevo.Model
 		///   Create and add a new activity and sets it as the current activity.
 		/// </summary>
 		/// <returns>The newly created activity.</returns>
-		public Activity CreateNewActivity( string name = "New Activity" )
+		public Activity CreateNewActivity( string name = DefaultActivityName )
 		{
 			var activity = _dataRepository.CreateNewActivity( name );
 			HandleActivity( activity );

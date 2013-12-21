@@ -41,7 +41,6 @@ namespace Laevo.View.Main
 		public TrayIconControl( MainViewModel viewModel )
 		{
 			viewModel.GuiReset += ResetKeyStates;
-			//viewModel.Exiting += () => { Icon.Dispose(); };
 
 			InitializeComponent();
 
@@ -57,7 +56,7 @@ namespace Laevo.View.Main
 			// Add triggers for desired system-wide commands.
 			ResetKeyStates();
 			var capsLockPressed = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
-			AddExclusiveKeysTrigger(capsLockPressed, Keys.CapsLock, Commands.ShowActivityInfoBox);
+			AddExclusiveKeysTrigger( capsLockPressed, Keys.CapsLock, Commands.ShowActivityBar, false );
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );
 			var newActivity = new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down );
@@ -127,11 +126,11 @@ namespace Laevo.View.Main
 		}
 
 		readonly List<ExclusiveCondition> _exclusiveConditions = new List<ExclusiveCondition>();
-		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Commands command )
+		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Commands command, object parameter = null )
 		{
 			CreateExclusiveTrigger(
 				condition, exclusiveKeys,
-				c => new CommandBindingTrigger<Commands>( c, this, command ) );
+				c => new CommandBindingTrigger<Commands>( c, this, command, parameter ) );
 
 		}
 		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Action action )
@@ -155,7 +154,7 @@ namespace Laevo.View.Main
 			_exclusiveConditions.Add( exclusiveCondition );
 		}
 
-		bool _isDisposed = false;
+		bool _isDisposed;
 		~TrayIconControl()
 		{
 			Dispose( false );

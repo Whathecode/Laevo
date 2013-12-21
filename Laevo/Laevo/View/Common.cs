@@ -13,6 +13,13 @@ namespace Laevo.View
 		{
 			// Moving focus also updates the source.
 			element.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+
+			// TODO: For text boxes the source can be updated as follows, but this doesn't move the caret.
+			/*var nameBinding = ActivityName.GetBindingExpression( TextBox.TextProperty );
+			if ( nameBinding != null && !ActivityName.IsReadOnly && ActivityName.IsEnabled )
+			{
+				nameBinding.UpdateSource();
+			}*/
 		}
 	}
 }

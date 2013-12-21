@@ -70,9 +70,6 @@
 				<RowDefinition Height="*"/>
 				<RowDefinition Height="60" />
 			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition />
-			</Grid.ColumnDefinitions>
 
 			<Canvas>
 				<Image x:Name="Image" Source="{Binding Icon}">
