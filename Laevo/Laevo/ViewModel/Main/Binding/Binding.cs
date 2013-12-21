@@ -19,6 +19,6 @@
 		CutWindow,
 		PasteWindows,
 		SwitchActivity,
-		ShowActivityInfoBox
+		ShowActivityBar
 	}
 }

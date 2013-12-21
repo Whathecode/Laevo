@@ -31,7 +31,7 @@ namespace Laevo.View.ActivityOverview.Labels
 				Y1 = 0,
 				X2 = 0,
 				Stroke = lineBrush,
-				StrokeThickness = 3,				
+				StrokeThickness = 3,
 				IsHitTestVisible = false
 			};
 			line.SetValue( TopProperty, TopOffset );

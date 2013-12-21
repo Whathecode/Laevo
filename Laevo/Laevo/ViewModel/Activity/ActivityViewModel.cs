@@ -228,8 +228,6 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
 		
-		[DefaultValue(false)]
-		public bool IsNewShortCutActivity { get; set; }
 
 		static ActivityViewModel()
 		{
@@ -248,10 +246,9 @@ namespace Laevo.ViewModel.Activity
 			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
-		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, bool isNewShortCutActivity = false )
+		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() )
 		{
-			IsNewShortCutActivity = isNewShortCutActivity;
 		}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
@@ -404,7 +401,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivityLibrary )]
 		public void OpenActivityLibrary()
 		{
-			var folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
+			string folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
 			Process.Start( "explorer.exe", Path.ChangeExtension( folderName, LibraryExtension ) );
 		}
 

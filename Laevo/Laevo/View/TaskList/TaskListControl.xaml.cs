@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
@@ -43,7 +44,7 @@ namespace Laevo.View.TaskList
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				Common.ForceUpdate( (UIElement)e.Source );
+				Common.ForceUpdate( (TextBox)e.Source );
 				e.Handled = true;
 			}
 		}

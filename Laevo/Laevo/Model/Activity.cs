@@ -19,6 +19,7 @@ namespace Laevo.Model
 	[DataContract]
 	class Activity
 	{
+		public const string DefaultActivityName = "New Activity";
 		public static readonly string ProgramMyDocumentsFolder = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), "Laevo" );
 		static readonly string ActivityContextPath = Path.Combine( ProgramMyDocumentsFolder, "Activities" );
 

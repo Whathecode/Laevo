@@ -371,6 +371,7 @@
     <Compile Include="Data\Model\AbstractMemoryModelRepository.cs" />
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
+    <Compile Include="Data\ScrumExampleDataFactory.cs" />
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
@@ -418,14 +419,15 @@
     <Compile Include="View\Activity\ActionButtons.xaml.cs">
       <DependentUpon>ActionButtons.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Activity\ActivityInfoBox.xaml.cs">
-      <DependentUpon>ActivityInfoBox.xaml</DependentUpon>
+    <Compile Include="View\Activity\ActivityBar.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>ActivityBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Activity\Converters\ActivityBorderThicknessConverter.cs" />
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Common.cs" />
     <Compile Include="View\Main\IconConverter.cs" />
-    <Compile Include="View\Activity\RGGlassEffect.cs" />
+    <Compile Include="View\Activity\GlassEffect.cs" />
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>
@@ -516,7 +518,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Activity\ActivityInfoBox.xaml">
+    <Page Include="View\Activity\ActivityBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
