@@ -371,7 +371,6 @@
     <Compile Include="Data\Model\AbstractMemoryModelRepository.cs" />
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
-    <Compile Include="Data\ScrumExampleDataFactory.cs" />
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
@@ -649,6 +648,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\ActionIcons\stop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -228,7 +228,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.SelectedActivityEvent -= OnActivitySelected;
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
-			activity.ActivityClosedEvent -= OnActivityClosed;
+			activity.ActivityStoppedEvent -= OnActivityStopped;
 
 			RemovedActivityEvent( activity );
 		}
@@ -258,7 +258,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
-			activity.ActivityClosedEvent += OnActivityClosed;
+			activity.ActivityStoppedEvent += OnActivityStopped;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -277,11 +277,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			ActivatedActivityEvent( oldActivity, CurrentActivityViewModel );
 		}
 
-		void OnActivityClosed( ActivityViewModel viewModel )
+		void OnActivityStopped( ActivityViewModel viewModel )
 		{
 			if ( viewModel == CurrentActivityViewModel )
 			{
-				// HACK: Since this activity is closed, CurrentActivityViewModel will be set to null next time the overview is activated and its state won't be updated.
+				// HACK: Since this activity is stopped, CurrentActivityViewModel will be set to null next time the overview is activated and its state won't be updated.
 				//       Therefore, already update the window states now. This is a temporary solution.
 				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
 				_model.DesktopManager.UpdateWindowAssociations();

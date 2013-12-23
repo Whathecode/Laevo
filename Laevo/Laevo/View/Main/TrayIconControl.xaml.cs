@@ -61,8 +61,8 @@ namespace Laevo.View.Main
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );
 			var newActivity = new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, newActivity ), Keys.CapsLock | Keys.N, Commands.NewActivity );
-			var closeActivity = new KeyInputCondition( () => _keyStates[ Keys.W ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, closeActivity ), Keys.CapsLock | Keys.W, Commands.CloseActivity );
+			var stopActivity = new KeyInputCondition( () => _keyStates[ Keys.W ], KeyInputCondition.KeyState.Down );
+			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, stopActivity ), Keys.CapsLock | Keys.W, Commands.StopActivity );
 			var openLibrary = new KeyInputCondition( () => _keyStates[ Keys.L ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, openLibrary ), Keys.CapsLock | Keys.L, Commands.OpenCurrentActivityLibrary );
 			var cutWindow = new KeyInputCondition( () => _keyStates[ Keys.X ], KeyInputCondition.KeyState.Down );

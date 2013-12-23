@@ -28,9 +28,7 @@ namespace Laevo
 		{
 			// Create Services.
 			var interruptionAggregator = new InterruptionAggregator( PluginLibrary );
-			var repositoryFactory
-				//= new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator );
-				= new ScrumExampleDataFactory();
+			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator );
 			
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();

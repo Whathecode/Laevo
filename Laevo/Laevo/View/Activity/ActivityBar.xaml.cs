@@ -113,7 +113,7 @@ namespace Laevo.View.Activity
 		/// <summary>
 		/// Override the window hit test. If the cursor is over a resize border, return a standard border result instead.
 		/// </summary>
-		IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
+		static IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
 		{
 			if ( message != WindowsHitTest )
 			{

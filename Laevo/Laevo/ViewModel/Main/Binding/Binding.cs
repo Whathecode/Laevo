@@ -14,7 +14,7 @@
 		HideActivityOverview,
 		SwitchActivityOverview,
 		OpenCurrentActivityLibrary,
-		CloseActivity,
+		StopActivity,
 		NewActivity,
 		CutWindow,
 		PasteWindows,

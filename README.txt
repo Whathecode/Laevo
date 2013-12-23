@@ -5,3 +5,5 @@ published by the Free Software Foundation. Check
 http://www.gnu.org/licenses/gpl.html for details.
 
 This program uses several other open source libraries. Their copyright notices are added in the relevant Libraries folders.
+
+Some icons used are from http://iconza.com/

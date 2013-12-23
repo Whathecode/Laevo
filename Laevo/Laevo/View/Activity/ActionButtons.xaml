@@ -67,14 +67,16 @@
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 				RenderTransformOrigin="0.5, 0.5"
 				RenderTransform="{StaticResource ResizeActionIcon}" />
-			<!-- Close button. -->
+			<!-- Stop button. -->
 			<Image
 				Focusable="True"
 				PreviewMouseDown="SetFocus"
-				Source="../Activity/ActionIcons/close.png"
+				Source="../Activity/ActionIcons/stop.png"
+				Width="32"
+				Height="32"
 				Cursor="Hand"
 				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.CloseActivity}}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.StopActivity}}"
 				RenderTransformOrigin="0.5, 0.5"
 				RenderTransform="{StaticResource ResizeActionIcon}" />
 		</StackPanel>
