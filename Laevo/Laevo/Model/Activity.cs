@@ -24,7 +24,7 @@ namespace Laevo.Model
 		static readonly string ActivityContextPath = Path.Combine( ProgramMyDocumentsFolder, "Activities" );
 
 		public event Action<Activity> OpenedEvent;
-		public event Action<Activity> ClosedEvent;
+		public event Action<Activity> StoppedEvent;
 
 		public event Action<Activity> ActivatedEvent;
 		public event Action<Activity> DeactivatedEvent;
@@ -191,9 +191,9 @@ namespace Laevo.Model
 		}
 
 		/// <summary>
-		///   Closing an activity removes it from the currently ongoing multitasking session.
+		///   Stopping an activity removes it from the currently ongoing multitasking session.
 		/// </summary>
-		public void Close()
+		public void Stop()
 		{
 			if ( !IsOpen )
 			{
@@ -203,7 +203,7 @@ namespace Laevo.Model
 			_currentOpenInterval.ExpandTo( DateTime.Now );
 			_currentOpenInterval = null;
 			IsOpen = false;
-			ClosedEvent( this );
+			StoppedEvent( this );
 		}
 
 		public void Plan( DateTime atTime, TimeSpan duration )

@@ -18,7 +18,6 @@ using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Application = System.Windows.Application;
 using Commands = Laevo.ViewModel.Main.Binding.Commands;
-using Laevo = Laevo.Model.Laevo;
 
 
 namespace Laevo.ViewModel.Main
@@ -187,19 +186,24 @@ namespace Laevo.ViewModel.Main
 			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
 		}
 
-		[CommandExecute( Commands.CloseActivity )]
-		public void CloseActivity()
+		[CommandExecute( Commands.StopActivity )]
+		public void StopActivity()
 		{
 			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
 			{
-				_activityOverviewViewModel.CurrentActivityViewModel.CloseActivity();
+				_activityOverviewViewModel.CurrentActivityViewModel.StopActivity();
 			}
 		}
 
-		[CommandCanExecute( Commands.CloseActivity )]
-		public bool CanCloseActivity()
+		[CommandCanExecute( Commands.StopActivity )]
+		public bool CanStopActivity()
 		{
-			return _activityOverviewViewModel.CurrentActivityViewModel != null;
+			var currentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
+
+			return
+				currentActivity != null &&
+				currentActivity != _activityOverviewViewModel.HomeActivity &&
+				currentActivity.IsOpen;
 		}
 
 		[CommandExecute( Commands.NewActivity )]

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -95,9 +94,9 @@ namespace Laevo.ViewModel.Activity
 		public event ActivityEventHandler ActivityEditFinishedEvent;
 
 		/// <summary>
-		///   Event which is triggered when activity is closed.
+		///   Event which is triggered when activity is stopped.
 		/// </summary>
-		public event ActivityEventHandler ActivityClosedEvent;
+		public event ActivityEventHandler ActivityStoppedEvent;
 
 		internal readonly Model.Activity Activity;
 		readonly VirtualDesktopManager _desktopManager;
@@ -326,7 +325,7 @@ namespace Laevo.ViewModel.Activity
 			Activity.ActivatedEvent += a => IsActive = true;
 			Activity.DeactivatedEvent += a => IsActive = false;
 			Activity.OpenedEvent += a => IsOpen = true;
-			Activity.ClosedEvent += a => IsOpen = false;
+			Activity.StoppedEvent += a => IsOpen = false;
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
@@ -438,18 +437,18 @@ namespace Laevo.ViewModel.Activity
 			Activity.Open();
 		}
 
-		[CommandExecute( Commands.CloseActivity )]
-		public void CloseActivity()
+		[CommandExecute( Commands.StopActivity )]
+		public void StopActivity()
 		{
 			Deactivated();
-			Activity.Close();
-			ActivityClosedEvent( this );
+			Activity.Stop();
+			ActivityStoppedEvent( this );
 		}
 
 		[CommandExecute( Commands.Remove )]
 		public void Remove()
 		{
-			CloseActivity();
+			StopActivity();
 			_overview.Remove( this );
 		}
 
