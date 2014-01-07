@@ -148,6 +148,8 @@ namespace Laevo.View.Activity
 
 			if ( activate )
 			{
+				PinTaskbar();
+
 				Activate();
 				ActivityName.Select( 0, ActivityName.Text.Length );
 				ActivityName.Focus();
@@ -180,6 +182,7 @@ namespace Laevo.View.Activity
 
 		void OnDeactivated( object sender, EventArgs e )
 		{
+			SettingsImage.Focus();
 			// Force activity name binding to update.
 			var nameBinding = ActivityName.GetBindingExpression( TextBox.TextProperty );
 			if ( nameBinding != null && !ActivityName.IsReadOnly && ActivityName.IsEnabled )
@@ -190,7 +193,8 @@ namespace Laevo.View.Activity
 			// Hide the infobox.
 			if ( !_barGotClosed )
 			{
-				ShowBarFor( TimeSpan.Zero );
+				_hideAnimation.BeginTime = TimeSpan.Zero;
+				BeginAnimation( TopProperty, _hideAnimation );
 			}
 			_barGotClosed = false;
 		}
@@ -201,6 +205,7 @@ namespace Laevo.View.Activity
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
 				_barGotClosed = true;
+				SettingsImage.Focus();
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}
