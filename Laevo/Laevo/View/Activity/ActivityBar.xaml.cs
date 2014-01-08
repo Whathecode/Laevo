@@ -58,10 +58,7 @@ namespace Laevo.View.Activity
 
 			Loaded += OnLoaded;
 			Deactivated += OnDeactivated;
-
-			// TODO: The activated event is the more general event we need, but due to a bug in the VDM which sometimes activates the wrong windows this sometimes causes issues.
-			PreviewMouseDown += ( s, args ) => PinTaskbar();
-			//Activated += ( s, args ) => PinTaskbar();
+			Activated += ( s, args ) => PinTaskbar();
 
 			// Create animation which hides the activity bar, sliding it out of view.
 			_hideAnimation = new DoubleAnimation
@@ -113,7 +110,7 @@ namespace Laevo.View.Activity
 		/// <summary>
 		/// Override the window hit test. If the cursor is over a resize border, return a standard border result instead.
 		/// </summary>
-		static IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
+		IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
 		{
 			if ( message != WindowsHitTest )
 			{
@@ -158,19 +155,22 @@ namespace Laevo.View.Activity
 		{
 			PinTaskbar();
 
-			_hideAnimation.BeginTime = delay;
-			BeginAnimation( TopProperty, _hideAnimation );
+			// Hide the activity bar after some time if it's not activated.
+			if ( !IsActive )
+			{
+				_hideAnimation.BeginTime = delay;
+				BeginAnimation( TopProperty, _hideAnimation );
+			}
 		}
 
 		void PinTaskbar()
 		{
-			Top = TopWhenVisible;
-			Show();
-
 			_hideAnimation.Completed -= HideCompleted;
 			BeginAnimation( TopProperty, null );
 			Top = TopWhenVisible;
 			_hideAnimation.Completed += HideCompleted;
+
+			Show();
 		}
 
 		void HideCompleted( object sender, EventArgs e )
