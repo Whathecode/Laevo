@@ -58,10 +58,7 @@ namespace Laevo.View.Activity
 
 			Loaded += OnLoaded;
 			Deactivated += OnDeactivated;
-
-			// TODO: The activated event is the more general event we need, but due to a bug in the VDM which sometimes activates the wrong windows this sometimes causes issues.
-			PreviewMouseDown += ( s, args ) => PinTaskbar();
-			//Activated += ( s, args ) => PinTaskbar();
+			Activated += ( s, args ) => PinTaskbar();
 
 			// Create animation which hides the activity bar, sliding it out of view.
 			_hideAnimation = new DoubleAnimation
@@ -113,7 +110,7 @@ namespace Laevo.View.Activity
 		/// <summary>
 		/// Override the window hit test. If the cursor is over a resize border, return a standard border result instead.
 		/// </summary>
-		static IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
+		IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
 		{
 			if ( message != WindowsHitTest )
 			{
@@ -148,8 +145,6 @@ namespace Laevo.View.Activity
 
 			if ( activate )
 			{
-				PinTaskbar();
-
 				Activate();
 				ActivityName.Select( 0, ActivityName.Text.Length );
 				ActivityName.Focus();
@@ -160,19 +155,22 @@ namespace Laevo.View.Activity
 		{
 			PinTaskbar();
 
-			_hideAnimation.BeginTime = delay;
-			BeginAnimation( TopProperty, _hideAnimation );
+			// Hide the activity bar after some time if it's not activated.
+			if ( !IsActive )
+			{
+				_hideAnimation.BeginTime = delay;
+				BeginAnimation( TopProperty, _hideAnimation );
+			}
 		}
 
 		void PinTaskbar()
 		{
-			Top = TopWhenVisible;
-			Show();
-
 			_hideAnimation.Completed -= HideCompleted;
 			BeginAnimation( TopProperty, null );
 			Top = TopWhenVisible;
 			_hideAnimation.Completed += HideCompleted;
+
+			Show();
 		}
 
 		void HideCompleted( object sender, EventArgs e )
@@ -182,7 +180,6 @@ namespace Laevo.View.Activity
 
 		void OnDeactivated( object sender, EventArgs e )
 		{
-			SettingsImage.Focus();
 			// Force activity name binding to update.
 			var nameBinding = ActivityName.GetBindingExpression( TextBox.TextProperty );
 			if ( nameBinding != null && !ActivityName.IsReadOnly && ActivityName.IsEnabled )
@@ -193,8 +190,7 @@ namespace Laevo.View.Activity
 			// Hide the infobox.
 			if ( !_barGotClosed )
 			{
-				_hideAnimation.BeginTime = TimeSpan.Zero;
-				BeginAnimation( TopProperty, _hideAnimation );
+				ShowBarFor( TimeSpan.Zero );
 			}
 			_barGotClosed = false;
 		}
@@ -205,7 +201,6 @@ namespace Laevo.View.Activity
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
 				_barGotClosed = true;
-				SettingsImage.Focus();
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}

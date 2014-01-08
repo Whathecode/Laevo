@@ -63,7 +63,7 @@
 				Foreground="White"
 				CaretBrush="White"
 				FontFamily="Segoe UI Light"
-				FontSize="18"
+				FontSize="18" 
 				Text="{Binding Label}"
 				Margin="10, 0, 10, 0"
 				HorizontalAlignment="Center"
@@ -79,7 +79,6 @@
 
 			<StackPanel Orientation="Horizontal">
 				<Image
-					x:Name="SettingsImage"
 					Focusable="True"
 					Source="../Activity/ActionIcons/edit.png"
 					Cursor="Hand"

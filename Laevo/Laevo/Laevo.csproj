@@ -371,6 +371,9 @@
     <Compile Include="Data\Model\AbstractMemoryModelRepository.cs" />
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
+    <Compile Include="Data\ScrumExampleDataFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
