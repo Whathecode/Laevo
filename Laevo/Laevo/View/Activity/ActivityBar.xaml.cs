@@ -65,7 +65,7 @@ namespace Laevo.View.Activity
 			{
 				From = TopWhenVisible,
 				To = -(Height + 5),
-				Duration = new Duration( TimeSpan.FromSeconds( 1 ) ),
+				Duration = new Duration( TimeSpan.FromSeconds( 0.5 ) ),
 				FillBehavior = FillBehavior.Stop,
 				BeginTime = _displayTime
 			};
@@ -156,7 +156,7 @@ namespace Laevo.View.Activity
 			PinTaskbar();
 
 			// Hide the activity bar after some time if it's not activated.
-			if ( !IsActive )
+			if ( !IsActive || _barGotClosed )
 			{
 				_hideAnimation.BeginTime = delay;
 				BeginAnimation( TopProperty, _hideAnimation );
