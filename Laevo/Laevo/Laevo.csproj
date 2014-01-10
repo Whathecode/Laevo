@@ -225,9 +225,9 @@
     <Reference Include="MouseKeyboardActivityMonitor">
       <HintPath>..\..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=3.1.26.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PostSharp.3.1.26\lib\net20\PostSharp.dll</HintPath>
+    <Reference Include="PostSharp, Version=3.1.28.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\PostSharp.3.1.28\lib\net20\PostSharp.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -371,6 +371,7 @@
     <Compile Include="Data\Model\AbstractMemoryModelRepository.cs" />
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
+    <Compile Include="Data\ScrumExampleDataFactory.cs" />
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
@@ -656,10 +657,10 @@
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\PostSharp.3.1.26\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.1.26\tools\PostSharp.targets')" />
+  <Import Project="..\packages\PostSharp.3.1.28\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.1.28\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('..\packages\PostSharp.3.1.26\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('..\packages\PostSharp.3.1.26\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="!Exists('..\packages\PostSharp.3.1.28\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('..\packages\PostSharp.3.1.28\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
