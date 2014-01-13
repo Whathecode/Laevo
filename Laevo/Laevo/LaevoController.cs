@@ -46,6 +46,7 @@ namespace Laevo
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
 		}
 
+
 		protected override void FreeManagedResources()
 		{
 			// Nothing to do.
