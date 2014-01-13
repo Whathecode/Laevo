@@ -74,6 +74,7 @@ namespace Laevo.View.Main
 			var switchActivity = new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchActivity ), Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
 
+
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
 			var resetExclusiveTriggers = new EventTrigger( anyKeyDown );
@@ -240,7 +241,7 @@ namespace Laevo.View.Main
 				ResetKeyStates();
 
 				_suppressKeys = true;
-			}
+			}			
 			if ( _suppressKeys )
 			{
 				e.Handled = true;
@@ -263,6 +264,8 @@ namespace Laevo.View.Main
 			// Re-enable key input when Caps Lock is released.
 			if ( e.KeyCode == Keys.CapsLock )
 			{
+				ResetKeyStates();
+
 				_suppressKeys = false;
 			}
 			if ( _suppressKeys )

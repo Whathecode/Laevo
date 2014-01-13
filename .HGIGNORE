@@ -33,3 +33,6 @@ _ReSharper*/
 [Bb]uild[Ll]og.*
 *.[Pp]ublish.xml
 Laevo/Laevo With Project References.DotSettings
+Laevo/Laevo With Project References.sln
+Laevo/Laevo With Project References.sln.DotSettings
+Laevo/packages/**

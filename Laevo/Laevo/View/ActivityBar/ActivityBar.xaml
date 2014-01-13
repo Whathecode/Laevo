@@ -129,7 +129,9 @@
 
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<StackPanel Orientation="Horizontal" />
+						<StackPanel
+							Orientation="Horizontal"
+							x:Name="OpenActivitieStackPanel"/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 
