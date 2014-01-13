@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using ABC.Applications;
 using ABC.Interruptions;
 using Laevo.Data;
 using Laevo.Data.Model;
@@ -18,7 +19,8 @@ namespace Laevo
 	{
 		static readonly string ProgramLocalDataFolder
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "Laevo" );
-		static readonly string PluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
+		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
+		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
 
 		readonly MainViewModel _viewModel;
 		readonly TrayIconControl _trayIcon;
@@ -27,12 +29,13 @@ namespace Laevo
 		public LaevoController()
 		{
 			// Create Services.
-			var interruptionAggregator = new InterruptionAggregator( PluginLibrary );
+			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
+			var applicationPersistence = new PersistenceProvider( PersistencePluginLibrary );
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator );
 			
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator );
+			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, applicationPersistence );
 
 			// Create ViewModel.
 			// TODO: Move DesktopManager to ViewModel?
