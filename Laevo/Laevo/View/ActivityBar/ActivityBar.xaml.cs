@@ -211,7 +211,7 @@ namespace Laevo.View.ActivityBar
 
 		public void SelectNextActivity()
 		{
-
+			// TODO: Tab through the activities.
 		}
 	}
 }
