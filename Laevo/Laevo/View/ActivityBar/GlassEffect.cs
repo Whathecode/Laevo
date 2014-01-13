@@ -5,7 +5,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 
 
-namespace Laevo.View.Activity
+namespace Laevo.View.ActivityBar
 {
 	[StructLayout( LayoutKind.Sequential )]
 	public struct Margins

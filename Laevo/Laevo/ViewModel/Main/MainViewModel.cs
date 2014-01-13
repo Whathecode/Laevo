@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data.View;
 using Laevo.Model;
-using Laevo.View.Activity;
 using Laevo.View.ActivityOverview;
 using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.ActivityBar;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.Settings;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -27,8 +28,13 @@ namespace Laevo.ViewModel.Main
 	{
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
+
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
+
+		readonly ActivityBarViewModel _activityBarViewModel = new ActivityBarViewModel();
+		readonly View.ActivityBar.ActivityBar _activityBar = new View.ActivityBar.ActivityBar();
+
 		readonly Dispatcher _dispatcher;
 
 		readonly Queue<ActivityViewModel> _lastActivatedActivities = new Queue<ActivityViewModel>();
@@ -38,9 +44,6 @@ namespace Laevo.ViewModel.Main
 		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
 		public int UnattendedInterruptions { get; private set; }
 
-		readonly ActivityBar _activityBar = new ActivityBar();
-
-
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
@@ -48,13 +51,15 @@ namespace Laevo.ViewModel.Main
 			_dispatcher = Dispatcher.CurrentDispatcher;
 			_model.LogonScreenExited += () => _dispatcher.Invoke( ResetGui );
 
-			_model.InterruptionAdded += a =>
-			{
-				UnattendedInterruptions++;
-			};
+			_model.InterruptionAdded += a => { UnattendedInterruptions++; };
 			_model.ActivityRemoved += a => UpdateUnattendedInterruptions();
 
 			EnsureActivityOverview();
+
+			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
+			_activityBarViewModel.HomeActivity = _activityOverviewViewModel.HomeActivity;
+			_activityBarViewModel.OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel>();
+			_activityBar.DataContext = _activityBarViewModel;
 			ShowActivityBar();
 		}
 
@@ -108,11 +113,12 @@ namespace Laevo.ViewModel.Main
 				_activityOverviewViewModel.TimeLineRenderScale = viewModel.TimeLineRenderScale;
 				_activityOverviewViewModel.EnableAttentionLines = viewModel.EnableAttentionLines;
 			};
-			
+
 			settingsWindow.Show();
 		}
 
 		readonly LaevoServiceProvider _serviceProvider = new LaevoServiceProvider();
+
 		[CommandExecute( Commands.Help )]
 		public void OpenManual()
 		{
@@ -176,8 +182,10 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.ShowActivityBar )]
 		public void ShowActivityBar( bool activate = false )
 		{
-			_activityBar.DataContext = _activityOverviewViewModel.CurrentActivityViewModel;
-			_activityBar.ShowActivityBar( activate );
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			{
+				_activityBar.ShowActivityBar( activate );
+			}
 		}
 
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
@@ -265,6 +273,8 @@ namespace Laevo.ViewModel.Main
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.RemovedActivityEvent += OnRemovedActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
+				_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
+				_activityOverviewViewModel.StoppedActivityEvent += OnStoppedActivityEvent;
 			}
 			_activityOverview = new ActivityOverviewWindow
 			{
@@ -277,17 +287,30 @@ namespace Laevo.ViewModel.Main
 		{
 			UpdateUnattendedInterruptions();
 
+			// Links CurrentActivity to Current Activity notify property in ActivityBarViewModel.
+			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
+
 			if ( oldActivity != newActivity )
 			{
-				// Keep track of last 2 actived activities.
-				_lastActivatedActivities.Enqueue( newActivity );
-				if ( _lastActivatedActivities.Count > 2 )
+				if ( oldActivity != null && !oldActivity.IsOpen )
 				{
-					_lastActivatedActivities.Dequeue();
+					_activityBarViewModel.OpenPlusCurrentActivities.Remove( oldActivity );
+				}
+
+				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate alt+tab switching.
+				int newActivityIndex = _activityBarViewModel.OpenPlusCurrentActivities.IndexOf( newActivity );
+				if ( newActivity != null && newActivityIndex == -1 && newActivity != _activityOverviewViewModel.HomeActivity )
+				{
+					_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, newActivity );
+				}
+				else if ( newActivityIndex != -1 )
+				{
+					_activityBarViewModel.OpenPlusCurrentActivities.Move( newActivityIndex, 0 );
 				}
 			}
 
 			HideActivityOverview();
+
 			// TODO: Is there a better way to check whether the name has been set already? Perhaps it's also not desirable to activate the activity bar each time as long as the name isn't changed?
 			ShowActivityBar( newActivity.Label == Model.Laevo.DefaultActivityName );
 		}
@@ -304,12 +327,27 @@ namespace Laevo.ViewModel.Main
 			lastActivated
 				.Where( a => a != removed )
 				.ForEach( _lastActivatedActivities.Enqueue );
+
+			_activityBarViewModel.OpenPlusCurrentActivities.Remove( removed );
 		}
 
 		void OnNoCurrentActiveActivityEvent()
 		{
 			// Open time line in order to select a new activity to continue work on.
 			SelectActivity( a => a.ActivateActivity( a.IsOpen ) );
+		}
+
+		void OnOpenedActivityEvent( ActivityViewModel opened )
+		{
+			if ( !_activityBarViewModel.OpenPlusCurrentActivities.Contains( opened ) )
+			{
+				_activityBarViewModel.OpenPlusCurrentActivities.Add( opened );
+			}
+		}
+
+		void OnStoppedActivityEvent( ActivityViewModel stopped )
+		{
+			_activityBarViewModel.OpenPlusCurrentActivities.Remove( stopped );
 		}
 
 		public override void Persist()

@@ -40,17 +40,18 @@ namespace Laevo.ViewModel.Activity
 		public static List<BitmapImage> PresetIcons { get; private set; }
 
 		public static readonly List<Color> PresetColors = new List<Color>
-		{			
-			Color.FromRgb( 86, 124, 212 ),	// Blue
-			Color.FromRgb( 121, 234, 255 ),	// Cyan
-			Color.FromRgb( 88, 160, 2 ),	// Green
-			Color.FromRgb( 227, 220, 0 ),	// Yellow
-			Color.FromRgb( 212, 131, 0 ),	// Orange
-			Color.FromRgb( 212, 50, 38 ),	// Red
-			Color.FromRgb( 193, 75, 159 ),	// Purple
-			Color.FromRgb( 193, 217, 197 ),	// Gray/White
-			Color.FromRgb( 49, 54, 52 )		// Dark gray
+		{
+			Color.FromRgb( 86, 124, 212 ), // Blue
+			Color.FromRgb( 121, 234, 255 ), // Cyan
+			Color.FromRgb( 88, 160, 2 ), // Green
+			Color.FromRgb( 227, 220, 0 ), // Yellow
+			Color.FromRgb( 212, 131, 0 ), // Orange
+			Color.FromRgb( 212, 50, 38 ), // Red
+			Color.FromRgb( 193, 75, 159 ), // Purple
+			Color.FromRgb( 193, 217, 197 ), // Gray/White
+			Color.FromRgb( 49, 54, 52 ) // Dark gray
 		};
+
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
 		public static BitmapImage DefaultIcon;
 		public static BitmapImage HomeIcon;
@@ -98,8 +99,14 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public event ActivityEventHandler ActivityStoppedEvent;
 
+		/// <summary>
+		///   Event which is triggered when activity is opended.
+		/// </summary>
+		public event ActivityEventHandler ActivityOpenedEvent;
+
 		internal readonly Model.Activity Activity;
 		readonly VirtualDesktopManager _desktopManager;
+
 		[DataMember]
 		VirtualDesktop _virtualDesktop;
 
@@ -146,6 +153,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		Interval<DateTime> _currentActiveTimeSpan;
+
 		/// <summary>
 		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
 		/// </summary>
@@ -226,7 +234,7 @@ namespace Laevo.ViewModel.Activity
 
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
-		
+
 
 		static ActivityViewModel()
 		{
@@ -246,9 +254,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
-			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() )
-		{
-		}
+			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) {}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
 		{
@@ -329,7 +335,7 @@ namespace Laevo.ViewModel.Activity
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
-			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();	
+			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
 		}
 
 
@@ -431,10 +437,11 @@ namespace Laevo.ViewModel.Activity
 			popup.Show();
 		}
 
-	    [CommandExecute( Commands.OpenActivity )]
+		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
 			Activity.Open();
+			ActivityOpenedEvent( this );
 		}
 
 		[CommandExecute( Commands.StopActivity )]
