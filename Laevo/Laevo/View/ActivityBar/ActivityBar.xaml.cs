@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Microsoft.Win32;
 using Whathecode.System.Extensions;
-using TextBox = System.Windows.Controls.TextBox;
 
 
-namespace Laevo.View.Activity
+namespace Laevo.View.ActivityBar
 {
 	/// <summary>
 	/// Interaction logic for ActivityBar.xaml
@@ -19,6 +19,7 @@ namespace Laevo.View.Activity
 	{
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		public static extern IntPtr DefWindowProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam );
+
 		const int WindowsHitTest = 0x0084;
 		const int HitBorder = 18;
 		const int HitBottomBorder = 15;
@@ -32,6 +33,7 @@ namespace Laevo.View.Activity
 
 		[DllImport( "dwmapi.dll", EntryPoint = "#127" )]
 		static extern void DwmGetColorizationParameters( out Dwmcolorizationparams parameters );
+
 		public struct Dwmcolorizationparams
 		{
 			public uint
@@ -58,13 +60,14 @@ namespace Laevo.View.Activity
 
 			Loaded += OnLoaded;
 			Deactivated += OnDeactivated;
+
 			Activated += ( s, args ) => PinTaskbar();
 
 			// Create animation which hides the activity bar, sliding it out of view.
 			_hideAnimation = new DoubleAnimation
 			{
 				From = TopWhenVisible,
-				To = -(Height + 5),
+				To = -( Height + 5 ),
 				Duration = new Duration( TimeSpan.FromSeconds( 0.5 ) ),
 				FillBehavior = FillBehavior.Stop,
 				BeginTime = _displayTime
@@ -163,13 +166,13 @@ namespace Laevo.View.Activity
 			}
 		}
 
-		void PinTaskbar()
+		public void PinTaskbar()
 		{
 			_hideAnimation.Completed -= HideCompleted;
 			BeginAnimation( TopProperty, null );
 			Top = TopWhenVisible;
 			_hideAnimation.Completed += HideCompleted;
-
+			
 			Show();
 		}
 
@@ -190,7 +193,8 @@ namespace Laevo.View.Activity
 			// Hide the infobox.
 			if ( !_barGotClosed )
 			{
-				ShowBarFor( TimeSpan.Zero );
+				_hideAnimation.BeginTime = TimeSpan.Zero;
+				BeginAnimation( TopProperty, _hideAnimation );
 			}
 			_barGotClosed = false;
 		}

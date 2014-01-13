@@ -22,7 +22,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 
 		/// <summary>
-		///   Event which is triggered when an activity is opened.
+		///   Event which is triggered when an activity is activated.
 		/// </summary>
 		public event ActivitySwitchEventHandler ActivatedActivityEvent;
 
@@ -35,6 +35,16 @@ namespace Laevo.ViewModel.ActivityOverview
 		///   Event which is triggered when an activity is selected.
 		/// </summary>
 		public event ActivityViewModel.ActivityEventHandler SelectedActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when an activity is opened.
+		/// </summary>
+		public event ActivityViewModel.ActivityEventHandler OpenedActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when an activity is stopped.
+		/// </summary>
+		public event ActivityViewModel.ActivityEventHandler StoppedActivityEvent;
 
 		/// <summary>
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
@@ -64,6 +74,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// <summary>
 		///   The ViewModel of the activity which is currently open.
 		/// </summary>
+		/// TODO: Think if property should be moved to MainViewModel.
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
@@ -229,6 +240,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
 			activity.ActivityStoppedEvent -= OnActivityStopped;
+			activity.ActivityOpenedEvent -= OnActivityOpened;
 
 			RemovedActivityEvent( activity );
 		}
@@ -259,6 +271,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
 			activity.ActivityStoppedEvent += OnActivityStopped;
+			activity.ActivityOpenedEvent += OnActivityOpened;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -290,6 +303,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				CurrentActivityViewModel = null;
 				NoCurrentActiveActivityEvent();
 			}
+			StoppedActivityEvent( viewModel );
 		}
 
 		void OnActivitySelected( ActivityViewModel viewModel )
@@ -305,6 +319,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivityEditFinished( ActivityViewModel viewModel )
 		{
 			ActivityMode = Mode.Activate;
+		}
+
+		void OnActivityOpened( ActivityViewModel viewModel )
+		{
+			OpenedActivityEvent( viewModel );
 		}
 
 		[CommandExecute( Commands.OpenHome )]
@@ -323,6 +342,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
+
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -360,7 +380,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				CurrentActivityViewModel.UpdateHasOpenWindows();
 			}
 		}
-		
+
 		public void CutWindow()
 		{
 			_model.DesktopManager.CutWindow( Window.GetForegroundWindow() );

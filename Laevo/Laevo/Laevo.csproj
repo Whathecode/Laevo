@@ -371,7 +371,6 @@
     <Compile Include="Data\Model\AbstractMemoryModelRepository.cs" />
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
-    <Compile Include="Data\ScrumExampleDataFactory.cs" />
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
@@ -389,6 +388,8 @@
     <Compile Include="Model\Settings.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="Data\View\ActivityDataContractSurrogate.cs" />
+    <Compile Include="ViewModel\ActivityBar\ActivityBarViewModel.cs" />
+    <Compile Include="ViewModel\ActivityBar\Binding\Binding.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\Binding\Binding.cs" />
     <Compile Include="ViewModel\Activity\Binding\Binding.cs" />
@@ -397,6 +398,13 @@
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
+    <Compile Include="View\ActivityBar\ActivityBar.xaml.cs">
+      <DependentUpon>ActivityBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ActivityBar\ActivitySwitcher.xaml.cs">
+      <DependentUpon>ActivitySwitcher.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ActivityBar\GlassEffect.cs" />
     <Compile Include="View\ActivityOverview\ClockControl.xaml.cs">
       <DependentUpon>ClockControl.xaml</DependentUpon>
     </Compile>
@@ -419,15 +427,10 @@
     <Compile Include="View\Activity\ActionButtons.xaml.cs">
       <DependentUpon>ActionButtons.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Activity\ActivityBar.xaml.cs">
-      <SubType>Code</SubType>
-      <DependentUpon>ActivityBar.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Activity\Converters\ActivityBorderThicknessConverter.cs" />
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Common.cs" />
     <Compile Include="View\Main\IconConverter.cs" />
-    <Compile Include="View\Activity\GlassEffect.cs" />
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>
@@ -506,6 +509,18 @@
     <Resource Include="View\ActivityOverview\Shaders\FadeEffect.ps" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="View\ActivityBar\ActivityBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ActivityBar\ActivitySwitcher.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ActivityBar\GlassButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\ActivityOverview\ActivityOverviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -517,14 +532,6 @@
     <Page Include="View\Activity\ActionButtons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Activity\ActivityBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Activity\GlassButton.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\TaskList\TaskListControl.xaml">
       <SubType>Designer</SubType>
@@ -653,6 +660,7 @@
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\stop.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
