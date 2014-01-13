@@ -15,6 +15,8 @@
 		SwitchActivityOverview,
 		OpenCurrentActivityLibrary,
 		StopActivity,
+		SuspendActivity,
+		ResumeActivity,
 		NewActivity,
 		CutWindow,
 		PasteWindows,

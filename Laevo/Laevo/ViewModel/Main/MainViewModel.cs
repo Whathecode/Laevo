@@ -191,7 +191,10 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
 		public void OpenCurrentActivityLibrary()
 		{
-			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			{
+				_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
+			}
 		}
 
 		[CommandExecute( Commands.StopActivity )]
@@ -212,6 +215,36 @@ namespace Laevo.ViewModel.Main
 				currentActivity != null &&
 				currentActivity != _activityOverviewViewModel.HomeActivity &&
 				currentActivity.IsOpen;
+		}
+
+		[CommandExecute( Commands.SuspendActivity )]
+		public void SuspendActivity()
+		{
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			{
+				_activityOverviewViewModel.CurrentActivityViewModel.SuspendActivity();
+			}
+		}
+
+		[CommandCanExecute( Commands.SuspendActivity )]
+		public bool CanSuspendActivity()
+		{
+			return !_activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
+		}
+
+		[CommandExecute( Commands.ResumeActivity )]
+		public void ResumeActivity()
+		{
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			{
+				_activityOverviewViewModel.CurrentActivityViewModel.ResumeActivity();
+			}
+		}
+
+		[CommandCanExecute( Commands.ResumeActivity )]
+		public bool CanResumeActivity()
+		{
+			return _activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
 		}
 
 		[CommandExecute( Commands.NewActivity )]

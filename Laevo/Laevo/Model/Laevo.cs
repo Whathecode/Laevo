@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using ABC.Applications;
 using ABC.Interruptions;
 using ABC.Windows.Desktop;
 using ABC.Windows.Desktop.Settings;
@@ -72,7 +73,7 @@ namespace Laevo.Model
 		public Activity CurrentActivity { get; private set; }
 
 
-		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger )
+		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger, PersistenceProvider persistenceProvider )
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
@@ -102,7 +103,7 @@ namespace Laevo.Model
 					// Simply ignore invalid files.
 				}
 			}
-			DesktopManager = new VirtualDesktopManager( vdmSettings );
+			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;

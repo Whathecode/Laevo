@@ -226,6 +226,12 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
 
+		/// <summary>
+		///   Determines whether the activity is currently suspended, meaning it no longer takes up any resources.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsSuspended )]
+		public bool IsSuspended { get; private set; }
+
 		[NotifyProperty( Binding.Properties.HasUnattendedInterruptions )]
 		public bool HasUnattendedInterruptions { get; private set; }
 
@@ -450,6 +456,28 @@ namespace Laevo.ViewModel.Activity
 			Deactivated();
 			Activity.Stop();
 			ActivityStoppedEvent( this );
+		}
+
+		public void SuspendActivity()
+		{
+			if ( IsSuspended )
+			{
+				return;
+			}
+
+			IsSuspended = true;
+			_virtualDesktop.Suspend();
+		}
+
+		public void ResumeActivity()
+		{
+			if ( !IsSuspended )
+			{
+				return;
+			}
+
+			IsSuspended = false;
+			_virtualDesktop.Resume();
 		}
 
 		[CommandExecute( Commands.Remove )]
