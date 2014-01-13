@@ -29,7 +29,8 @@ abc_dlls = [
 	'ABC.Windows',
 	'ABC.PInvoke',
 	'ABC.Interruptions',
-	'ABC.Applications'
+	'ABC.Applications',
+	'ABC.Common'
 	]
 abc_dlls.each do |d|
 	FileUtils.cp(
