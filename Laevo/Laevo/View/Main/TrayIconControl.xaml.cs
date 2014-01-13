@@ -240,7 +240,7 @@ namespace Laevo.View.Main
 				ResetKeyStates();
 
 				_suppressKeys = true;
-			}			
+			}
 			if ( _suppressKeys )
 			{
 				e.Handled = true;
@@ -263,8 +263,6 @@ namespace Laevo.View.Main
 			// Re-enable key input when Caps Lock is released.
 			if ( e.KeyCode == Keys.CapsLock )
 			{
-				ResetKeyStates();
-
 				_suppressKeys = false;
 			}
 			if ( _suppressKeys )
