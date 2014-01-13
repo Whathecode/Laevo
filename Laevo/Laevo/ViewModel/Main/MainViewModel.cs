@@ -37,8 +37,6 @@ namespace Laevo.ViewModel.Main
 
 		readonly Dispatcher _dispatcher;
 
-		readonly Queue<ActivityViewModel> _lastActivatedActivities = new Queue<ActivityViewModel>();
-
 		public event Action GuiReset;
 
 		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
@@ -191,10 +189,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
 		public void OpenCurrentActivityLibrary()
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
-			{
-				_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
-			}
+			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
 		}
 
 		[CommandExecute( Commands.StopActivity )]
@@ -215,36 +210,6 @@ namespace Laevo.ViewModel.Main
 				currentActivity != null &&
 				currentActivity != _activityOverviewViewModel.HomeActivity &&
 				currentActivity.IsOpen;
-		}
-
-		[CommandExecute( Commands.SuspendActivity )]
-		public void SuspendActivity()
-		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
-			{
-				_activityOverviewViewModel.CurrentActivityViewModel.SuspendActivity();
-			}
-		}
-
-		[CommandCanExecute( Commands.SuspendActivity )]
-		public bool CanSuspendActivity()
-		{
-			return !_activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
-		}
-
-		[CommandExecute( Commands.ResumeActivity )]
-		public void ResumeActivity()
-		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
-			{
-				_activityOverviewViewModel.CurrentActivityViewModel.ResumeActivity();
-			}
-		}
-
-		[CommandCanExecute( Commands.ResumeActivity )]
-		public bool CanResumeActivity()
-		{
-			return _activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -275,13 +240,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivity )]
 		public void SwitchActivity()
 		{
-			if ( _lastActivatedActivities.Count < 2 )
-			{
-				return;
-			}
 
-			ActivityViewModel lastActivity = _lastActivatedActivities.Dequeue();
-			lastActivity.ActivateActivity( lastActivity.IsOpen );
 		}
 
 		/// <summary>
@@ -301,7 +260,6 @@ namespace Laevo.ViewModel.Main
 					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale,
 					EnableAttentionLines = _model.Settings.EnableAttentionLines
 				};
-				_lastActivatedActivities.Enqueue( _activityOverviewViewModel.HomeActivity );
 
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.RemovedActivityEvent += OnRemovedActivityEvent;
@@ -350,17 +308,6 @@ namespace Laevo.ViewModel.Main
 
 		void OnRemovedActivityEvent( ActivityViewModel removed )
 		{
-			if ( !_lastActivatedActivities.Contains( removed ) )
-			{
-				return;
-			}
-
-			var lastActivated = _lastActivatedActivities.ToList();
-			_lastActivatedActivities.Clear();
-			lastActivated
-				.Where( a => a != removed )
-				.ForEach( _lastActivatedActivities.Enqueue );
-
 			_activityBarViewModel.OpenPlusCurrentActivities.Remove( removed );
 		}
 
