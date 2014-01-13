@@ -208,5 +208,10 @@ namespace Laevo.View.ActivityBar
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}
+
+		public void SelectNextActivity()
+		{
+
+		}
 	}
 }
