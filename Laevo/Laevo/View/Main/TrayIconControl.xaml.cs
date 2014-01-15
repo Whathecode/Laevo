@@ -73,7 +73,8 @@ namespace Laevo.View.Main
 			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
 			var switchActivity = new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down );
 			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchActivity ), Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
-
+			var activateSelectedActivity = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Released );
+			AddExclusiveKeysTrigger( activateSelectedActivity, Keys.CapsLock, Commands.ActivateSelectedActivity );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
@@ -101,7 +102,7 @@ namespace Laevo.View.Main
 		void InitializeKeyboardListener()
 		{
 			SafeKeyboardHookListenerDispose();
-			
+
 			_keyboardListener = new KeyboardHookListener( new GlobalHooker() );
 			_keyboardListener.KeyDown += OnKeyDown;
 			_keyboardListener.KeyUp += OnKeyUp;
@@ -127,13 +128,14 @@ namespace Laevo.View.Main
 		}
 
 		readonly List<ExclusiveCondition> _exclusiveConditions = new List<ExclusiveCondition>();
+
 		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Commands command, object parameter = null )
 		{
 			CreateExclusiveTrigger(
 				condition, exclusiveKeys,
 				c => new CommandBindingTrigger<Commands>( c, this, command, parameter ) );
-
 		}
+
 		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Action action )
 		{
 			var dispatcher = Dispatcher;
@@ -146,6 +148,7 @@ namespace Laevo.View.Main
 					return trigger;
 				} );
 		}
+
 		void CreateExclusiveTrigger( AbstractCondition condition, Keys exclusiveKeys, Func<AbstractCondition, EventTrigger> createTrigger )
 		{
 			Func<bool> otherThanExclusive = () => _keyStates.Any( k => !exclusiveKeys.HasFlag( k.Key ) && k.Value );
@@ -156,6 +159,7 @@ namespace Laevo.View.Main
 		}
 
 		bool _isDisposed;
+
 		~TrayIconControl()
 		{
 			Dispose( false );
@@ -199,8 +203,8 @@ namespace Laevo.View.Main
 
 			if ( keyboardHookLost )
 			{
-				Dispatcher.Invoke( InitializeKeyboardListener );	// Dispatcher needs to be used since this is executed from the timer thread.
-				SwitchCapsLock();	// Reset caps lock to its previous position.
+				Dispatcher.Invoke( InitializeKeyboardListener ); // Dispatcher needs to be used since this is executed from the timer thread.
+				SwitchCapsLock(); // Reset caps lock to its previous position.
 			}
 
 			lock ( _inputController )
@@ -220,6 +224,7 @@ namespace Laevo.View.Main
 
 		bool _suppressKeys;
 		readonly Dictionary<Keys, bool> _newInput = new Dictionary<Keys, bool>();
+
 		void OnKeyDown( object sender, KeyEventArgs e )
 		{
 			// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
@@ -241,7 +246,7 @@ namespace Laevo.View.Main
 				ResetKeyStates();
 
 				_suppressKeys = true;
-			}			
+			}
 			if ( _suppressKeys )
 			{
 				e.Handled = true;
@@ -278,6 +283,7 @@ namespace Laevo.View.Main
 		{
 			SwitchCapsLock();
 		}
+
 		void SwitchCapsLock()
 		{
 			lock ( _switchingCapsLockLock )
@@ -295,7 +301,7 @@ namespace Laevo.View.Main
 
 		void UpdateCapsLockState()
 		{
-			string headerText = TurnCapsLockText + (_isCapsLockEnabled ? "Off" : "On");
+			string headerText = TurnCapsLockText + ( _isCapsLockEnabled ? "Off" : "On" );
 			DispatcherHelper.SafeDispatch( CapsLockMenuItem.Dispatcher, () => CapsLockMenuItem.Header = headerText );
 		}
 	}

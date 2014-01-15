@@ -160,7 +160,7 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && !_activityBar.IsActive )
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && ( !_activityBar.IsActive || _activityBar.BarGotClosed ) )
 			{
 				ShowActivityOverview();
 			}
@@ -223,7 +223,8 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SuspendActivity )]
 		public bool CanSuspendActivity()
 		{
-			return !_activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
+			return _activityOverviewViewModel.CurrentActivityViewModel != null
+			       && !_activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
 		}
 
 		[CommandExecute( Commands.ResumeActivity )]
@@ -238,7 +239,8 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.ResumeActivity )]
 		public bool CanResumeActivity()
 		{
-			return _activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
+			return _activityOverviewViewModel.CurrentActivityViewModel != null
+			       && _activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -269,7 +271,13 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivity )]
 		public void SwitchActivity()
 		{
+			_activityBar.SelectNextActivity();
+		}
 
+		[CommandExecute( Commands.ActivateSelectedActivity )]
+		public void ActivateSelectedActivity()
+		{
+			_activityBar.ActivateSelectedActivity();
 		}
 
 		/// <summary>
@@ -317,7 +325,7 @@ namespace Laevo.ViewModel.Main
 					_activityBarViewModel.OpenPlusCurrentActivities.Remove( oldActivity );
 				}
 
-				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate alt+tab switching.
+				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate windows alt+tab switching.
 				int newActivityIndex = _activityBarViewModel.OpenPlusCurrentActivities.IndexOf( newActivity );
 				if ( newActivity != null && newActivityIndex == -1 && newActivity != _activityOverviewViewModel.HomeActivity )
 				{

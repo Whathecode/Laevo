@@ -21,6 +21,7 @@
 		CutWindow,
 		PasteWindows,
 		SwitchActivity,
-		ShowActivityBar
+		ShowActivityBar,
+		ActivateSelectedActivity
 	}
 }
