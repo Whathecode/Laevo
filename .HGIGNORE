@@ -32,8 +32,17 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
 *.[Pp]ublish.xml
+
+# General things to ignore (customly added)
+*/packages/*
+
+# Personal settings/project files which shouldn't be under version control, but templates might need to be added somewhere.
 Laevo/Laevo With Project References.DotSettings
 Laevo/Laevo With Project References.sln
 Laevo/Laevo With Project References.sln.DotSettings
-Laevo/packages/**
 ProjectReferences.txt
+
+# Local files of Steven.
+Laevo/Laevo.Installer/*
+Logos/*
+Windows API Code Pack 1.1/*
