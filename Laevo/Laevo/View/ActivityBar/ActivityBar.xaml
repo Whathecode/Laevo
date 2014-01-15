@@ -60,7 +60,7 @@
 			</Button>
 
 			<TextBox
-				x:Name="ActivityName"
+				x:Name="TbActivityName"
 				Background="Transparent"
 				BorderBrush="Transparent"
 				Foreground="White"
@@ -81,7 +81,7 @@
 			</TextBox>
 
 			<Image
-				x:Name="SettingsImage"
+				x:Name="ImgSettings"
 				Focusable="True"
 				Source="../Activity/ActionIcons/edit.png"
 				Cursor="Hand"
@@ -98,12 +98,12 @@
 			HorizontalAlignment="Right">
 
 			<Border
-				x:Name="Container"
+				x:Name="BorderHomeActivity"
 				CornerRadius="5"
 				BorderThickness="2"
 				Margin="0, 0, 15, 0"
 				Padding="3">
-				
+
 				<Border.Background>
 					<SolidColorBrush Color="{Binding HomeActivity.Color}" />
 				</Border.Background>
@@ -116,36 +116,34 @@
 						<Binding Path="HomeActivity.HasUnattendedInterruptions" />
 					</MultiBinding>
 				</Border.BorderBrush>
-				
+
 				<Image
 					Cursor="Hand"
-					Source="../Activity/Icons/home.png" 
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}, Path=HomeActivity}"/>
+					Source="../Activity/Icons/home.png"
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}, Path=HomeActivity}" />
 			</Border>
 
 			<ItemsControl
-				x:Name="Activites"
+				x:Name="ItemsControlActivities"
 				ItemsSource="{Binding OpenPlusCurrentActivities}">
 
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<StackPanel
-							Orientation="Horizontal"
-							x:Name="OpenActivitieStackPanel"/>
+						<StackPanel Orientation="Horizontal" Name="Test1Panel" />
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
 						<Button
-							x:Name="Container"
+							x:Name="BtnActivity"
 							BorderThickness="2"
 							Margin="0, 0, 3, 0"
 							Padding="3"
 							Command="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}}">
 
 							<Button.Background>
-								<SolidColorBrush Color= "Transparent" />
+								<SolidColorBrush Color="Transparent" />
 							</Button.Background>
 
 							<Button.BorderBrush>

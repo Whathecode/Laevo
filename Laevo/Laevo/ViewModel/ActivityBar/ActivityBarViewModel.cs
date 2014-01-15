@@ -8,25 +8,25 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 namespace Laevo.ViewModel.ActivityBar
 {
-	[ViewModel(typeof(Binding.Properties), typeof(Commands))]
+	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class ActivityBarViewModel : AbstractViewModel
 	{
 		/// <summary>
 		/// Home activity.
 		/// </summary>
-		[NotifyProperty(Binding.Properties.HomeActivity)]
+		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; set; }
 
 		/// <summary>
 		/// List representing currently all opened activities and current one, which is always on the first position.
 		/// </summary>
-		[NotifyProperty(Binding.Properties.OpenPlusCurrentActivities)]
+		[NotifyProperty( Binding.Properties.OpenPlusCurrentActivities )]
 		public ObservableCollection<ActivityViewModel> OpenPlusCurrentActivities { get; set; }
-		
+
 		/// <summary>
 		/// Current activity.
 		/// </summary>
-		[NotifyProperty(Binding.Properties.CurrentActivity)]
+		[NotifyProperty( Binding.Properties.CurrentActivity )]
 		public ActivityViewModel CurrentActivity { get; set; }
 
 		protected override void FreeUnmanagedResources()
