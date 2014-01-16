@@ -84,10 +84,19 @@ namespace Laevo.View.Main
 		}
 
 
+		bool _resettingKeyStates;
 		void ResetKeyStates()
 		{
 			lock ( _inputController )
 			{
+				// Throttle resetting key states, since this is a slow operation.
+				// When called too often (repeatedly pressing caps lock), it locks up the system.
+				if ( _resettingKeyStates )
+				{
+					return;
+				}
+				_resettingKeyStates = true;
+
 				_keyStates.Clear();
 
 				// Prevent exception when looking up a non-existent key.
@@ -96,6 +105,8 @@ namespace Laevo.View.Main
 				// Set keystate of all keys which are currently down to true.
 				List<Key> downKeys = KeyHelper.GetNonToggleKeysState();
 				downKeys.ForEach( k => _keyStates[ (Keys)KeyInterop.VirtualKeyFromKey( k ) ] = true );
+
+				_resettingKeyStates = false;
 			}
 		}
 
