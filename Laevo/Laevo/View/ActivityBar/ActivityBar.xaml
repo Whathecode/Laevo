@@ -99,48 +99,60 @@
 			DockPanel.Dock="Right"
 			HorizontalAlignment="Right">
 
-			<ItemsControl
-				x:Name="ItemsControlActivities"
-				ItemsSource="{Binding OpenPlusCurrentActivities}">
+			<StackPanel 
+				Visibility="{Binding OpenPlusCurrentActivities.Count,  Converter={StaticResource ItemsCountToBoolConverter}}"
+				Orientation="Horizontal">
+			
+				<TextBlock
+					Text="{Binding SelectedActivity.Label}"
+					Margin="0, 0, 20, 0"
+					FontSize="20"
+					VerticalAlignment="Center"/>
+
+				<ItemsControl
+					x:Name="ItemsControlActivities"
+					ItemsSource="{Binding OpenPlusCurrentActivities}">
 				
 				
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<StackPanel 
-							Orientation="Horizontal"
-							Visibility="{Binding OpenPlusCurrentActivities.Count,  Converter={StaticResource ItemsCountToBoolConverter}}"/>
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel 
+								Orientation="Horizontal"
+								/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
 
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<Button
-							x:Name="BtnActivity"
-							BorderThickness="2"
-							Margin="0, 0, 3, 0"
-							Padding="3"
-							Command="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button
+								x:Name="BtnActivity"
+								BorderThickness="2"
+								Margin="0, 0, 3, 0"
+								Padding="3"
+								Command="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}}">
 
-							<Button.Background>
-								<SolidColorBrush Color="{Binding Path=Color}" />
-							</Button.Background>
+								<Button.Background>
+									<SolidColorBrush Color="{Binding Path=Color}" />
+								</Button.Background>
 
-							<Button.BorderBrush>
-								<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
-									<Binding Path="IsActive" />
-									<Binding Path="IsOpen" />
-									<Binding Path="HasOpenWindows" />
-									<Binding Path="HasUnattendedInterruptions" />
-								</MultiBinding>
-							</Button.BorderBrush>
+								<Button.BorderBrush>
+									<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+										<Binding Path="IsActive" />
+										<Binding Path="IsOpen" />
+										<Binding Path="HasOpenWindows" />
+										<Binding Path="HasUnattendedInterruptions" />
+									</MultiBinding>
+								</Button.BorderBrush>
 
-							<Image
-								Cursor="Hand"
-								Source="{Binding Path=Icon}" />
-						</Button>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
+								<Image
+									Cursor="Hand"
+									Source="{Binding Path=Icon}" />
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+			</StackPanel>
 
 			<Image
 				Cursor="Hand"

@@ -6,7 +6,6 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Laevo.ViewModel.Activity;
 using Microsoft.Win32;
 using Whathecode.System.Extensions;
 
@@ -52,9 +51,6 @@ namespace Laevo.View.ActivityBar
 
 		readonly TimeSpan _displayTime = TimeSpan.FromSeconds( 4 );
 		readonly DoubleAnimation _hideAnimation;
-
-		int _selectionIndex;
-		ActivityViewModel _selectedActivity;
 
 		public bool BarGotClosed { get; private set; }
 
@@ -151,8 +147,6 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		public void ShowActivityBar( bool activate )
 		{
-			SetSelectionStartIndex();
-
 			ShowBarFor( _displayTime );
 
 			if ( activate )
@@ -214,71 +208,41 @@ namespace Laevo.View.ActivityBar
 			{
 				BarGotClosed = true;
 
-				// Pass focus to next element.
-				TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Next ) );
+				//Pass focus to previous element.
+				TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}
 
 		/// <summary>
-		/// Activates selected activity.
+		/// Sets bat to be closed and passes the focus.
 		/// </summary>
-		public void ActivateSelectedActivity()
+		internal void CloseAndPassFocus()
 		{
-			if ( _selectedActivity != null )
-			{
-				//Hide();
-				BarGotClosed = true;
 
-				//Pass focus to previous element.
-				TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+			//TODO: Some problem with activity switching and bar hiding/showing- left for next week. 
+			BarGotClosed = true;
 
-				_selectedActivity.ActivateActivity( false );
-				_selectedActivity = null;
-			}
+			//Pass focus to previous element.
+			TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+
+			ShowBarFor( _displayTime );
 		}
 
 		/// <summary>
-		/// Switches beetewn current and opened activities and then saves selected activity.
+		/// Switches between current and opened activities.
 		/// </summary>
-		public void SelectNextActivity()
+		internal void SelectNextActivity( int selectionIndex )
 		{
-			if ( ItemsControlActivities.Items.Count > 0 )
-			{
-				// Come back on the beginning when selection index is outside of activities collection.
-				if ( _selectionIndex == ItemsControlActivities.Items.Count )
-				{
-					_selectionIndex = 0;
-				}
-				// Gets the content presented for the activity item.
-				var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( _selectionIndex );
-				// Gets the selected activity button and give it a focus.
-				var activityButton = contentPresenter.ContentTemplate.FindName( BtnActivityName, contentPresenter ) as Button;
-				// ReSharper disable once PossibleNullReferenceException, checked in the first line, never will be null.
-				activityButton.Focus();
-
-				_selectedActivity = (ActivityViewModel)ItemsControlActivities.Items[ _selectionIndex ];
-				_selectionIndex++;
-			}
-		}
-
-		/// <summary>
-		/// Sets selection start index for switching between activites.
-		/// </summary>
-		void SetSelectionStartIndex()
-		{
-			if ( ItemsControlActivities.Items.Count > 0 )
-			{
-				// Start index depends on active activity, if it is home activity we want to start selction from first open activity. 
-				// On the other case we want to skip first open activity in a first loop.
-				var firstInList = (ActivityViewModel)ItemsControlActivities.Items[ 0 ];
-				_selectionIndex = firstInList.IsActive ? 1 : 0;
-			}
-			else
-			{
-				_selectionIndex = 0;
-			}
+			Activate();
+			BarGotClosed = false;
+			// Gets the content presented for the activity item.
+			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
+			// Gets the selected activity button and give it a focus.
+			var activityButton = contentPresenter.ContentTemplate.FindName( BtnActivityName, contentPresenter ) as Button;
+			// ReSharper disable once PossibleNullReferenceException, checked in the first line, never will be null.
+			activityButton.Focus();
 		}
 	}
 }
