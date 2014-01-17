@@ -252,10 +252,6 @@ namespace Laevo.View.Main
 			// Disable caps lock, and any keys pressed simultaneously with caps lock.
 			if ( e.KeyCode == Keys.CapsLock )
 			{
-				// HACK: Sometimes keys end up staying 'up' in _keyStates for a reason currently unknown.
-				//       Refreshing this buffer whenever a shortkey will be used solves this for this particular application.
-				ResetKeyStates();
-
 				_suppressKeys = true;
 			}
 			if ( _suppressKeys )

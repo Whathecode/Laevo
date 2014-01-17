@@ -83,7 +83,7 @@
 								x:Name="TaskInfo"
 								Padding="0, 0, 0, 10"
 								Background="Transparent">
-								<StackPanel Orientation="Horizontal">
+								<StackPanel Orientation="Horizontal" >
 									<TextBox
 										x:Name="TaskName"
 										IsKeyboardFocusedChanged="OnTaskNameFocusChanged"
