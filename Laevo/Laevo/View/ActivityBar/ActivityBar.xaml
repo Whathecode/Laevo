@@ -8,7 +8,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
-	xmlns:converters="clr-namespace:Laevo.View.ActivityBar.Converters"
+	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:b1="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityBar="clr-namespace:Laevo.View.ActivityBar"
@@ -38,7 +38,6 @@
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
-			<converters:ItemsCountToBoolConverter x:Key="ItemsCountToBoolConverter"/>
 		</ResourceDictionary>
 	</Window.Resources>
 
@@ -103,12 +102,17 @@
 				x:Name="ItemsControlActivities"
 				ItemsSource="{Binding OpenPlusCurrentActivities}">
 				
-				
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<StackPanel 
-							Orientation="Horizontal"
-							Visibility="{Binding OpenPlusCurrentActivities.Count,  Converter={StaticResource ItemsCountToBoolConverter}}"/>
+						<StackPanel Orientation="Horizontal">
+							<StackPanel.Visibility>
+								<!-- TODO: Write a single binding converter using NCalc in the FCL extensions, which might result in an easier syntax here. -->
+								<MultiBinding
+									Converter="{converters:ConditionConverter Expression='[0] > 1', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}">
+									<Binding Path="OpenPlusCurrentActivities.Count" />
+								</MultiBinding>
+							</StackPanel.Visibility>
+						</StackPanel>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 
