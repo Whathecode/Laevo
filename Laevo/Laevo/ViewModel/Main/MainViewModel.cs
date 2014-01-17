@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -53,6 +52,7 @@ namespace Laevo.ViewModel.Main
 
 			EnsureActivityOverview();
 
+			_activityBarViewModel.ActivityBar = _activityBar;
 			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
 			_activityBarViewModel.HomeActivity = _activityOverviewViewModel.HomeActivity;
 			_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, _activityOverviewViewModel.HomeActivity );
@@ -239,13 +239,13 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivity )]
 		public void SwitchActivity()
 		{
-			_activityBar.SelectNextActivity();
+			_activityBarViewModel.SelectNextActivity();
 		}
 
 		[CommandExecute( Commands.ActivateSelectedActivity )]
 		public void ActivateSelectedActivity()
 		{
-			_activityBar.ActivateSelectedActivity();
+			_activityBarViewModel.ActivateSelectedActivity();
 		}
 
 		/// <summary>
