@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.Composition;
-using ABC.Applications;
+using ABC.Applications.Services;
 
 
 namespace Laevo.Model
