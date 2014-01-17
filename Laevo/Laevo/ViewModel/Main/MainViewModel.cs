@@ -55,7 +55,7 @@ namespace Laevo.ViewModel.Main
 
 			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
 			_activityBarViewModel.HomeActivity = _activityOverviewViewModel.HomeActivity;
-			_activityBarViewModel.OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel>();
+			_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, _activityOverviewViewModel.HomeActivity );
 			_activityBar.DataContext = _activityBarViewModel;
 			ShowActivityBar();
 		}
@@ -327,7 +327,7 @@ namespace Laevo.ViewModel.Main
 
 				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate windows alt+tab switching.
 				int newActivityIndex = _activityBarViewModel.OpenPlusCurrentActivities.IndexOf( newActivity );
-				if ( newActivity != null && newActivityIndex == -1 && newActivity != _activityOverviewViewModel.HomeActivity )
+				if ( newActivity != null && newActivityIndex == -1 )
 				{
 					_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, newActivity );
 				}

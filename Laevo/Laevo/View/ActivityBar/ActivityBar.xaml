@@ -8,6 +8,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:converters="clr-namespace:Laevo.View.ActivityBar.Converters"
 	xmlns:b1="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityBar="clr-namespace:Laevo.View.ActivityBar"
@@ -37,6 +38,7 @@
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+			<converters:ItemsCountToBoolConverter x:Key="ItemsCountToBoolConverter"/>
 		</ResourceDictionary>
 	</Window.Resources>
 
@@ -97,39 +99,16 @@
 			DockPanel.Dock="Right"
 			HorizontalAlignment="Right">
 
-			<Border
-				x:Name="BorderHomeActivity"
-				CornerRadius="5"
-				BorderThickness="2"
-				Margin="0, 0, 15, 0"
-				Padding="3">
-
-				<Border.Background>
-					<SolidColorBrush Color="{Binding HomeActivity.Color}" />
-				</Border.Background>
-
-				<Border.BorderBrush>
-					<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
-						<Binding Path="HomeActivity.IsActive" />
-						<Binding Path="HomeActivity.IsOpen" />
-						<Binding Path="HomeActivity.HasOpenWindows" />
-						<Binding Path="HomeActivity.HasUnattendedInterruptions" />
-					</MultiBinding>
-				</Border.BorderBrush>
-
-				<Image
-					Cursor="Hand"
-					Source="../Activity/Icons/home.png"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}, Path=HomeActivity}" />
-			</Border>
-
 			<ItemsControl
 				x:Name="ItemsControlActivities"
 				ItemsSource="{Binding OpenPlusCurrentActivities}">
-
+				
+				
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<StackPanel Orientation="Horizontal" Name="Test1Panel" />
+						<StackPanel 
+							Orientation="Horizontal"
+							Visibility="{Binding OpenPlusCurrentActivities.Count,  Converter={StaticResource ItemsCountToBoolConverter}}"/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 
@@ -143,7 +122,7 @@
 							Command="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}}">
 
 							<Button.Background>
-								<SolidColorBrush Color="Transparent" />
+								<SolidColorBrush Color="{Binding Path=Color}" />
 							</Button.Background>
 
 							<Button.BorderBrush>
@@ -162,6 +141,13 @@
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
+
+			<Image
+				Cursor="Hand"
+				Source="{Binding HomeActivity.Icon}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}, Path=HomeActivity}"
+				Width="30" Height="30"
+				Margin="25, 0, 0, 0"/>
 
 		</StackPanel>
 

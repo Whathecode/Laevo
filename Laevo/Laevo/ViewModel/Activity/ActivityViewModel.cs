@@ -53,8 +53,6 @@ namespace Laevo.ViewModel.Activity
 		};
 
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
-		public static BitmapImage DefaultIcon;
-		public static BitmapImage HomeIcon;
 
 		/// <summary>
 		///   Path of the folder which contains the file libraries.
@@ -254,9 +252,6 @@ namespace Laevo.ViewModel.Activity
 				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
 				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
 				.ToList();
-
-			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
-			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
@@ -270,7 +265,6 @@ namespace Laevo.ViewModel.Activity
 			_virtualDesktop = desktop;
 
 			Label = activity.Name;
-			Icon = DefaultIcon;
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;

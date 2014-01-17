@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityBar.Binding;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -28,6 +29,11 @@ namespace Laevo.ViewModel.ActivityBar
 		/// </summary>
 		[NotifyProperty( Binding.Properties.CurrentActivity )]
 		public ActivityViewModel CurrentActivity { get; set; }
+
+		public ActivityBarViewModel()
+		{
+			OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel>();
+		}
 
 		protected override void FreeUnmanagedResources()
 		{
