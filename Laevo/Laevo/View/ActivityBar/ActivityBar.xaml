@@ -9,7 +9,7 @@
 	mc:Ignorable="d"
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
-	xmlns:b1="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	xmlns:binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityBar="clr-namespace:Laevo.View.ActivityBar"
 	xmlns:activityBarViewModel="clr-namespace:Laevo.ViewModel.ActivityBar"
@@ -19,7 +19,10 @@
 	Topmost="True"
 	ShowInTaskbar="False"
 	ShowActivated="False"
+	Foreground="White"
 	Background="Transparent"
+	FontFamily="Segoe UI Light"
+	FontSize="18"
 	Height="55"
 	activityBar:GlassEffect.IsEnabled="True">
 
@@ -61,13 +64,11 @@
 			</Button>
 
 			<TextBox
-				x:Name="TbActivityName"
+				x:Name="ActivityName"
 				Background="Transparent"
 				BorderBrush="Transparent"
 				Foreground="White"
 				CaretBrush="White"
-				FontFamily="Segoe UI Light"
-				FontSize="18"
 				Text="{Binding Label}"
 				Margin="10, 0, 10, 0"
 				HorizontalAlignment="Center"
@@ -82,13 +83,12 @@
 			</TextBox>
 
 			<Image
-				x:Name="ImgSettings"
 				Focusable="True"
 				Source="../Activity/ActionIcons/edit.png"
 				Cursor="Hand"
 				Width="28"
 				Height="28"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.EditActivity }}" />
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.EditActivity}}" />
 
 		</StackPanel>
 
@@ -104,13 +104,11 @@
 				<TextBlock
 					Text="{Binding SelectedActivity.Label}"
 					Margin="0, 0, 20, 0"
-					FontSize="20"
 					VerticalAlignment="Center"/>
 
 				<ItemsControl
 					x:Name="ItemsControlActivities"
 					ItemsSource="{Binding OpenPlusCurrentActivities}">
-				
 				
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
@@ -129,11 +127,11 @@
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
 							<Button
-								x:Name="BtnActivity"
+								x:Name="ActivityButton"
 								BorderThickness="2"
 								Margin="0, 0, 3, 0"
 								Padding="3"
-								Command="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}}">
+								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}">
 
 								<Button.Background>
 									<SolidColorBrush Color="{Binding Path=Color}" />
@@ -161,7 +159,7 @@
 			<Image
 				Cursor="Hand"
 				Source="{Binding HomeActivity.Icon}"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}, Path=HomeActivity}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}, Path=HomeActivity}"
 				Width="30" Height="30"
 				Margin="25, 0, 0, 0"/>
 

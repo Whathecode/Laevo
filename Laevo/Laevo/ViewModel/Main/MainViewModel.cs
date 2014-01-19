@@ -160,7 +160,7 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && ( !_activityBar.IsActive || _activityBar.BarGotClosed ) )
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && !_activityBar.IsInUse() )
 			{
 				ShowActivityOverview();
 			}

@@ -46,13 +46,14 @@ namespace Laevo.View.ActivityBar
 				ColorizationOpaqueBlend;
 		}
 
-		const string BtnActivityName = "BtnActivity";
+		const string ActivityButtonName = "ActivityButton";
 		const double TopWhenVisible = -3;
 
 		readonly TimeSpan _displayTime = TimeSpan.FromSeconds( 4 );
 		readonly DoubleAnimation _hideAnimation;
 
-		public bool BarGotClosed { get; private set; }
+		private bool _barGotClosed;
+
 
 		public ActivityBar()
 		{
@@ -152,8 +153,8 @@ namespace Laevo.View.ActivityBar
 			if ( activate )
 			{
 				Activate();
-				TbActivityName.Select( 0, TbActivityName.Text.Length );
-				TbActivityName.Focus();
+				ActivityName.Select( 0, ActivityName.Text.Length );
+				ActivityName.Focus();
 			}
 		}
 
@@ -162,7 +163,7 @@ namespace Laevo.View.ActivityBar
 			PinTaskbar();
 
 			// Hide the activity bar after some time if it's not activated.
-			if ( !IsActive || BarGotClosed )
+			if ( !IsInUse() )
 			{
 				_hideAnimation.BeginTime = delay;
 				BeginAnimation( TopProperty, _hideAnimation );
@@ -179,6 +180,14 @@ namespace Laevo.View.ActivityBar
 			Show();
 		}
 
+		/// <summary>
+		/// Determines whether or not the activity bar is currently in use.
+		/// </summary>
+		public bool IsInUse()
+		{
+			return IsActive && !_barGotClosed;
+		}
+
 		void HideCompleted( object sender, EventArgs e )
 		{
 			Hide(); // Hide the window entirely since it is no longer visible.
@@ -187,45 +196,44 @@ namespace Laevo.View.ActivityBar
 		void OnDeactivated( object sender, EventArgs e )
 		{
 			// Force activity name binding to update.
-			var nameBinding = TbActivityName.GetBindingExpression( TextBox.TextProperty );
-			if ( nameBinding != null && !TbActivityName.IsReadOnly && TbActivityName.IsEnabled )
+			var nameBinding = ActivityName.GetBindingExpression( TextBox.TextProperty );
+			if ( nameBinding != null && !ActivityName.IsReadOnly && ActivityName.IsEnabled )
 			{
 				nameBinding.UpdateSource();
 			}
 
 			// Hide the infobox.
-			if ( !BarGotClosed )
+			if ( !_barGotClosed )
 			{
 				_hideAnimation.BeginTime = TimeSpan.Zero;
 				BeginAnimation( TopProperty, _hideAnimation );
 			}
-			BarGotClosed = false;
+			_barGotClosed = false;
 		}
 
 		void LabelKeyDown( object sender, KeyEventArgs e )
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				BarGotClosed = true;
+				_barGotClosed = true;
 
-				//Pass focus to previous element.
-				TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+				// TODO: Why is the focus moved here?
+				ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}
 
 		/// <summary>
-		/// Sets bat to be closed and passes the focus.
+		/// Sets bar to be closed and passes the focus.
 		/// </summary>
 		internal void CloseAndPassFocus()
 		{
+			// TODO: There are still some problems left with activity switching and bar hiding/showing.
+			_barGotClosed = true;
 
-			//TODO: Some problem with activity switching and bar hiding/showing- left for next week. 
-			BarGotClosed = true;
-
-			//Pass focus to previous element.
-			TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+			// TODO: Why is the focus moved here?
+			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 
 			ShowBarFor( _displayTime );
 		}
@@ -236,12 +244,11 @@ namespace Laevo.View.ActivityBar
 		internal void SelectNextActivity( int selectionIndex )
 		{
 			Activate();
-			BarGotClosed = false;
-			// Gets the content presented for the activity item.
+			_barGotClosed = false;
+
+			// Move focus to next activity button.
 			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
-			// Gets the selected activity button and give it a focus.
-			var activityButton = contentPresenter.ContentTemplate.FindName( BtnActivityName, contentPresenter ) as Button;
-			// ReSharper disable once PossibleNullReferenceException, checked in the first line, never will be null.
+			var activityButton = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
 			activityButton.Focus();
 		}
 	}
