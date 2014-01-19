@@ -228,6 +228,7 @@ namespace Laevo.ViewModel.Activity
 		///   Determines whether the activity is currently suspended, meaning it no longer takes up any resources.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsSuspended )]
+		[DataMember]
 		public bool IsSuspended { get; private set; }
 
 		[NotifyProperty( Binding.Properties.HasUnattendedInterruptions )]
@@ -288,6 +289,7 @@ namespace Laevo.ViewModel.Activity
 			Color = storedViewModel.Color;
 			HeightPercentage = storedViewModel.HeightPercentage;
 			OffsetPercentage = storedViewModel.OffsetPercentage;
+			IsSuspended = storedViewModel.IsSuspended;
 
 			CommonInitialize();
 
