@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -60,7 +61,18 @@ namespace Laevo.View.Main
 			_isCapsLockEnabled = KeyHelper.IsCapsLockEnabled();
 			InitializeKeyboardListener();
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
-			_updateLoop.Elapsed += ( s, a ) => DispatcherHelper.SafeDispatch( _dispatcher, () => OnUpdate( s, a ) );
+			_updateLoop.Elapsed += ( s, a ) =>
+			{
+				// Use a dispatcher, otherwise race conditions might occur when 'OnUpdate' dispatches to the main thread.
+				try
+				{
+					DispatcherHelper.SafeDispatch( _dispatcher, () => OnUpdate( s, a ) );
+				}
+				catch ( TaskCanceledException )
+				{
+					// This only happens on shutdown, which is nothing critical.
+				}
+			};
 			_updateLoop.Start();
 
 			UpdateCapsLockState();
