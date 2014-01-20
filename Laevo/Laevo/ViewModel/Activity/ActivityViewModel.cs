@@ -272,7 +272,7 @@ namespace Laevo.ViewModel.Activity
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
-			IsEditable = false;
+			IsEditable = isEditable;
 
 			CommonInitialize();
 		}
