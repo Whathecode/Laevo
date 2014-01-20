@@ -69,6 +69,7 @@
 				BorderBrush="Transparent"
 				Foreground="White"
 				CaretBrush="White"
+				IsEnabled="{Binding IsEditable}"
 				Text="{Binding Label}"
 				Margin="10, 0, 10, 0"
 				HorizontalAlignment="Center"
