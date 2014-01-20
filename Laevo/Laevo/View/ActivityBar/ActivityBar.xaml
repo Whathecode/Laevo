@@ -88,7 +88,9 @@
 				Cursor="Hand"
 				Width="28"
 				Height="28"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.EditActivity}}" />
+				Visibility="{Binding IsEditable, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.EditActivity}}">
+			</Image>
 
 		</StackPanel>
 
