@@ -240,6 +240,9 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
 
+		[NotifyProperty( Binding.Properties.IsEditable )]
+		public bool IsEditable { get; private set; }
+
 
 		static ActivityViewModel()
 		{
@@ -258,7 +261,7 @@ namespace Laevo.ViewModel.Activity
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) {}
 
-		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
+		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop, bool isEditable = true )
 		{
 			Activity = activity;
 
@@ -269,6 +272,7 @@ namespace Laevo.ViewModel.Activity
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
+			IsEditable = false;
 
 			CommonInitialize();
 		}
@@ -290,6 +294,7 @@ namespace Laevo.ViewModel.Activity
 			HeightPercentage = storedViewModel.HeightPercentage;
 			OffsetPercentage = storedViewModel.OffsetPercentage;
 			IsSuspended = storedViewModel.IsSuspended;
+			IsEditable = true;
 
 			CommonInitialize();
 
@@ -437,6 +442,12 @@ namespace Laevo.ViewModel.Activity
 			};
 			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
 			popup.Show();
+		}
+
+		[CommandCanExecute( Commands.EditActivity )]
+		public bool CanEditActivity()
+		{
+			return IsEditable;
 		}
 
 		[CommandExecute( Commands.OpenActivity )]

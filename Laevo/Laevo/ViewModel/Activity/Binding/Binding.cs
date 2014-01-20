@@ -18,7 +18,8 @@
 		HasOpenWindows,
 		IsSuspended,
 		HasUnattendedInterruptions,
-		IsPlannedActivity
+		IsPlannedActivity,
+		IsEditable
 	}
 
 	public enum Commands
