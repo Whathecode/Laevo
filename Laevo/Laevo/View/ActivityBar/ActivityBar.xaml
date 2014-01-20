@@ -112,14 +112,11 @@
 				
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
-						<StackPanel Orientation="Horizontal">
-							<StackPanel.Visibility>
-								<!-- TODO: Write a single binding converter using NCalc in the FCL extensions, which might result in an easier syntax here. -->
-								<MultiBinding
-									Converter="{converters:ConditionConverter Expression='[0] > 1', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}">
-									<Binding Path="OpenPlusCurrentActivities.Count" />
-								</MultiBinding>
-							</StackPanel.Visibility>
+							<StackPanel
+								Orientation="Horizontal"
+								Visibility="{Binding
+									OpenPlusCurrentActivities.Count,
+									Converter={converters:SingleConditionConverter Expression='[0] > 1', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}">
 						</StackPanel>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
