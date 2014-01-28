@@ -32,6 +32,7 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
+	[KnownType( typeof( ABC.Windows.Window ))]
 	class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
@@ -426,6 +427,7 @@ namespace Laevo.ViewModel.Activity
 					SelectedActivityEvent( this );
 					break;
 				case Mode.Activate:
+					// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
 					ActivateActivity( Activity.IsOpen );
 					break;
 			}

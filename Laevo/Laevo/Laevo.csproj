@@ -300,6 +300,10 @@
           <Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
           <Name>ABC.Applications</Name>
         </ProjectReference>
+		<ProjectReference Include="$(ABC-Toolkit)\ABC.Common\ABC.Common.csproj">
+		  <Project>{d53f1095-6dc0-4950-982f-3322aae74a50}</Project>
+		  <Name>ABC.Common</Name>
+		</ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -315,6 +319,9 @@
         </Reference>
         <Reference Include="ABC.Applications">
           <HintPath>..\..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
+        </Reference>
+        <Reference Include="ABC.Common">
+          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Common.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>
@@ -651,7 +658,6 @@
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\stop.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
