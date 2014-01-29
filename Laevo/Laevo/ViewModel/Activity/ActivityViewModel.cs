@@ -32,6 +32,7 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
+	[KnownType( typeof( ABC.Windows.Window ))]
 	class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
@@ -53,8 +54,6 @@ namespace Laevo.ViewModel.Activity
 		};
 
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
-		public static BitmapImage DefaultIcon;
-		public static BitmapImage HomeIcon;
 
 		/// <summary>
 		///   Path of the folder which contains the file libraries.
@@ -230,6 +229,7 @@ namespace Laevo.ViewModel.Activity
 		///   Determines whether the activity is currently suspended, meaning it no longer takes up any resources.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsSuspended )]
+		[DataMember]
 		public bool IsSuspended { get; private set; }
 
 		[NotifyProperty( Binding.Properties.HasUnattendedInterruptions )]
@@ -240,6 +240,9 @@ namespace Laevo.ViewModel.Activity
 
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
+
+		[NotifyProperty( Binding.Properties.IsEditable )]
+		public bool IsEditable { get; private set; }
 
 
 		static ActivityViewModel()
@@ -254,15 +257,12 @@ namespace Laevo.ViewModel.Activity
 				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
 				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
 				.ToList();
-
-			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
-			HomeIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 		}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
 			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) {}
 
-		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop )
+		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop, bool isEditable = true )
 		{
 			Activity = activity;
 
@@ -270,10 +270,10 @@ namespace Laevo.ViewModel.Activity
 			_virtualDesktop = desktop;
 
 			Label = activity.Name;
-			Icon = DefaultIcon;
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
+			IsEditable = isEditable;
 
 			CommonInitialize();
 		}
@@ -294,6 +294,8 @@ namespace Laevo.ViewModel.Activity
 			Color = storedViewModel.Color;
 			HeightPercentage = storedViewModel.HeightPercentage;
 			OffsetPercentage = storedViewModel.OffsetPercentage;
+			IsSuspended = storedViewModel.IsSuspended;
+			IsEditable = true;
 
 			CommonInitialize();
 
@@ -425,6 +427,7 @@ namespace Laevo.ViewModel.Activity
 					SelectedActivityEvent( this );
 					break;
 				case Mode.Activate:
+					// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
 					ActivateActivity( Activity.IsOpen );
 					break;
 			}
@@ -441,6 +444,12 @@ namespace Laevo.ViewModel.Activity
 			};
 			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
 			popup.Show();
+		}
+
+		[CommandCanExecute( Commands.EditActivity )]
+		public bool CanEditActivity()
+		{
+			return IsEditable;
 		}
 
 		[CommandExecute( Commands.OpenActivity )]

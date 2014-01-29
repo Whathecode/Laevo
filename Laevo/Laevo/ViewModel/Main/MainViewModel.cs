@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -53,9 +52,10 @@ namespace Laevo.ViewModel.Main
 
 			EnsureActivityOverview();
 
+			_activityBarViewModel.ActivityBar = _activityBar;
 			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
 			_activityBarViewModel.HomeActivity = _activityOverviewViewModel.HomeActivity;
-			_activityBarViewModel.OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel>();
+			_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, _activityOverviewViewModel.HomeActivity );
 			_activityBar.DataContext = _activityBarViewModel;
 			ShowActivityBar();
 		}
@@ -160,7 +160,7 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && ( !_activityBar.IsActive || _activityBar.BarGotClosed ) )
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && !_activityBar.IsInUse() )
 			{
 				ShowActivityOverview();
 			}
@@ -211,38 +211,6 @@ namespace Laevo.ViewModel.Main
 				currentActivity.IsOpen;
 		}
 
-		[CommandExecute( Commands.SuspendActivity )]
-		public void SuspendActivity()
-		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
-			{
-				_activityOverviewViewModel.CurrentActivityViewModel.SuspendActivity();
-			}
-		}
-
-		[CommandCanExecute( Commands.SuspendActivity )]
-		public bool CanSuspendActivity()
-		{
-			return _activityOverviewViewModel.CurrentActivityViewModel != null
-			       && !_activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
-		}
-
-		[CommandExecute( Commands.ResumeActivity )]
-		public void ResumeActivity()
-		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
-			{
-				_activityOverviewViewModel.CurrentActivityViewModel.ResumeActivity();
-			}
-		}
-
-		[CommandCanExecute( Commands.ResumeActivity )]
-		public bool CanResumeActivity()
-		{
-			return _activityOverviewViewModel.CurrentActivityViewModel != null
-			       && _activityOverviewViewModel.CurrentActivityViewModel.IsSuspended;
-		}
-
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
@@ -271,13 +239,13 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.SwitchActivity )]
 		public void SwitchActivity()
 		{
-			_activityBar.SelectNextActivity();
+			_activityBarViewModel.SelectNextActivity();
 		}
 
 		[CommandExecute( Commands.ActivateSelectedActivity )]
 		public void ActivateSelectedActivity()
 		{
-			_activityBar.ActivateSelectedActivity();
+			_activityBarViewModel.ActivateSelectedActivity();
 		}
 
 		/// <summary>
@@ -327,7 +295,7 @@ namespace Laevo.ViewModel.Main
 
 				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate windows alt+tab switching.
 				int newActivityIndex = _activityBarViewModel.OpenPlusCurrentActivities.IndexOf( newActivity );
-				if ( newActivity != null && newActivityIndex == -1 && newActivity != _activityOverviewViewModel.HomeActivity )
+				if ( newActivity != null && newActivityIndex == -1 )
 				{
 					_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, newActivity );
 				}

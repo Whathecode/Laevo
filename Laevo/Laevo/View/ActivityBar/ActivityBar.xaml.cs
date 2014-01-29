@@ -6,7 +6,6 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Laevo.ViewModel.Activity;
 using Microsoft.Win32;
 using Whathecode.System.Extensions;
 
@@ -47,16 +46,14 @@ namespace Laevo.View.ActivityBar
 				ColorizationOpaqueBlend;
 		}
 
-		const string BtnActivityName = "BtnActivity";
+		const string ActivityButtonName = "ActivityButton";
 		const double TopWhenVisible = -3;
 
 		readonly TimeSpan _displayTime = TimeSpan.FromSeconds( 4 );
 		readonly DoubleAnimation _hideAnimation;
 
-		int _selectionIndex;
-		ActivityViewModel _selectedActivity;
+		private bool _barGotClosed;
 
-		public bool BarGotClosed { get; private set; }
 
 		public ActivityBar()
 		{
@@ -151,15 +148,13 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		public void ShowActivityBar( bool activate )
 		{
-			SetSelectionStartIndex();
-
 			ShowBarFor( _displayTime );
 
 			if ( activate )
 			{
 				Activate();
-				TbActivityName.Select( 0, TbActivityName.Text.Length );
-				TbActivityName.Focus();
+				ActivityName.Select( 0, ActivityName.Text.Length );
+				ActivityName.Focus();
 			}
 		}
 
@@ -168,7 +163,7 @@ namespace Laevo.View.ActivityBar
 			PinTaskbar();
 
 			// Hide the activity bar after some time if it's not activated.
-			if ( !IsActive || BarGotClosed )
+			if ( !IsInUse() )
 			{
 				_hideAnimation.BeginTime = delay;
 				BeginAnimation( TopProperty, _hideAnimation );
@@ -185,6 +180,14 @@ namespace Laevo.View.ActivityBar
 			Show();
 		}
 
+		/// <summary>
+		/// Determines whether or not the activity bar is currently in use.
+		/// </summary>
+		public bool IsInUse()
+		{
+			return IsActive && !_barGotClosed;
+		}
+
 		void HideCompleted( object sender, EventArgs e )
 		{
 			Hide(); // Hide the window entirely since it is no longer visible.
@@ -193,92 +196,60 @@ namespace Laevo.View.ActivityBar
 		void OnDeactivated( object sender, EventArgs e )
 		{
 			// Force activity name binding to update.
-			var nameBinding = TbActivityName.GetBindingExpression( TextBox.TextProperty );
-			if ( nameBinding != null && !TbActivityName.IsReadOnly && TbActivityName.IsEnabled )
+			var nameBinding = ActivityName.GetBindingExpression( TextBox.TextProperty );
+			if ( nameBinding != null && !ActivityName.IsReadOnly && ActivityName.IsEnabled )
 			{
 				nameBinding.UpdateSource();
 			}
 
 			// Hide the infobox.
-			if ( !BarGotClosed )
+			if ( !_barGotClosed )
 			{
 				_hideAnimation.BeginTime = TimeSpan.Zero;
 				BeginAnimation( TopProperty, _hideAnimation );
 			}
-			BarGotClosed = false;
+			_barGotClosed = false;
 		}
 
 		void LabelKeyDown( object sender, KeyEventArgs e )
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				BarGotClosed = true;
+				_barGotClosed = true;
 
-				// Pass focus to next element.
-				TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Next ) );
+				// TODO: Why is the focus moved here?
+				ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}
 
 		/// <summary>
-		/// Activates selected activity.
+		/// Sets bar to be closed and passes the focus.
 		/// </summary>
-		public void ActivateSelectedActivity()
+		internal void CloseAndPassFocus()
 		{
-			if ( _selectedActivity != null )
-			{
-				//Hide();
-				BarGotClosed = true;
+			// TODO: There are still some problems left with activity switching and bar hiding/showing.
+			_barGotClosed = true;
 
-				//Pass focus to previous element.
-				TbActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+			// TODO: Why is the focus moved here?
+			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 
-				_selectedActivity.ActivateActivity( false );
-				_selectedActivity = null;
-			}
+			ShowBarFor( _displayTime );
 		}
 
 		/// <summary>
-		/// Switches beetewn current and opened activities and then saves selected activity.
+		/// Switches between current and opened activities.
 		/// </summary>
-		public void SelectNextActivity()
+		internal void SelectNextActivity( int selectionIndex )
 		{
-			if ( ItemsControlActivities.Items.Count > 0 )
-			{
-				// Come back on the beginning when selection index is outside of activities collection.
-				if ( _selectionIndex == ItemsControlActivities.Items.Count )
-				{
-					_selectionIndex = 0;
-				}
-				// Gets the content presented for the activity item.
-				var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( _selectionIndex );
-				// Gets the selected activity button and give it a focus.
-				var activityButton = contentPresenter.ContentTemplate.FindName( BtnActivityName, contentPresenter ) as Button;
-				// ReSharper disable once PossibleNullReferenceException, checked in the first line, never will be null.
-				activityButton.Focus();
+			Activate();
+			_barGotClosed = false;
 
-				_selectedActivity = (ActivityViewModel)ItemsControlActivities.Items[ _selectionIndex ];
-				_selectionIndex++;
-			}
-		}
-
-		/// <summary>
-		/// Sets selection start index for switching between activites.
-		/// </summary>
-		void SetSelectionStartIndex()
-		{
-			if ( ItemsControlActivities.Items.Count > 0 )
-			{
-				// Start index depends on active activity, if it is home activity we want to start selction from first open activity. 
-				// On the other case we want to skip first open activity in a first loop.
-				var firstInList = (ActivityViewModel)ItemsControlActivities.Items[ 0 ];
-				_selectionIndex = firstInList.IsActive ? 1 : 0;
-			}
-			else
-			{
-				_selectionIndex = 0;
-			}
+			// Move focus to next activity button.
+			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
+			var activityButton = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
+			activityButton.Focus();
 		}
 	}
 }

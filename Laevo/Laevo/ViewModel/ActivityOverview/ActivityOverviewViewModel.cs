@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
+using System.Windows.Media.Imaging;
 using ABC.Windows;
 using Laevo.Data.View;
 using Laevo.ViewModel.Activity;
@@ -53,6 +54,8 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
+
+		readonly BitmapImage _defaultIcon;
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -114,10 +117,17 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 			_dataRepository = dataRepository;
 
+			_defaultIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
+			var homeIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
+
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.DesktopManager, _model.DesktopManager.CurrentDesktop );
+			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.DesktopManager, _model.DesktopManager.CurrentDesktop, false )
+			{
+				Icon = homeIcon
+			};
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity();
+
 
 			// Initialize the activities and tasks to work with this overview.
 			Activities.Concat( Tasks ).ForEach( a =>
@@ -152,7 +162,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.DesktopManager )
 			{
-				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines
+				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
+				Icon = _defaultIcon
 			};
 			lock ( Activities )
 			{
@@ -167,7 +178,10 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.DesktopManager );
+			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.DesktopManager )
+			{
+				Icon = _defaultIcon
+			};
 			AddTask( newTask );
 		}
 
