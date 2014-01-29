@@ -8,7 +8,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
-	xmlns:b1="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityBar="clr-namespace:Laevo.View.ActivityBar"
 	xmlns:activityBarViewModel="clr-namespace:Laevo.ViewModel.ActivityBar"
@@ -18,7 +19,10 @@
 	Topmost="True"
 	ShowInTaskbar="False"
 	ShowActivated="False"
+	Foreground="White"
 	Background="Transparent"
+	FontFamily="Segoe UI Light"
+	FontSize="18"
 	Height="55"
 	activityBar:GlassEffect.IsEnabled="True">
 
@@ -60,13 +64,12 @@
 			</Button>
 
 			<TextBox
-				x:Name="TbActivityName"
+				x:Name="ActivityName"
 				Background="Transparent"
 				BorderBrush="Transparent"
 				Foreground="White"
 				CaretBrush="White"
-				FontFamily="Segoe UI Light"
-				FontSize="18"
+				IsEnabled="{Binding IsEditable}"
 				Text="{Binding Label}"
 				Margin="10, 0, 10, 0"
 				HorizontalAlignment="Center"
@@ -81,13 +84,14 @@
 			</TextBox>
 
 			<Image
-				x:Name="ImgSettings"
 				Focusable="True"
 				Source="../Activity/ActionIcons/edit.png"
 				Cursor="Hand"
 				Width="28"
 				Height="28"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.EditActivity }}" />
+				Visibility="{Binding IsEditable, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.EditActivity}}">
+			</Image>
 
 		</StackPanel>
 
@@ -97,71 +101,67 @@
 			DockPanel.Dock="Right"
 			HorizontalAlignment="Right">
 
-			<Border
-				x:Name="BorderHomeActivity"
-				CornerRadius="5"
-				BorderThickness="2"
-				Margin="0, 0, 15, 0"
-				Padding="3">
+			<StackPanel 
+				Orientation="Horizontal">
+			
+				<TextBlock
+					Text="{Binding SelectedActivity.Label}"
+					Margin="0, 0, 20, 0"
+					VerticalAlignment="Center"/>
 
-				<Border.Background>
-					<SolidColorBrush Color="{Binding HomeActivity.Color}" />
-				</Border.Background>
+				<ItemsControl
+					x:Name="ItemsControlActivities"
+					ItemsSource="{Binding OpenPlusCurrentActivities}">
+				
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel
+								Orientation="Horizontal"
+								Visibility="{Binding
+									OpenPlusCurrentActivities.Count,
+									Converter={converters:SingleConditionConverter Expression='[0] > 1', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}">
+						</StackPanel>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
 
-				<Border.BorderBrush>
-					<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
-						<Binding Path="HomeActivity.IsActive" />
-						<Binding Path="HomeActivity.IsOpen" />
-						<Binding Path="HomeActivity.HasOpenWindows" />
-						<Binding Path="HomeActivity.HasUnattendedInterruptions" />
-					</MultiBinding>
-				</Border.BorderBrush>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button
+								x:Name="ActivityButton"
+								BorderThickness="2"
+								Margin="0, 0, 3, 0"
+								Padding="3"
+								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}">
 
-				<Image
-					Cursor="Hand"
-					Source="../Activity/Icons/home.png"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}, Path=HomeActivity}" />
-			</Border>
+								<Button.Background>
+									<SolidColorBrush Color="{Binding Path=Color}" />
+								</Button.Background>
 
-			<ItemsControl
-				x:Name="ItemsControlActivities"
-				ItemsSource="{Binding OpenPlusCurrentActivities}">
+								<Button.BorderBrush>
+									<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+										<Binding Path="IsActive" />
+										<Binding Path="IsOpen" />
+										<Binding Path="HasOpenWindows" />
+										<Binding Path="HasUnattendedInterruptions" />
+									</MultiBinding>
+								</Button.BorderBrush>
 
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<StackPanel Orientation="Horizontal" Name="Test1Panel" />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
+								<Image
+									Cursor="Hand"
+									Source="{Binding Path=Icon}" />
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
 
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<Button
-							x:Name="BtnActivity"
-							BorderThickness="2"
-							Margin="0, 0, 3, 0"
-							Padding="3"
-							Command="{wtc:CommandBinding {x:Static b1:Commands.SelectActivity}}">
+			</StackPanel>
 
-							<Button.Background>
-								<SolidColorBrush Color="Transparent" />
-							</Button.Background>
-
-							<Button.BorderBrush>
-								<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
-									<Binding Path="IsActive" />
-									<Binding Path="IsOpen" />
-									<Binding Path="HasOpenWindows" />
-									<Binding Path="HasUnattendedInterruptions" />
-								</MultiBinding>
-							</Button.BorderBrush>
-
-							<Image
-								Cursor="Hand"
-								Source="{Binding Path=Icon}" />
-						</Button>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
+			<Image
+				Cursor="Hand"
+				Source="{Binding HomeActivity.Icon}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}, Path=HomeActivity}"
+				Width="30" Height="30"
+				Margin="25, 0, 0, 0"/>
 
 		</StackPanel>
 

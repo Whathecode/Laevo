@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Laevo.ViewModel.Main;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
@@ -30,8 +33,10 @@ namespace Laevo.View.Main
 		readonly Timer _updateLoop = new Timer();
 		KeyboardHookListener _keyboardListener;
 
+		readonly Dispatcher _dispatcher;
 		readonly InputController _inputController = new InputController();
 		readonly Dictionary<Keys, bool> _keyStates = new Dictionary<Keys, bool>();
+		readonly object _inputLock = new object();
 
 		const string TurnCapsLockText = "Turn Caps Lock ";
 		bool _isCapsLockEnabled;
@@ -40,7 +45,15 @@ namespace Laevo.View.Main
 
 		public TrayIconControl( MainViewModel viewModel )
 		{
-			viewModel.GuiReset += ResetKeyStates;
+			_dispatcher = Dispatcher.CurrentDispatcher;
+
+			viewModel.GuiReset += () =>
+			{
+				lock ( _inputLock )
+				{
+					ResetKeyStates();
+				}
+			};
 
 			InitializeComponent();
 
@@ -48,7 +61,18 @@ namespace Laevo.View.Main
 			_isCapsLockEnabled = KeyHelper.IsCapsLockEnabled();
 			InitializeKeyboardListener();
 			_updateLoop.Interval = 1000 / UpdatesPerSecond;
-			_updateLoop.Elapsed += OnUpdate;
+			_updateLoop.Elapsed += ( s, a ) =>
+			{
+				// Use a dispatcher, otherwise race conditions might occur when 'OnUpdate' dispatches to the main thread.
+				try
+				{
+					DispatcherHelper.SafeDispatch( _dispatcher, () => OnUpdate( s, a ) );
+				}
+				catch ( TaskCanceledException )
+				{
+					// This only happens on shutdown, which is nothing critical.
+				}
+			};
 			_updateLoop.Start();
 
 			UpdateCapsLockState();
@@ -84,30 +108,16 @@ namespace Laevo.View.Main
 		}
 
 
-		bool _resettingKeyStates;
 		void ResetKeyStates()
 		{
-			lock ( _inputController )
-			{
-				// Throttle resetting key states, since this is a slow operation.
-				// When called too often (repeatedly pressing caps lock), it locks up the system.
-				if ( _resettingKeyStates )
-				{
-					return;
-				}
-				_resettingKeyStates = true;
+			_keyStates.Clear();
 
-				_keyStates.Clear();
+			// Prevent exception when looking up a non-existent key.
+			new[] { Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A, Keys.Tab }.ForEach( k => _keyStates[ k ] = false );
 
-				// Prevent exception when looking up a non-existent key.
-				new[] { Keys.CapsLock, Keys.N, Keys.W, Keys.L, Keys.X, Keys.V, Keys.A, Keys.Tab }.ForEach( k => _keyStates[ k ] = false );
-
-				// Set keystate of all keys which are currently down to true.
-				List<Key> downKeys = KeyHelper.GetNonToggleKeysState();
-				downKeys.ForEach( k => _keyStates[ (Keys)KeyInterop.VirtualKeyFromKey( k ) ] = true );
-
-				_resettingKeyStates = false;
-			}
+			// Set keystate of all keys which are currently down to true.
+			List<Key> downKeys = KeyHelper.GetNonToggleKeysState();
+			downKeys.ForEach( k => _keyStates[ (Keys)KeyInterop.VirtualKeyFromKey( k ) ] = true );
 		}
 
 		void InitializeKeyboardListener()
@@ -196,9 +206,15 @@ namespace Laevo.View.Main
 			_isDisposed = true;
 		}
 
-
+		readonly object _updateLock = new object();
 		void OnUpdate( object sender, EventArgs e )
 		{
+			// Prevent locking up the system during heavy load and update events keep piling up.
+			if ( !Monitor.TryEnter( _updateLock ) )
+			{
+				return;
+			}
+
 			// HACK: Verify whether caps lock was enabled/disabled without SwitchCapsLock being called. This indicates the global keyboard hook was silently removed.
 			//       http://msdn.microsoft.com/en-us/library/windows/desktop/ms646293(v=vs.85).aspx
 			bool keyboardHookLost = false;
@@ -218,19 +234,18 @@ namespace Laevo.View.Main
 				SwitchCapsLock(); // Reset caps lock to its previous position.
 			}
 
-			lock ( _inputController )
+			lock ( _inputLock )
 			{
-				lock ( _newInput )
+				foreach ( var input in _newInput )
 				{
-					foreach ( var input in _newInput )
-					{
-						_keyStates[ input.Key ] = input.Value;
-					}
-					_newInput.Clear();
+					_keyStates[ input.Key ] = input.Value;
 				}
+				_newInput.Clear();
 
 				_inputController.Update();
 			}
+
+			Monitor.Exit( _updateLock );
 		}
 
 		bool _suppressKeys;
@@ -238,53 +253,53 @@ namespace Laevo.View.Main
 
 		void OnKeyDown( object sender, KeyEventArgs e )
 		{
-			// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
-			if ( e.KeyCode == Keys.None )
+			lock ( _inputLock )
 			{
-				return;
-			}
+				// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
+				if ( e.KeyCode == Keys.None )
+				{
+					return;
+				}
 
-			lock ( _newInput )
-			{
 				_newInput[ e.KeyCode ] = true;
-			}
 
-			// Disable caps lock, and any keys pressed simultaneously with caps lock.
-			if ( e.KeyCode == Keys.CapsLock )
-			{
-				// HACK: Sometimes keys end up staying 'up' in _keyStates for a reason currently unknown.
-				//       Refreshing this buffer whenever a shortkey will be used solves this for this particular application.
-				ResetKeyStates();
+				// Disable caps lock, and any keys pressed simultaneously with caps lock.
+				if ( e.KeyCode == Keys.CapsLock )
+				{
+					// HACK: Sometimes keys end up staying 'up' in _keyStates for a reason currently unknown.
+					//       Refreshing this buffer whenever a shortkey will be used solves this for this particular application.
+					ResetKeyStates();
 
-				_suppressKeys = true;
-			}
-			if ( _suppressKeys )
-			{
-				e.Handled = true;
+					_suppressKeys = true;
+				}
+				if ( _suppressKeys )
+				{
+					e.Handled = true;
+				}
 			}
 		}
 
 		void OnKeyUp( object sender, KeyEventArgs e )
 		{
-			// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
-			if ( e.KeyCode == Keys.None )
+			lock ( _inputLock )
 			{
-				return;
-			}
+				// Ignore invalid events. (These Keys.None events do occur, but I'm not quite sure why: http://globalmousekeyhook.codeplex.com/workitem/1001)
+				if ( e.KeyCode == Keys.None )
+				{
+					return;
+				}
 
-			lock ( _newInput )
-			{
 				_newInput[ e.KeyCode ] = false;
-			}
 
-			// Re-enable key input when Caps Lock is released.
-			if ( e.KeyCode == Keys.CapsLock )
-			{
-				_suppressKeys = false;
-			}
-			if ( _suppressKeys )
-			{
-				e.Handled = true;
+				// Re-enable key input when Caps Lock is released.
+				if ( e.KeyCode == Keys.CapsLock )
+				{
+					_suppressKeys = false;
+				}
+				if ( _suppressKeys )
+				{
+					e.Handled = true;
+				}
 			}
 		}
 

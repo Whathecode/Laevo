@@ -45,12 +45,6 @@
 				<MenuItem
 					Header="Stop Activity"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.StopActivity}}" />
-				<MenuItem
-					Header="Suspend Activity"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.SuspendActivity}}" />
-				<MenuItem
-					Header="Resume Activity"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.ResumeActivity}}" />
 			</ContextMenu>
 		</tb:TaskbarIcon.ContextMenu>
 		
