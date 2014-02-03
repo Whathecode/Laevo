@@ -47,12 +47,12 @@ namespace Laevo.View.ActivityBar
 		}
 
 		const string ActivityButtonName = "ActivityButton";
-		const double TopWhenVisible = -3;
+		const double TopWhenVisible = -5;
 
 		readonly TimeSpan _displayTime = TimeSpan.FromSeconds( 4 );
 		readonly DoubleAnimation _hideAnimation;
 
-		private bool _barGotClosed;
+		bool _barGotClosed;
 
 
 		public ActivityBar()
@@ -84,8 +84,8 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		void ResizeToScreenWidth()
 		{
-			Left = -5;
-			Width = SystemParameters.PrimaryScreenWidth + 10;
+			Width = SystemParameters.PrimaryScreenWidth / 2;
+			Left = ( SystemParameters.PrimaryScreenWidth / 2 ) - ( Width / 2 );
 		}
 
 		/// <summary>
@@ -230,7 +230,7 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		internal void PassFocusToPreviousItem()
 		{
-			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );	
+			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 		}
 
 		/// <summary>
