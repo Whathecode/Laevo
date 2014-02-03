@@ -69,10 +69,11 @@ namespace Laevo.ViewModel.ActivityBar
 		{
 			if ( SelectedActivity != null )
 			{
+				// Move the focus from Activity icon after user select one in order to finnish selection action.
+				ActivityBar.PassFocusToPreviousItem();
+
 				SelectedActivity.ActivateActivity( false );
 				SelectedActivity = null;
-
-				ActivityBar.CloseAndPassFocus();
 			}
 			_selectionIndex = 1;
 		}

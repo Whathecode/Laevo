@@ -217,25 +217,20 @@ namespace Laevo.View.ActivityBar
 			{
 				_barGotClosed = true;
 
-				// TODO: Why is the focus moved here?
-				ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
+				// Move the focus from name textbox after user ends name editing to finnish action.
+				// Without this feature textbox will be focused during next Activity bar call.
+				PassFocusToPreviousItem();
 
 				ShowBarFor( TimeSpan.Zero );
 			}
 		}
 
 		/// <summary>
-		/// Sets bar to be closed and passes the focus.
+		/// Passes the focus to previous visual item.
 		/// </summary>
-		internal void CloseAndPassFocus()
+		internal void PassFocusToPreviousItem()
 		{
-			// TODO: There are still some problems left with activity switching and bar hiding/showing.
-			_barGotClosed = true;
-
-			// TODO: Why is the focus moved here?
-			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
-
-			ShowBarFor( _displayTime );
+			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );	
 		}
 
 		/// <summary>
@@ -244,7 +239,8 @@ namespace Laevo.View.ActivityBar
 		internal void SelectNextActivity( int selectionIndex )
 		{
 			Activate();
-			_barGotClosed = false;
+			//_barGotClosed = false;\
+			PinTaskbar();
 
 			// Move focus to next activity button.
 			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
