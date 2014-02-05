@@ -286,7 +286,7 @@ namespace Laevo.Model
 
 			// Attempt rename.
 			string newFolder = CreateSafeFolderName();
-			if ( newFolder == currentName )
+			if ( newFolder.Split( Path.DirectorySeparatorChar ).Last() == currentName )
 			{
 				// The current folder name is already a 'safe' desired name.
 				return;
