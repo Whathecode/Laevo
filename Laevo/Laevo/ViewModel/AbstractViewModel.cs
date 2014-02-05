@@ -5,7 +5,7 @@ using Whathecode.System;
 namespace Laevo.ViewModel
 {
 	[DataContract]
-	abstract class AbstractViewModel : AbstractDisposable
+	public abstract class AbstractViewModel : AbstractDisposable
 	{
 		public abstract void Persist();
 

@@ -17,7 +17,7 @@ namespace Laevo.Model
 	/// </summary>
 	/// <author>Steven Jeuris</author>
 	[DataContract]
-	class Activity
+	public class Activity
 	{
 		public const string DefaultActivityName = "New Activity";
 		public static readonly string ProgramMyDocumentsFolder = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), "Laevo" );

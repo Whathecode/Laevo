@@ -9,7 +9,7 @@ namespace Laevo.Data.Model
 	///   Provides access to the persisted model data of Laevo.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	interface IModelRepository
+	public interface IModelRepository
 	{
 		ReadOnlyCollection<Activity> Activities { get; }
 		ReadOnlyCollection<Activity> Tasks { get; }

@@ -7,7 +7,7 @@ namespace Laevo.Model.AttentionShifts
 	///   Represents a shift of attention towards a certain activity.
 	/// </summary>
 	[DataContract]
-	class ActivityAttentionShift : AbstractAttentionShift
+	public class ActivityAttentionShift : AbstractAttentionShift
 	{
 		/// <summary>
 		///   The activity towards which attention shifted.

@@ -8,7 +8,7 @@ namespace Laevo.Model
 	/// </summary>
 	/// <author>Steven Jeuris</author>
 	[DataContract]
-	class Settings
+	public class Settings
 	{
 		/// <summary>
 		///   The scale at which the time line is rendered in the WPF 3D environment.
