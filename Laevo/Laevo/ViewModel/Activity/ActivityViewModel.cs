@@ -33,7 +33,7 @@ namespace Laevo.ViewModel.Activity
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
 	[KnownType( typeof( ABC.Windows.Window ))]
-	class ActivityViewModel : AbstractViewModel
+	public class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
 

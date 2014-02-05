@@ -17,7 +17,7 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 namespace Laevo.ViewModel.ActivityOverview
 {
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
-	class ActivityOverviewViewModel : AbstractViewModel
+	public class ActivityOverviewViewModel : AbstractViewModel
 	{
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
 

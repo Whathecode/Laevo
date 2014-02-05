@@ -24,7 +24,7 @@ namespace Laevo.Model
 	///   TODO: Make tasks typesafe?
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	class Laevo
+	public class Laevo
 	{
 		public const string DefaultActivityName = "New Activity";
 

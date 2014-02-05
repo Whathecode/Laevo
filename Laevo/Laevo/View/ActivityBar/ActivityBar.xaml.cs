@@ -2,12 +2,16 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Laevo.ViewModel.Activity;
 using Microsoft.Win32;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
+using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 
 
 namespace Laevo.View.ActivityBar
@@ -15,8 +19,15 @@ namespace Laevo.View.ActivityBar
 	/// <summary>
 	/// Interaction logic for ActivityBar.xaml
 	/// </summary>
+	[WpfControl( typeof( Properties ) )]
 	public partial class ActivityBar
 	{
+		public enum Properties
+		{
+			SelectedActivity
+		}
+
+
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		public static extern IntPtr DefWindowProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam );
 
@@ -55,9 +66,45 @@ namespace Laevo.View.ActivityBar
 		bool _barGotClosed;
 
 
+		[DependencyProperty( Properties.SelectedActivity )]
+		public ActivityViewModel SelectedActivity { get; set; }
+
+		[DependencyPropertyChanged( Properties.SelectedActivity )]
+		static void OnSelectedActivityChanged( DependencyObject o, DependencyPropertyChangedEventArgs args )
+		{
+			var bar = (ActivityBar)o;
+
+			// Always listen to the activated event of the currently selected activity.
+			var old = (ActivityViewModel)args.OldValue;
+			if ( old != null )
+			{
+				old.ActivatedActivityEvent -= bar.OnSelectedActivityActivated;
+			}
+			var newlySelected = (ActivityViewModel)args.NewValue;
+			if ( newlySelected != null )
+			{
+				newlySelected.ActivatedActivityEvent += bar.OnSelectedActivityActivated;
+
+				// Focus the currently selected activity.
+				var contentPresenter = (ContentPresenter)bar.ItemsControlActivities.ItemContainerGenerator.ContainerFromItem( newlySelected );
+				var button = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
+				button.Focus();
+			}
+		}
+
+		void OnSelectedActivityActivated( ActivityViewModel viewModel )
+		{
+			PassFocusToPreviousItem();
+		}
+
+
 		public ActivityBar()
 		{
 			InitializeComponent();
+
+			// Set up two way binding for the necessary properties to the viewmodel.
+			var binding = new Binding( "SelectedActivity" ) { Mode = BindingMode.TwoWay };
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.SelectedActivity ), binding );
 
 			ResizeToScreenWidth();
 			SystemEvents.DisplaySettingsChanged += ( s, a ) => ResizeToScreenWidth();
@@ -217,7 +264,7 @@ namespace Laevo.View.ActivityBar
 			{
 				_barGotClosed = true;
 
-				// Move the focus from name textbox after user ends name editing to finnish action.
+				// Move the focus from name textbox after user ends name editing to finish action.
 				// Without this feature textbox will be focused during next Activity bar call.
 				PassFocusToPreviousItem();
 
@@ -228,24 +275,9 @@ namespace Laevo.View.ActivityBar
 		/// <summary>
 		/// Passes the focus to previous visual item.
 		/// </summary>
-		internal void PassFocusToPreviousItem()
+		void PassFocusToPreviousItem()
 		{
 			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
-		}
-
-		/// <summary>
-		/// Switches between current and opened activities.
-		/// </summary>
-		internal void SelectNextActivity( int selectionIndex )
-		{
-			Activate();
-			//_barGotClosed = false;\
-			PinTaskbar();
-
-			// Move focus to next activity button.
-			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
-			var activityButton = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
-			activityButton.Focus();
 		}
 	}
 }
