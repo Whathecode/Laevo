@@ -459,6 +459,12 @@ namespace Laevo.ViewModel.Activity
 			ActivityOpenedEvent( this );
 		}
 
+		[CommandCanExecute( Commands.OpenActivity )]
+		public bool CanOpenActivity()
+		{
+			return !Activity.IsOpen;
+		}
+
 		[CommandExecute( Commands.StopActivity )]
 		public void StopActivity()
 		{

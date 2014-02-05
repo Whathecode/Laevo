@@ -11,6 +11,8 @@ namespace Laevo.ViewModel.ActivityBar
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	class ActivityBarViewModel : AbstractViewModel
 	{
+		int _selectionIndex;
+
 		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; private set; }
 
@@ -41,56 +43,50 @@ namespace Laevo.ViewModel.ActivityBar
 
 			OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel> { HomeActivity };
 
+			// TODO: Better decoupling from ActivityOverviewViewModel. These events could be provided as services through a central mechanism. Perhaps they don't belong in overview either way.
+			overview.OpenedActivityEvent += opened => OpenPlusCurrentActivities.Add( opened );
+			overview.RemovedActivityEvent += removed => OpenPlusCurrentActivities.Remove( removed );
+			overview.StoppedActivityEvent += stopped => OpenPlusCurrentActivities.Remove( stopped );
 			overview.ActivatedActivityEvent += OnActivityActivated;
-			overview.RemovedActivityEvent += OnActivityRemoved;
-			overview.OpenedActivityEvent += OnOpenedActivityEvent;
-			overview.StoppedActivityEvent += OnStoppedActivityEvent;
 		}
 
 
-		void OnActivityActivated( ActivityViewModel oldActivity, ActivityViewModel newActivity )
+		void OnActivityActivated( ActivityViewModel oldActivity, ActivityViewModel activatedActivity )
 		{
-			CurrentActivity = newActivity;
+			// When an activity is activated, selection stops.
+			SelectedActivity = null;
+			_selectionIndex = 0;
 
-			if ( oldActivity != newActivity )
+			// Nothing to do when activity didn't change.
+			if ( oldActivity == activatedActivity )
 			{
-				if ( oldActivity != null && !oldActivity.IsOpen )
-				{
-					OpenPlusCurrentActivities.Remove( oldActivity );
-				}
+				return;
+			}
 
-				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate windows alt+tab switching.
-				int newActivityIndex = OpenPlusCurrentActivities.IndexOf( newActivity );
-				if ( newActivity != null && newActivityIndex == -1 )
+			CurrentActivity = activatedActivity;
+
+			// Activities which are activated, but not open are shown in the list until they are deactivated.
+			if ( oldActivity != null && !oldActivity.IsOpen )
+			{
+				OpenPlusCurrentActivities.Remove( oldActivity );
+			}
+
+			// Similar behavior as windows Alt+Tab window switching.
+			// The activated activity is always in front, the previously activated activity is second.
+			if ( activatedActivity != null )
+			{
+				if ( activatedActivity.IsOpen )
 				{
-					OpenPlusCurrentActivities.Insert( 0, newActivity );
+					OpenPlusCurrentActivities.Move( OpenPlusCurrentActivities.IndexOf( activatedActivity ), 0 );
 				}
-				else if ( newActivityIndex != -1 )
+				else
 				{
-					OpenPlusCurrentActivities.Move( newActivityIndex, 0 );
+					// Non-open but activated activites are temporarily added to the list.
+					OpenPlusCurrentActivities.Insert( 0, activatedActivity );
 				}
 			}
 		}
 
-		void OnActivityRemoved( ActivityViewModel removed )
-		{
-			OpenPlusCurrentActivities.Remove( removed );
-		}
-
-		void OnOpenedActivityEvent( ActivityViewModel opened )
-		{
-			if ( !OpenPlusCurrentActivities.Contains( opened ) )
-			{
-				OpenPlusCurrentActivities.Add( opened );
-			}
-		}
-
-		void OnStoppedActivityEvent( ActivityViewModel stopped )
-		{
-			OpenPlusCurrentActivities.Remove( stopped );
-		}
-
-		int _selectionIndex;
 		/// <summary>
 		/// Selects next activity.
 		/// </summary>
@@ -118,9 +114,7 @@ namespace Laevo.ViewModel.ActivityBar
 			if ( SelectedActivity != null )
 			{
 				SelectedActivity.ActivateActivity( false );
-				SelectedActivity = null;
 			}
-			_selectionIndex = 0;
 		}
 
 		protected override void FreeUnmanagedResources()
