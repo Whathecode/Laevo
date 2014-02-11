@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Microsoft.Win32;
 using Whathecode.System.Extensions;
@@ -31,21 +31,6 @@ namespace Laevo.View.ActivityBar
 		const int HitTopLeftBorderCorner = 13;
 		const int HitTopRightBorderCorner = 14;
 
-		[DllImport( "dwmapi.dll", EntryPoint = "#127" )]
-		static extern void DwmGetColorizationParameters( out Dwmcolorizationparams parameters );
-
-		public struct Dwmcolorizationparams
-		{
-			public uint
-				ColorizationColor,
-				ColorizationAfterglow,
-				ColorizationColorBalance,
-				ColorizationAfterglowBalance,
-				ColorizationBlurBalance,
-				ColorizationGlassReflectionIntensity,
-				ColorizationOpaqueBlend;
-		}
-
 		const string ActivityButtonName = "ActivityButton";
 		const double TopWhenVisible = -5;
 
@@ -54,6 +39,9 @@ namespace Laevo.View.ActivityBar
 
 		bool _barGotClosed;
 
+		// How much should we shift Activity menu to display it in left corner bar position. Values are relative to menu owner- ActivityButton.
+		const int MenuHorizontalShift = -16;
+		const int MenuVerticalShift = 10;
 
 		public ActivityBar()
 		{
@@ -84,23 +72,13 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		void ResizeToScreenWidth()
 		{
+			// Sets width of Activity Bar to half of the screen and places it in the middle.
 			Width = SystemParameters.PrimaryScreenWidth / 2;
 			Left = ( SystemParameters.PrimaryScreenWidth / 2 ) - ( Width / 2 );
-		}
 
-		/// <summary>
-		/// Gets a color from windows registry in order to apply it to a window in both Aero and othere themes. (Not used for now)
-		/// </summary>
-		Color GetWindowColorizationColor( bool opaque )
-		{
-			Dwmcolorizationparams windowsColors;
-			DwmGetColorizationParameters( out windowsColors );
-
-			return Color.FromArgb(
-				(byte)( opaque ? 255 : windowsColors.ColorizationColor >> 24 ),
-				(byte)( windowsColors.ColorizationColor >> 16 ),
-				(byte)( windowsColors.ColorizationColor >> 8 ),
-				(byte)windowsColors.ColorizationColor );
+			// Place activity menu in bottom left corner of Activity Bar.
+			ContextMenu.HorizontalOffset = MenuHorizontalShift;
+			ContextMenu.VerticalOffset = MenuVerticalShift;
 		}
 
 		void OnLoaded( object sender, RoutedEventArgs e )
@@ -246,6 +224,32 @@ namespace Laevo.View.ActivityBar
 			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
 			var activityButton = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
 			activityButton.Focus();
+		}
+
+		/// <summary>
+		/// Resets properties and shows Activity Menu.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void ShowActivityMenu( object sender, RoutedEventArgs e )
+		{
+			ActivityButton.ContextMenu.Visibility = Visibility.Visible;
+			ActivityButton.ContextMenu.Focus();
+			ActivityButton.ContextMenu.IsEnabled = true;
+			ActivityButton.ContextMenu.PlacementTarget = ActivityButton;
+			ActivityButton.ContextMenu.Placement = PlacementMode.Bottom;
+			ActivityButton.ContextMenu.IsOpen = true;
+		}
+
+		/// <summary>
+		/// Hides Activity Menu.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void HideActivityMenu( object sender, MouseButtonEventArgs e )
+		{
+			ActivityButton.ContextMenu.Visibility = Visibility.Hidden;
+			ActivityButton.ContextMenu.IsOpen = false;
 		}
 	}
 }

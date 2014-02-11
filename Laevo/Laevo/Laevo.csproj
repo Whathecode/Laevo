@@ -300,10 +300,10 @@
           <Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
           <Name>ABC.Applications</Name>
         </ProjectReference>
-		<ProjectReference Include="$(ABC-Toolkit)\ABC.Common\ABC.Common.csproj">
-		  <Project>{d53f1095-6dc0-4950-982f-3322aae74a50}</Project>
-		  <Name>ABC.Common</Name>
-		</ProjectReference>
+        <ProjectReference Include="$(ABC-Toolkit)\ABC.Common\ABC.Common.csproj">
+          <Project>{d53f1095-6dc0-4950-982f-3322aae74a50}</Project>
+          <Name>ABC.Common</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
