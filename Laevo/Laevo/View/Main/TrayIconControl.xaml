@@ -39,12 +39,6 @@
 				<MenuItem
 					Header="New Activity"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}" />
-				<MenuItem
-					Header="Open Current Activity Context"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenCurrentActivityLibrary}}" />
-				<MenuItem
-					Header="Stop Activity"
-					Command="{view:TrayCommandBinding {x:Static b:Commands.StopActivity}}" />
 			</ContextMenu>
 		</tb:TaskbarIcon.ContextMenu>
 		

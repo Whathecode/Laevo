@@ -473,6 +473,12 @@ namespace Laevo.ViewModel.Activity
 			ActivityStoppedEvent( this );
 		}
 
+		[CommandCanExecute( Commands.StopActivity )]
+		public bool CanStopActivity()
+		{
+			return Label != "Home";
+		}
+
 		public void SuspendActivity()
 		{
 			if ( IsSuspended )
