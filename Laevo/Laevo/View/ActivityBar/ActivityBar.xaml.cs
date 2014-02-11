@@ -257,7 +257,6 @@ namespace Laevo.View.ActivityBar
 		{
 			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
 		}
-		}
 
 		/// <summary>
 		/// Resets properties and shows Activity Menu.
@@ -283,5 +282,6 @@ namespace Laevo.View.ActivityBar
 		{
 			ActivityButton.ContextMenu.Visibility = Visibility.Hidden;
 			ActivityButton.ContextMenu.IsOpen = false;
+		}
 	}
 }
