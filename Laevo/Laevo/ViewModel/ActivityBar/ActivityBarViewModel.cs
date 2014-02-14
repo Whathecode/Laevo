@@ -87,9 +87,6 @@ namespace Laevo.ViewModel.ActivityBar
 			}
 		}
 
-		/// <summary>
-		/// Selects next activity.
-		/// </summary>
 		internal void SelectNextActivity()
 		{
 			if ( OpenPlusCurrentActivities.Count > 1 )
@@ -106,9 +103,6 @@ namespace Laevo.ViewModel.ActivityBar
 			}
 		}
 
-		/// <summary>
-		/// Activates selected activity.
-		/// </summary>
 		internal void ActivateSelectedActivity()
 		{
 			if ( SelectedActivity != null )

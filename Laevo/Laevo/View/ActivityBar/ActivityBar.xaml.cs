@@ -62,27 +62,14 @@ namespace Laevo.View.ActivityBar
 		{
 			var bar = (ActivityBar)o;
 
-			// Always listen to the activated event of the currently selected activity.
-			var old = (ActivityViewModel)args.OldValue;
-			if ( old != null )
-			{
-				old.ActivatedActivityEvent -= bar.OnSelectedActivityActivated;
-			}
+			// Focus the currently selected activity.
 			var newlySelected = (ActivityViewModel)args.NewValue;
 			if ( newlySelected != null )
 			{
-				newlySelected.ActivatedActivityEvent += bar.OnSelectedActivityActivated;
-
-				// Focus the currently selected activity.
 				var contentPresenter = (ContentPresenter)bar.ItemsControlActivities.ItemContainerGenerator.ContainerFromItem( newlySelected );
 				var button = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
 				button.Focus();
 			}
-		}
-
-		void OnSelectedActivityActivated( ActivityViewModel viewModel )
-		{
-			PassFocusToPreviousItem();
 		}
 
 
@@ -173,6 +160,9 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		public void ShowActivityBar( bool activate )
 		{
+			// When the bar is shown, the activity button is always focused first.
+			ActivityButton.Focus();
+
 			ShowBarFor( _displayTime );
 
 			if ( activate )
@@ -242,27 +232,12 @@ namespace Laevo.View.ActivityBar
 			{
 				_barGotClosed = true;
 
-				// Move the focus from name textbox after user ends name editing to finish action.
-				// Without this feature textbox will be focused during next Activity bar call.
-				PassFocusToPreviousItem();
-
 				ShowBarFor( TimeSpan.Zero );
+
+				e.Handled = true;
 			}
 		}
 
-		/// <summary>
-		/// Passes the focus to previous visual item.
-		/// </summary>
-		void PassFocusToPreviousItem()
-		{
-			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
-		}
-
-		/// <summary>
-		/// Resets properties and shows Activity Menu.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
 		void ShowActivityMenu( object sender, RoutedEventArgs e )
 		{
 			ActivityButton.ContextMenu.Visibility = Visibility.Visible;
@@ -273,11 +248,6 @@ namespace Laevo.View.ActivityBar
 			ActivityButton.ContextMenu.IsOpen = true;
 		}
 
-		/// <summary>
-		/// Hides Activity Menu.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
 		void HideActivityMenu( object sender, MouseButtonEventArgs e )
 		{
 			ActivityButton.ContextMenu.Visibility = Visibility.Hidden;
