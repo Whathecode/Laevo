@@ -34,7 +34,28 @@
 			
 			<activityBar:ActivityBackgroundConverter x:Key="ActivityBackgroundConverter" />
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
-			
+
+			<Style x:Key="NoButtonHover" TargetType="Button">
+				<Setter Property="OverridesDefaultStyle" Value="True"/>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="Button">
+							<Border
+								Name="Border"
+								CornerRadius="3"
+								BorderThickness="2"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								Background="{TemplateBinding Background}">
+								
+									<ContentPresenter
+										Margin="2"
+										HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+							</Border>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
 		</ResourceDictionary>
 
 	</Window.Resources>
@@ -115,10 +136,13 @@
 						<DataTemplate>
 							<Button
 								x:Name="ActivityButton"
+								Style="{StaticResource NoButtonHover}"
 								BorderThickness="2"
 								Margin="0, 0, 3, 0"
 								Padding="3"
-								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}">
+								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}"
+								MouseEnter="OnActivityHover"
+								MouseLeave="OnActivityHoverLeave">
 
 								<Button.Background>
 									<MultiBinding Converter="{StaticResource ActivityBackgroundConverter}">
