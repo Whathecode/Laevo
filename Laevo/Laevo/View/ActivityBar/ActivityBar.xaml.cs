@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,7 +42,6 @@ namespace Laevo.View.ActivityBar
 		const int HitTopLeftBorderCorner = 13;
 		const int HitTopRightBorderCorner = 14;
 
-		const string ActivityButtonName = "ActivityButton";
 		const double TopWhenVisible = -5;
 
 		readonly TimeSpan _displayTime = TimeSpan.FromSeconds( 4 );
@@ -73,37 +71,6 @@ namespace Laevo.View.ActivityBar
 
 		[DependencyProperty( Properties.SelectedActivity )]
 		public ActivityViewModel SelectedActivity { get; set; }
-
-		[DependencyPropertyChanged( Properties.SelectedActivity )]
-		static void OnSelectedActivityChanged( DependencyObject o, DependencyPropertyChangedEventArgs args )
-		{
-			var bar = (ActivityBar)o;
-			var oldSelected = (ActivityViewModel)args.OldValue;
-			var newlySelected = (ActivityViewModel)args.NewValue;
-
-			// Listen to when the selected event is activated.
-			if ( oldSelected != null )
-			{
-				oldSelected.ActivatedActivityEvent -= bar.OnSelectedActivityActivated;
-			}
-			if ( newlySelected != null )
-			{
-				newlySelected.ActivatedActivityEvent += bar.OnSelectedActivityActivated;
-			}
-
-			// Focus the currently selected activity.
-			if ( newlySelected != null )
-			{
-				var contentPresenter = (ContentPresenter)bar.ItemsControlActivities.ItemContainerGenerator.ContainerFromItem( newlySelected );
-				var button = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
-				button.Focus();
-			}
-		}
-		void OnSelectedActivityActivated( ActivityViewModel viewModel )
-		{
-			_barGotClosed = true;
-			HideActivityBar();
-		}
 
 
 		public ActivityBar()
