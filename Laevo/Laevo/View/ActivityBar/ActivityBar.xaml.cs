@@ -265,5 +265,17 @@ namespace Laevo.View.ActivityBar
 
 			ShowBarFor( _displayTime );
 		}
+
+		void OnActivityHover( object sender, MouseEventArgs e )
+		{
+			var button = (FrameworkElement)sender;
+			SelectedActivity = (ActivityViewModel)button.DataContext;
+		}
+
+		void OnActivityHoverLeave( object sender, MouseEventArgs e )
+		{
+			var button = (FrameworkElement)sender;
+			SelectedActivity = null;
+		}
 	}
 }
