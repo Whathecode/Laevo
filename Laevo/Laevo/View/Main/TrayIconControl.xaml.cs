@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Laevo.ViewModel.ActivityBar;
 using Laevo.ViewModel.Main;
 using Laevo.ViewModel.Main.Binding;
 using MouseKeyboardActivityMonitor;
@@ -81,6 +82,8 @@ namespace Laevo.View.Main
 			ResetKeyStates();
 			var capsLockPressed = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
 			AddExclusiveKeysTrigger( capsLockPressed, Keys.CapsLock, Commands.ShowActivityBar, false );
+			var hideActivityBar = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
+			AddExclusiveKeysTrigger( hideActivityBar, Keys.CapsLock, Commands.HideActivityBar );
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );
 			var newActivity = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down ) );

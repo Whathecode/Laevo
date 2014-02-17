@@ -55,7 +55,7 @@ namespace Laevo.ViewModel.Main
 
 			_activityBarViewModel = new ActivityBarViewModel( _activityOverviewViewModel );
 			_activityBar.DataContext = _activityBarViewModel;
-			ShowActivityBar();
+			ShowActivityBar( true );
 		}
 
 
@@ -176,11 +176,20 @@ namespace Laevo.ViewModel.Main
 		}
 
 		[CommandExecute( Commands.ShowActivityBar )]
-		public void ShowActivityBar( bool activate = false )
+		public void ShowActivityBar( bool autoHide )
 		{
 			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
 			{
-				_activityBar.ShowActivityBar( activate );
+				_activityBar.ShowActivityBar( autoHide );
+			}
+		}
+
+		[CommandExecute( Commands.HideActivityBar )]
+		public void HideActivityBar()
+		{
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			{
+				_activityBar.HideActivityBar();
 			}
 		}
 
@@ -282,7 +291,7 @@ namespace Laevo.ViewModel.Main
 			HideActivityOverview();
 
 			// TODO: Is there a better way to check whether the name has been set already? Perhaps it's also not desirable to activate the activity bar each time as long as the name isn't changed?
-			ShowActivityBar( newActivity.Label == Model.Laevo.DefaultActivityName );
+			ShowActivityBar( newActivity.Label != Model.Laevo.DefaultActivityName );
 		}
 
 		void OnNoCurrentActiveActivityEvent()

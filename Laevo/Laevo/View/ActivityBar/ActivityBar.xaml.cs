@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,7 +25,8 @@ namespace Laevo.View.ActivityBar
 	{
 		public enum Properties
 		{
-			SelectedActivity
+			SelectedActivity,
+			CurrentActivity
 		}
 
 
@@ -54,6 +56,25 @@ namespace Laevo.View.ActivityBar
 		const int MenuHorizontalShift = -16;
 		const int MenuVerticalShift = 10;
 
+		[DependencyProperty( Properties.CurrentActivity )]
+		public ActivityViewModel CurrentActivity { get; set; }
+
+		[DependencyPropertyChanged( Properties.CurrentActivity )]
+		public static void OnCurrentActivityChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
+		{
+			var bar = (ActivityBar)sender;
+
+			if ( bar.CurrentActivity.IsUnnamed )
+			{
+				bar.CurrentActivity.IsUnnamed = false;
+				bar.Activate();
+				bar.Focus();
+
+				bar.ActivityName.Select( 0, bar.ActivityName.Text.Length );
+				bar.ActivityName.Focus();
+			}
+		}
+
 		[DependencyProperty( Properties.SelectedActivity )]
 		public ActivityViewModel SelectedActivity { get; set; }
 
@@ -61,15 +82,31 @@ namespace Laevo.View.ActivityBar
 		static void OnSelectedActivityChanged( DependencyObject o, DependencyPropertyChangedEventArgs args )
 		{
 			var bar = (ActivityBar)o;
+			var oldSelected = (ActivityViewModel)args.OldValue;
+			var newlySelected = (ActivityViewModel)args.NewValue;
+
+			// Listen to when the selected event is activated.
+			if ( oldSelected != null )
+			{
+				oldSelected.ActivatedActivityEvent -= bar.OnSelectedActivityActivated;
+			}
+			if ( newlySelected != null )
+			{
+				newlySelected.ActivatedActivityEvent += bar.OnSelectedActivityActivated;
+			}
 
 			// Focus the currently selected activity.
-			var newlySelected = (ActivityViewModel)args.NewValue;
 			if ( newlySelected != null )
 			{
 				var contentPresenter = (ContentPresenter)bar.ItemsControlActivities.ItemContainerGenerator.ContainerFromItem( newlySelected );
 				var button = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
 				button.Focus();
 			}
+		}
+		void OnSelectedActivityActivated( ActivityViewModel viewModel )
+		{
+			_barGotClosed = true;
+			HideActivityBar();
 		}
 
 
@@ -78,8 +115,10 @@ namespace Laevo.View.ActivityBar
 			InitializeComponent();
 
 			// Set up two way binding for the necessary properties to the viewmodel.
-			var binding = new Binding( "SelectedActivity" ) { Mode = BindingMode.TwoWay };
-			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.SelectedActivity ), binding );
+			var selectedBinding = new Binding( "SelectedActivity" ) { Mode = BindingMode.TwoWay };
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.SelectedActivity ), selectedBinding );
+			var currentBinding = new Binding( "CurrentActivity" ) { Mode = BindingMode.TwoWay };
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.CurrentActivity ), currentBinding );
 
 			ResizeToScreenWidth();
 			SystemEvents.DisplaySettingsChanged += ( s, a ) => ResizeToScreenWidth();
@@ -158,19 +197,21 @@ namespace Laevo.View.ActivityBar
 		/// <summary>
 		/// Show the activity bar and hide it after some time.
 		/// </summary>
-		public void ShowActivityBar( bool activate )
+		public void ShowActivityBar( bool autoHide )
 		{
-			// When the bar is shown, the activity button is always focused first.
-			ActivityButton.Focus();
-
-			ShowBarFor( _displayTime );
-
-			if ( activate )
+			if ( autoHide )
 			{
-				Activate();
-				ActivityName.Select( 0, ActivityName.Text.Length );
-				ActivityName.Focus();
+				ShowBarFor( _displayTime );
 			}
+			else
+			{
+				PinTaskbar();
+			}
+		}
+
+		public void HideActivityBar()
+		{
+			ShowBarFor( _displayTime );
 		}
 
 		void ShowBarFor( TimeSpan delay )
@@ -232,6 +273,7 @@ namespace Laevo.View.ActivityBar
 			{
 				_barGotClosed = true;
 
+				ActivityButton.Focus();
 				ShowBarFor( TimeSpan.Zero );
 
 				e.Handled = true;
