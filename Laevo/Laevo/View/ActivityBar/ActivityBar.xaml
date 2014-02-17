@@ -32,20 +32,6 @@
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
-			<Style TargetType="{x:Type ContextMenu}">
-				<Setter Property="OverridesDefaultStyle" Value="True" />
-				<Setter Property="SnapsToDevicePixels" Value="True" />
-				<Setter Property="Template">
-					<Setter.Value>
-						<ControlTemplate TargetType="{x:Type ContextMenu}">
-							<Border Background="{TemplateBinding Background}" CornerRadius="7, 7, 8, 8"
-							        BorderBrush="{x:Static SystemColors.ActiveBorderBrush}" BorderThickness="1">
-								<StackPanel ClipToBounds="True" Orientation="Vertical" IsItemsHost="True" Margin="5,4,5,4" />
-							</Border>
-						</ControlTemplate>
-					</Setter.Value>
-				</Setter>
-			</Style>
 		</ResourceDictionary>
 
 	</Window.Resources>
@@ -55,8 +41,8 @@
 		<StackPanel
 			DataContext="{Binding CurrentActivity}"
 			Orientation="Horizontal"
-			DockPanel.Dock="Left">
-
+			DockPanel.Dock="Left"
+			Name="CurrentActivityStackPanel">
 
 			<Button
 				Style="{StaticResource GlassButton}"
@@ -69,21 +55,6 @@
 				<Button.Background>
 					<SolidColorBrush Color="{Binding Color}" />
 				</Button.Background>
-
-				<Button.ContextMenu>
-					<ContextMenu Background="{DynamicResource AeroThemeColor}" Name="ContextMenu">
-						<MenuItem
-							Header="Activity Settings"
-							Command="{wtc:CommandBinding {x:Static binding:Commands.EditActivity}}"
-							Visibility="{Binding IsEditable, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}" />
-						<MenuItem
-							Header="Open conetext"
-							Command="{wtc:CommandBinding {x:Static binding:Commands.OpenActivityLibrary}}" />
-						<MenuItem
-							Header="Stop"
-							Command="{wtc:CommandBinding {x:Static binding:Commands.StopActivity}}" />
-					</ContextMenu>
-				</Button.ContextMenu>
 
 				<Image Source="{Binding Icon}" Width="23" Height="23" />
 			</Button>
