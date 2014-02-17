@@ -32,6 +32,7 @@
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 			
+			<activityBar:ActivityBackgroundConverter x:Key="ActivityBackgroundConverter" />
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
 			
 		</ResourceDictionary>
@@ -120,7 +121,11 @@
 								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}">
 
 								<Button.Background>
-									<SolidColorBrush Color="{Binding Path=Color}" />
+									<MultiBinding Converter="{StaticResource ActivityBackgroundConverter}">
+										<Binding />
+										<Binding Path="Color" />
+										<Binding ElementName="Control" Path="SelectedActivity" />
+									</MultiBinding>
 								</Button.Background>
 
 								<Button.BorderBrush>

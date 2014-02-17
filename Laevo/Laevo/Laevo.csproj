@@ -403,6 +403,7 @@
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
+    <Compile Include="View\ActivityBar\ActivityBackgroundConverter.cs" />
     <Compile Include="View\ActivityBar\ActivityBar.xaml.cs">
       <DependentUpon>ActivityBar.xaml</DependentUpon>
     </Compile>
