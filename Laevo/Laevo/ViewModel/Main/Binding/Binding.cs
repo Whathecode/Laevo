@@ -20,6 +20,7 @@
 		PasteWindows,
 		SwitchActivity,
 		ShowActivityBar,
+		HideActivityBar,
 		ActivateSelectedActivity
 	}
 }

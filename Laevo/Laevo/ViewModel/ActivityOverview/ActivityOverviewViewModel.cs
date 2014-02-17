@@ -163,7 +163,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.DesktopManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
-				Icon = _defaultIcon
+				Icon = _defaultIcon,
+				IsUnnamed = true
 			};
 			lock ( Activities )
 			{

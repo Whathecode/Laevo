@@ -189,6 +189,7 @@ namespace Laevo.ViewModel.Activity
 		[NotifyPropertyChanged( Binding.Properties.Label )]
 		public void OnLabelChanged( string oldLabel, string newLabel )
 		{
+			IsUnnamed = false;
 			Activity.Name = newLabel;
 
 			if ( _overview != null && _overview.CurrentActivityViewModel == this )
@@ -244,6 +245,8 @@ namespace Laevo.ViewModel.Activity
 
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; private set; }
+
+		public bool IsUnnamed { get; set; }
 
 
 		static ActivityViewModel()
