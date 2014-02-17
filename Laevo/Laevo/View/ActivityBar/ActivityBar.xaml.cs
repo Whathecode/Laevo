@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -49,10 +48,7 @@ namespace Laevo.View.ActivityBar
 		readonly DoubleAnimation _hideAnimation;
 
 		bool _barGotClosed;
-
-		// How much should we shift Activity menu to display it in left corner bar position. Values are relative to menu owner- ActivityButton.
-		const int MenuHorizontalShift = -16;
-		const int MenuVerticalShift = 10;
+		readonly ActivityMenu _activityMenu = new ActivityMenu();
 
 		[DependencyProperty( Properties.SelectedActivity )]
 		public ActivityViewModel SelectedActivity { get; set; }
@@ -123,9 +119,8 @@ namespace Laevo.View.ActivityBar
 			Width = SystemParameters.PrimaryScreenWidth / 2;
 			Left = ( SystemParameters.PrimaryScreenWidth / 2 ) - ( Width / 2 );
 
-			// Place activity menu in bottom left corner of Activity Bar.
-			ContextMenu.HorizontalOffset = MenuHorizontalShift;
-			ContextMenu.VerticalOffset = MenuVerticalShift;
+			_activityMenu.Left = Left;
+			_activityMenu.Top = Height + TopWhenVisible;
 		}
 
 		void OnLoaded( object sender, RoutedEventArgs e )
@@ -261,27 +256,31 @@ namespace Laevo.View.ActivityBar
 		/// <summary>
 		/// Resets properties and shows Activity Menu.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
 		void ShowActivityMenu( object sender, RoutedEventArgs e )
 		{
-			ActivityButton.ContextMenu.Visibility = Visibility.Visible;
-			ActivityButton.ContextMenu.Focus();
-			ActivityButton.ContextMenu.IsEnabled = true;
-			ActivityButton.ContextMenu.PlacementTarget = ActivityButton;
-			ActivityButton.ContextMenu.Placement = PlacementMode.Bottom;
-			ActivityButton.ContextMenu.IsOpen = true;
+			if ( _activityMenu.IsVisible )
+			{
+				_activityMenu.Hide();
+				return;
+			}
+			
+			_activityMenu.ShowActivated = true;
+			_barGotClosed = true;
+			_activityMenu.Show();
+			_activityMenu.DataContext = CurrentActivityStackPanel.DataContext;
+			_activityMenu.Deactivated += HideActivityMenu;
 		}
 
 		/// <summary>
 		/// Hides Activity Menu.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		void HideActivityMenu( object sender, MouseButtonEventArgs e )
+		void HideActivityMenu( object sender, EventArgs e )
 		{
-			ActivityButton.ContextMenu.Visibility = Visibility.Hidden;
-			ActivityButton.ContextMenu.IsOpen = false;
+			_activityMenu.Deactivated -= HideActivityMenu;
+			_activityMenu.Hide();
+			_barGotClosed = false;
+
+			ShowBarFor( _displayTime );
 		}
 	}
 }

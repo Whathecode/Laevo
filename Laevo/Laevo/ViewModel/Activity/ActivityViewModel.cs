@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -264,6 +265,8 @@ namespace Laevo.ViewModel.Activity
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop, bool isEditable = true )
 		{
+			Contract.Requires( activity != null );
+
 			Activity = activity;
 
 			_desktopManager = desktopManager;
@@ -476,7 +479,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.StopActivity )]
 		public bool CanStopActivity()
 		{
-			return Label != "Home";
+			return Activity.IsOpen;
 		}
 
 		public void SuspendActivity()
