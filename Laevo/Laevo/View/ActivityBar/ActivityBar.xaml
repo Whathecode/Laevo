@@ -31,7 +31,9 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
+			
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+			
 			<Style TargetType="{x:Type ContextMenu}">
 				<Setter Property="OverridesDefaultStyle" Value="True" />
 				<Setter Property="SnapsToDevicePixels" Value="True" />
@@ -56,7 +58,6 @@
 			DataContext="{Binding CurrentActivity}"
 			Orientation="Horizontal"
 			DockPanel.Dock="Left">
-
 
 			<Button
 				Style="{StaticResource GlassButton}"
@@ -100,7 +101,7 @@
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
 				PreviewKeyDown="LabelKeyDown">
-
+				
 				<TextBox.Template>
 					<ControlTemplate TargetType="{x:Type TextBox}">
 						<ScrollViewer x:Name="PART_ContentHost" />
