@@ -31,7 +31,9 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
+			
 			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+			
 		</ResourceDictionary>
 
 	</Window.Resources>
@@ -43,7 +45,6 @@
 			Orientation="Horizontal"
 			DockPanel.Dock="Left"
 			Name="CurrentActivityStackPanel">
-
 			<Button
 				Style="{StaticResource GlassButton}"
 				Width="35"
@@ -71,7 +72,7 @@
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
 				PreviewKeyDown="LabelKeyDown">
-
+				
 				<TextBox.Template>
 					<ControlTemplate TargetType="{x:Type TextBox}">
 						<ScrollViewer x:Name="PART_ContentHost" />

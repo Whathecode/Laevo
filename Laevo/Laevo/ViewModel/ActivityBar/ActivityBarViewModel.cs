@@ -75,7 +75,7 @@ namespace Laevo.ViewModel.ActivityBar
 			// The activated activity is always in front, the previously activated activity is second.
 			if ( activatedActivity != null )
 			{
-				if ( activatedActivity.IsOpen )
+				if ( OpenPlusCurrentActivities.Contains( activatedActivity ) )
 				{
 					OpenPlusCurrentActivities.Move( OpenPlusCurrentActivities.IndexOf( activatedActivity ), 0 );
 				}
@@ -87,9 +87,6 @@ namespace Laevo.ViewModel.ActivityBar
 			}
 		}
 
-		/// <summary>
-		/// Selects next activity.
-		/// </summary>
 		internal void SelectNextActivity()
 		{
 			if ( OpenPlusCurrentActivities.Count > 1 )
@@ -106,9 +103,6 @@ namespace Laevo.ViewModel.ActivityBar
 			}
 		}
 
-		/// <summary>
-		/// Activates selected activity.
-		/// </summary>
 		internal void ActivateSelectedActivity()
 		{
 			if ( SelectedActivity != null )
