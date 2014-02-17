@@ -44,7 +44,13 @@ namespace Laevo.ViewModel.ActivityBar
 			OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel> { HomeActivity };
 
 			// TODO: Better decoupling from ActivityOverviewViewModel. These events could be provided as services through a central mechanism. Perhaps they don't belong in overview either way.
-			overview.OpenedActivityEvent += opened => OpenPlusCurrentActivities.Add( opened );
+			overview.OpenedActivityEvent += opened =>
+			{
+				if ( !opened.IsActive )
+				{
+					OpenPlusCurrentActivities.Add( opened );
+				}
+			}; 
 			overview.RemovedActivityEvent += removed => OpenPlusCurrentActivities.Remove( removed );
 			overview.StoppedActivityEvent += stopped => OpenPlusCurrentActivities.Remove( stopped );
 			overview.ActivatedActivityEvent += OnActivityActivated;
