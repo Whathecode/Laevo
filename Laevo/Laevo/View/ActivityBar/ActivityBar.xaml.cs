@@ -100,6 +100,13 @@ namespace Laevo.View.ActivityBar
 				FillBehavior = FillBehavior.Stop,
 				BeginTime = _displayTime
 			};
+
+			// When menu is deactivated, hide entire activity bar.
+			_activityMenu.Deactivated += ( sender, args ) =>
+			{
+				_activityMenu.Hide();
+				ShowBarFor( TimeSpan.Zero );
+			};
 		}
 
 
@@ -203,7 +210,7 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		public bool IsInUse()
 		{
-			return IsActive && !_barGotClosed;
+			return ( IsActive || _activityMenu.IsActive ) && !_barGotClosed;
 		}
 
 		void HideCompleted( object sender, EventArgs e )
@@ -220,8 +227,8 @@ namespace Laevo.View.ActivityBar
 				nameBinding.UpdateSource();
 			}
 
-			// Hide the infobox.
-			if ( !_barGotClosed )
+			// Hide the infobox when needed.
+			if ( !_barGotClosed && !_activityMenu.IsVisible )
 			{
 				_hideAnimation.BeginTime = TimeSpan.Zero;
 				BeginAnimation( TopProperty, _hideAnimation );
@@ -242,7 +249,7 @@ namespace Laevo.View.ActivityBar
 			}
 		}
 
-		void ShowActivityMenu( object sender, RoutedEventArgs e )
+		void SwitchActivityMenu( object sender, RoutedEventArgs e )
 		{
 			if ( _activityMenu.IsVisible )
 			{
@@ -250,20 +257,8 @@ namespace Laevo.View.ActivityBar
 				return;
 			}
 			
-			_activityMenu.ShowActivated = true;
-			_barGotClosed = true;
+			_activityMenu.DataContext = CurrentActivity;
 			_activityMenu.Show();
-			_activityMenu.DataContext = CurrentActivityStackPanel.DataContext;
-			_activityMenu.Deactivated += HideActivityMenu;
-		}
-
-		void HideActivityMenu( object sender, EventArgs e )
-		{
-			_activityMenu.Deactivated -= HideActivityMenu;
-			_activityMenu.Hide();
-			_barGotClosed = false;
-
-			ShowBarFor( _displayTime );
 		}
 
 		void OnActivityHover( object sender, MouseEventArgs e )

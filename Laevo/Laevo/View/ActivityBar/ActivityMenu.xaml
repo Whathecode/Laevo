@@ -15,7 +15,6 @@
 	WindowStyle="None"
 	Topmost="True"
 	ShowInTaskbar="False"
-	ShowActivated="False"
 	Foreground="White"
 	Background="Transparent"
 	FontFamily="Segoe UI Light"
