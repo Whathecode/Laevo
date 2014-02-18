@@ -30,6 +30,8 @@
 		EditActivity,
 		OpenActivity,
 		StopActivity,
+		SuspendActivity,
+		ResumeActivity,
 		Remove,
 		ChangeColor,
 		ChangeIcon

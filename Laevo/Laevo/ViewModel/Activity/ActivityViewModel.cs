@@ -482,9 +482,10 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.StopActivity )]
 		public bool CanStopActivity()
 		{
-			return Activity.IsOpen;
+			return IsEditable && Activity.IsOpen;
 		}
 
+		[CommandExecute( Commands.SuspendActivity )]
 		public void SuspendActivity()
 		{
 			if ( IsSuspended )
@@ -496,6 +497,13 @@ namespace Laevo.ViewModel.Activity
 			_virtualDesktop.Suspend();
 		}
 
+		[CommandCanExecute( Commands.SuspendActivity )]
+		public bool CanSuspendActivity()
+		{
+			return IsEditable && !IsSuspended;
+		}
+
+		[CommandExecute( Commands.ResumeActivity )]
 		public void ResumeActivity()
 		{
 			if ( !IsSuspended )
@@ -505,6 +513,12 @@ namespace Laevo.ViewModel.Activity
 
 			IsSuspended = false;
 			_virtualDesktop.Resume();
+		}
+
+		[CommandCanExecute( Commands.ResumeActivity )]
+		public bool CanResumeActivity()
+		{
+			return IsSuspended;
 		}
 
 		[CommandExecute( Commands.Remove )]
