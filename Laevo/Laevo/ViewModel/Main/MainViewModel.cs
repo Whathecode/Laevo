@@ -84,6 +84,11 @@ namespace Laevo.ViewModel.Main
 			UnattendedInterruptions = _model.Activities.Concat( _model.Tasks ).Sum( a => a.Interruptions.Count( i => !i.AttendedTo ) );
 		}
 
+		public ActivityViewModel GetCurrentActivity()
+		{
+			return _activityOverviewViewModel.CurrentActivityViewModel;
+		}
+
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
@@ -191,32 +196,6 @@ namespace Laevo.ViewModel.Main
 			{
 				_activityBar.HideActivityBar();
 			}
-		}
-
-		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
-		public void OpenCurrentActivityLibrary()
-		{
-			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
-		}
-
-		[CommandExecute( Commands.StopActivity )]
-		public void StopActivity()
-		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
-			{
-				_activityOverviewViewModel.CurrentActivityViewModel.StopActivity();
-			}
-		}
-
-		[CommandCanExecute( Commands.StopActivity )]
-		public bool CanStopActivity()
-		{
-			var currentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
-
-			return
-				currentActivity != null &&
-				currentActivity != _activityOverviewViewModel.HomeActivity &&
-				currentActivity.IsOpen;
 		}
 
 		[CommandExecute( Commands.NewActivity )]
