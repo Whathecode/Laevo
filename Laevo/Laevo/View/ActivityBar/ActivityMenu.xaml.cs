@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls.Primitives;
 
+
 namespace Laevo.View.ActivityBar
 {
 	/// <summary>

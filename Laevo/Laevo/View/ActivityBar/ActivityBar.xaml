@@ -67,14 +67,12 @@
 		<StackPanel
 			DataContext="{Binding CurrentActivity}"
 			Orientation="Horizontal"
-			DockPanel.Dock="Left"
-			Name="CurrentActivityStackPanel">
+			DockPanel.Dock="Left">
 			<Button
 				x:Name="ActivityButton"
 				Style="{StaticResource GlassButton}"
 				Width="35" Height="35"
-				Click="ShowActivityMenu"
-				MouseRightButtonDown="HideActivityMenu">
+				Click="SwitchActivityMenu">
 
 				<Button.Background>
 					<SolidColorBrush Color="{Binding Color}" />
