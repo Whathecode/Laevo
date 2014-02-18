@@ -72,8 +72,6 @@ namespace Laevo
 			// Hack- Create empty window to catch aero theme color changes.
 			var hiddenWindow = new Window { ShowActivated = false, Focusable = false, Visibility = Visibility.Hidden, Width = 0, Height = 0, Left = -100, Top = -100 };
 			hiddenWindow.Show();
-
-			// Register empty window hooks.
 			var mainWindowPointer = new WindowInteropHelper( hiddenWindow ).Handle;
 			var mainWindowSource = HwndSource.FromHwnd( mainWindowPointer );
 			if ( mainWindowSource != null )
@@ -85,24 +83,16 @@ namespace Laevo
 		/// <summary>
 		/// Catches changes of aero theme colors.
 		/// </summary>
-		/// <param name="hwnd"></param>
-		/// <param name="msg"></param>
-		/// <param name="wParam"></param>
-		/// <param name="lParam"></param>
-		/// <param name="handled"></param>
-		/// <returns></returns>
 		IntPtr HandleChangedColor( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
 		{
 			switch ( msg )
 			{
-					//TODO: Investigate if case below ever happens. Documentation is wrong?
 				case AeroColorChanged:
-					Current.Resources[ "AeroThemeColor" ] = new SolidColorBrush( GetWindowColorizationColor( false ) );
-					return IntPtr.Zero;
-					// Case when aero theme color is actually changed.
+					// TODO: Investigate whether this case ever happens. Documentation is wrong?
 				case AeroColorChanged2:
 					Current.Resources[ "AeroThemeColor" ] = new SolidColorBrush( GetWindowColorizationColor( false ) );
 					return IntPtr.Zero;
+
 				default:
 					return IntPtr.Zero;
 			}

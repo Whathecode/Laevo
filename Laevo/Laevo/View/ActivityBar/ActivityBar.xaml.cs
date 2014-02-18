@@ -274,7 +274,6 @@ namespace Laevo.View.ActivityBar
 
 		void OnActivityHoverLeave( object sender, MouseEventArgs e )
 		{
-			var button = (FrameworkElement)sender;
 			SelectedActivity = null;
 		}
 	}
