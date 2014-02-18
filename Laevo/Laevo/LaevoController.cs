@@ -22,7 +22,7 @@ namespace Laevo
 		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
 
-		PersistenceProvider _applicationPersistence;
+		readonly PersistenceProvider _applicationPersistence;
 
 		readonly MainViewModel _viewModel;
 		readonly TrayIconControl _trayIcon;

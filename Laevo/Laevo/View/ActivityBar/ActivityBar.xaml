@@ -44,6 +44,8 @@
 								Name="Border"
 								CornerRadius="3"
 								BorderThickness="2"
+								Margin="0, 0, 3, 0"
+								Padding="3"
 								BorderBrush="{TemplateBinding BorderBrush}"
 								Background="{TemplateBinding Background}">
 								
@@ -68,11 +70,10 @@
 			DockPanel.Dock="Left"
 			Name="CurrentActivityStackPanel">
 			<Button
+				x:Name="ActivityButton"
 				Style="{StaticResource GlassButton}"
-				Width="35"
-				Height="35"
+				Width="35" Height="35"
 				Click="ShowActivityMenu"
-				Name="ActivityButton"
 				MouseRightButtonDown="HideActivityMenu">
 
 				<Button.Background>
@@ -137,9 +138,6 @@
 							<Button
 								x:Name="ActivityButton"
 								Style="{StaticResource NoButtonHover}"
-								BorderThickness="2"
-								Margin="0, 0, 3, 0"
-								Padding="3"
 								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}"
 								MouseEnter="OnActivityHover"
 								MouseLeave="OnActivityHoverLeave">
