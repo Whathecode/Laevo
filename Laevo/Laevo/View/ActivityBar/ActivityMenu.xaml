@@ -23,7 +23,8 @@
 	FontSize="15"
 	SizeToContent="WidthAndHeight"
 	MinHeight="100"
-	activityBar:GlassEffect.IsEnabled="True">
+	activityBar:GlassEffect.IsEnabled="True"
+	activityBar:DisableResize.IsDisabled="True">
 
 	<Window.Resources>
 		<Style TargetType="{x:Type Image}">

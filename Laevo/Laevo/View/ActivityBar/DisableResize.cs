@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
 
 
 namespace Laevo.View.ActivityBar
 {
 	// TODO: Move class to FCL or common dir, maybe? 
 
-	public static class Extension
+	public class DisableResize
     {
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		public static extern IntPtr DefWindowProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam );
@@ -21,6 +23,45 @@ namespace Laevo.View.ActivityBar
 		const int HitTopBorder = 12;
 		const int HitTopLeftBorderCorner = 13;
 		const int HitTopRightBorderCorner = 14;
+
+		/// <summary>
+		/// Registers new dependency property which allows to disable resize feature in a window by setting
+		/// DisableResize.IsDisabled to true.
+		/// </summary>
+		public static readonly DependencyProperty IsDisabledProperty =
+			DependencyProperty.RegisterAttached( "IsDisabled",
+				typeof( Boolean ),
+				typeof( DisableResize ),
+				new FrameworkPropertyMetadata( OnIsDisabledChanged ) );
+
+		public static void SetIsDisabled( DependencyObject element, Boolean value )
+		{
+			element.SetValue( IsDisabledProperty, value );
+		}
+
+		public static Boolean GetIsDisabled( DependencyObject element )
+		{
+			return (Boolean)element.GetValue( IsDisabledProperty );
+		}
+
+		public static void OnIsDisabledChanged( DependencyObject obj, DependencyPropertyChangedEventArgs args )
+		{
+			if ( !(bool)args.NewValue ) return;
+
+			var window = (Window)obj;
+			window.Loaded += OnLoaded;
+		}
+
+		static void OnLoaded( object sender, RoutedEventArgs e )
+		{
+			// Disable default resize behavior by overriding default events.
+			var mainWindowPointer = new WindowInteropHelper( (Window)sender ).Handle;
+			var mainWindowSource = HwndSource.FromHwnd( mainWindowPointer );
+			if ( mainWindowSource != null )
+			{
+				mainWindowSource.AddHook( HandleWindowHits );
+			}
+		}
 
         /// <summary>
 		/// Override the window hit test. If the cursor is over a resize border, return a standard border result instead.

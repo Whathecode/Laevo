@@ -56,8 +56,6 @@ namespace Laevo.View.ActivityBar
 		/// <summary>
 		/// Applies Windows aero styling to specific window.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
 		static void WindowLoaded( object sender, RoutedEventArgs e )
 		{
 			// Checks if Aero theme is turned on. 
@@ -85,11 +83,6 @@ namespace Laevo.View.ActivityBar
 				{
 					window.Background = originalBackground;
 				}
-			}
-			else
-			{
-				// TODO: Disable resize mode to hide a window border when aero theme is not used in order to have better styling.
-				//window.ResizeMode = ResizeMode.NoResize;
 			}
 		}
 	}
