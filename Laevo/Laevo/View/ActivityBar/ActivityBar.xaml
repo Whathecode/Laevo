@@ -24,7 +24,8 @@
 	FontFamily="Segoe UI Light"
 	FontSize="18"
 	Height="55"
-	activityBar:GlassEffect.IsEnabled="True">
+	activityBar:GlassEffect.IsEnabled="True"
+	activityBar:DisableResize.IsDisabled="True">
 
 	<Window.Resources>
 		<ResourceDictionary>

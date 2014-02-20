@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using Laevo.ViewModel.Activity;
 using Microsoft.Win32;
@@ -70,7 +69,6 @@ namespace Laevo.View.ActivityBar
 			ResizeToScreenWidth();
 			SystemEvents.DisplaySettingsChanged += ( s, a ) => ResizeToScreenWidth();
 
-			Loaded += OnLoaded;
 			Deactivated += OnDeactivated;
 
 			Activated += ( s, args ) => PinTaskbar();
@@ -105,17 +103,6 @@ namespace Laevo.View.ActivityBar
 
 			_activityMenu.Left = Left;
 			_activityMenu.Top = Height + TopWhenVisible;
-		}
-
-		void OnLoaded( object sender, RoutedEventArgs e )
-		{
-			// Disable default resize behavior by overriding default events.
-			var mainWindowPointer = new WindowInteropHelper( this ).Handle;
-			var mainWindowSource = HwndSource.FromHwnd( mainWindowPointer );
-			if ( mainWindowSource != null )
-			{
-				mainWindowSource.AddHook( Extension.HandleWindowHits );
-			}
 		}
 
 		/// <summary>
