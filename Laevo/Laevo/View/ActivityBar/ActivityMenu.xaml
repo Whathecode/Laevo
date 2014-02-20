@@ -6,8 +6,10 @@
 	xmlns:commandFactory="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	mc:Ignorable="d"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
@@ -20,6 +22,7 @@
 	FontFamily="Segoe UI Light"
 	FontSize="15"
 	SizeToContent="WidthAndHeight"
+	MinHeight="100"
 	activityBar:GlassEffect.IsEnabled="True">
 
 	<Window.Resources>
@@ -132,7 +135,6 @@
 		<Border
 			Background="White"
 			CornerRadius="5, 5, 5, 5"
-			Margin="0, 0, 15, 0"
 			BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
 			BorderThickness="1"
 			HorizontalAlignment="Left">
@@ -170,17 +172,24 @@
 		<StackPanel
 			ClipToBounds="True"
 			Orientation="Vertical"
-			Margin="5,4,5,4">
+			Margin="15,10,10,15">
 
 			<StackPanel Orientation="Horizontal">
 
+				<!--TODO: Why condition converter is not working in case of commmand binding?-->
 				<Button
 					HorizontalAlignment="Left"
 					Margin="0,0,1,0"
 					VerticalAlignment="Top"
 					Width="100" Height="26"
-					Content="Stop"
-					Command="{commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}"
+					Content="{Binding IsOpen, 
+						Converter={converters:SingleConditionConverter Type={x:Type system:String}, 
+						Expression='[0]', 
+						IfTrue=Stop, IfFalse=Open}}"
+					Command="{Binding IsOpen, 
+						Converter={converters:SingleConditionConverter Expression='[0]', 
+						IfTrue={commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}, 
+						IfFalse={commandFactory:CommandBinding {x:Static binding:Commands.OpenActivity}}}}"
 					Foreground="#FFFFFFFF"
 					Template="{DynamicResource StatesButtonTemplate}" />
 
@@ -205,9 +214,10 @@
 					<Button.ContextMenu>
 						<ContextMenu>
 							<MenuItem
-								Header="Suspend" />
-							<MenuItem
-								Header="Resume" />
+								Header="{Binding IsSuspended, 
+									Converter={converters:SingleConditionConverter Type={x:Type system:String}, 
+									Expression='[0]', 
+									IfTrue=Resume, IfFalse=Suspend}}" />
 						</ContextMenu>
 					</Button.ContextMenu>
 				</Button>

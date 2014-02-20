@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Interop;
 
 
 namespace Laevo.View.ActivityBar
@@ -13,8 +14,19 @@ namespace Laevo.View.ActivityBar
 		public ActivityMenu()
 		{
 			InitializeComponent();
+			Loaded += OnLoaded;
 		}
 
+		void OnLoaded( object sender, RoutedEventArgs e )
+		{
+			// Disable default resize behavior by overriding default events.
+			var mainWindowPointer = new WindowInteropHelper( this ).Handle;
+			var mainWindowSource = HwndSource.FromHwnd( mainWindowPointer );
+			if ( mainWindowSource != null )
+			{
+				mainWindowSource.AddHook( Extension.HandleWindowHits );
+			}
+		}
 
 		/// <summary>
 		/// Resets properties and shows other activity states menu.
