@@ -6,10 +6,12 @@ using System.Windows.Interop;
 
 namespace Laevo.View.ActivityBar
 {
-	// TODO: Move class to FCL or common dir, maybe? 
-
+	/// <summary>
+	///   Allows disabling resizing functionality of a transparent (glass style) window. ResizeMode can't be used when this style is used.
+	///   TODO: Move class to FCL or common dir, maybe?
+	/// </summary>
 	public class DisableResize
-    {
+	{
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		public static extern IntPtr DefWindowProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam );
 
@@ -25,8 +27,7 @@ namespace Laevo.View.ActivityBar
 		const int HitTopRightBorderCorner = 14;
 
 		/// <summary>
-		/// Registers new dependency property which allows to disable resize feature in a window by setting
-		/// DisableResize.IsDisabled to true.
+		/// Dependendency property which determines whether resizing functionality is disabled or not.
 		/// </summary>
 		public static readonly DependencyProperty IsDisabledProperty =
 			DependencyProperty.RegisterAttached( "IsDisabled",
@@ -63,7 +64,7 @@ namespace Laevo.View.ActivityBar
 			}
 		}
 
-        /// <summary>
+		/// <summary>
 		/// Override the window hit test. If the cursor is over a resize border, return a standard border result instead.
 		/// </summary>
 		public static IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
@@ -91,5 +92,5 @@ namespace Laevo.View.ActivityBar
 
 			return new IntPtr( hitLocation );
 		}
-    }
+	}
 }

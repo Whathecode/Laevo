@@ -15,9 +15,7 @@ namespace Laevo.View.ActivityBar
 			InitializeComponent();
 		}
 
-		/// <summary>
-		/// Resets properties and shows other activity states menu.
-		/// </summary>
+
 		void ShowOtherStatesMenu( object sender, RoutedEventArgs e )
 		{
 			OtherStatesButton.ContextMenu.Visibility = Visibility.Visible;
@@ -27,10 +25,7 @@ namespace Laevo.View.ActivityBar
 			OtherStatesButton.ContextMenu.IsOpen = true;
 		}
 
-		/// <summary>
-		/// Hides other activity states menu.
-		/// </summary>
-		void HidetherStatesMenu( object sender, EventArgs e )
+		void HideOtherStatesMenu( object sender, EventArgs e )
 		{
 			OtherStatesButton.ContextMenu.Visibility = Visibility.Hidden;
 			OtherStatesButton.ContextMenu.IsOpen = false;
