@@ -31,7 +31,7 @@
 		OpenActivity,
 		StopActivity,
 		SuspendActivity,
-		ResumeActivity,
+		ForceSuspend,
 		Remove,
 		ChangeColor,
 		ChangeIcon
