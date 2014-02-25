@@ -23,16 +23,9 @@
 	ShowInTaskbar="False"
 	FontFamily="Segoe UI Light"
 	FontSize="20"
-	Foreground="White">
+	Foreground="White"
+	Topmost="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Edit}, IfTrue=False, IfFalse=True}}">
 
-	<Window.Topmost>
-		<Binding Path="ActivityMode">
-			<Binding.Converter>
-				<converters:ActivityModeToTopMostConverter />
-			</Binding.Converter>
-		</Binding>
-	</Window.Topmost>
-	
 	<Window.Resources>
 		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
 			<GradientStop Color="#606c88" Offset="0" />

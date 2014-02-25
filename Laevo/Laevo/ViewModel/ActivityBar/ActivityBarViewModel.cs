@@ -13,8 +13,8 @@ namespace Laevo.ViewModel.ActivityBar
 	{
 		int _selectionIndex;
 
-		[NotifyProperty( Binding.Properties.HomeActivity )]
-		public ActivityViewModel HomeActivity { get; private set; }
+		[NotifyProperty( Binding.Properties.Overview )]
+		public ActivityOverviewViewModel Overview { get; private set; }
 
 		/// <summary>
 		/// List representing currently all opened activities and current one, which is always on the first position.
@@ -22,12 +22,6 @@ namespace Laevo.ViewModel.ActivityBar
 		/// </summary>
 		[NotifyProperty( Binding.Properties.OpenPlusCurrentActivities )]
 		public ObservableCollection<ActivityViewModel> OpenPlusCurrentActivities { get; private set; }
-
-		/// <summary>
-		/// Current activated activity.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.CurrentActivity )]
-		public ActivityViewModel CurrentActivity { get; private set; }
 
 		/// <summary>
 		/// Currently selected activity.
@@ -38,10 +32,8 @@ namespace Laevo.ViewModel.ActivityBar
 
 		public ActivityBarViewModel( ActivityOverviewViewModel overview )
 		{
-			HomeActivity = overview.HomeActivity;
-			CurrentActivity = overview.CurrentActivityViewModel;
-
-			OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel> { HomeActivity };
+			Overview = overview;
+			OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel> { overview.HomeActivity };
 
 			// TODO: Better decoupling from ActivityOverviewViewModel. These events could be provided as services through a central mechanism. Perhaps they don't belong in overview either way.
 			overview.OpenedActivityEvent += opened =>
@@ -68,8 +60,6 @@ namespace Laevo.ViewModel.ActivityBar
 			{
 				return;
 			}
-
-			CurrentActivity = activatedActivity;
 
 			// Activities which are activated, but not open are shown in the list until they are deactivated.
 			if ( oldActivity != null && !oldActivity.IsOpen )

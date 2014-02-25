@@ -9,7 +9,6 @@
 	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	mc:Ignorable="d"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"

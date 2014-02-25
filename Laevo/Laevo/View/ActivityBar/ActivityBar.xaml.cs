@@ -41,7 +41,7 @@ namespace Laevo.View.ActivityBar
 		{
 			var bar = (ActivityBar)sender;
 
-			if ( bar.CurrentActivity.IsUnnamed )
+			if ( bar.CurrentActivity != null && bar.CurrentActivity.IsUnnamed )
 			{
 				bar.CurrentActivity.IsUnnamed = false;
 				bar.Activate();
@@ -63,7 +63,7 @@ namespace Laevo.View.ActivityBar
 			// Set up two way binding for the necessary properties to the viewmodel.
 			var selectedBinding = new Binding( "SelectedActivity" ) { Mode = BindingMode.TwoWay };
 			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.SelectedActivity ), selectedBinding );
-			var currentBinding = new Binding( "CurrentActivity" ) { Mode = BindingMode.TwoWay };
+			var currentBinding = new Binding( "Overview.CurrentActivityViewModel" );
 			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.CurrentActivity ), currentBinding );
 
 			ResizeToScreenWidth();
@@ -139,6 +139,9 @@ namespace Laevo.View.ActivityBar
 
 		public void PinTaskbar()
 		{
+			// When the bar is reshown, hide menu.
+			_activityMenu.Hide();
+
 			_hideAnimation.Completed -= HideCompleted;
 			BeginAnimation( TopProperty, null );
 			Top = TopWhenVisible;

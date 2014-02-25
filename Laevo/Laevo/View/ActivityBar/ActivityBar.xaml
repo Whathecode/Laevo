@@ -13,6 +13,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityBar="clr-namespace:Laevo.View.ActivityBar"
 	xmlns:activityBarViewModel="clr-namespace:Laevo.ViewModel.ActivityBar"
+	xmlns:overview="clr-namespace:Laevo.ViewModel.ActivityOverview"
 	d:DataContext="{d:DesignInstance Type=activityBarViewModel:ActivityBarViewModel}"
 	Title="ActivityInfoBox"
 	WindowStyle="None"
@@ -66,7 +67,7 @@
 	<DockPanel Margin="10, 0, 10, 0">
 
 		<StackPanel
-			DataContext="{Binding CurrentActivity}"
+			DataContext="{Binding Overview.CurrentActivityViewModel}"
 			Orientation="Horizontal"
 			DockPanel.Dock="Left">
 			<Button
@@ -104,12 +105,35 @@
 
 		</StackPanel>
 
-		<!-- Container which shows the open activites between which can be switched. -->
+		<!-- Shown when the activity is being suspended. -->
 		<StackPanel
 			Orientation="Horizontal"
 			DockPanel.Dock="Right"
-			HorizontalAlignment="Right">
-
+			Visibility="{Binding Overview.ActivityMode,
+				Converter={converters:EnumHasFlagConverter Flag={x:Static overview:Mode.Suspending}, IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+			
+			<TextBlock
+				VerticalAlignment="Center"
+				Text="Suspending activity ... Please close all remaining open windows."
+				Margin="0, 0, 10, 0" />
+			<!-- TODO: Once CommandBinding is extended to support rebinding the command if the path changes, the DataContext binding of the Force Suspend Button can be removed. -->
+			<Button
+				DataContext="{Binding Overview.CurrentActivityViewModel}"
+				Height="26"
+				Padding="10, 0, 10, 0"
+				FontSize="15"
+				Content="Force Suspend"
+				Command="{wtc:CommandBinding {x:Static binding:Commands.ForceSuspend}}" />
+		</StackPanel>
+		
+		<!-- Shows the open activites between which can be switched. -->
+		<StackPanel
+			Orientation="Horizontal"
+			DockPanel.Dock="Right"
+			HorizontalAlignment="Right"
+			Visibility="{Binding Overview.ActivityMode,
+				Converter={converters:EnumHasFlagConverter Flag={x:Static overview:Mode.Suspending}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
+			
 			<StackPanel
 				Orientation="Horizontal">
 
@@ -170,8 +194,8 @@
 
 			<Image
 				Cursor="Hand"
-				Source="{Binding HomeActivity.Icon}"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}, Path=HomeActivity}"
+				Source="{Binding Overview.HomeActivity.Icon}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}, Path=Overview.HomeActivity}"
 				Width="30" Height="30"
 				Margin="25, 0, 0, 0" />
 
