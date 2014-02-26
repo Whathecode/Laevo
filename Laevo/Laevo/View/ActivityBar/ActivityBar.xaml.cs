@@ -110,6 +110,9 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		public void ShowActivityBar( bool autoHide )
 		{
+			// When the bar is reshown, hide menu.
+			_activityMenu.Hide();
+
 			if ( autoHide )
 			{
 				ShowBarFor( _displayTime );
@@ -139,9 +142,6 @@ namespace Laevo.View.ActivityBar
 
 		public void PinTaskbar()
 		{
-			// When the bar is reshown, hide menu.
-			_activityMenu.Hide();
-
 			_hideAnimation.Completed -= HideCompleted;
 			BeginAnimation( TopProperty, null );
 			Top = TopWhenVisible;
