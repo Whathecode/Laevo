@@ -543,7 +543,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.SuspendActivity )]
 		public bool CanSuspendActivity()
 		{
-			return IsEditable && !IsSuspended;
+			return IsEditable && !IsSuspended && !_isSuspending;
 		}
 
 		[CommandExecute( Commands.ForceSuspend )]
