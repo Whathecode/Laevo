@@ -132,6 +132,7 @@
 
 	<StackPanel Orientation="Horizontal">
 
+		<!-- Edit activity and open library. -->
 		<Border
 			Background="White"
 			CornerRadius="5, 5, 5, 5"
@@ -169,6 +170,7 @@
 			</StackPanel>
 		</Border>
 
+		<!-- Open/Stop/Suspend options. -->
 		<StackPanel
 			ClipToBounds="True"
 			Orientation="Vertical"
@@ -179,6 +181,7 @@
 				Orientation="Horizontal"
 				Visibility="{Binding IsEditable, Converter={data:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
+				<!-- Open/Stop. -->
 				<Button
 					Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
 					HorizontalAlignment="Left"
@@ -200,6 +203,7 @@
 					Foreground="#FFFFFFFF"
 					Template="{DynamicResource StatesButtonTemplate}" />
 
+				<!-- Extended hidden options in context menu. -->
 				<Button
 					Name="OtherStatesButton"
 					HorizontalAlignment="Left"
