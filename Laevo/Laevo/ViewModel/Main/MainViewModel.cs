@@ -92,6 +92,9 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
+			// Make sure newly opened windows on the current desk are stored as well.
+			_model.DesktopManager.UpdateWindowAssociations();
+
 			_activityOverviewViewModel.Exit();
 			Persist();
 			_model.Exit();
