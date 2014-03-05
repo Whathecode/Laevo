@@ -36,6 +36,7 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
+	[KnownType( typeof( ABC.Windows.Window ) )]
 	public class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
