@@ -22,7 +22,7 @@ namespace Laevo
 		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
 
-		readonly PersistenceProvider _applicationPersistence;
+		readonly PersistenceProvider _persistenceProvider;
 
 		readonly MainViewModel _viewModel;
 		readonly TrayIconControl _trayIcon;
@@ -32,12 +32,12 @@ namespace Laevo
 		{
 			// Create Services.
 			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
-			_applicationPersistence = new PersistenceProvider( PersistencePluginLibrary );
-			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator );
+			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
+			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider );
 			
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _applicationPersistence );
+			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
 
 			// Create ViewModel.
 			// TODO: Move DesktopManager to ViewModel?
@@ -51,7 +51,7 @@ namespace Laevo
 
 		protected override void FreeManagedResources()
 		{
-			_applicationPersistence.Dispose();
+			_persistenceProvider.Dispose();
 		}
 
 		protected override void FreeUnmanagedResources()
