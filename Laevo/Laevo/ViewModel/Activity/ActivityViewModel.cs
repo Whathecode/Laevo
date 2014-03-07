@@ -526,6 +526,8 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.SuspendActivity )]
 		public void SuspendActivity()
 		{
+			_desktopManager.UpdateWindowAssociations();
+
 			if ( IsSuspended )
 			{
 				return;
