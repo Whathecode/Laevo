@@ -8,6 +8,7 @@
 		FocusedOffsetPercentage,
 		HomeActivity,
 		Mode,
+		CurrentActivityViewModel,
 		TimeLineRenderScale,
 		EnableAttentionLines
 	}

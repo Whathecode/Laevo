@@ -70,7 +70,7 @@ namespace Laevo.ViewModel.Main
 			{
 				_activityOverview.Close();
 				_activityOverview = null;
-				if ( _activityOverviewViewModel.ActivityMode == Mode.Select )
+				if ( _activityOverviewViewModel.ActivityMode.HasFlag( Mode.Select ) )
 				{
 					ShowActivityOverview();
 				}
@@ -92,6 +92,9 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
+			// Make sure newly opened windows on the current desk are stored as well.
+			_model.DesktopManager.UpdateWindowAssociations();
+
 			_activityOverviewViewModel.Exit();
 			Persist();
 			_model.Exit();
@@ -134,20 +137,26 @@ namespace Laevo.ViewModel.Main
 			_activityOverview.Activate();
 		}
 
+		[CommandCanExecute( Commands.ShowActivityOverview )]
+		public bool CanShowActivityOverview()
+		{
+			return CanSwitchActivityOverview();
+		}
+
 		/// <summary>
 		///   Opens the activity overview in order to select one of the activities.
 		/// </summary>
 		/// <param name="selectedActivity">The action to perform on the selected activity.</param>
 		public void SelectActivity( Action<ActivityViewModel> selectedActivity )
 		{
-			_activityOverviewViewModel.ActivityMode = Mode.Select;
+			_activityOverviewViewModel.ActivityMode |= Mode.Select;
 			var awaitOpen = Observable.FromEvent<ActivityViewModel.ActivityEventHandler, ActivityViewModel>(
 				h => _activityOverviewViewModel.SelectedActivityEvent += h,
 				h => _activityOverviewViewModel.SelectedActivityEvent -= h ).Take( 1 );
 			awaitOpen.Subscribe( a =>
 			{
 				selectedActivity( a );
-				_activityOverviewViewModel.ActivityMode = Mode.Activate;
+				_activityOverviewViewModel.ActivityMode &= ~Mode.Select;
 				HideActivityOverview();
 			} );
 			ShowActivityOverview();
@@ -208,7 +217,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.NewActivity )]
 		public bool CanNewActivity()
 		{
-			return _activityOverviewViewModel.ActivityMode != Mode.Select;
+			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
 		}
 
 		[CommandExecute( Commands.CutWindow )]
@@ -254,6 +263,7 @@ namespace Laevo.ViewModel.Main
 				};
 
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
+				_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
 			}
 			_activityOverview = new ActivityOverviewWindow
@@ -271,6 +281,11 @@ namespace Laevo.ViewModel.Main
 
 			// TODO: Is there a better way to check whether the name has been set already? Perhaps it's also not desirable to activate the activity bar each time as long as the name isn't changed?
 			ShowActivityBar( newActivity.Label != Model.Laevo.DefaultActivityName );
+		}
+
+		void OnSuspendingActivityEvent( ActivityViewModel viewmodel )
+		{
+			ShowActivityBar( false );
 		}
 
 		void OnNoCurrentActiveActivityEvent()
