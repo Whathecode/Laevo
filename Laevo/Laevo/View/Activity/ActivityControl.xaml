@@ -3,7 +3,7 @@
 	x:Class="Laevo.View.Activity.ActivityControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
@@ -12,16 +12,16 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
-	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	xmlns:activity="clr-namespace:Laevo.View.Activity"
-	mc:Ignorable="d" 
+	xmlns:linkedActivity="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity"
+	mc:Ignorable="d"
 	d:DesignHeight="118" d:DesignWidth="206"
-	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
-	Panel.ZIndex="10"	
+	d:DataContext="{d:DesignInstance Type=linkedActivity:LinkedActivityViewModel}"
+	Panel.ZIndex="10"
 	activityOverview:TimeLineControl.Occurance="{Binding Occurance}"
 	activityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
 	ClipToBounds="False">
-	
+
 	<activityOverview:TimeLineControl.Offset>
 		<MultiBinding Mode="TwoWay">
 			<MultiBinding.Converter>
@@ -36,7 +36,7 @@
 			<Binding Path="HeightPercentage" />
 		</MultiBinding>
 	</activityOverview:TimeLineControl.Offset>
-	
+
 	<UserControl.MinWidth>
 		<MultiBinding
 			Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">
@@ -45,22 +45,26 @@
 			<Binding ElementName="Control" Path="ActualWidth" />
 		</MultiBinding>
 	</UserControl.MinWidth>
-	
+
 	<UserControl.Resources>
 		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<converters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
 		<converters:ActivityBorderThicknessConverter x:Key="ActivityBorderThicknessConverter" />
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
+		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
+		<converters:ActivityShowStartButtonConverter x:Key="ActivityShowStartButtonConverter" />
 	</UserControl.Resources>
 
-	<StackPanel Orientation="Vertical">
-		
+	<StackPanel
+		Orientation="Vertical"
+		DataContext="{Binding BaseActivity}">
+
 		<Canvas
 			x:Name="Header"
 			Panel.ZIndex="20"
 			Height="{Binding ElementName=Image, Path=ActualHeight, Converter={wtcConverters:CalculateValueConverter Operation=Division, Value=2}}">
-			
+
 			<!-- Icon and text. -->
 			<StackPanel Orientation="Horizontal">
 				<Image
@@ -93,9 +97,9 @@
 					</TextBox.Template>
 				</TextBox>
 			</StackPanel>
-			
+
 			<!-- Action buttons. -->
-			<activity:ActionButtons x:Name="Buttons">
+			<activity:ActionButtons x:Name="Buttons"> <!-- TODO: Disable start stop buttons in previous activity parts. ShowStartButton="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityShowStartButtonConverter}}">-->
 				<activity:ActionButtons.Visibility>
 					<MultiBinding
 						Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and ![2]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
@@ -105,9 +109,9 @@
 					</MultiBinding>
 				</activity:ActionButtons.Visibility>
 			</activity:ActionButtons>
-			
+
 		</Canvas>
-		
+
 		<Border
 			x:Name="Container"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
@@ -118,17 +122,18 @@
 			ClipToBounds="True"
 			AllowDrop="True"
 			Drop="OnTaskDropped">
-			
+
 			<Border.CornerRadius>
 				<MultiBinding
-					Converter="{wtcConverters:ConditionConverter Expression='[0] and !(([1] || [2]) and ([3] > 2))', IfTrue='5, 0, 0, 5', IfFalse='5', Type={x:Type CornerRadius}}">
+					Converter="{StaticResource ActivityCornerRadiusConverter}">
 					<Binding Path="IsOpen" />
 					<Binding ElementName="Container" Path="IsMouseOver" />
 					<Binding ElementName="Buttons" Path="IsMouseOver" />
 					<Binding ElementName="Control" Path="MinWidth" />
+					<Binding ElementName="Control" Path="DataContext.Position" />
 				</MultiBinding>
 			</Border.CornerRadius>
-			
+
 			<Border.BorderThickness>
 				<MultiBinding
 					Converter="{StaticResource ActivityBorderThicknessConverter}">
@@ -136,9 +141,10 @@
 					<Binding ElementName="Container" Path="IsMouseOver" />
 					<Binding ElementName="Buttons" Path="IsMouseOver" />
 					<Binding ElementName="Control" Path="MinWidth" />
+					<Binding ElementName="Control" Path="DataContext.Position" />
 				</MultiBinding>
 			</Border.BorderThickness>
-			
+
 			<Border.BorderBrush>
 				<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
 					<Binding Path="IsActive" />
@@ -147,10 +153,10 @@
 					<Binding Path="HasUnattendedInterruptions" />
 				</MultiBinding>
 			</Border.BorderBrush>
-			
+
 			<Border.Height>
 				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">
-					<Binding Path="HeightPercentage" />
+					<Binding ElementName="Control" Path="DataContext.HeightPercentage" />
 					<Binding ElementName="Header" Path="ActualHeight" />
 					<Binding Path="ActualHeight">
 						<Binding.RelativeSource>
@@ -159,6 +165,7 @@
 					</Binding>
 				</MultiBinding>
 			</Border.Height>
+
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 					<GradientStop
@@ -167,7 +174,7 @@
 						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
 				</LinearGradientBrush>
 			</Border.Background>
-			
+
 			<Border.Resources>
 				<converters:TimeSpanConverter x:Key="TimeSpanConverter" />
 				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
@@ -176,13 +183,13 @@
 						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Stroke="Yellow" StrokeThickness="4">
-						
+
 						<Line.X1>
 							<MultiBinding
 								Converter="{StaticResource TimeSpanConverter}"
 								ConverterParameter="Start">
 								<Binding Path="." />
-								<Binding ElementName="Control" Path="DataContext.Occurance" />	
+								<Binding ElementName="Control" Path="DataContext.Occurance" />
 								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
 								<Binding ElementName="Container" Path="ActualWidth" />
 							</MultiBinding>
@@ -205,23 +212,23 @@
 			<ItemsControl
 				Visibility="{Binding ShowActiveTimeSpans, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
 				ItemTemplate="{StaticResource TimeSpanTemplate}">
-				
+
 				<ItemsControl.Style>
 					<Style TargetType="ItemsControl">
 						<Style.Triggers>
 							<Trigger Property="ItemsControl.Visibility" Value="Visible">
-								<Setter Property="ItemsSource" Value="{Binding ActiveTimeSpans}"/>
+								<Setter Property="ItemsSource" Value="{Binding ActiveTimeSpans}" />
 							</Trigger>
 							<Trigger Property="ItemsControl.Visibility" Value="Hidden">
-								<Setter Property="ItemsSource" Value="{x:Null}"/>
+								<Setter Property="ItemsSource" Value="{x:Null}" />
 							</Trigger>
 							<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
-								<Setter Property="ItemsSource" Value="{x:Null}"/>
+								<Setter Property="ItemsSource" Value="{x:Null}" />
 							</Trigger>
 						</Style.Triggers>
 					</Style>
 				</ItemsControl.Style>
-				
+
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<Canvas />

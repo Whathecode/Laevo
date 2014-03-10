@@ -13,6 +13,7 @@ using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.Activity.LinkedActivity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
 using Whathecode.System.Algorithm;
@@ -49,14 +50,15 @@ namespace Laevo.View.ActivityOverview
 		const double ZoomPercentage = 0.001;
 		const double DragMomentum = 0.0000001;
 
-		readonly List<UnitLabels> _unitLabels = new List<UnitLabels>(); 
+		readonly List<UnitLabels> _unitLabels = new List<UnitLabels>();
 		readonly List<ILabels> _labels = new List<ILabels>();
-		readonly Dictionary<ActivityViewModel, ActivityControl> _activities = new Dictionary<ActivityViewModel, ActivityControl>();
+		readonly Dictionary<LinkedActivityViewModel, ActivityControl> _activities = new Dictionary<LinkedActivityViewModel, ActivityControl>();
 
 		[DependencyProperty( Properties.MoveTimeLine )]
 		public ICommand MoveTimeLineCommand { get; private set; }
 
 		bool _isDragOverActivity;
+
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
 
@@ -192,15 +194,23 @@ namespace Laevo.View.ActivityOverview
 			if ( oldViewModel != null )
 			{
 				oldViewModel.Activities.CollectionChanged -= ActivitiesChanged;
+				foreach ( var activityViewModel in oldViewModel.Activities )
+				{
+					activityViewModel.LinkedActivities.CollectionChanged -= LinkedActivitiesChanged;
+				}
 			}
-		
-			var viewModel = e.NewValue as ActivityOverviewViewModel;
-			if ( viewModel == null )
+
+			var overviewViewModel = e.NewValue as ActivityOverviewViewModel;
+			if ( overviewViewModel == null )
 			{
 				return;
 			}
-			viewModel.Activities.ForEach( NewActivity );
-			viewModel.Activities.CollectionChanged += ActivitiesChanged;
+			foreach ( var activityViewModel in overviewViewModel.Activities )
+			{
+				activityViewModel.LinkedActivities.CollectionChanged += LinkedActivitiesChanged;
+				activityViewModel.LinkedActivities.ForEach( NewActivity );
+			}
+			overviewViewModel.Activities.CollectionChanged += ActivitiesChanged;
 		}
 
 		void ActivitiesChanged( object sender, NotifyCollectionChangedEventArgs e )
@@ -210,22 +220,46 @@ namespace Laevo.View.ActivityOverview
 			{
 				foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
 				{
-					ActivityControl control = _activities[ activity ];
-					control.DragEnter -= OnActivityDragStart;
-					control.DragLeave -= OnActivityDragStop;
-					TimeLine.Children.Remove( control );
-					_activities.Remove( activity );
+					activity.LinkedActivities.CollectionChanged -= LinkedActivitiesChanged;
+					activity.LinkedActivities.ForEach( DeleteActivity );
 				}
 			}
 
 			// Add new items.
 			if ( e.NewItems != null )
 			{
-				e.NewItems.Cast<ActivityViewModel>().ForEach( NewActivity );
+				foreach ( var activity in e.NewItems.Cast<ActivityViewModel>() )
+				{
+					activity.LinkedActivities.CollectionChanged += LinkedActivitiesChanged;
+				}
 			}
 		}
 
-		void NewActivity( ActivityViewModel viewModel )
+		void DeleteActivity( LinkedActivityViewModel viewModel )
+		{
+			ActivityControl control = _activities[ viewModel ];
+			control.DragEnter -= OnActivityDragStart;
+			control.DragLeave -= OnActivityDragStop;
+			TimeLine.Children.Remove( control );
+			_activities.Remove( viewModel );
+		}
+
+		void LinkedActivitiesChanged( object sender, NotifyCollectionChangedEventArgs e )
+		{
+			// Remove old items.
+			if ( e.OldItems != null )
+			{
+				e.OldItems.Cast<LinkedActivityViewModel>().ForEach( DeleteActivity );
+			}
+
+			// Add new items.
+			if ( e.NewItems != null )
+			{
+				e.NewItems.Cast<LinkedActivityViewModel>().ForEach( NewActivity );
+			}
+		}
+
+		void NewActivity( LinkedActivityViewModel viewModel )
 		{
 			var activity = new ActivityControl
 			{
@@ -251,6 +285,7 @@ namespace Laevo.View.ActivityOverview
 		Interval<DateTime> _startDrag;
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
+
 		void MoveTimeLine( MouseBehavior.ClickDragInfo info )
 		{
 			double mouseX = Mouse.GetPosition( this ).X;
@@ -276,7 +311,7 @@ namespace Laevo.View.ActivityOverview
 					ConstantDeceleration = velocity * DragMomentum,
 					TimeLine = TimeLine
 				};
-				_dragAnimation.Completed += DragAnimationCompleted;	
+				_dragAnimation.Completed += DragAnimationCompleted;
 				TimeLine.BeginAnimation( visibleIntervalProperty, _dragAnimation );
 			}
 			else
@@ -303,7 +338,7 @@ namespace Laevo.View.ActivityOverview
 			VectorLine planeLine = new VectorLine( leftFieldOfView, new Vector( 0, Math.Tan( angleRadians ) * -ratio ) );
 			double viewPercentage = mouseXPosition / Container2D.ActualWidth;
 			double viewWidth = 2 * ratio;
-			VectorLine viewRay = new VectorLine( new Vector( 0, 1 ), new Vector( -ratio + (viewWidth * viewPercentage), 0 ) );
+			VectorLine viewRay = new VectorLine( new Vector( 0, 1 ), new Vector( -ratio + ( viewWidth * viewPercentage ), 0 ) );
 			Vector viewIntersection = planeLine.Intersection( viewRay );
 
 			// Find the percentage of the focused point on the time line.
@@ -329,9 +364,9 @@ namespace Laevo.View.ActivityOverview
 
 			DependencyProperty animatedProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
 			_dragAnimation.Completed -= DragAnimationCompleted;
-			TimeLine.VisibleInterval = TimeLine.VisibleInterval;	// Required to copy latest animated value to local value.
+			TimeLine.VisibleInterval = TimeLine.VisibleInterval; // Required to copy latest animated value to local value.
 			TimeLine.BeginAnimation( animatedProperty, null );
-			_dragAnimation = null;			
+			_dragAnimation = null;
 		}
 
 		void OnMouseWheel( object sender, MouseWheelEventArgs e )
@@ -351,6 +386,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		readonly RateOfChange<long, long> _velocity = new RateOfChange<long, long>( TimeSpan.FromMilliseconds( 200 ).Ticks );
+
 		void OnRendering( object sender, EventArgs e )
 		{
 			// While dragging, calculate velocity.
@@ -376,6 +412,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		double _timeLinePosition;
+
 		void OnTimeLineDragEnter( object sender, DragEventArgs e )
 		{
 			// Check whether a task is being dragged.
@@ -395,6 +432,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		readonly TimeGate _throttleDragEvents = new TimeGate( TimeSpan.FromMilliseconds( 15 ), true );
+
 		void OnTimeLineDragOver( object sender, DragEventArgs e )
 		{
 			// TODO: GetPosition on the 3D viewport seems to be so expensive that it locks up the rendering thread.
