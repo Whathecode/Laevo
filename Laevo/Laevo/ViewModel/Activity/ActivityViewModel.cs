@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -12,9 +13,11 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ABC.Windows;
 using ABC.Windows.Desktop;
 using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
@@ -100,6 +103,16 @@ namespace Laevo.ViewModel.Activity
 		///   Event which is triggered when activity is stopped.
 		/// </summary>
 		public event ActivityEventHandler ActivityStoppedEvent;
+
+		/// <summary>
+		///   Event which is triggered before activity suspension is started.
+		/// </summary>
+		public event ActivityEventHandler SuspendingActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered after an activity has been suspended and no longer contains any open resources.
+		/// </summary>
+		public event ActivityEventHandler SuspendedActivityEvent;
 
 		internal readonly Model.Activity Activity;
 
@@ -384,10 +397,35 @@ namespace Laevo.ViewModel.Activity
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
 			// Initialize desktop.
-			_desktopManager.SwitchToDesktop( _virtualDesktop );
+			try
+			{
+				_desktopManager.SwitchToDesktop( _virtualDesktop );
+			}
+			catch ( UnresponsiveWindowsException e )
+			{
+				var unresponsive = e.UnresponsiveWindows.GroupBy( u => u.Window.GetProcess().ProcessName ).ToList();
+
+				// Ask user whether to ignore the locking application windows from now on.
+				// TODO: The error message could be made topmost when we could access the overview window. This exception might need to be propagated to the view.
+				string error = unresponsive.Aggregate(
+					"The following applications stopped responding and are locking up the window manager:\n\n",
+					( info, processWindows ) => info + "- " + processWindows.Key + "\n" );
+				error += "\nWould you like to ignore them from now on?";
+				MessageBoxResult result = MessageBox.Show( error, "Unresponsive Applications", MessageBoxButton.YesNo, MessageBoxImage.Exclamation );
+				if ( result == MessageBoxResult.Yes )
+				{
+					e.IgnoreAllWindows();
+				}
+			}
 			InitializeLibrary();
 
 			OpenInterruptions();
+
+			// Resume the activity in case it was suspended.
+			if ( IsSuspended )
+			{
+				ResumeActivity();
+			}
 
 			ActivatedActivityEvent( this );
 		}
@@ -409,15 +447,14 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.SelectActivity )]
 		public void SelectActivity()
 		{
-			switch ( _overview.ActivityMode )
+			if ( _overview.ActivityMode.HasFlag( Mode.Select ) )
 			{
-				case Mode.Select:
-					SelectedActivityEvent( this );
-					break;
-				case Mode.Activate:
-					// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
-					ActivateActivity( Activity.IsOpen );
-					break;
+				SelectedActivityEvent( this );
+			}
+			else
+			{
+				// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
+				ActivateActivity( Activity.IsOpen );
 			}
 		}
 
@@ -473,28 +510,67 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.StopActivity )]
 		public bool CanStopActivity()
 		{
-			return IsEditable && Activity.IsOpen;
+			return IsEditable && Activity.IsOpen && !_isSuspending;
 		}
 
+		bool _isSuspending;
 		[CommandExecute( Commands.SuspendActivity )]
 		public void SuspendActivity()
 		{
+			_desktopManager.UpdateWindowAssociations();
+
 			if ( IsSuspended )
 			{
 				return;
 			}
 
-			IsSuspended = true;
+			_isSuspending = true;
+			SuspendingActivityEvent( this );
+
+			// Await full suspension in background.
+			var awaitSuspend = new BackgroundWorker();
+			awaitSuspend.DoWork += ( sender, args ) =>
+			{
+				do
+				{
+					// When all windows are closed, assume suspension was successful.
+					_desktopManager.UpdateWindowAssociations();
+					Thread.Sleep( TimeSpan.FromSeconds( 1 ) );
+				}
+				while ( _virtualDesktop.Windows.Count != 0 );
+			};
+			awaitSuspend.RunWorkerCompleted += ( sender, args ) =>
+			{
+				IsSuspended = true;
+				_isSuspending = false;
+				StopActivity();
+				SuspendedActivityEvent( this );
+			};
+			awaitSuspend.RunWorkerAsync();
+
+			// Initiate the actual suspension.
 			_virtualDesktop.Suspend();
 		}
 
 		[CommandCanExecute( Commands.SuspendActivity )]
 		public bool CanSuspendActivity()
 		{
-			return IsEditable && !IsSuspended;
+			return IsEditable && !IsSuspended && !_isSuspending;
 		}
 
-		[CommandExecute( Commands.ResumeActivity )]
+		[CommandExecute( Commands.ForceSuspend )]
+		public void ForceSuspend()
+		{
+			// By moving the remaining windows to the home activity, suspension will finish.
+			_virtualDesktop.TransferWindows( _virtualDesktop.Windows.ToList(), _overview.HomeActivity._virtualDesktop );
+		}
+
+		[CommandCanExecute( Commands.ForceSuspend )]
+		public bool CanForceSuspend()
+		{
+			return _isSuspending;
+		}
+
 		public void ResumeActivity()
 		{
 			if ( !IsSuspended )
@@ -504,12 +580,6 @@ namespace Laevo.ViewModel.Activity
 
 			IsSuspended = false;
 			_virtualDesktop.Resume();
-		}
-
-		[CommandCanExecute( Commands.ResumeActivity )]
-		public bool CanResumeActivity()
-		{
-			return IsSuspended;
 		}
 
 		[CommandExecute( Commands.Remove )]

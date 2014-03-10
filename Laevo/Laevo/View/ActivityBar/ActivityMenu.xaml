@@ -9,7 +9,6 @@
 	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	mc:Ignorable="d"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
@@ -133,6 +132,7 @@
 
 	<StackPanel Orientation="Horizontal">
 
+		<!-- Edit activity and open library. -->
 		<Border
 			Background="White"
 			CornerRadius="5, 5, 5, 5"
@@ -170,30 +170,40 @@
 			</StackPanel>
 		</Border>
 
+		<!-- Open/Stop/Suspend options. -->
 		<StackPanel
 			ClipToBounds="True"
 			Orientation="Vertical"
-			Margin="15,10,10,15">
+			Margin="15,10,10,15"
+			MinWidth="120">
 
-			<StackPanel Orientation="Horizontal">
+			<StackPanel
+				Orientation="Horizontal"
+				Visibility="{Binding IsEditable, Converter={data:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
-				<!--TODO: Why condition converter is not working in case of commmand binding?-->
+				<!-- Open/Stop. -->
 				<Button
+					Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
 					HorizontalAlignment="Left"
 					Margin="0,0,1,0"
 					VerticalAlignment="Top"
 					Width="100" Height="26"
-					Content="{Binding IsOpen, 
-						Converter={converters:SingleConditionConverter Type={x:Type system:String}, 
-						Expression='[0]', 
-						IfTrue=Stop, IfFalse=Open}}"
-					Command="{Binding IsOpen, 
-						Converter={converters:SingleConditionConverter Expression='[0]', 
-						IfTrue={commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}, 
-						IfFalse={commandFactory:CommandBinding {x:Static binding:Commands.OpenActivity}}}}"
+					Content="Stop"
+					Command="{commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}"
+					Foreground="#FFFFFFFF"
+					Template="{DynamicResource StatesButtonTemplate}" />
+				<Button
+					Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+					HorizontalAlignment="Left"
+					Margin="0,0,1,0"
+					VerticalAlignment="Top"
+					Width="100" Height="26"
+					Content="Open"
+					Command="{commandFactory:CommandBinding {x:Static binding:Commands.OpenActivity}}"
 					Foreground="#FFFFFFFF"
 					Template="{DynamicResource StatesButtonTemplate}" />
 
+				<!-- Extended hidden options in context menu. -->
 				<Button
 					Name="OtherStatesButton"
 					HorizontalAlignment="Left"
@@ -203,7 +213,7 @@
 					Template="{DynamicResource StatesButtonTemplate}"
 					ContextMenuService.Placement="Right"
 					Click="ShowOtherStatesMenu"
-					MouseRightButtonDown="HidetherStatesMenu">
+					MouseRightButtonDown="HideOtherStatesMenu">
 
 					<Button.Content>
 						<Polygon
@@ -215,33 +225,14 @@
 					<Button.ContextMenu>
 						<ContextMenu>
 							<MenuItem
-								Header="{Binding IsSuspended, 
-									Converter={converters:SingleConditionConverter Type={x:Type system:String}, 
-									Expression='[0]', 
-									IfTrue=Resume, IfFalse=Suspend}}" />
+								Header="Suspend"
+								Command="{commandFactory:CommandBinding {x:Static binding:Commands.SuspendActivity}}"
+								Visibility="{Binding IsSuspended, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
 						</ContextMenu>
 					</Button.ContextMenu>
 				</Button>
 
 			</StackPanel>
-
-			<!--Quick launch items-->
-
-			<!--<MenuItem Header="test">
-				<MenuItem.Icon>
-					<Image Source="Burn.png" />
-				</MenuItem.Icon>
-			</MenuItem>
-			<MenuItem Header="test">
-				<MenuItem.Icon>
-					<Image Source="Burn.png" />
-				</MenuItem.Icon>
-			</MenuItem>
-			<MenuItem Header="test">
-				<MenuItem.Icon>
-					<Image Source="Burn.png" />
-				</MenuItem.Icon>
-			</MenuItem>-->
 
 		</StackPanel>
 	</StackPanel>

@@ -48,6 +48,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler StoppedActivityEvent;
 
 		/// <summary>
+		///   Event which is triggered when an activity is being suspended.
+		/// </summary>
+		public event ActivityViewModel.ActivityEventHandler SuspendingActivityEvent;
+
+		/// <summary>
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
 		public event Action NoCurrentActiveActivityEvent;
@@ -76,8 +81,9 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		/// <summary>
 		///   The ViewModel of the activity which is currently open.
+		///   TODO: Think if property should be moved to MainViewModel.
 		/// </summary>
-		/// TODO: Think if property should be moved to MainViewModel.
+		[NotifyProperty( Binding.Properties.CurrentActivityViewModel )]
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
@@ -255,6 +261,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
 			activity.ActivityStoppedEvent -= OnActivityStopped;
+			activity.SuspendingActivityEvent -= OnSuspendingActivity;
+			activity.SuspendedActivityEvent -= OnSuspendedActivity;
 
 			RemovedActivityEvent( activity );
 		}
@@ -285,6 +293,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
 			activity.ActivityStoppedEvent += OnActivityStopped;
+			activity.SuspendingActivityEvent += OnSuspendingActivity;
+			activity.SuspendedActivityEvent += OnSuspendedActivity;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -326,12 +336,23 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnActivityEditStarted( ActivityViewModel viewModel )
 		{
-			ActivityMode = Mode.Edit;
+			ActivityMode |= Mode.Edit;
 		}
 
 		void OnActivityEditFinished( ActivityViewModel viewModel )
 		{
-			ActivityMode = Mode.Activate;
+			ActivityMode &= ~Mode.Edit;
+		}
+
+		void OnSuspendingActivity( ActivityViewModel viewmodel )
+		{
+			ActivityMode |= Mode.Suspending;
+			SuspendingActivityEvent( viewmodel );
+		}
+
+		void OnSuspendedActivity( ActivityViewModel viewmodel )
+		{
+			ActivityMode &= ~Mode.Suspending;
 		}
 
 		[CommandExecute( Commands.OpenHome )]
