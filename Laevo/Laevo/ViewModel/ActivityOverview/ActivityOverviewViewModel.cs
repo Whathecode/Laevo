@@ -255,7 +255,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
 			activity.ActivityStoppedEvent -= OnActivityStopped;
-			activity.ActivityOpenedEvent -= OnActivityOpened;
 
 			RemovedActivityEvent( activity );
 		}
@@ -286,7 +285,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
 			activity.ActivityStoppedEvent += OnActivityStopped;
-			activity.ActivityOpenedEvent += OnActivityOpened;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -334,11 +332,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivityEditFinished( ActivityViewModel viewModel )
 		{
 			ActivityMode = Mode.Activate;
-		}
-
-		void OnActivityOpened( ActivityViewModel viewModel )
-		{
-			OpenedActivityEvent( viewModel );
 		}
 
 		[CommandExecute( Commands.OpenHome )]

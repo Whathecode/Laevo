@@ -55,6 +55,7 @@ namespace Laevo.Model
 
 		[DataMember]
 		List<Interval<DateTime>> _openIntervals;
+
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
@@ -65,6 +66,7 @@ namespace Laevo.Model
 
 		[DataMember]
 		List<AbstractInterruption> _interruptions;
+
 		/// <summary>
 		///   Interruptions which interrupted the activity.
 		/// </summary>
@@ -88,7 +90,7 @@ namespace Laevo.Model
 
 
 		public Activity()
-			: this( "" ) { }
+			: this( "" ) {}
 
 		public Activity( string name )
 		{
@@ -175,18 +177,25 @@ namespace Laevo.Model
 		/// <summary>
 		///   Opening an activity makes it part of the current multitasking session.
 		/// </summary>
-		public void Open()
+		public void Open( bool planned = false )
 		{
 			if ( IsOpen )
 			{
 				return;
 			}
 
-			var now = DateTime.Now;
-			_currentOpenInterval = new Interval<DateTime>( now, now );
-			_openIntervals.Add( _currentOpenInterval );
-			IsOpen = true;
+			if ( !planned )
+			{
+				var now = DateTime.Now;
+				_currentOpenInterval = new Interval<DateTime>( now, now );
+				_openIntervals.Add( _currentOpenInterval );
+			}
+			else
+			{
+				_openIntervals.Last().Start = DateTime.Now;
+			}
 
+			IsOpen = true;
 			OpenedEvent( this );
 		}
 
@@ -209,9 +218,17 @@ namespace Laevo.Model
 		public void Plan( DateTime atTime, TimeSpan duration )
 		{
 			// Set the planned time as an interval when the activity will be open.
-			_openIntervals.Clear();
 			_currentOpenInterval = new Interval<DateTime>( atTime, atTime + duration );
 			_openIntervals.Add( _currentOpenInterval );
+		}
+
+		/// <summary>
+		/// Changes activity timeline position (currently only for planned activities).
+		/// </summary>
+		public void UpdateInterval( DateTime atTime, TimeSpan duration )
+		{
+			_openIntervals.Last().Start = atTime;
+			_openIntervals.Last().End = atTime + duration;
 		}
 
 		/// <summary>

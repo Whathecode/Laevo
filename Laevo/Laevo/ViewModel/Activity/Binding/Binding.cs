@@ -2,15 +2,11 @@
 {
 	public enum Properties
 	{
-		Occurance,
-		TimeSpan,
 		ActiveTimeSpans,
 		ShowActiveTimeSpans,
 		Icon,
 		Color,
 		Label,
-		HeightPercentage,
-		OffsetPercentage,
 		PossibleColors,
 		PossibleIcons,
 		IsActive,
@@ -19,7 +15,8 @@
 		IsSuspended,
 		HasUnattendedInterruptions,
 		IsPlannedActivity,
-		IsEditable
+		IsEditable,
+		LinkedActivities
 	}
 
 	public enum Commands

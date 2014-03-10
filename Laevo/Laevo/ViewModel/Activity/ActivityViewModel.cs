@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -17,6 +18,7 @@ using System.Windows.Media.Imaging;
 using ABC.Windows.Desktop;
 using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
+using Laevo.ViewModel.Activity.LinkedActivity;
 using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;
 using Whathecode.System.Arithmetic.Range;
@@ -33,7 +35,7 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
-	[KnownType( typeof( ABC.Windows.Window ))]
+	[KnownType( typeof( ABC.Windows.Window ) )]
 	public class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
@@ -99,17 +101,12 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public event ActivityEventHandler ActivityStoppedEvent;
 
-		/// <summary>
-		///   Event which is triggered when activity is opended.
-		/// </summary>
-		public event ActivityEventHandler ActivityOpenedEvent;
-
 		internal readonly Model.Activity Activity;
+
 		readonly VirtualDesktopManager _desktopManager;
 
 		[DataMember]
 		VirtualDesktop _virtualDesktop;
-
 
 		/// <summary>
 		///   The time when the activity was created.
@@ -119,38 +116,22 @@ namespace Laevo.ViewModel.Activity
 			get { return Activity.DateCreated; }
 		}
 
-		/// <summary>
-		///   The time when the activity started or will start.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.Occurance )]
-		public DateTime Occurance { get; private set; }
+		public bool IsUnnamed { get; set; }
 
-		[NotifyPropertyChanged( Binding.Properties.Occurance )]
-		public void OnOccuranceChanged( DateTime oldOccurance, DateTime newOccurance )
-		{
-			if ( IsPlannedActivity )
-			{
-				Activity.Plan( newOccurance, TimeSpan );
-			}
-		}
+		/// <summary>
+		///   Default percentage of the available height the activity box occupies.
+		/// </summary>
+		[DataMember]
+		public double HeightPercentage { get; set; }
+
+		/// <summary>
+		///   Default offset, as a percentage of the total available height, where to position the activity box, from the bottom.
+		/// </summary>
+		[DataMember]
+		public double OffsetPercentage { get; set; }
 
 		[NotifyProperty( Binding.Properties.IsPlannedActivity )]
 		public bool IsPlannedActivity { get; private set; }
-
-		/// <summary>
-		///   The entire timespan during which the activity has been open, regardless of whether it was closed in between.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.TimeSpan )]
-		public TimeSpan TimeSpan { get; private set; }
-
-		[NotifyPropertyChanged( Binding.Properties.TimeSpan )]
-		public void OnTimeSpanChanged( TimeSpan oldDuration, TimeSpan newDuration )
-		{
-			if ( IsPlannedActivity )
-			{
-				Activity.Plan( Occurance, newDuration );
-			}
-		}
 
 		Interval<DateTime> _currentActiveTimeSpan;
 
@@ -199,20 +180,6 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		///   The percentage of the available height the activity box occupies.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.HeightPercentage )]
-		[DataMember]
-		public double HeightPercentage { get; set; }
-
-		/// <summary>
-		///   The offset, as a percentage of the total available height, where to position the activity box, from the bottom.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.OffsetPercentage )]
-		[DataMember]
-		public double OffsetPercentage { get; set; }
-
-		/// <summary>
 		///   Determines whether or not the activity is currently active (working on it).
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsActive )]
@@ -246,7 +213,8 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; private set; }
 
-		public bool IsUnnamed { get; set; }
+		[NotifyProperty( Binding.Properties.LinkedActivities )]
+		public ObservableCollection<LinkedActivityViewModel> LinkedActivities { get; set; }
 
 
 		static ActivityViewModel()
@@ -270,6 +238,8 @@ namespace Laevo.ViewModel.Activity
 		{
 			Contract.Requires( activity != null );
 
+			InitializeLinkedActivities();
+
 			Activity = activity;
 
 			_desktopManager = desktopManager;
@@ -282,6 +252,12 @@ namespace Laevo.ViewModel.Activity
 			IsEditable = isEditable;
 
 			CommonInitialize();
+		}
+
+		void InitializeLinkedActivities()
+		{
+			LinkedActivities = new ObservableCollection<LinkedActivityViewModel>();
+			LinkedActivities.CollectionChanged += UpdateLinkedActivitiesPositions;
 		}
 
 		public ActivityViewModel(
@@ -305,6 +281,12 @@ namespace Laevo.ViewModel.Activity
 
 			CommonInitialize();
 
+			InitializeLinkedActivities();
+			foreach ( var interval in Activity.OpenIntervals )
+			{
+				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) );
+			}
+
 			// Initiate attention history.
 			Model.Activity lastActivity = null;
 			ActivityAttentionShift lastShift = null;
@@ -320,7 +302,7 @@ namespace Laevo.ViewModel.Activity
 					}
 
 					// Activity opened.
-					_currentActiveTimeSpan = new Interval<DateTime>( s.Time, s.Time );
+					_currentActiveTimeSpan = new Interval<DateTime>( DateTime.Now, DateTime.Now );
 					ActiveTimeSpans.Add( _currentActiveTimeSpan );
 				}
 				else if ( _currentActiveTimeSpan != null )
@@ -461,8 +443,17 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
-			Activity.Open();
-			ActivityOpenedEvent( this );
+			IsOpen = true;
+			if ( !IsPlannedActivity )
+			{
+				LinkedActivities.Add( CreateLinkedActivity() );
+			}
+				// TODO: Change horrible plan activity opening?
+			else
+			{
+				LinkedActivities[ 0 ] = ( CreateLinkedActivity( DateTime.Now, Activity.OpenIntervals.Last().End.Subtract( DateTime.Now ) ) );
+			}
+			Activity.Open( IsPlannedActivity );
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]
@@ -526,6 +517,7 @@ namespace Laevo.ViewModel.Activity
 		{
 			StopActivity();
 			_overview.Remove( this );
+			//TODO: Consider partial activity remove. Parametrized command will be needed?
 		}
 
 		[CommandCanExecute( Commands.Remove )]
@@ -551,11 +543,13 @@ namespace Laevo.ViewModel.Activity
 			Icon = newIcon;
 		}
 
+		/// <summary>
+		/// Creates default 1 hour long planned activity.
+		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			Occurance = atTime;
-			TimeSpan = TimeSpan.FromHours( 1 );
-			Activity.Plan( atTime, TimeSpan );
+			LinkedActivities.Add( CreateLinkedActivity( atTime, TimeSpan.FromHours( 1 ) ) );
+			Activity.Plan( atTime, LinkedActivities.Last().TimeSpan );
 		}
 
 		/// <summary>
@@ -664,19 +658,23 @@ namespace Laevo.ViewModel.Activity
 
 		public void Update( DateTime now )
 		{
-			IsPlannedActivity = Occurance > DateTime.Now;
+			IsPlannedActivity = LinkedActivities.Last().Occurance + LinkedActivities.Last().TimeSpan > DateTime.Now;
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
 
 			// Update the interval which indicates when the activity was open.
+			// TODO: Ask if it's possible to have activity with no intervals?
 			if ( Activity.OpenIntervals.Count > 0 )
 			{
-				Occurance = Activity.OpenIntervals.First().Start;
-				TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.First().Start;
+				if ( IsOpen )
+				{
+					LinkedActivities.Last().Occurance = Activity.OpenIntervals.Last().Start;
+					LinkedActivities.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
+				}
 			}
-			else
-			{
-				Occurance = Activity.DateCreated;
-			}
+			//else
+			//{
+			//	Occurance = Activity.DateCreated;
+			//}
 
 			// Update the intervals which indicate when the activity was active.
 			if ( _currentActiveTimeSpan != null )
@@ -712,6 +710,45 @@ namespace Laevo.ViewModel.Activity
 
 			Activity.Deactivate();
 			_currentActiveTimeSpan = null;
+		}
+
+		LinkedActivityViewModel CreateLinkedActivity()
+		{
+			var newActivity = new LinkedActivityViewModel
+			{
+				HeightPercentage = LinkedActivities.Count == 0 ? HeightPercentage : LinkedActivities.Last().HeightPercentage,
+				OffsetPercentage = LinkedActivities.Count == 0 ? OffsetPercentage : LinkedActivities.Last().OffsetPercentage,
+				BaseActivity = this,
+				Occurance = DateTime.Now
+			};
+
+			return newActivity;
+		}
+
+		LinkedActivityViewModel CreateLinkedActivity( DateTime occurence, TimeSpan timeSpan )
+		{
+			var newActivity = CreateLinkedActivity();
+			newActivity.Occurance = occurence;
+			newActivity.TimeSpan = timeSpan;
+
+			return newActivity;
+		}
+
+		void UpdateLinkedActivitiesPositions( object sender, NotifyCollectionChangedEventArgs e )
+		{
+			if ( LinkedActivities.Count == 1 )
+			{
+				LinkedActivities[ 0 ].Position = ActivityPosition.None;
+			}
+			else if ( LinkedActivities.Count >= 1 )
+			{
+				LinkedActivities.First().Position = ActivityPosition.Start;
+				for ( var i = 1; i < LinkedActivities.Count - 1; i++ )
+				{
+					LinkedActivities[ i ].Position = ActivityPosition.Middle;
+				}
+				LinkedActivities.Last().Position = ActivityPosition.End;
+			}
 		}
 
 		public override void Persist()

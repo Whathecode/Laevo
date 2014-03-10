@@ -7,6 +7,7 @@ namespace Laevo.View.Activity.Converters
 	class OccuranceEndConverter : AbstractMultiValueConverter<object, DateTime>
 	{
 		DateTime _occurance;
+
 		public override DateTime Convert( object[] values )
 		{
 			_occurance = (DateTime)values[ 0 ];
@@ -25,14 +26,11 @@ namespace Laevo.View.Activity.Converters
 					TimeSpan.FromMinutes( 0 )
 				};
 			}
-			else
+			return new object[]
 			{
-				return new object[]
-				{
-					_occurance,
-					value - _occurance
-				};
-			}
+				_occurance,
+				value - _occurance
+			};
 		}
 	}
 }
