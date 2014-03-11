@@ -12,10 +12,12 @@ fcl = doc.xpath("//nameSpace:PropertyGroup/nameSpace:Framework-Class-Library-Ext
 # Copy Framework Class Library Extension DLLs.
 fcl_library = '..\\Libraries\\Framework Class Library Extension\\'
 fcl_dlls = [
-	'Whathecode.System',
-	'Whathecode.System.Aspects',
+	'Whathecode.Interop',
+	'Whathecode.Microsoft',
 	'Whathecode.PresentationFramework',
-	'Whathecode.PresentationFramework.Aspects'
+	'Whathecode.PresentationFramework.Aspects',
+	'Whathecode.System',
+	'Whathecode.System.Aspects'
 	]
 fcl_dlls.each do |d|
 	FileUtils.cp(
@@ -26,11 +28,11 @@ end
 # Copy ABC Toolkit DLLs.
 abc_toolkit = '..\\Libraries\\ABC Toolkit\\'
 abc_dlls = [
-	'ABC.Windows',
-	'ABC.PInvoke',
-	'ABC.Interruptions',
 	'ABC.Applications',
-	'ABC.Common'
+	'ABC.Common',
+	'ABC.Interruptions',
+	'ABC.PInvoke',
+	'ABC.Windows'
 	]
 abc_dlls.each do |d|
 	FileUtils.cp(
