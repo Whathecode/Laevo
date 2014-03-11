@@ -177,14 +177,14 @@ namespace Laevo.Model
 		/// <summary>
 		///   Opening an activity makes it part of the current multitasking session.
 		/// </summary>
-		public void Open( bool planned = false )
+		public void Open( bool isPlanned = false )
 		{
 			if ( IsOpen )
 			{
 				return;
 			}
 
-			if ( !planned )
+			if ( !isPlanned )
 			{
 				var now = DateTime.Now;
 				_currentOpenInterval = new Interval<DateTime>( now, now );
@@ -192,7 +192,8 @@ namespace Laevo.Model
 			}
 			else
 			{
-				_openIntervals.Last().Start = DateTime.Now;
+				Interval<DateTime> last = _openIntervals.Last();
+				_openIntervals[ _openIntervals.Count - 1 ] = new Interval<DateTime>( DateTime.Now, true, last.End, last.IsEndIncluded );
 			}
 
 			IsOpen = true;
@@ -227,8 +228,7 @@ namespace Laevo.Model
 		/// </summary>
 		public void UpdateInterval( DateTime atTime, TimeSpan duration )
 		{
-			_openIntervals.Last().Start = atTime;
-			_openIntervals.Last().End = atTime + duration;
+			_openIntervals[ _openIntervals.Count - 1 ] = new Interval<DateTime>( atTime, atTime + duration );
 		}
 
 		/// <summary>
