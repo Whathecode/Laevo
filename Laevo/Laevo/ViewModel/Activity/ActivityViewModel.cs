@@ -728,7 +728,7 @@ namespace Laevo.ViewModel.Activity
 
 		public void Update( DateTime now )
 		{
-			IsPlannedActivity = LinkedActivities.Last().Occurance + LinkedActivities.Last().TimeSpan > DateTime.Now;
+			IsPlannedActivity = LinkedActivities.Count > 0 && LinkedActivities.Last().Occurance + LinkedActivities.Last().TimeSpan > DateTime.Now;
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
 
 			// Update the interval which indicates when the activity was open.
