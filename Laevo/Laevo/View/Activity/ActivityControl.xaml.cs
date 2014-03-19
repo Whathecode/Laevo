@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.Activity.LinkedActivity;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
@@ -77,8 +78,8 @@ namespace Laevo.View.Activity
 				return;
 			}
 
-			var dropTarget = (ActivityViewModel)DataContext;
-			dropTarget.Merge( draggedTask );
+			var dropTarget = (LinkedActivityViewModel)DataContext;
+			dropTarget.BaseActivity.Merge( draggedTask );
 		}
 	}
 }
