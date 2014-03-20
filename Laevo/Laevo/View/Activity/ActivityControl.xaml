@@ -86,7 +86,14 @@
 					Source="../Activity/ActionIcons/linked.png"
 					Stretch="None"
 					Cursor="Hand"
-					Visibility="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityLinkedVisibilityConverter}}" />
+					Visibility="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityLinkedVisibilityConverter}}" >
+					<Image.Margin>
+						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
+							<Binding ElementName="Image" Path="ActualWidth" />
+							<Binding ElementName="Image" Path="ActualHeight" />
+						</MultiBinding>
+					</Image.Margin>
+				</Image>
 
 				<TextBox
 					x:Name="ActivityName"
