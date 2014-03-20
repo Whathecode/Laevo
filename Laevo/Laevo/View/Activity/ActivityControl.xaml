@@ -54,6 +54,7 @@
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
 		<converters:ActivityShowStartButtonConverter x:Key="ActivityShowStartButtonConverter" />
+		<converters:ActivityDashedBorderThicknessConverter x:Key="ActivityDashedBorderThicknessConverter" />
 	</UserControl.Resources>
 
 	<StackPanel
@@ -138,9 +139,6 @@
 				<MultiBinding
 					Converter="{StaticResource ActivityBorderThicknessConverter}">
 					<Binding Path="IsOpen" />
-					<Binding ElementName="Container" Path="IsMouseOver" />
-					<Binding ElementName="Buttons" Path="IsMouseOver" />
-					<Binding ElementName="Control" Path="MinWidth" />
 					<Binding ElementName="Control" Path="DataContext.Position" />
 				</MultiBinding>
 			</Border.BorderThickness>
@@ -208,33 +206,70 @@
 				</DataTemplate>
 			</Border.Resources>
 
-			<!-- Attention time spans. -->
-			<ItemsControl
-				Visibility="{Binding ShowActiveTimeSpans, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-				ItemTemplate="{StaticResource TimeSpanTemplate}">
+			<Border>
 
-				<ItemsControl.Style>
-					<Style TargetType="ItemsControl">
-						<Style.Triggers>
-							<Trigger Property="ItemsControl.Visibility" Value="Visible">
-								<Setter Property="ItemsSource" Value="{Binding ActiveTimeSpans}" />
-							</Trigger>
-							<Trigger Property="ItemsControl.Visibility" Value="Hidden">
-								<Setter Property="ItemsSource" Value="{x:Null}" />
-							</Trigger>
-							<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
-								<Setter Property="ItemsSource" Value="{x:Null}" />
-							</Trigger>
-						</Style.Triggers>
-					</Style>
-				</ItemsControl.Style>
+				<Border.BorderThickness>
+					<MultiBinding
+						Converter="{StaticResource ActivityDashedBorderThicknessConverter}">
+						<Binding Path="IsOpen" />
+						<Binding ElementName="Container" Path="IsMouseOver" />
+						<Binding ElementName="Buttons" Path="IsMouseOver" />
+						<Binding ElementName="Control" Path="MinWidth" />
+						<Binding ElementName="Control" Path="DataContext.Position" />
+					</MultiBinding>
+				</Border.BorderThickness>
 
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<Canvas />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-			</ItemsControl>
+				<Border.BorderBrush>
+					<VisualBrush>
+						<VisualBrush.Visual>
+							<Rectangle
+								StrokeThickness="4"
+								StrokeDashArray="2 2"
+								Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+								Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}">
+
+								<Rectangle.Stroke>
+									<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+										<Binding Path="IsActive" />
+										<Binding Path="IsOpen" />
+										<Binding Path="HasOpenWindows" />
+										<Binding Path="HasUnattendedInterruptions" />
+									</MultiBinding>
+								</Rectangle.Stroke>
+
+							</Rectangle>
+						</VisualBrush.Visual>
+					</VisualBrush>
+				</Border.BorderBrush>
+
+				<!-- Attention time spans. -->
+				<ItemsControl
+					Visibility="{Binding ShowActiveTimeSpans, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
+					ItemTemplate="{StaticResource TimeSpanTemplate}">
+
+					<ItemsControl.Style>
+						<Style TargetType="ItemsControl">
+							<Style.Triggers>
+								<Trigger Property="ItemsControl.Visibility" Value="Visible">
+									<Setter Property="ItemsSource" Value="{Binding ActiveTimeSpans}" />
+								</Trigger>
+								<Trigger Property="ItemsControl.Visibility" Value="Hidden">
+									<Setter Property="ItemsSource" Value="{x:Null}" />
+								</Trigger>
+								<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
+									<Setter Property="ItemsSource" Value="{x:Null}" />
+								</Trigger>
+							</Style.Triggers>
+						</Style>
+					</ItemsControl.Style>
+
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<Canvas />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</Border>
 		</Border>
 
 	</StackPanel>

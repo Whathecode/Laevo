@@ -14,13 +14,9 @@ namespace Laevo.View.Activity.Converters
 			const int tb = 2;
 
 			bool isOpen = (bool)values[ 0 ];
-			// TODO: Why check if mouse over?
-			bool isMouseOverContainer = (bool)values[ 1 ];
-			bool isMouseOverButtons = (bool)values[ 2 ];
-			double minWidth = (double)values[ 3 ];
-			ActivityPosition position = (ActivityPosition)values[ 4 ];
+			ActivityPosition position = (ActivityPosition)values[ 1 ];
 
-			if ( isOpen ) //&& !(( isMouseOverContainer || isMouseOverButtons ) && minWidth > 2.0) )
+			if ( isOpen )
 			{
 				switch ( position )
 				{

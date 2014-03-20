@@ -6,11 +6,12 @@ using Whathecode.System.Windows.Data;
 
 namespace Laevo.View.Activity.Converters
 {
-	class ActivityCornerRadiusConverter : AbstractMultiValueConverter<object, CornerRadius>
+	class ActivityDashedBorderThicknessConverter : AbstractMultiValueConverter<object, Thickness>
 	{
-		public override CornerRadius Convert( object[] values )
+		public override Thickness Convert( object[] values )
 		{
-			const int cr = 5;
+			const int fb = 2;
+			const int tb = 2;
 
 			bool isOpen = (bool)values[ 0 ];
 			bool isMouseOverContainer = (bool)values[ 1 ];
@@ -25,41 +26,41 @@ namespace Laevo.View.Activity.Converters
 					switch ( position )
 					{
 						case ActivityPosition.None:
-							return new CornerRadius( cr, cr, cr, cr );
+							return new Thickness( 0, 0, fb, 0 );
 						case ActivityPosition.End:
-							return new CornerRadius( 0, cr, cr, 0 );
+							return new Thickness( fb, 0, fb, 0 );
 					}
 				}
 				switch ( position )
 				{
 					case ActivityPosition.None:
-						return new CornerRadius( cr, 0, 0, cr );
+						return new Thickness( 0 );
 					case ActivityPosition.Start:
-						return new CornerRadius( cr, 0, 0, cr );
+						return new Thickness( 0, 0, fb, 0 );
 					case ActivityPosition.Middle:
-						return new CornerRadius( 0, 0, 0, 0 );
+						return new Thickness( fb, 0, fb, 0 );
 					case ActivityPosition.End:
-						return new CornerRadius( 0, 0, 0, 0 );
+						return new Thickness( fb, 0, 0, 0 );
 					default:
-						return new CornerRadius( cr );
+						return new Thickness( 0 );
 				}
 			}
 			switch ( position )
 			{
 				case ActivityPosition.None:
-					return new CornerRadius( cr );
+					return new Thickness( 0 );
 				case ActivityPosition.Start:
-					return new CornerRadius( cr, 0, 0, cr );
+					return new Thickness( 0, 0, tb, 0 );
 				case ActivityPosition.Middle:
-					return new CornerRadius( 0, 0, 0, 0 );
+					return new Thickness( tb, 0, tb, 0 );
 				case ActivityPosition.End:
-					return new CornerRadius( 0, cr, cr, 0 );
+					return new Thickness( tb, 0, 0, 0 );
 				default:
-					return new CornerRadius( cr );
+					return new Thickness( 0 );
 			}
 		}
 
-		public override object[] ConvertBack( CornerRadius value )
+		public override object[] ConvertBack( Thickness value )
 		{
 			throw new NotImplementedException();
 		}
