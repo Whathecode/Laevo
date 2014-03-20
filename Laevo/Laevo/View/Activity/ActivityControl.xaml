@@ -53,7 +53,7 @@
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
-		<converters:ActivityShowStartButtonConverter x:Key="ActivityShowStartButtonConverter" />
+		<converters:ActivityLinkedVisibilityConverter x:Key="ActivityLinkedVisibilityConverter" />
 		<converters:ActivityDashedBorderThicknessConverter x:Key="ActivityDashedBorderThicknessConverter" />
 	</UserControl.Resources>
 
@@ -81,6 +81,13 @@
 						</MultiBinding>
 					</Image.Margin>
 				</Image>
+
+				<Image
+					Source="../Activity/ActionIcons/linked.png"
+					Stretch="None"
+					Cursor="Hand"
+					Visibility="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityLinkedVisibilityConverter}}" />
+
 				<TextBox
 					x:Name="ActivityName"
 					Background="Transparent"
@@ -97,6 +104,7 @@
 						</ControlTemplate>
 					</TextBox.Template>
 				</TextBox>
+
 			</StackPanel>
 
 			<!-- Action buttons. -->
@@ -271,7 +279,6 @@
 				</ItemsControl>
 			</Border>
 		</Border>
-
 	</StackPanel>
 
 </UserControl>
