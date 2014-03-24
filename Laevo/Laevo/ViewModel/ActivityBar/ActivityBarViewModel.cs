@@ -46,6 +46,15 @@ namespace Laevo.ViewModel.ActivityBar
 			overview.RemovedActivityEvent += removed => OpenPlusCurrentActivities.Remove( removed );
 			overview.StoppedActivityEvent += stopped => OpenPlusCurrentActivities.Remove( stopped );
 			overview.ActivatedActivityEvent += OnActivityActivated;
+			
+			// Activities which are activated are shown in the list until they are suspended.
+			overview.SuspendingActivityEvent += model =>
+			{
+				if ( model != null )
+				{
+					OpenPlusCurrentActivities.Remove( model );
+				}
+			};
 		}
 
 
@@ -61,12 +70,6 @@ namespace Laevo.ViewModel.ActivityBar
 				return;
 			}
 
-			// Activities which are activated, but not open are shown in the list until they are deactivated.
-			if ( oldActivity != null && !oldActivity.IsOpen )
-			{
-				OpenPlusCurrentActivities.Remove( oldActivity );
-			}
-
 			// Similar behavior as windows Alt+Tab window switching.
 			// The activated activity is always in front, the previously activated activity is second.
 			if ( activatedActivity != null )
@@ -77,7 +80,7 @@ namespace Laevo.ViewModel.ActivityBar
 				}
 				else
 				{
-					// Non-open but activated activites are temporarily added to the list.
+					// Non-open but activated activites are added to the list.
 					OpenPlusCurrentActivities.Insert( 0, activatedActivity );
 				}
 			}
