@@ -53,7 +53,6 @@
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
-		<converters:ActivityLinkedVisibilityConverter x:Key="ActivityLinkedVisibilityConverter" />
 		<converters:ActivityDashedBorderThicknessConverter x:Key="ActivityDashedBorderThicknessConverter" />
 	</UserControl.Resources>
 
@@ -87,7 +86,10 @@
 					Stretch="None"
 					Cursor="Hand"
 					Margin="-56, 23, 0, 0"
-					Visibility="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityLinkedVisibilityConverter}}" >
+					Visibility="{Binding
+						ElementName=Control,
+						Path=DataContext.Position,
+						Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static linkedActivity:ActivityPosition.End}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 				</Image>
 
 				<TextBox
@@ -141,6 +143,7 @@
 					Converter="{StaticResource ActivityCornerRadiusConverter}">
 					<Binding Path="IsOpen" />
 					<Binding ElementName="Control" Path="DataContext.Position" />
+					<Binding ElementName="Control" Path="DataContext.BaseActivity.IsPlannedActivity" />
 				</MultiBinding>
 			</Border.CornerRadius>
 
