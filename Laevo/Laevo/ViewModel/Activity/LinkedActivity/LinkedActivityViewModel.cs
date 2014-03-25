@@ -9,7 +9,6 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	public class LinkedActivityViewModel : AbstractViewModel
 	{
-
 		/// <summary>
 		///   Activity place with refering to other linked activities.
 		/// </summary>
@@ -60,6 +59,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 
 		[NotifyProperty( Binding.Properties.BaseActivity )]
 		public ActivityViewModel BaseActivity { get; set; }
+
 
 		protected override void FreeUnmanagedResources()
 		{

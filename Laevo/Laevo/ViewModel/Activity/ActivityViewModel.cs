@@ -196,13 +196,13 @@ namespace Laevo.ViewModel.Activity
 		///   Determines whether or not the activity is currently active (working on it).
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsActive )]
-		public bool IsActive { get; set; }
+		public bool IsActive { get; private set; }
 
 		/// <summary>
 		///   Determines whether or not the activity is currently open, but not necessarily active (working on it).
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsOpen )]
-		public bool IsOpen { get; set; }
+		public bool IsOpen { get; private set; }
 
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
@@ -218,16 +218,16 @@ namespace Laevo.ViewModel.Activity
 		public bool HasUnattendedInterruptions { get; private set; }
 
 		[NotifyProperty( Binding.Properties.PossibleColors )]
-		public ObservableCollection<Color> PossibleColors { get; set; }
+		public ObservableCollection<Color> PossibleColors { get; private set; }
 
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
-		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
+		public ObservableCollection<BitmapImage> PossibleIcons { get; private set; }
 
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; private set; }
 
 		[NotifyProperty( Binding.Properties.LinkedActivities )]
-		public ObservableCollection<LinkedActivityViewModel> LinkedActivities { get; set; }
+		public ObservableCollection<LinkedActivityViewModel> LinkedActivities { get; private set; }
 
 
 		static ActivityViewModel()
@@ -251,8 +251,6 @@ namespace Laevo.ViewModel.Activity
 		{
 			Contract.Requires( activity != null );
 
-			InitializeLinkedActivities();
-
 			Activity = activity;
 
 			_desktopManager = desktopManager;
@@ -265,12 +263,6 @@ namespace Laevo.ViewModel.Activity
 			IsEditable = isEditable;
 
 			CommonInitialize();
-		}
-
-		void InitializeLinkedActivities()
-		{
-			LinkedActivities = new ObservableCollection<LinkedActivityViewModel>();
-			LinkedActivities.CollectionChanged += UpdateLinkedActivitiesPositions;
 		}
 
 		public ActivityViewModel(
@@ -294,7 +286,7 @@ namespace Laevo.ViewModel.Activity
 
 			CommonInitialize();
 
-			InitializeLinkedActivities();
+			// Initialize all linked activities.
 			foreach ( var interval in Activity.OpenIntervals )
 			{
 				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) );
@@ -345,6 +337,9 @@ namespace Laevo.ViewModel.Activity
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+
+			LinkedActivities = new ObservableCollection<LinkedActivityViewModel>();
+			LinkedActivities.CollectionChanged += UpdateLinkedActivitiesPositions;
 		}
 
 
@@ -480,15 +475,16 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
+			// TODO: Change horrible plan activity opening?
+
 			IsOpen = true;
 			if ( !IsPlannedActivity )
 			{
 				LinkedActivities.Add( CreateLinkedActivity() );
 			}
-				// TODO: Change horrible plan activity opening?
 			else
 			{
-				LinkedActivities[ 0 ] = ( CreateLinkedActivity( DateTime.Now, Activity.OpenIntervals.Last().End.Subtract( DateTime.Now ) ) );
+				LinkedActivities[ 0 ] = CreateLinkedActivity( DateTime.Now, Activity.OpenIntervals.Last().End.Subtract( DateTime.Now ) );
 			}
 			Activity.Open( IsPlannedActivity );
 		}
@@ -808,16 +804,13 @@ namespace Laevo.ViewModel.Activity
 		{
 			if ( LinkedActivities.Count == 1 )
 			{
-				LinkedActivities[ 0 ].Position = ActivityPosition.None;
+				LinkedActivities[ 0 ].Position = ActivityPosition.Start | ActivityPosition.End;
 			}
 			else if ( LinkedActivities.Count >= 1 )
 			{
-				LinkedActivities.First().Position = ActivityPosition.Start;
-				for ( var i = 1; i < LinkedActivities.Count - 1; i++ )
-				{
-					LinkedActivities[ i ].Position = ActivityPosition.Middle;
-				}
-				LinkedActivities.Last().Position = ActivityPosition.End;
+				LinkedActivities[ 0 ].Position = ActivityPosition.Start;
+				LinkedActivities.Skip( 1 ).Take( LinkedActivities.Count - 2 ).ForEach( a => a.Position = ActivityPosition.None );
+				LinkedActivities[ LinkedActivities.Count - 1 ].Position = ActivityPosition.End;
 			}
 		}
 

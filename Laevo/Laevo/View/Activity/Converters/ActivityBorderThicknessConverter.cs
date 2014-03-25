@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using Laevo.ViewModel.Activity.LinkedActivity;
-using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Data;
 
 
@@ -19,8 +18,8 @@ namespace Laevo.View.Activity.Converters
 			var position = (ActivityPosition)values[ 1 ];
 
 			int normal = isOpen ? thick : thin;
-			int left = position.EqualsAny( ActivityPosition.Middle, ActivityPosition.End ) ? hide : normal;
-			int right = position.EqualsAny( ActivityPosition.Start, ActivityPosition.Middle ) ? hide : normal;
+			int left = position.HasFlag( ActivityPosition.Start ) ? normal : hide;
+			int right = position.HasFlag( ActivityPosition.End ) ? normal : hide;
 
 			return new Thickness( left, normal, right, normal );
 		}
