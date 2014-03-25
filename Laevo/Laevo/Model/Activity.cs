@@ -193,6 +193,7 @@ namespace Laevo.Model
 			else
 			{
 				Interval<DateTime> last = _openIntervals.Last();
+                _currentOpenInterval = new Interval<DateTime>(DateTime.Now, last.End);
 				_openIntervals[ _openIntervals.Count - 1 ] = new Interval<DateTime>( DateTime.Now, true, last.End, last.IsEndIncluded );
 			}
 
