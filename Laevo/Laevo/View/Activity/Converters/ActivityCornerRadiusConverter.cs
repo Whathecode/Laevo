@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Laevo.ViewModel.Activity.LinkedActivity;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Data;
 
 
@@ -10,53 +11,16 @@ namespace Laevo.View.Activity.Converters
 	{
 		public override CornerRadius Convert( object[] values )
 		{
-			const int cr = 5;
+			const int rounded = 5;
+			const int straight = 0;
 
 			bool isOpen = (bool)values[ 0 ];
-			bool isMouseOverContainer = (bool)values[ 1 ];
-			bool isMouseOverButtons = (bool)values[ 2 ];
-			double minWidth = (double)values[ 3 ];
-			ActivityPosition position = (ActivityPosition)values[ 4 ];
+			var position = (ActivityPosition)values[ 1 ];
 
-			if ( isOpen )
-			{
-				if ( ( isMouseOverContainer || isMouseOverButtons ) && minWidth > 2.0 )
-				{
-					switch ( position )
-					{
-						case ActivityPosition.None:
-							return new CornerRadius( cr, cr, cr, cr );
-						case ActivityPosition.End:
-							return new CornerRadius( 0, cr, cr, 0 );
-					}
-				}
-				switch ( position )
-				{
-					case ActivityPosition.None:
-						return new CornerRadius( cr, 0, 0, cr );
-					case ActivityPosition.Start:
-						return new CornerRadius( cr, 0, 0, cr );
-					case ActivityPosition.Middle:
-						return new CornerRadius( 0, 0, 0, 0 );
-					case ActivityPosition.End:
-						return new CornerRadius( 0, 0, 0, 0 );
-					default:
-						return new CornerRadius( cr );
-				}
-			}
-			switch ( position )
-			{
-				case ActivityPosition.None:
-					return new CornerRadius( cr );
-				case ActivityPosition.Start:
-					return new CornerRadius( cr, 0, 0, cr );
-				case ActivityPosition.Middle:
-					return new CornerRadius( 0, 0, 0, 0 );
-				case ActivityPosition.End:
-					return new CornerRadius( 0, cr, cr, 0 );
-				default:
-					return new CornerRadius( cr );
-			}
+			int leftRadius = position.EqualsAny( ActivityPosition.Middle, ActivityPosition.End ) ? straight : rounded;
+			int rightRadius = isOpen || position.EqualsAny( ActivityPosition.Start, ActivityPosition.Middle ) ? straight : rounded;
+
+			return new CornerRadius( leftRadius, rightRadius, rightRadius, leftRadius );
 		}
 
 		public override object[] ConvertBack( CornerRadius value )
