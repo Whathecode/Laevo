@@ -87,8 +87,16 @@
 					Stretch="None"
 					Cursor="Hand"
 					Margin="-56, 23, 0, 0"
-					Visibility="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityLinkedVisibilityConverter}}" >
-				</Image>
+					Visibility="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityLinkedVisibilityConverter}}" />
+
+				<Image
+					Source="../Activity/ActionIcons/planned.png"
+					Stretch="None"
+					Cursor="Hand"
+					Margin="-56, 23, 0, 0"
+					Visibility="{Binding ElementName=Control, Path=DataContext.IsPlanned,
+									Converter={wtcConverters:SingleConditionConverter Expression='[0]', 
+									IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
 
 				<TextBox
 					x:Name="ActivityName"
@@ -112,7 +120,7 @@
 			<!-- Action buttons. -->
 			<!-- TODO: Disable start stop buttons in previous activity parts. -->
 			<!-- ShowStartButton="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityShowStartButtonConverter}}">-->
-			<activity:ActionButtons x:Name="Buttons">
+			<activity:ActionButtons x:Name="Buttons" DataContext="{Binding ElementName=Control, Path=DataContext}">
 				<activity:ActionButtons.Visibility>
 					<MultiBinding
 						Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and ![2]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">

@@ -143,8 +143,8 @@ namespace Laevo.ViewModel.Activity
 		[DataMember]
 		public double OffsetPercentage { get; set; }
 
-		[NotifyProperty( Binding.Properties.IsPlannedActivity )]
-		public bool IsPlannedActivity { get; private set; }
+		//[NotifyProperty( Binding.Properties.IsPlanned )]
+		//public bool IsPlanned { get; private set; }
 
 		Interval<DateTime> _currentActiveTimeSpan;
 
@@ -298,6 +298,10 @@ namespace Laevo.ViewModel.Activity
 			foreach ( var interval in Activity.OpenIntervals )
 			{
 				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) );
+			}
+			foreach ( var interval in Activity.PlannedIntervals )
+			{
+				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ), true ) );
 			}
 
 			// Initiate attention history.
@@ -481,16 +485,18 @@ namespace Laevo.ViewModel.Activity
 		public void OpenActivity()
 		{
 			IsOpen = true;
-			if ( !IsPlannedActivity )
+
+			if ( LinkedActivities.Count == 0 || !LinkedActivities.First().IsPlanned )
 			{
 				LinkedActivities.Add( CreateLinkedActivity() );
+				Activity.Open();
 			}
-				// TODO: Change horrible plan activity opening?
+			// TODO: Change plan activity opening?
 			else
 			{
-				LinkedActivities[ 0 ] = ( CreateLinkedActivity( DateTime.Now, Activity.OpenIntervals.Last().End.Subtract( DateTime.Now ) ) );
+				Activity.Open( true );
 			}
-			Activity.Open( IsPlannedActivity );
+			
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]
@@ -587,7 +593,7 @@ namespace Laevo.ViewModel.Activity
 		{
 			StopActivity();
 			_overview.Remove( this );
-			//TODO: Consider partial activity remove. Parametrized command will be needed?
+			//TODO: Consider partial activity remove?
 		}
 
 		[CommandCanExecute( Commands.Remove )]
@@ -618,7 +624,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			LinkedActivities.Add( CreateLinkedActivity( atTime, TimeSpan.FromHours( 1 ) ) );
+			LinkedActivities.Add( CreateLinkedActivity( atTime, TimeSpan.FromHours( 1 ), true ) );
 			Activity.Plan( atTime, LinkedActivities.Last().TimeSpan );
 		}
 
@@ -728,11 +734,9 @@ namespace Laevo.ViewModel.Activity
 
 		public void Update( DateTime now )
 		{
-			IsPlannedActivity = LinkedActivities.Count > 0 && LinkedActivities.Last().Occurance + LinkedActivities.Last().TimeSpan > DateTime.Now;
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
 
 			// Update the interval which indicates when the activity was open.
-			// TODO: Ask if it's possible to have activity with no intervals?
 			if ( Activity.OpenIntervals.Count > 0 )
 			{
 				if ( IsOpen )
@@ -741,10 +745,6 @@ namespace Laevo.ViewModel.Activity
 					LinkedActivities.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
 				}
 			}
-			//else
-			//{
-			//	Occurance = Activity.DateCreated;
-			//}
 
 			// Update the intervals which indicate when the activity was active.
 			if ( _currentActiveTimeSpan != null )
@@ -795,17 +795,26 @@ namespace Laevo.ViewModel.Activity
 			return newActivity;
 		}
 
-		LinkedActivityViewModel CreateLinkedActivity( DateTime occurence, TimeSpan timeSpan )
+		LinkedActivityViewModel CreateLinkedActivity( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
 		{
 			var newActivity = CreateLinkedActivity();
 			newActivity.Occurance = occurence;
 			newActivity.TimeSpan = timeSpan;
+			if ( isPlanned )
+			{
+				newActivity.Position = ActivityPosition.Planned;
+			}
 
 			return newActivity;
 		}
 
 		void UpdateLinkedActivitiesPositions( object sender, NotifyCollectionChangedEventArgs e )
 		{
+			if ( LinkedActivities.First().IsPlanned )
+			{
+				return;
+			}
+
 			if ( LinkedActivities.Count == 1 )
 			{
 				LinkedActivities[ 0 ].Position = ActivityPosition.None;

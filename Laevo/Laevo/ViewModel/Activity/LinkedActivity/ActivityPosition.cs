@@ -5,6 +5,7 @@
 		Start,
 		Middle,
 		End,
-		None
+		None,
+		Planned
 	};
 }

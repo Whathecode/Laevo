@@ -156,7 +156,7 @@
 					DataContext="{Binding LinkedActivities[0]}"
 					Orientation="Vertical"
 					DockPanel.Dock="Left"
-					Visibility="{Binding BaseActivity.IsPlannedActivity, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}">
+					Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Width="50">From: </TextBlock>
 						<xctk:DateTimePicker

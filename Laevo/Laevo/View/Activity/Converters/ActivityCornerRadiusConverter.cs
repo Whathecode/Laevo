@@ -18,7 +18,7 @@ namespace Laevo.View.Activity.Converters
 			var position = (ActivityPosition)values[ 1 ];
 
 			int leftRadius = position.EqualsAny( ActivityPosition.Middle, ActivityPosition.End ) ? straight : rounded;
-			int rightRadius = isOpen || position.EqualsAny( ActivityPosition.Start, ActivityPosition.Middle ) ? straight : rounded;
+			int rightRadius = ( isOpen && position != ActivityPosition.Planned ) || position.EqualsAny( ActivityPosition.Start, ActivityPosition.Middle ) ? straight : rounded;
 
 			return new CornerRadius( leftRadius, rightRadius, rightRadius, leftRadius );
 		}

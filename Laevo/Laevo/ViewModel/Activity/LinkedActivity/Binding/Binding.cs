@@ -7,7 +7,8 @@
 		HeightPercentage,
 		OffsetPercentage,
 		BaseActivity,
-		Position
+		Position,
+		IsPlanned
 	}
 
 	public enum Commands
