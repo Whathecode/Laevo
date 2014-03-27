@@ -9,12 +9,20 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	public class LinkedActivityViewModel : AbstractViewModel
 	{
-
 		/// <summary>
 		///   Activity place with refering to other linked activities.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Position )]
 		public ActivityPosition Position { get; set; }
+
+		[NotifyPropertyChanged( Binding.Properties.Position )]
+		public void OnLabelChanged( ActivityPosition oldPosition, ActivityPosition newPosition )
+		{
+			if ( newPosition == ActivityPosition.Planned )
+			{
+				IsPlanned = true;
+			}
+		}
 
 		/// <summary>
 		///   The time when the activity started or will start.
@@ -25,7 +33,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		[NotifyPropertyChanged( Binding.Properties.Occurance )]
 		public void OnOccuranceChanged( DateTime oldOccurance, DateTime newOccurance )
 		{
-			if ( BaseActivity.IsPlannedActivity )
+			if ( IsPlanned )
 			{
 				BaseActivity.Activity.UpdateInterval( newOccurance, TimeSpan );
 			}
@@ -40,7 +48,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		[NotifyPropertyChanged( Binding.Properties.TimeSpan )]
 		public void OnTimeSpanChanged( TimeSpan oldDuration, TimeSpan newDuration )
 		{
-			if ( BaseActivity.IsPlannedActivity )
+			if ( IsPlanned )
 			{
 				BaseActivity.Activity.UpdateInterval( Occurance, newDuration );
 			}
@@ -60,6 +68,9 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 
 		[NotifyProperty( Binding.Properties.BaseActivity )]
 		public ActivityViewModel BaseActivity { get; set; }
+
+		[NotifyProperty( Binding.Properties.IsPlanned )]
+		public bool IsPlanned { get; private set; }
 
 		protected override void FreeUnmanagedResources()
 		{

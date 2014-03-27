@@ -678,6 +678,9 @@
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\linked.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\ActionIcons\planned.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>

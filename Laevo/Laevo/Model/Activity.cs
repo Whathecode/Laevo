@@ -65,6 +65,17 @@ namespace Laevo.Model
 		}
 
 		[DataMember]
+		List<Interval<DateTime>> _planedIntervals;
+
+		/// <summary>
+		///   The intervals during which the activity is planned.
+		/// </summary>
+		public IReadOnlyCollection<Interval<DateTime>> PlannedIntervals
+		{
+			get { return _planedIntervals; }
+		}
+
+		[DataMember]
 		List<AbstractInterruption> _interruptions;
 
 		/// <summary>
@@ -117,6 +128,7 @@ namespace Laevo.Model
 		{
 			_dataPaths = new List<Uri>();
 			_openIntervals = new List<Interval<DateTime>>();
+			_planedIntervals = new List<Interval<DateTime>>();
 			_interruptions = new List<AbstractInterruption>();
 		}
 
@@ -192,9 +204,9 @@ namespace Laevo.Model
 			}
 			else
 			{
-				Interval<DateTime> last = _openIntervals.Last();
-                _currentOpenInterval = new Interval<DateTime>(DateTime.Now, last.End);
-				_openIntervals[ _openIntervals.Count - 1 ] = new Interval<DateTime>( DateTime.Now, true, last.End, last.IsEndIncluded );
+				Interval<DateTime> last = _planedIntervals.Last();
+				_currentOpenInterval = new Interval<DateTime>( last.Start, last.End );
+				//UpdateInterval( DateTime.Now, last.End.Subtract( DateTime.Now ) );
 			}
 
 			IsOpen = true;
@@ -220,8 +232,9 @@ namespace Laevo.Model
 		public void Plan( DateTime atTime, TimeSpan duration )
 		{
 			// Set the planned time as an interval when the activity will be open.
-			_currentOpenInterval = new Interval<DateTime>( atTime, atTime + duration );
-			_openIntervals.Add( _currentOpenInterval );
+			var plannedInterval = new Interval<DateTime>( atTime, atTime + duration );
+			//_openIntervals.Add( _currentOpenInterval );
+			_planedIntervals.Add( plannedInterval );
 		}
 
 		/// <summary>
@@ -229,7 +242,7 @@ namespace Laevo.Model
 		/// </summary>
 		public void UpdateInterval( DateTime atTime, TimeSpan duration )
 		{
-			_openIntervals[ _openIntervals.Count - 1 ] = new Interval<DateTime>( atTime, atTime + duration );
+			_planedIntervals[ _planedIntervals.Count - 1 ] = new Interval<DateTime>( atTime, atTime + duration );
 		}
 
 		/// <summary>

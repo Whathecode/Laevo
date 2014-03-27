@@ -2,22 +2,23 @@
 	x:Class="Laevo.View.Activity.ActionButtons"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
-	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
-	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
+	xmlns:linkedActivity="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity"
+	d:DataContext="{d:DesignInstance Type=linkedActivity:LinkedActivityViewModel}"
 	mc:Ignorable="d"
 	x:Name="Control">
-	
+
 	<StackPanel
+		DataContext="{Binding BaseActivity}"
 		x:Name="Buttons"
 		Orientation="Horizontal">
-		
+
 		<StackPanel.Resources>
 			<ScaleTransform
 				x:Key="ResizeActionIcon"
@@ -35,13 +36,14 @@
 			RenderTransformOrigin="0.5, 0.5"
 			RenderTransform="{StaticResource ResizeActionIcon}">
 			<Image.Opacity>
-				<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1]', IfTrue=0.3, IfFalse=1}">
+				<MultiBinding
+					Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1]', IfTrue=0.3, IfFalse=1}">
 					<Binding Path="HasOpenWindows" />
 					<Binding Path="IsOpen" />
 				</MultiBinding>
 			</Image.Opacity>
 		</Image>
-		
+
 		<!-- Edit button. -->
 		<Image
 			Focusable="True"
@@ -49,7 +51,7 @@
 			Source="../Activity/ActionIcons/edit.png"
 			Cursor="Hand"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
-		
+
 		<StackPanel
 			Visibility="{Binding
 				ElementName=Control,
@@ -59,8 +61,8 @@
 			<Image
 				Focusable="True"
 				PreviewMouseDown="SetFocus"
-				Source="{Binding
-					IsPlannedActivity,
+				Source="{Binding ElementName=Control, 
+					Path=DataContext.IsPlanned, 
 					Converter={wtcConverters:FromBooleanConverter IfTrue='../Activity/ActionIcons/start_planned.png', IfFalse='../Activity/ActionIcons/start.png'}}"
 				Cursor="Hand"
 				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
@@ -80,7 +82,7 @@
 				RenderTransformOrigin="0.5, 0.5"
 				RenderTransform="{StaticResource ResizeActionIcon}" />
 		</StackPanel>
-		
+
 	</StackPanel>
-	
+
 </UserControl>
