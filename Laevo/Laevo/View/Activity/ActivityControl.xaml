@@ -123,7 +123,7 @@
 			<!-- Action buttons. -->
 			<!-- TODO: Disable start stop buttons in previous activity parts. -->
 			<!-- ShowStartButton="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityShowStartButtonConverter}}">-->
-			<activity:ActionButtons x:Name="Buttons" DataContext="{Binding ElementName=Control, Path=DataContext}">
+			<activity:ActionButtons x:Name="Buttons">
 				<activity:ActionButtons.Visibility>
 					<MultiBinding
 						Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and ![2]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
