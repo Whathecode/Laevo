@@ -9,13 +9,12 @@
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
-	xmlns:linkedActivity="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity"
-	d:DataContext="{d:DesignInstance Type=linkedActivity:LinkedActivityViewModel}"
+	xmlns:activity="clr-namespace:Laevo.ViewModel.Activity"
+	d:DataContext="{d:DesignInstance Type=activity:ActivityViewModel}"
 	mc:Ignorable="d"
 	x:Name="Control">
 
 	<StackPanel
-		DataContext="{Binding BaseActivity}"
 		x:Name="Buttons"
 		Orientation="Horizontal">
 
@@ -61,8 +60,7 @@
 			<Image
 				Focusable="True"
 				PreviewMouseDown="SetFocus"
-				Source="{Binding ElementName=Control, 
-					Path=DataContext.IsPlanned, 
+				Source="{Binding LinkedActivities[0].IsPlanned, 
 					Converter={wtcConverters:FromBooleanConverter IfTrue='../Activity/ActionIcons/start_planned.png', IfFalse='../Activity/ActionIcons/start.png'}}"
 				Cursor="Hand"
 				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
