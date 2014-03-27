@@ -16,8 +16,8 @@ namespace Laevo.View.Activity.Converters
 
 			var position = (ActivityPosition)value;
 
-			int left = position.EqualsAny( ActivityPosition.Middle, ActivityPosition.End ) ? show : hide;
-			int right = position.EqualsAny( ActivityPosition.Start, ActivityPosition.Middle ) ? show : hide;
+			int left = !position.HasFlag( ActivityPosition.Start ) ? show : hide;
+			int right = !position.HasFlag( ActivityPosition.End ) ? show : hide;
 
 			return new Thickness( left, hide, right, hide );
 		}

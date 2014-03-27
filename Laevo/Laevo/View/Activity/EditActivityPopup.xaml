@@ -151,12 +151,17 @@
 				Grid.Row="3"
 				Grid.Column="0"
 				LastChildFill="False">
-
+				
+				<!-- TODO: Issue to fix when changing date of planned activity which crossed current time yellow line more then 1 hour. -->
 				<StackPanel
 					DataContext="{Binding LinkedActivities[0]}"
 					Orientation="Vertical"
 					DockPanel.Dock="Left"
-					Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}">
+					Visibility="{Binding
+						IsPlanned,
+						Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}},
+						UpdateSourceTrigger=Explicit,
+						FallbackValue=Collapsed}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Width="50">From: </TextBlock>
 						<xctk:DateTimePicker

@@ -15,15 +15,6 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		[NotifyProperty( Binding.Properties.Position )]
 		public ActivityPosition Position { get; set; }
 
-		[NotifyPropertyChanged( Binding.Properties.Position )]
-		public void OnLabelChanged( ActivityPosition oldPosition, ActivityPosition newPosition )
-		{
-			if ( newPosition == ActivityPosition.Planned )
-			{
-				IsPlanned = true;
-			}
-		}
-
 		/// <summary>
 		///   The time when the activity started or will start.
 		/// </summary>
@@ -70,7 +61,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		public ActivityViewModel BaseActivity { get; set; }
 
 		[NotifyProperty( Binding.Properties.IsPlanned )]
-		public bool IsPlanned { get; private set; }
+		public bool IsPlanned { get; set; }
 
 		protected override void FreeUnmanagedResources()
 		{

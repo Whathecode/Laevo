@@ -33,7 +33,7 @@ namespace Laevo.View.Activity
 				return;
 			}
 
-			if ( e.OldValue == null || e.NewValue == null)
+			if ( e.OldValue == null || e.NewValue == null )
 			{
 				return;
 			}

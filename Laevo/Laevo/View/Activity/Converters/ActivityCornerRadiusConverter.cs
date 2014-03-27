@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using Laevo.ViewModel.Activity.LinkedActivity;
-using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Data;
 
 
@@ -16,9 +15,10 @@ namespace Laevo.View.Activity.Converters
 
 			bool isOpen = (bool)values[ 0 ];
 			var position = (ActivityPosition)values[ 1 ];
+			bool isPlanned = (bool)values[ 2 ];
 
-			int leftRadius = position.EqualsAny( ActivityPosition.Middle, ActivityPosition.End ) ? straight : rounded;
-			int rightRadius = ( isOpen && position != ActivityPosition.Planned ) || position.EqualsAny( ActivityPosition.Start, ActivityPosition.Middle ) ? straight : rounded;
+			int leftRadius = position.HasFlag( ActivityPosition.Start ) ? rounded : straight;
+			int rightRadius = position.HasFlag( ActivityPosition.End ) && (!isOpen || isPlanned) ? rounded : straight;
 
 			return new CornerRadius( leftRadius, rightRadius, rightRadius, leftRadius );
 		}
