@@ -51,6 +51,7 @@
 		<converters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
 		<converters:ActivityBorderThicknessConverter x:Key="ActivityBorderThicknessConverter" />
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
+		<converters:ActivityDownIconMarginConverter x:Key="ActivityDownIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
 		<converters:ActivityDashedBorderThicknessConverter x:Key="ActivityDashedBorderThicknessConverter" />
@@ -89,17 +90,8 @@
 					Visibility="{Binding
 						ElementName=Control,
 						Path=DataContext.Position,
-						Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static linkedActivity:ActivityPosition.End}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
-				</Image>
+						Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static linkedActivity:ActivityPosition.End}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
 
-				<Image
-					Source="../Activity/ActionIcons/planned.png"
-					Stretch="None"
-					Cursor="Hand"
-					Margin="-56, 23, 0, 0"
-					Visibility="{Binding ElementName=Control, Path=DataContext.IsPlanned,
-									Converter={wtcConverters:SingleConditionConverter Expression='[0]', 
-									IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
 
 				<TextBox
 					x:Name="ActivityName"
@@ -119,6 +111,24 @@
 				</TextBox>
 
 			</StackPanel>
+			
+			<Image
+				DataContext="{Binding ElementName=Control, Path=DataContext}"
+				Source="../Activity/ActionIcons/Calendar.png"
+				Stretch="None"
+				Cursor="Hand"
+				PreviewMouseDown="OnPreviewMouseDown"
+				Visibility="{Binding IsPlanned,
+									Converter={wtcConverters:SingleConditionConverter Expression='[0]', 
+									IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" >
+				<Image.Margin>
+					<MultiBinding Converter="{StaticResource ActivityDownIconMarginConverter}">
+						<Binding ElementName="Image" Path="ActualWidth" />
+						<Binding ElementName="Image" Path="ActualHeight" />
+						<Binding ElementName="Control" Path="ActualHeight" />
+					</MultiBinding>
+				</Image.Margin>
+			</Image>
 
 			<!-- Action buttons. -->
 			<!-- TODO: Disable start stop buttons in previous activity parts. -->

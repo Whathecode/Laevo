@@ -439,6 +439,7 @@
     <Compile Include="View\Activity\Converters\ActivityDashedBorderThicknessConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityCornerRadiusConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityBorderThicknessConverter.cs" />
+    <Compile Include="View\Activity\Converters\ActivityDownIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Common.cs" />
@@ -680,6 +681,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\planned.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\ActivityOverview\Images\Calendar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Activity\ActionIcons\Calendar.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

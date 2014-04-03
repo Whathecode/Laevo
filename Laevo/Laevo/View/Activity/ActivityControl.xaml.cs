@@ -12,7 +12,7 @@ using Whathecode.System.Xaml.Behaviors;
 
 
 namespace Laevo.View.Activity
-{	
+{
 	/// <summary>
 	/// Interaction logic for ActivityControl.xaml
 	/// </summary>
@@ -80,6 +80,18 @@ namespace Laevo.View.Activity
 
 			var dropTarget = (LinkedActivityViewModel)DataContext;
 			dropTarget.BaseActivity.Merge( draggedTask );
+		}
+
+		void OnPreviewMouseDown( object sender, MouseEventArgs e )
+		{
+			if ( e.LeftButton != MouseButtonState.Pressed )
+			{
+				return;
+			}
+
+			// Start the drag operation.
+			var draggedTask = (FrameworkElement)sender;
+			DragDrop.DoDragDrop( draggedTask, draggedTask.DataContext, DragDropEffects.Move );
 		}
 	}
 }
