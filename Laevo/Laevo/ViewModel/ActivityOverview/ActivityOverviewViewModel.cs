@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using ABC.Windows;
 using Laevo.Data.View;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.Activity.LinkedActivity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -94,6 +95,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsFocusedTimeBeforeNow )]
 		public bool IsFocusedTimeBeforeNow { get; private set; }
+
 
 		/// <summary>
 		///   The time which currently has input focus and can be acted upon. This is rounded to nearest values.
@@ -448,11 +450,19 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 		}
 
-		void PositionActivityAtCurrentOffset( ActivityViewModel task )
+		public void LinkedActivityDropped( LinkedActivityViewModel linkedActivity )
 		{
-			var offsetRange = new Interval<double>( task.HeightPercentage, 1 );
+			linkedActivity.Occurance = FocusedRoundedTime;
+			var offsetRange = new Interval<double>( linkedActivity.HeightPercentage, 1 );
 			var percentageInterval = new Interval<double>( 0, 1 );
-			task.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
+			linkedActivity.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 ) + linkedActivity.HeightPercentage;
+		}
+
+		void PositionActivityAtCurrentOffset( ActivityViewModel activity )
+		{
+			var offsetRange = new Interval<double>( activity.HeightPercentage, 1 );
+			var percentageInterval = new Interval<double>( 0, 1 );
+			activity.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
 		}
 
 		public void FocusedTimeChanged( DateTime focusedTime )

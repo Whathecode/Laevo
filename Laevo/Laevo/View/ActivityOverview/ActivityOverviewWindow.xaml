@@ -96,6 +96,7 @@
 			DragLeave="OnTimeLineDragLeave"
 			DragOver="OnTimeLineDragOver"
 			Drop="OnTimeLineDragDropped"
+			GiveFeedback="PlannedGiveFeedback"
 			ContextMenuOpening="OnContextMenuOpening"
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
@@ -234,7 +235,7 @@
 									Orientation ="Horizontal">
 									<StackPanel.Resources>
 										<BitmapImage x:Key="OpenTaskCursor" UriSource="Images\OpenTask.png" />
-										<BitmapImage x:Key="PlanActivityCursor" UriSource="Images\PlanActivity.png" />
+										<BitmapImage x:Key="PlanActivityCursor" UriSource="Images\Calendar.png" />
 									</StackPanel.Resources>
 									<Image
 										x:Name="DragDropCursor"
