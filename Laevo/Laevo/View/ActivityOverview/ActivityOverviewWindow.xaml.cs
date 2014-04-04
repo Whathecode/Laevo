@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
@@ -60,6 +59,7 @@ namespace Laevo.View.ActivityOverview
 
 		bool _isDragOverActivity;
 		bool _isLinkedActivityDragged;
+		bool _isDraggedOverHome;
 
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
@@ -483,24 +483,22 @@ namespace Laevo.View.ActivityOverview
 
 		void OnTimeLineDragDropped( object sender, DragEventArgs e )
 		{
-			_isLinkedActivityDragged = false;
-
-			if ( e.Data == null || DataContext == null ) return;
-
-			UpdateFocusedTime( e.GetPosition( this ).X );
-			UpdateOffsetPercentage( e.GetPosition( TimeLineContainer ).Y );
-			var overview = (ActivityOverviewViewModel)DataContext;
-
-			if ( e.Data.GetDataPresent( typeof( LinkedActivityViewModel ) ) && !overview.IsFocusedTimeBeforeNow )
+			if ( e.Data != null && DataContext != null && ( !_isLinkedActivityDragged || ( !_isDraggedOverHome && !_isDragOverActivity ) ) )
 			{
-				overview.LinkedActivityDropped( e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel );
-			}
-			else if ( e.Data.GetDataPresent( typeof( ActivityViewModel ) ) )
-			{
-				overview.TaskDropped( e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel );
-			}
+				UpdateFocusedTime( e.GetPosition( this ).X );
+				UpdateOffsetPercentage( e.GetPosition( TimeLineContainer ).Y );
+				var overview = (ActivityOverviewViewModel)DataContext;
 
-			IsTimeLineDraggedOver = false;
+				if ( e.Data.GetDataPresent( typeof( LinkedActivityViewModel ) ) && !overview.IsFocusedTimeBeforeNow )
+				{
+					overview.LinkedActivityDropped( e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel );
+				}
+				else if ( e.Data.GetDataPresent( typeof( ActivityViewModel ) ) )
+				{
+					overview.TaskDropped( e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel );
+				}
+			}
+			ResetDragOverIndicators();
 		}
 
 		void OnContextMenuOpening( object sender, ContextMenuEventArgs e )
@@ -511,6 +509,12 @@ namespace Laevo.View.ActivityOverview
 
 		void OnHomeDrop( object sender, DragEventArgs e )
 		{
+			if ( _isLinkedActivityDragged )
+			{
+				ResetDragOverIndicators();
+				return;
+			}
+
 			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
 			var overview = (ActivityOverviewViewModel)DataContext;
 
@@ -518,27 +522,52 @@ namespace Laevo.View.ActivityOverview
 			{
 				overview.HomeActivity.Merge( draggedTask );
 			}
+			ResetDragOverIndicators();
 		}
 
-		void PlannedGiveFeedback( object sender, GiveFeedbackEventArgs e )
+		void ResetDragOverIndicators()
 		{
-			// Hack to show droping activity in the past is not allowed
-			var overview = (ActivityOverviewViewModel)DataContext;
-			if ( overview.IsFocusedTimeBeforeNow )
+			DragDropCursor.Visibility = Visibility.Visible;
+			IsTimeLineDraggedOver = false;
+			_isLinkedActivityDragged = false;
+			_isDraggedOverHome = false;
+			_isDragOverActivity = false;
+		}
+
+		/// <summary>
+		/// Hack to show droping activity is not allowed in the past, over other activity and home icon.
+		/// </summary>
+		void ActivityDraggedGiveFeedback( object sender, GiveFeedbackEventArgs e )
+		{
+			if ( !_isLinkedActivityDragged )
 			{
-				if ( _isLinkedActivityDragged )
-				{
-					// Unfortunately there is no "no-drag" cursor avalible. 
-					Mouse.SetCursor( Cursors.No );
-					DragDropCursor.Visibility = Visibility.Collapsed;
-					e.Handled = true;
-				}
+				return;
+			}
+
+			var overview = (ActivityOverviewViewModel)DataContext;
+
+			if ( overview.IsFocusedTimeBeforeNow || _isDraggedOverHome || _isDragOverActivity )
+			{
+				// Unfortunately there is no "no-drag" cursor avalible. 
+				Mouse.SetCursor( Cursors.No );
+				DragDropCursor.Visibility = Visibility.Collapsed;
+				e.Handled = true;
 			}
 			else
 			{
 				DragDropCursor.Visibility = Visibility.Visible;
 				Mouse.SetCursor( Cursors.Arrow );
 			}
+		}
+
+		void OnHomeDragEnter( object sender, DragEventArgs e )
+		{
+			_isDraggedOverHome = true;
+		}
+
+		void OnHomeDragLeave( object sender, DragEventArgs e )
+		{
+			_isDraggedOverHome = false;
 		}
 	}
 }
