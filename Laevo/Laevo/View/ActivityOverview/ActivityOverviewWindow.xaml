@@ -96,7 +96,7 @@
 			DragLeave="OnTimeLineDragLeave"
 			DragOver="OnTimeLineDragOver"
 			Drop="OnTimeLineDragDropped"
-			GiveFeedback="PlannedGiveFeedback"
+			GiveFeedback="ActivityDraggedGiveFeedback"
 			ContextMenuOpening="OnContextMenuOpening"
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
@@ -320,6 +320,8 @@
 					VerticalAlignment="Bottom"
 					CornerRadius="5"
 					BorderThickness="0, 0, 0, 2"
+					DragEnter="OnHomeDragEnter"
+					DragLeave="OnHomeDragLeave"
 					BorderBrush="{Binding HomeActivity.IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue=Yellow, IfFalse=Transparent}}">
 
 					<Button
