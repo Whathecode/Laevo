@@ -31,6 +31,7 @@ namespace Laevo.Model
 		readonly Dispatcher _dispatcher;
 
 		readonly ProcessTracker _processTracker = new ProcessTracker();
+
 		/// <summary>
 		///   Triggered when the user returns from the logon screen to the desktop.
 		///   HACK: This is required due to a bug in WPF. More info can be found in MainViewModel.RecoverFromGuiCrash().
@@ -42,19 +43,17 @@ namespace Laevo.Model
 
 		public static string ProgramLocalDataFolder { get; private set; }
 
-		public VirtualDesktopManager DesktopManager
-		{
-			get;
-			private set;
-		}
+		public VirtualDesktopManager DesktopManager { get; private set; }
 
 		public event Action<Activity> ActivityRemoved;
+
 		public ReadOnlyCollection<Activity> Activities
 		{
 			get { return _dataRepository.Activities; }
 		}
 
 		public event Action<Activity> InterruptionAdded;
+
 		public ReadOnlyCollection<Activity> Tasks
 		{
 			get { return _dataRepository.Tasks; }
@@ -114,7 +113,7 @@ namespace Laevo.Model
 			_dataRepository
 				.Activities
 				.Concat( _dataRepository.Tasks )
-				.Concat( new [] { HomeActivity } )
+				.Concat( new[] { HomeActivity } )
 				.ForEach( HandleActivity );
 
 			// Set up interruption handlers.
@@ -125,8 +124,8 @@ namespace Laevo.Model
 				newActivity.AddInterruption( interruption );
 				DispatcherHelper.SafeDispatch( _dispatcher, () =>
 				{
-					HandleActivity( newActivity ); 
-					InterruptionAdded( newActivity );	// TODO: This event should probably be removed and some other mechanism should be used.
+					HandleActivity( newActivity );
+					InterruptionAdded( newActivity ); // TODO: This event should probably be removed and some other mechanism should be used.
 				} );
 			};
 
@@ -146,6 +145,7 @@ namespace Laevo.Model
 
 
 		public const int SnapToMinutes = 15;
+
 		public static DateTime GetNearestTime( DateTime near )
 		{
 			const int snapToMinutes = 15;
@@ -209,6 +209,11 @@ namespace Laevo.Model
 		public void CreateActivityFromTask( Activity task )
 		{
 			_dataRepository.CreateActivityFromTask( task );
+		}
+
+		public void CreateTaskFromActivity( Activity activity )
+		{
+			_dataRepository.CreateTaskFromActivity( activity );
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )

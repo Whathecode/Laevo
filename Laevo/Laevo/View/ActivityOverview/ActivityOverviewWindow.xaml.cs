@@ -603,5 +603,20 @@ namespace Laevo.View.ActivityOverview
 		{
 			_isLinkedDraggedOverHome = false;
 		}
+
+		void OnTaskListDrop( object sender, DragEventArgs e )
+		{
+			if ( _isLinkedActivityDragged )
+			{
+				var linkedActivity = e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel;
+
+				// ReSharper disable once PossibleNullReferenceException - if _isLinkedActivityDragged is true cannot be null.
+				if ( linkedActivity.IsPlanned )
+				{
+					var overview = (ActivityOverviewViewModel)DataContext;
+					overview.AddTask( linkedActivity.BaseActivity );
+				}
+			}
+		}
 	}
 }

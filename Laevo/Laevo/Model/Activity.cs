@@ -232,7 +232,6 @@ namespace Laevo.Model
 		{
 			// Set the planned time as an interval when the activity will be open.
 			var plannedInterval = new Interval<DateTime>( atTime, atTime + duration );
-			//_openIntervals.Add( _currentOpenInterval );
 			_planedIntervals.Add( plannedInterval );
 		}
 
@@ -242,6 +241,11 @@ namespace Laevo.Model
 		public void UpdateInterval( DateTime atTime, TimeSpan duration )
 		{
 			_planedIntervals[ _planedIntervals.Count - 1 ] = new Interval<DateTime>( atTime, atTime + duration );
+		}
+
+		public void ClearPlannedIntervals()
+		{
+			_planedIntervals.Clear();
 		}
 
 		/// <summary>

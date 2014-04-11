@@ -36,6 +36,7 @@
 		<Button
 			Command="{wtc:CommandBinding {x:Static b:Commands.NewTask}}"
 			Cursor="Hand"
+			AllowDrop="True"
 			Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
 			Margin="{Binding ElementName=Tasks, Path=HasItems, Converter={wtcConverters:FromBooleanConverter IfTrue='0, 0, 10, 0', IfFalse=0}}">
 			<Image Source="add.png" />
