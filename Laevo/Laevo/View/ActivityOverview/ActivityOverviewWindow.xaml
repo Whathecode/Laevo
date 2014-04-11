@@ -311,7 +311,8 @@
 				<taskList:TaskListControl
 					VerticalAlignment="Bottom"
 					Margin="0, 0, 20, 2"
-					Height="35" />
+					Height="35" 
+					Drop="OnTaskListDrop"/>
 
 				<Border
 					Width="55"

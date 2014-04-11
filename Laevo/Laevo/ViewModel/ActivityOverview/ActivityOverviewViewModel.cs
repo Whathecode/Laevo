@@ -194,14 +194,26 @@ namespace Laevo.ViewModel.ActivityOverview
 			AddTask( newTask );
 		}
 
-		void AddTask( ActivityViewModel task )
+		public void AddTask( ActivityViewModel task )
 		{
 			lock ( Tasks )
 			{
 				Tasks.Insert( 0, task );
 			}
-
-			HookActivityToOverview( task );
+			if ( _model.Activities.Contains( task.Activity ) )
+			{
+				if ( task.LinkedActivities.First().IsPlanned )
+				{
+					task.Activity.ClearPlannedIntervals();
+					task.LinkedActivities.RemoveAt( 0 );
+					Activities.Remove( task );
+				}
+				_model.CreateTaskFromActivity( task.Activity );
+			}
+			else
+			{
+				HookActivityToOverview( task );
+			}
 		}
 
 		[CommandExecute( Commands.NewActivity )]

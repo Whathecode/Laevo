@@ -15,18 +15,21 @@ namespace Laevo.Data.Model
 	abstract class AbstractMemoryModelRepository : IModelRepository
 	{
 		protected readonly List<Activity> MemoryActivities = new List<Activity>();
+
 		public ReadOnlyCollection<Activity> Activities
 		{
 			get { return MemoryActivities.AsReadOnly(); }
 		}
 
-		protected readonly List<Activity> MemoryTasks = new List<Activity>(); 
+		protected readonly List<Activity> MemoryTasks = new List<Activity>();
+
 		public ReadOnlyCollection<Activity> Tasks
 		{
 			get { return MemoryTasks.AsReadOnly(); }
 		}
 
-		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>(); 
+		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>();
+
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
 		{
 			get { return MemoryAttentionShifts.AsReadOnly(); }
@@ -57,6 +60,18 @@ namespace Laevo.Data.Model
 			MemoryTasks.Add( newTask );
 
 			return newTask;
+		}
+
+		public void CreateTaskFromActivity( Activity activity )
+		{
+			// Ensure it is a activity which is passed.
+			if ( !MemoryActivities.Contains( activity ) )
+			{
+				throw new InvalidOperationException( "The passed activity is not an activity from the timeline." );
+			}
+
+			MemoryActivities.Remove( activity );
+			MemoryTasks.Add( activity );
 		}
 
 		public void CreateActivityFromTask( Activity task )
