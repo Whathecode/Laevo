@@ -85,7 +85,7 @@ namespace Laevo.View.Activity
 		void OnPreviewMouseDown( object sender, MouseEventArgs e )
 		{
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
-			if ( e.LeftButton != MouseButtonState.Pressed || DateTime.Now > linkedActivity.Occurance )
+			if ( e.LeftButton != MouseButtonState.Pressed || ( DateTime.Now > linkedActivity.Occurance && linkedActivity.IsPlanned ) )
 			{
 				return;
 			}
