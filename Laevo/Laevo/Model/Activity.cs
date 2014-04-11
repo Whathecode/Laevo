@@ -206,7 +206,6 @@ namespace Laevo.Model
 			{
 				Interval<DateTime> last = _planedIntervals.Last();
 				_currentOpenInterval = new Interval<DateTime>( last.Start, last.End );
-				//UpdateInterval( DateTime.Now, last.End.Subtract( DateTime.Now ) );
 			}
 
 			IsOpen = true;

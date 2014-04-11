@@ -50,6 +50,7 @@ namespace Laevo.View.TaskList
 		}
 
 		ActivityViewModel _draggedTaskViewModel;
+
 		void OnTaskDraggedPreview( object sender, MouseEventArgs e )
 		{
 			if ( e.LeftButton != MouseButtonState.Pressed )
@@ -89,10 +90,12 @@ namespace Laevo.View.TaskList
 
 		void DragTaskFeedback( object sender, GiveFeedbackEventArgs e )
 		{
-			// TODO: Optionally hide default cursors in order to enable specialized visualizations.
-			/*e.UseDefaultCursors = false;
-			Mouse.SetCursor( Cursors.None );
-			e.Handled = true;*/
+			// Change default no drop mouse cursor.
+			if ( e.Effects == DragDropEffects.None )
+			{
+				Mouse.SetCursor( Cursors.No );
+				e.Handled = true;
+			}
 		}
 	}
 }
