@@ -20,6 +20,7 @@ namespace Laevo.Data.Model
 
 		Activity CreateNewActivity( string name );
 		Activity CreateNewTask( string name = "New Task" );
+		void AddTask( Activity task );
 		void CreateActivityFromTask( Activity task );
 		void CreateTaskFromActivity( Activity activity );
 		void RemoveActivity( Activity activity );

@@ -194,26 +194,40 @@ namespace Laevo.ViewModel.ActivityOverview
 			AddTask( newTask );
 		}
 
-		public void AddTask( ActivityViewModel task )
+		void AddTask( ActivityViewModel task )
 		{
 			lock ( Tasks )
 			{
 				Tasks.Insert( 0, task );
 			}
-			if ( _model.Activities.Contains( task.Activity ) )
-			{
-				if ( task.LinkedActivities.First().IsPlanned )
-				{
-					task.Activity.ClearPlannedIntervals();
-					task.LinkedActivities.RemoveAt( 0 );
-					Activities.Remove( task );
-				}
-				_model.CreateTaskFromActivity( task.Activity );
-			}
-			else
+			if ( !_model.Activities.Contains( task.Activity ) )
 			{
 				HookActivityToOverview( task );
 			}
+		}
+
+		public void AddTaskToActivity( LinkedActivityViewModel linkedActivity )
+		{
+			AddTask( linkedActivity.BaseActivity );
+
+			linkedActivity.BaseActivity.StopActivity();
+
+			if ( linkedActivity.IsPlanned )
+			{
+				if ( !linkedActivity.IsPast() )
+				{
+					linkedActivity.BaseActivity.Activity.DeleteLastPlannedInterval();
+					linkedActivity.BaseActivity.LinkedActivities.Remove( linkedActivity );
+				}
+
+				if ( linkedActivity.BaseActivity.LinkedActivities.Count == 0 )
+				{
+					Activities.Remove( linkedActivity.BaseActivity );
+					_model.CreateTaskFromActivity( linkedActivity.BaseActivity.Activity );
+					return;
+				}
+			}
+			_model.AddTask( linkedActivity.BaseActivity.Activity );
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -254,20 +268,15 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			_model.Remove( activity.Activity );
 
-			if ( Activities.Contains( activity ) )
+			lock ( Activities )
 			{
-				lock ( Activities )
-				{
-					Activities.Remove( activity );
-				}
+				Activities.Remove( activity );
 			}
-			else
+			lock ( Tasks )
 			{
-				lock ( Tasks )
-				{
-					Tasks.Remove( activity );
-				}
+				Tasks.Remove( activity );
 			}
+
 
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
@@ -442,13 +451,17 @@ namespace Laevo.ViewModel.ActivityOverview
 				return;
 			}
 
-			// Convert to activity.
-			_model.CreateActivityFromTask( task.Activity );
-			task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
 			Tasks.Remove( task );
-			Activities.Add( task );
 
-			PositionActivityAtCurrentOffset( task );
+			// Convert to activity.
+			// When "to do item" is placed again on the timeline, activity is already in the collection.
+			if ( !Activities.Contains( task ) )
+			{
+				_model.CreateActivityFromTask( task.Activity );
+				task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
+				Activities.Add( task );
+				PositionActivityAtCurrentOffset( task );
+			}
 
 			// Based on where the task is dropped, open, or plan it.
 			if ( IsFocusedTimeBeforeNow )

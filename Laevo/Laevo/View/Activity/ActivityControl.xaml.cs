@@ -82,17 +82,31 @@ namespace Laevo.View.Activity
 			dropTarget.BaseActivity.Merge( draggedTask );
 		}
 
-		void OnPreviewMouseDown( object sender, MouseEventArgs e )
+		void CreateToDoItem( object sender, MouseEventArgs e )
 		{
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
-			if ( e.LeftButton != MouseButtonState.Pressed || ( DateTime.Now > linkedActivity.Occurance && linkedActivity.IsPlanned ) )
+			if ( e.LeftButton == MouseButtonState.Pressed
+				// Creation of to do item should be possible only using the newest linked activity.
+			     && linkedActivity.BaseActivity.LinkedActivities.Count == linkedActivity.BaseActivity.LinkedActivities.IndexOf( linkedActivity ) + 1 )
 			{
-				return;
+				StartDrag( sender );
 			}
+		}
 
-			// Start the drag operation.
+		void ReschedulePlanned( object sender, MouseEventArgs e )
+		{
+			// Second condition disables rescheduling planned activity which lays already in the past.
+			var linkedActivity = (LinkedActivityViewModel)DataContext;
+			if ( e.LeftButton == MouseButtonState.Pressed && ( DateTime.Now < linkedActivity.Occurance && linkedActivity.IsPlanned ) )
+			{
+				StartDrag( sender );
+			}
+		}
+
+		void StartDrag( object sender )
+		{
 			var draggedTask = (FrameworkElement)sender;
-			DragDrop.DoDragDrop( draggedTask, draggedTask.DataContext, DragDropEffects.Move );
+			DragDrop.DoDragDrop( draggedTask, DataContext, DragDropEffects.Move );
 		}
 	}
 }

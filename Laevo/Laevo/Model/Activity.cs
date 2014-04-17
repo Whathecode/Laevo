@@ -243,9 +243,9 @@ namespace Laevo.Model
 			_planedIntervals[ _planedIntervals.Count - 1 ] = new Interval<DateTime>( atTime, atTime + duration );
 		}
 
-		public void ClearPlannedIntervals()
+		public void DeleteLastPlannedInterval()
 		{
-			_planedIntervals.Clear();
+			_planedIntervals.Remove( _planedIntervals.Last() );
 		}
 
 		/// <summary>

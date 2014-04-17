@@ -63,6 +63,11 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		[NotifyProperty( Binding.Properties.IsPlanned )]
 		public bool IsPlanned { get; set; }
 
+		public bool IsPast()
+		{
+			return Occurance + TimeSpan < DateTime.Now;
+		}
+
 		protected override void FreeUnmanagedResources()
 		{
 			// Nothing to do.
