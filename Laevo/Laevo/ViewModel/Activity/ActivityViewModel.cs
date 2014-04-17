@@ -479,20 +479,15 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
-			// TODO: Change horrible plan activity opening?
-
 			IsOpen = true;
+			var hasPlannedParts = LinkedActivities.Where( linkedActivity => linkedActivity.IsPlanned )
+				.Any( linkedActivity => !linkedActivity.IsPast() );
 
-			if ( LinkedActivities.Count == 0 || !LinkedActivities.First().IsPlanned )
+			if ( LinkedActivities.Count == 0 || !hasPlannedParts )
 			{
 				LinkedActivities.Add( CreateLinkedActivity() );
-				Activity.Open();
 			}
-			else
-			{
-				Activity.Open( true );
-			}
-			
+			Activity.Open( hasPlannedParts );
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]
@@ -516,6 +511,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		bool _isSuspending;
+
 		[CommandExecute( Commands.SuspendActivity )]
 		public void SuspendActivity()
 		{
@@ -538,8 +534,7 @@ namespace Laevo.ViewModel.Activity
 					// When all windows are closed, assume suspension was successful.
 					_desktopManager.UpdateWindowAssociations();
 					Thread.Sleep( TimeSpan.FromSeconds( 1 ) );
-				}
-				while ( _virtualDesktop.Windows.Count != 0 );
+				} while ( _virtualDesktop.Windows.Count != 0 );
 			};
 			awaitSuspend.RunWorkerCompleted += ( sender, args ) =>
 			{
@@ -735,7 +730,7 @@ namespace Laevo.ViewModel.Activity
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
 			{
-				if ( IsOpen )
+				if ( IsOpen && !LinkedActivities.Last().IsPlanned )
 				{
 					LinkedActivities.Last().Occurance = Activity.OpenIntervals.Last().Start;
 					LinkedActivities.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;

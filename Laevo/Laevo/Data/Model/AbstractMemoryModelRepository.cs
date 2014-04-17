@@ -62,6 +62,11 @@ namespace Laevo.Data.Model
 			return newTask;
 		}
 
+		public void AddTask( Activity task )
+		{
+			MemoryTasks.Add( task );
+		}
+
 		public void CreateTaskFromActivity( Activity activity )
 		{
 			// Ensure it is a activity which is passed.
@@ -88,14 +93,8 @@ namespace Laevo.Data.Model
 
 		public void RemoveActivity( Activity activity )
 		{
-			if ( MemoryActivities.Contains( activity ) )
-			{
-				MemoryActivities.Remove( activity );
-			}
-			else
-			{
-				MemoryTasks.Remove( activity );
-			}
+			MemoryActivities.Remove( activity );
+			MemoryTasks.Remove( activity );
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )

@@ -73,7 +73,7 @@
 					Source="{Binding Path=Icon}"
 					Stretch="None"
 					Cursor="Hand"
-					PreviewMouseDown="OnPreviewMouseDown"
+					PreviewMouseDown="CreateToDoItem"
 					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
@@ -118,7 +118,7 @@
 				Source="../Activity/ActionIcons/Calendar.png"
 				Stretch="None"
 				Cursor="Hand"
-				PreviewMouseDown="OnPreviewMouseDown"
+				PreviewMouseDown="ReschedulePlanned"
 				Visibility="{Binding IsPlanned,
 									Converter={wtcConverters:SingleConditionConverter Expression='[0]', 
 									IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" >

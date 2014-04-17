@@ -216,6 +216,12 @@ namespace Laevo.Model
 			_dataRepository.CreateTaskFromActivity( activity );
 		}
 
+		public void AddTask( Activity task )
+		{
+			HandleActivity( task );
+			_dataRepository.AddTask( task );
+		}
+
 		public void SwapTaskOrder( Activity task1, Activity task2 )
 		{
 			_dataRepository.SwapTaskOrder( task1, task2 );
