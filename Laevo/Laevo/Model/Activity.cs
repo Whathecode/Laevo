@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -230,8 +231,15 @@ namespace Laevo.Model
 
 		public void AddPlannedInterval( DateTime atTime, TimeSpan duration )
 		{
+			if ( atTime < DateTime.Now )
+			{
+				throw new InvalidOperationException( "A planned interval needs to lie in the future." );
+			}
+
 			var plannedInterval = new PlannedInterval( atTime, atTime + duration );
 			_plannedIntervals.Add( plannedInterval );
+
+			IsToDo = false;
 		}
 
 		/// <summary>
