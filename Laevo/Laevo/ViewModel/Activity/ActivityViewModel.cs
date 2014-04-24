@@ -287,11 +287,12 @@ namespace Laevo.ViewModel.Activity
 			CommonInitialize();
 
 			// Initialize all linked activities.
-			foreach ( var interval in Activity.OpenIntervals )
+			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
+			foreach ( var interval in Activity.OpenIntervals.Where( i => !dontDisplay.Any( i.Intersects ) ) )
 			{
 				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) );
 			}
-			foreach ( var interval in Activity.PlannedIntervals )
+			foreach ( Interval<DateTime> interval in Activity.PlannedIntervals.Select( planned => planned.Interval ) )
 			{
 				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ), true ) );
 			}
@@ -480,14 +481,15 @@ namespace Laevo.ViewModel.Activity
 		public void OpenActivity()
 		{
 			IsOpen = true;
-			var hasPlannedParts = LinkedActivities.Where( linkedActivity => linkedActivity.IsPlanned )
-				.Any( linkedActivity => !linkedActivity.IsPast() );
+			bool hasPlannedParts = LinkedActivities
+				.Where( linkedActivity => linkedActivity.IsPlanned )
+				.Any( plannedActivity => !plannedActivity.IsPast() );
 
 			if ( LinkedActivities.Count == 0 || !hasPlannedParts )
 			{
 				LinkedActivities.Add( CreateLinkedActivity() );
 			}
-			Activity.Open( hasPlannedParts );
+			Activity.Open();
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]
@@ -611,12 +613,14 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		/// Creates default 1 hour long planned activity.
+		///   Creates default 1 hour long planned activity.
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			LinkedActivities.Add( CreateLinkedActivity( atTime, TimeSpan.FromHours( 1 ), true ) );
-			Activity.Plan( atTime, LinkedActivities.Last().TimeSpan );
+			TimeSpan plannedTime = TimeSpan.FromHours( 1 );
+
+			LinkedActivities.Add( CreateLinkedActivity( atTime, plannedTime, true ) );
+			Activity.AddPlannedInterval( atTime, plannedTime );
 		}
 
 		/// <summary>
