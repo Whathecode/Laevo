@@ -216,7 +216,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				if ( !linkedActivity.IsPast() )
 				{
-					linkedActivity.BaseActivity.Activity.DeleteLastPlannedInterval();
+					linkedActivity.BaseActivity.Activity.MakeToDo();
 					linkedActivity.BaseActivity.LinkedActivities.Remove( linkedActivity );
 				}
 
