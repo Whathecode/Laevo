@@ -201,7 +201,7 @@ namespace Laevo.View.ActivityOverview
 				oldViewModel.Activities.CollectionChanged -= ActivitiesChanged;
 				foreach ( var activityViewModel in oldViewModel.Activities )
 				{
-					activityViewModel.LinkedActivities.CollectionChanged -= LinkedActivitiesChanged;
+					activityViewModel.WorkIntervals.CollectionChanged -= LinkedActivitiesChanged;
 				}
 			}
 
@@ -212,8 +212,8 @@ namespace Laevo.View.ActivityOverview
 			}
 			foreach ( var activityViewModel in overviewViewModel.Activities )
 			{
-				activityViewModel.LinkedActivities.CollectionChanged += LinkedActivitiesChanged;
-				activityViewModel.LinkedActivities.ForEach( NewActivity );
+				activityViewModel.WorkIntervals.CollectionChanged += LinkedActivitiesChanged;
+				activityViewModel.WorkIntervals.ForEach( NewActivity );
 			}
 			overviewViewModel.Activities.CollectionChanged += ActivitiesChanged;
 		}
@@ -225,8 +225,8 @@ namespace Laevo.View.ActivityOverview
 			{
 				foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
 				{
-					activity.LinkedActivities.CollectionChanged -= LinkedActivitiesChanged;
-					activity.LinkedActivities.ForEach( DeleteActivity );
+					activity.WorkIntervals.CollectionChanged -= LinkedActivitiesChanged;
+					activity.WorkIntervals.ForEach( DeleteActivity );
 				}
 			}
 
@@ -235,7 +235,7 @@ namespace Laevo.View.ActivityOverview
 			{
 				foreach ( var activity in e.NewItems.Cast<ActivityViewModel>() )
 				{
-					activity.LinkedActivities.CollectionChanged += LinkedActivitiesChanged;
+					activity.WorkIntervals.CollectionChanged += LinkedActivitiesChanged;
 				}
 			}
 		}
