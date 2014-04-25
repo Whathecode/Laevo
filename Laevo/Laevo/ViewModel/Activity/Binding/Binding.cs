@@ -14,7 +14,6 @@
 		HasOpenWindows,
 		IsSuspended,
 		HasUnattendedInterruptions,
-		//IsPlanned,
 		IsEditable,
 		LinkedActivities
 	}
