@@ -89,7 +89,7 @@ namespace Laevo.View.Activity
 				// Creation of to do item should be possible only using the newest linked activity.
 			     && linkedActivity.BaseActivity.LinkedActivities.Count == linkedActivity.BaseActivity.LinkedActivities.IndexOf( linkedActivity ) + 1 )
 			{
-				StartDrag( sender );
+				StartDrag( sender, LinkedActivityDragOption.ToDoCreate );
 			}
 		}
 
@@ -99,14 +99,16 @@ namespace Laevo.View.Activity
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
 			if ( e.LeftButton == MouseButtonState.Pressed && ( DateTime.Now < linkedActivity.Occurance && linkedActivity.IsPlanned ) )
 			{
-				StartDrag( sender );
+				StartDrag( sender, LinkedActivityDragOption.Reschedule );
 			}
 		}
 
-		void StartDrag( object sender )
+		void StartDrag( object sender, LinkedActivityDragOption dragOption )
 		{
 			var draggedTask = (FrameworkElement)sender;
-			DragDrop.DoDragDrop( draggedTask, DataContext, DragDropEffects.Move );
+			var draggedLinkedActivity = new DraggedLinkedActivity( DataContext as LinkedActivityViewModel, dragOption );
+
+			DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move );
 		}
 	}
 }

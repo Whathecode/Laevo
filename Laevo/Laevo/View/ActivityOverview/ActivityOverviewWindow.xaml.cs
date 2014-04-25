@@ -63,6 +63,7 @@ namespace Laevo.View.ActivityOverview
 		bool _isTaskDragged;
 		bool _isUnplannedOrPastDraggedOverTimeline;
 		bool _taskExists;
+		LinkedActivityDragOption _dragOption = LinkedActivityDragOption.None;
 
 		[DependencyProperty( Properties.IsTimeLineDraggedOver )]
 		public bool IsTimeLineDraggedOver { get; private set; }
@@ -426,7 +427,7 @@ namespace Laevo.View.ActivityOverview
 		void OnTimeLineDragEnter( object sender, DragEventArgs e )
 		{
 			// Check whether a task or linked activity is being dragged.
-			_isLinkedActivityDragged = e.Data.GetDataPresent( typeof( LinkedActivityViewModel ) );
+			_isLinkedActivityDragged = e.Data.GetDataPresent( typeof( DraggedLinkedActivity ) );
 			_isTaskDragged = e.Data.GetDataPresent( typeof( ActivityViewModel ) );
 
 			if ( _isLinkedActivityDragged || _isTaskDragged )
@@ -438,7 +439,7 @@ namespace Laevo.View.ActivityOverview
 
 				if ( _isLinkedActivityDragged )
 				{
-					var linkedActivity = e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel;
+					var linkedActivity = GetLinkedActivityFromDragArg( e );
 					// ReSharper disable once PossibleNullReferenceException
 					_isUnplannedOrPastDraggedOverTimeline = !linkedActivity.IsPlanned || linkedActivity.Occurance < DateTime.Now;
 				}
@@ -471,7 +472,7 @@ namespace Laevo.View.ActivityOverview
 			var newFocusTime = UpdateFocusedTime( e.GetPosition( this ).X );
 
 			//var overview = (ActivityOverviewViewModel)DataContext;
-			if ( _isUnplannedOrPastDraggedOverTimeline || ( _isLinkedActivityDragged && newFocusTime <= DateTime.Now ) )
+			if ( _isUnplannedOrPastDraggedOverTimeline || ( _isLinkedActivityDragged && newFocusTime <= DateTime.Now ) || _dragOption == LinkedActivityDragOption.ToDoCreate )
 			{
 				DragDropCursorPosition.Visibility = Visibility.Collapsed;
 				SetCursorToNoDrop();
@@ -520,12 +521,12 @@ namespace Laevo.View.ActivityOverview
 				UpdateOffsetPercentage( e.GetPosition( TimeLineContainer ).Y );
 				var overview = (ActivityOverviewViewModel)DataContext;
 
-				if ( e.Data.GetDataPresent( typeof( LinkedActivityViewModel ) ) && !overview.IsFocusedTimeBeforeNow && !_isLinkedDraggedOverHome && !_isLinkedDraggedOverActivity &&
-				     !_isUnplannedOrPastDraggedOverTimeline )
+				if ( _isLinkedActivityDragged && !overview.IsFocusedTimeBeforeNow && !_isLinkedDraggedOverHome && !_isLinkedDraggedOverActivity &&
+				     !_isUnplannedOrPastDraggedOverTimeline && _dragOption != LinkedActivityDragOption.ToDoCreate )
 				{
-					overview.LinkedActivityDropped( e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel );
+					overview.LinkedActivityDropped( GetLinkedActivityFromDragArg( e ) );
 				}
-				else if ( e.Data.GetDataPresent( typeof( ActivityViewModel ) ) )
+				else if ( _isTaskDragged )
 				{
 					overview.TaskDropped( e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel );
 				}
@@ -563,6 +564,7 @@ namespace Laevo.View.ActivityOverview
 			_isLinkedDraggedOverActivity = false;
 			_isUnplannedOrPastDraggedOverTimeline = false;
 			_taskExists = false;
+			_dragOption = LinkedActivityDragOption.None;
 		}
 
 		/// <summary>
@@ -578,7 +580,9 @@ namespace Laevo.View.ActivityOverview
 			var overview = (ActivityOverviewViewModel)DataContext;
 
 			// Handle event to keep custom no-drop mouse cursor.
-			if ( overview.IsFocusedTimeBeforeNow || _isLinkedDraggedOverHome || _isLinkedDraggedOverActivity || _isUnplannedOrPastDraggedOverTimeline || _taskExists )
+			if ( ( overview.IsFocusedTimeBeforeNow && IsTimeLineDraggedOver ) || _isLinkedDraggedOverHome || _isLinkedDraggedOverActivity || _isUnplannedOrPastDraggedOverTimeline ||
+			     _taskExists
+			     || ( _dragOption == LinkedActivityDragOption.ToDoCreate && IsTimeLineDraggedOver ) )
 			{
 				e.Handled = true;
 			}
@@ -612,9 +616,8 @@ namespace Laevo.View.ActivityOverview
 		{
 			if ( _isLinkedActivityDragged && !_taskExists )
 			{
-				var linkedActivity = e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel;
+				var linkedActivity = GetLinkedActivityFromDragArg( e );
 				var overview = (ActivityOverviewViewModel)DataContext;
-				// ReSharper disable once PossibleNullReferenceException - if _isLinkedActivityDragged is true linkedActivity cannot be null.
 				overview.AddTaskToActivity( linkedActivity );
 			}
 			ResetDragOverIndicators();
@@ -628,14 +631,26 @@ namespace Laevo.View.ActivityOverview
 			}
 
 			var overview = (ActivityOverviewViewModel)DataContext;
-			var linkedActivity = e.Data.GetData( typeof( LinkedActivityViewModel ) ) as LinkedActivityViewModel;
+			var linkedActivity = GetLinkedActivityFromDragArg( e );
 
-			// ReSharper disable once PossibleNullReferenceException - if _isLinkedActivityDragged is true linkedActivity cannot be null.
+
 			if ( overview.Tasks.Contains( linkedActivity.BaseActivity ) )
 			{
 				_taskExists = true;
 				SetCursorToNoDrop();
 			}
+		}
+
+		LinkedActivityViewModel GetLinkedActivityFromDragArg( DragEventArgs e )
+		{
+			var draggedLinkedActivity = e.Data.GetData( typeof( DraggedLinkedActivity ) ) as DraggedLinkedActivity;
+
+			if ( draggedLinkedActivity != null )
+			{
+				_dragOption = draggedLinkedActivity.DragOption;
+				return draggedLinkedActivity.LinkedActivity;
+			}
+			throw new Exception( "Planned interwal drag&drop fail." );
 		}
 
 		void OnTaskListDragLeave( object sender, DragEventArgs e )

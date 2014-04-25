@@ -13,7 +13,7 @@ namespace Laevo.View.Activity.Converters
 			double iconHeight = values[ 1 ];
 			double controlHeight = values[ 2 ];
 
-			return new Thickness( -iconwidth / 3, controlHeight / 2 - iconHeight / 2, 0, 0 );
+			return new Thickness( -iconwidth / 3, iconHeight + 8, 0, 0 );
 		}
 
 		public override double[] ConvertBack( Thickness value )
