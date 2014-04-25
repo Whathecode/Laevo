@@ -60,7 +60,7 @@
 			<Image
 				Focusable="True"
 				PreviewMouseDown="SetFocus"
-				Source="{Binding LinkedActivities[0].IsPlanned, 
+				Source="{Binding WorkIntervals[0].IsPlanned, 
 					Converter={wtcConverters:FromBooleanConverter IfTrue='../Activity/ActionIcons/start_planned.png', IfFalse='../Activity/ActionIcons/start.png'}}"
 				Cursor="Hand"
 				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"

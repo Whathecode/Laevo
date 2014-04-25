@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Laevo.ViewModel.Activity.LinkedActivity.Binding;
+using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 
@@ -26,7 +28,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		{
 			if ( IsPlanned )
 			{
-				BaseActivity.Activity.UpdateInterval( newOccurance, TimeSpan );
+				UpdateLastPlannedInterval( newOccurance, TimeSpan );
 			}
 		}
 
@@ -41,8 +43,14 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		{
 			if ( IsPlanned )
 			{
-				BaseActivity.Activity.UpdateInterval( Occurance, newDuration );
+				UpdateLastPlannedInterval( Occurance, newDuration );
 			}
+		}
+
+		void UpdateLastPlannedInterval( DateTime atTime, TimeSpan duration )
+		{
+			var plannedIntervals = BaseActivity.Activity.PlannedIntervals;
+			plannedIntervals.Last().Interval = new Interval<DateTime>( atTime, atTime + duration );
 		}
 
 		/// <summary>

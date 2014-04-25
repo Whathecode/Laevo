@@ -216,11 +216,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				if ( !linkedActivity.IsPast() )
 				{
-					linkedActivity.BaseActivity.Activity.DeleteLastPlannedInterval();
-					linkedActivity.BaseActivity.LinkedActivities.Remove( linkedActivity );
+					linkedActivity.BaseActivity.Activity.MakeToDo();
+					linkedActivity.BaseActivity.WorkIntervals.Remove( linkedActivity );
 				}
 
-				if ( linkedActivity.BaseActivity.LinkedActivities.Count == 0 )
+				if ( linkedActivity.BaseActivity.WorkIntervals.Count == 0 )
 				{
 					Activities.Remove( linkedActivity.BaseActivity );
 					_model.CreateTaskFromActivity( linkedActivity.BaseActivity.Activity );

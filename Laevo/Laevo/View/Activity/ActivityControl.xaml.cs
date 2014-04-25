@@ -87,7 +87,7 @@ namespace Laevo.View.Activity
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
 			if ( e.LeftButton == MouseButtonState.Pressed
 				// Creation of to do item should be possible only using the newest linked activity.
-			     && linkedActivity.BaseActivity.LinkedActivities.Count == linkedActivity.BaseActivity.LinkedActivities.IndexOf( linkedActivity ) + 1 )
+			     && linkedActivity.BaseActivity.WorkIntervals.Count == linkedActivity.BaseActivity.WorkIntervals.IndexOf( linkedActivity ) + 1 )
 			{
 				StartDrag( sender, LinkedActivityDragOption.ToDoCreate );
 			}
