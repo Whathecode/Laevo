@@ -287,14 +287,18 @@ namespace Laevo.ViewModel.Activity
 			CommonInitialize();
 
 			// Initialize all work intervals.
+
+			// In case of planned activity, all open intervals laying between a date of cration and an end of work interval, should not be shown on the timeline.
 			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
 			var openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
 				.Select( interval => CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) )
 				.ToList();
+			
 			var plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
 				.Select( interval => CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ), true ) );
+			
 			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
 				WorkIntervals.Add( i );
