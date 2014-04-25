@@ -143,11 +143,7 @@ namespace Laevo.ViewModel.Activity
 		[DataMember]
 		public double OffsetPercentage { get; set; }
 
-		//[NotifyProperty( Binding.Properties.IsPlanned )]
-		//public bool IsPlanned { get; private set; }
-
 		Interval<DateTime> _currentActiveTimeSpan;
-
 		/// <summary>
 		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
 		/// </summary>
@@ -226,8 +222,12 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; private set; }
 
+		/// <summary>
+		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
+		///   TODO: The collection should only be allowed to be modified from the view model.
+		/// </summary>
 		[NotifyProperty( Binding.Properties.LinkedActivities )]
-		public ObservableCollection<LinkedActivityViewModel> LinkedActivities { get; private set; }
+		public ObservableCollection<LinkedActivityViewModel> WorkIntervals { get; private set; }
 
 
 		static ActivityViewModel()
@@ -286,14 +286,18 @@ namespace Laevo.ViewModel.Activity
 
 			CommonInitialize();
 
-			// Initialize all linked activities.
-			foreach ( var interval in Activity.OpenIntervals )
+			// Initialize all work intervals.
+			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
+			var openIntervals = Activity.OpenIntervals
+				.Where( i => !dontDisplay.Any( i.Intersects ) )
+				.Select( interval => CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) )
+				.ToList();
+			var plannedIntervals = Activity.PlannedIntervals
+				.Select( planned => planned.Interval )
+				.Select( interval => CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ), true ) );
+			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
-				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) );
-			}
-			foreach ( var interval in Activity.PlannedIntervals )
-			{
-				LinkedActivities.Add( CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ), true ) );
+				WorkIntervals.Add( i );
 			}
 
 			// Initiate attention history.
@@ -342,8 +346,8 @@ namespace Laevo.ViewModel.Activity
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
 
-			LinkedActivities = new ObservableCollection<LinkedActivityViewModel>();
-			LinkedActivities.CollectionChanged += UpdateLinkedActivitiesPositions;
+			WorkIntervals = new ObservableCollection<LinkedActivityViewModel>();
+			WorkIntervals.CollectionChanged += UpdateLinkedActivitiesPositions;
 		}
 
 
@@ -480,14 +484,15 @@ namespace Laevo.ViewModel.Activity
 		public void OpenActivity()
 		{
 			IsOpen = true;
-			var hasPlannedParts = LinkedActivities.Where( linkedActivity => linkedActivity.IsPlanned )
-				.Any( linkedActivity => !linkedActivity.IsPast() );
+			bool hasPlannedParts = WorkIntervals
+				.Where( linkedActivity => linkedActivity.IsPlanned )
+				.Any( plannedActivity => !plannedActivity.IsPast() );
 
-			if ( LinkedActivities.Count == 0 || !hasPlannedParts )
+			if ( WorkIntervals.Count == 0 || !hasPlannedParts )
 			{
-				LinkedActivities.Add( CreateLinkedActivity() );
+				WorkIntervals.Add( CreateLinkedActivity() );
 			}
-			Activity.Open( hasPlannedParts );
+			Activity.Open();
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]
@@ -582,9 +587,9 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.Remove )]
 		public void Remove()
 		{
+			// TODO: Consider partial activity remove?
 			StopActivity();
 			_overview.Remove( this );
-			//TODO: Consider partial activity remove?
 		}
 
 		[CommandCanExecute( Commands.Remove )]
@@ -611,12 +616,14 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		/// Creates default 1 hour long planned activity.
+		///   Creates default 1 hour long planned activity.
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			LinkedActivities.Add( CreateLinkedActivity( atTime, TimeSpan.FromHours( 1 ), true ) );
-			Activity.Plan( atTime, LinkedActivities.Last().TimeSpan );
+			TimeSpan plannedTime = TimeSpan.FromHours( 1 );
+
+			WorkIntervals.Add( CreateLinkedActivity( atTime, plannedTime, true ) );
+			Activity.AddPlannedInterval( atTime, plannedTime );
 		}
 
 		/// <summary>
@@ -730,10 +737,10 @@ namespace Laevo.ViewModel.Activity
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
 			{
-				if ( IsOpen && !LinkedActivities.Last().IsPlanned )
+				if ( IsOpen && !WorkIntervals.Last().IsPlanned )
 				{
-					LinkedActivities.Last().Occurance = Activity.OpenIntervals.Last().Start;
-					LinkedActivities.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
+					WorkIntervals.Last().Occurance = Activity.OpenIntervals.Last().Start;
+					WorkIntervals.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
 				}
 			}
 
@@ -777,8 +784,8 @@ namespace Laevo.ViewModel.Activity
 		{
 			var newActivity = new LinkedActivityViewModel
 			{
-				HeightPercentage = LinkedActivities.Count == 0 ? HeightPercentage : LinkedActivities.Last().HeightPercentage,
-				OffsetPercentage = LinkedActivities.Count == 0 ? OffsetPercentage : LinkedActivities.Last().OffsetPercentage,
+				HeightPercentage = WorkIntervals.Count == 0 ? HeightPercentage : WorkIntervals.Last().HeightPercentage,
+				OffsetPercentage = WorkIntervals.Count == 0 ? OffsetPercentage : WorkIntervals.Last().OffsetPercentage,
 				BaseActivity = this,
 				Occurance = DateTime.Now
 			};
@@ -798,15 +805,15 @@ namespace Laevo.ViewModel.Activity
 
 		void UpdateLinkedActivitiesPositions( object sender, NotifyCollectionChangedEventArgs e )
 		{
-			if ( LinkedActivities.Count == 1 )
+			if ( WorkIntervals.Count == 1 )
 			{
-				LinkedActivities[ 0 ].Position = ActivityPosition.Start | ActivityPosition.End;
+				WorkIntervals[ 0 ].Position = ActivityPosition.Start | ActivityPosition.End;
 			}
-			else if ( LinkedActivities.Count >= 1 )
+			else if ( WorkIntervals.Count >= 1 )
 			{
-				LinkedActivities[ 0 ].Position = ActivityPosition.Start;
-				LinkedActivities.Skip( 1 ).Take( LinkedActivities.Count - 2 ).ForEach( a => a.Position = ActivityPosition.None );
-				LinkedActivities[ LinkedActivities.Count - 1 ].Position = ActivityPosition.End;
+				WorkIntervals[ 0 ].Position = ActivityPosition.Start;
+				WorkIntervals.Skip( 1 ).Take( WorkIntervals.Count - 2 ).ForEach( a => a.Position = ActivityPosition.None );
+				WorkIntervals[ WorkIntervals.Count - 1 ].Position = ActivityPosition.End;
 			}
 		}
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -46,6 +47,13 @@ namespace Laevo.Model
 		public bool IsActive { get; private set; }
 
 		/// <summary>
+		///   Determines whether or not the activity is a to-do item, meaning that currently it is not open, nor is work planned on it in the future at a specific interval.
+		///   When work will continue on the activity is undecided.
+		/// </summary>
+		[DataMember]
+		public bool IsToDo { get; private set; }
+
+		/// <summary>
 		///   The date when this activity was first created.
 		/// </summary>
 		[DataMember]
@@ -65,14 +73,14 @@ namespace Laevo.Model
 		}
 
 		[DataMember]
-		List<Interval<DateTime>> _planedIntervals;
+		List<PlannedInterval> _plannedIntervals;
 
 		/// <summary>
 		///   The intervals during which the activity is planned.
 		/// </summary>
-		public IReadOnlyCollection<Interval<DateTime>> PlannedIntervals
+		public IReadOnlyCollection<PlannedInterval> PlannedIntervals
 		{
-			get { return _planedIntervals; }
+			get { return _plannedIntervals; }
 		}
 
 		[DataMember]
@@ -128,7 +136,7 @@ namespace Laevo.Model
 		{
 			_dataPaths = new List<Uri>();
 			_openIntervals = new List<Interval<DateTime>>();
-			_planedIntervals = new List<Interval<DateTime>>();
+			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
 		}
 
@@ -189,25 +197,18 @@ namespace Laevo.Model
 		/// <summary>
 		///   Opening an activity makes it part of the current multitasking session.
 		/// </summary>
-		public void Open( bool isPlanned = false )
+		public void Open()
 		{
 			if ( IsOpen )
 			{
 				return;
 			}
 
-			if ( !isPlanned )
-			{
-				var now = DateTime.Now;
-				_currentOpenInterval = new Interval<DateTime>( now, now );
-				_openIntervals.Add( _currentOpenInterval );
-			}
-			else
-			{
-				Interval<DateTime> last = _planedIntervals.Last();
-				_currentOpenInterval = new Interval<DateTime>( last.Start, last.End );
-			}
+			var now = DateTime.Now;
+			_currentOpenInterval = new Interval<DateTime>( now, now );
+			_openIntervals.Add( _currentOpenInterval );
 
+			IsToDo = false;
 			IsOpen = true;
 			OpenedEvent( this );
 		}
@@ -228,24 +229,30 @@ namespace Laevo.Model
 			StoppedEvent( this );
 		}
 
-		public void Plan( DateTime atTime, TimeSpan duration )
+		public void AddPlannedInterval( DateTime atTime, TimeSpan duration )
 		{
-			// Set the planned time as an interval when the activity will be open.
-			var plannedInterval = new Interval<DateTime>( atTime, atTime + duration );
-			_planedIntervals.Add( plannedInterval );
+			if ( atTime < DateTime.Now )
+			{
+				throw new InvalidOperationException( "A planned interval needs to lie in the future." );
+			}
+
+			var plannedInterval = new PlannedInterval( atTime, atTime + duration );
+			_plannedIntervals.Add( plannedInterval );
+
+			IsToDo = false;
 		}
 
 		/// <summary>
-		/// Changes activity timeline position (currently only for planned activities).
+		///   Turns the activity into a to-do item. This removes all future planned intervals, as a to-do items implies it is unknown when work will continue.
+		///   In case the activity is open, it is also stopped.
 		/// </summary>
-		public void UpdateInterval( DateTime atTime, TimeSpan duration )
+		public void MakeToDo()
 		{
-			_planedIntervals[ _planedIntervals.Count - 1 ] = new Interval<DateTime>( atTime, atTime + duration );
-		}
+			Stop();
 
-		public void DeleteLastPlannedInterval()
-		{
-			_planedIntervals.Remove( _planedIntervals.Last() );
+			DateTime now = DateTime.Now;
+			_plannedIntervals.RemoveAll( p => p.Interval.Start > now );
+			IsToDo = true;
 		}
 
 		/// <summary>
