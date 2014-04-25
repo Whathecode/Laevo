@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -23,6 +22,7 @@ namespace Laevo.Model
 		public const string DefaultActivityName = "New Activity";
 		public static readonly string ProgramMyDocumentsFolder = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), "Laevo" );
 		static readonly string ActivityContextPath = Path.Combine( ProgramMyDocumentsFolder, "Activities" );
+		const int MaxPathLength = 259;
 
 		public event Action<Activity> OpenedEvent;
 		public event Action<Activity> StoppedEvent;
@@ -157,6 +157,13 @@ namespace Laevo.Model
 		{
 			string folderName = DateCreated.ToString( "d" ) + " " + Name;
 			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
+
+			// Cut a folder name in order not to exceed max path length.
+			int maxFolderNameLength = MaxPathLength - ActivityContextPath.Length;
+			if ( safeName.Length > maxFolderNameLength )
+			{
+				safeName = safeName.Remove( maxFolderNameLength );
+			}
 
 			return safeName;
 		}
