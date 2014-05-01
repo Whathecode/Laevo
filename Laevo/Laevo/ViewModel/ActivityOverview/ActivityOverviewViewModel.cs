@@ -196,38 +196,16 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void AddTask( ActivityViewModel task )
 		{
+			if ( !task.Activity.IsToDo )
+			{
+				throw new ArgumentException( "The passed activity is not a to-do item.", "task" );
+			}
+
 			lock ( Tasks )
 			{
 				Tasks.Insert( 0, task );
 			}
-			if ( !_model.Activities.Contains( task.Activity ) )
-			{
-				HookActivityToOverview( task );
-			}
-		}
-
-		public void AddTaskToActivity( LinkedActivityViewModel linkedActivity )
-		{
-			AddTask( linkedActivity.BaseActivity );
-
-			linkedActivity.BaseActivity.StopActivity();
-
-			if ( linkedActivity.IsPlanned )
-			{
-				if ( !linkedActivity.IsPast() )
-				{
-					linkedActivity.BaseActivity.Activity.MakeToDo();
-					linkedActivity.BaseActivity.WorkIntervals.Remove( linkedActivity );
-				}
-
-				if ( linkedActivity.BaseActivity.WorkIntervals.Count == 0 )
-				{
-					Activities.Remove( linkedActivity.BaseActivity );
-					_model.CreateTaskFromActivity( linkedActivity.BaseActivity.Activity );
-					return;
-				}
-			}
-			_model.AddTask( linkedActivity.BaseActivity.Activity );
+			HookActivityToOverview( task );
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -277,15 +255,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				Tasks.Remove( activity );
 			}
 
-
-			activity.ActivatingActivityEvent -= OnActivityActivating;
-			activity.ActivatedActivityEvent -= OnActivityActivated;
-			activity.SelectedActivityEvent -= OnActivitySelected;
-			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
-			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
-			activity.ActivityStoppedEvent -= OnActivityStopped;
-			activity.SuspendingActivityEvent -= OnSuspendingActivity;
-			activity.SuspendedActivityEvent -= OnSuspendedActivity;
+			UnHookActivityFromOverview( activity );
 
 			RemovedActivityEvent( activity );
 		}
@@ -306,9 +276,25 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.SwapTaskOrder( task1.Activity, task2.Activity );
 		}
 
+		void UnHookActivityFromOverview( ActivityViewModel activity )
+		{
+			activity.ActivatingActivityEvent -= OnActivityActivating;
+			activity.ActivatedActivityEvent -= OnActivityActivated;
+			activity.SelectedActivityEvent -= OnActivitySelected;
+			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
+			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
+			activity.ActivityStoppedEvent -= OnActivityStopped;
+			activity.SuspendingActivityEvent -= OnSuspendingActivity;
+			activity.SuspendedActivityEvent -= OnSuspendedActivity;
+			activity.ToDoChangedEvent -= OnToDoChanged;
+		}
+
 		void HookActivityToOverview( ActivityViewModel activity )
 		{
 			activity.SetOverviewManager( this );
+
+			// Make sure the events are never hooked twice.
+			UnHookActivityFromOverview( activity );
 
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
@@ -318,6 +304,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityStoppedEvent += OnActivityStopped;
 			activity.SuspendingActivityEvent += OnSuspendingActivity;
 			activity.SuspendedActivityEvent += OnSuspendedActivity;
+			activity.ToDoChangedEvent += OnToDoChanged;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -367,15 +354,32 @@ namespace Laevo.ViewModel.ActivityOverview
 			ActivityMode &= ~Mode.Edit;
 		}
 
-		void OnSuspendingActivity( ActivityViewModel viewmodel )
+		void OnSuspendingActivity( ActivityViewModel viewModel )
 		{
 			ActivityMode |= Mode.Suspending;
-			SuspendingActivityEvent( viewmodel );
+			SuspendingActivityEvent( viewModel );
 		}
 
-		void OnSuspendedActivity( ActivityViewModel viewmodel )
+		void OnSuspendedActivity( ActivityViewModel viewModel )
 		{
 			ActivityMode &= ~Mode.Suspending;
+		}
+
+		void OnToDoChanged( ActivityViewModel viewModel )
+		{
+			bool isTurnedIntoToDo = viewModel.Activity.IsToDo;
+
+			if ( isTurnedIntoToDo )
+			{
+				AddTask( viewModel );
+
+				// Remove all future planned intervals.
+				var toRemove = viewModel.WorkIntervals.Where( i => !i.IsPast() ).ToList();
+				foreach ( var r in toRemove )
+				{
+					viewModel.WorkIntervals.Remove( r );
+				}
+			}
 		}
 
 		[CommandExecute( Commands.OpenHome )]
@@ -394,7 +398,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
-
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -457,7 +460,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			// When "to do item" is placed again on the timeline, activity is already in the collection.
 			if ( !Activities.Contains( task ) )
 			{
-				_model.CreateActivityFromTask( task.Activity );
 				task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
 				Activities.Add( task );
 				PositionActivityAtCurrentOffset( task );

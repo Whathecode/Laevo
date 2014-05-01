@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -30,6 +30,8 @@ namespace Laevo.Model
 		public event Action<Activity> ActivatedEvent;
 		public event Action<Activity> DeactivatedEvent;
 
+		public event Action<Activity> ToDoChangedEvent;
+
 		/// <summary>
 		///   A name describing this activity.
 		/// </summary>
@@ -46,12 +48,24 @@ namespace Laevo.Model
 		/// </summary>
 		public bool IsActive { get; private set; }
 
+		[DataMember]
+		bool _isToDo;
 		/// <summary>
 		///   Determines whether or not the activity is a to-do item, meaning that currently it is not open, nor is work planned on it in the future at a specific interval.
 		///   When work will continue on the activity is undecided.
 		/// </summary>
-		[DataMember]
-		public bool IsToDo { get; private set; }
+		public bool IsToDo
+		{
+			get { return _isToDo; }
+			private set
+			{
+				if ( value != _isToDo )
+				{
+					_isToDo = value;
+					ToDoChangedEvent( this );
+				}
+			}
+		}
 
 		/// <summary>
 		///   The date when this activity was first created.

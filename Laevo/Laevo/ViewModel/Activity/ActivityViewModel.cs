@@ -114,6 +114,11 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public event ActivityEventHandler SuspendedActivityEvent;
 
+		/// <summary>
+		///   Event which is triggered when the activity changes from or to a to-do item.
+		/// </summary>
+		public event ActivityEventHandler ToDoChangedEvent;
+
 		internal readonly Model.Activity Activity;
 
 		readonly VirtualDesktopManager _desktopManager;
@@ -344,7 +349,13 @@ namespace Laevo.ViewModel.Activity
 			Activity.ActivatedEvent += a => IsActive = true;
 			Activity.DeactivatedEvent += a => IsActive = false;
 			Activity.OpenedEvent += a => IsOpen = true;
-			Activity.StoppedEvent += a => IsOpen = false;
+			Activity.StoppedEvent += a =>
+			{
+				IsOpen = false;
+				Deactivated();
+				ActivityStoppedEvent( this );
+			};
+			Activity.ToDoChangedEvent += a => ToDoChangedEvent( this );
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
@@ -508,9 +519,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.StopActivity )]
 		public void StopActivity()
 		{
-			Deactivated();
 			Activity.Stop();
-			ActivityStoppedEvent( this );
 		}
 
 		[CommandCanExecute( Commands.StopActivity )]
@@ -600,6 +609,18 @@ namespace Laevo.ViewModel.Activity
 		public bool CanRemoveActivity()
 		{
 			return !HasOpenWindows && !IsOpen;
+		}
+
+		[CommandExecute( Commands.MakeToDo )]
+		public void MakeToDo()
+		{
+			Activity.MakeToDo();
+		}
+
+		[CommandCanExecute( Commands.MakeToDo )]
+		public bool CanMakeToDo()
+		{
+			return !Activity.IsToDo;
 		}
 
 		public void UpdateHasOpenWindows()

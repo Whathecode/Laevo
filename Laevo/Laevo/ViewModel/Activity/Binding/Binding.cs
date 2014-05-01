@@ -29,6 +29,7 @@
 		SuspendActivity,
 		ForceSuspend,
 		Remove,
+		MakeToDo,
 		ChangeColor,
 		ChangeIcon
 	}
