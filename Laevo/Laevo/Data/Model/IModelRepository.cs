@@ -19,10 +19,6 @@ namespace Laevo.Data.Model
 		Settings Settings { get; }
 
 		Activity CreateNewActivity( string name );
-		Activity CreateNewTask( string name = "New Task" );
-		void AddTask( Activity task );
-		void CreateActivityFromTask( Activity task );
-		void CreateTaskFromActivity( Activity activity );
 		void RemoveActivity( Activity activity );
 		void SwapTaskOrder( Activity task1, Activity task2 );
 		void AddAttentionShift( AbstractAttentionShift attentionShift );

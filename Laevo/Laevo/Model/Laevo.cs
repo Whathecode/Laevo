@@ -120,7 +120,8 @@ namespace Laevo.Model
 			_interruptionTrigger.InterruptionReceived += interruption =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
-				var newActivity = _dataRepository.CreateNewTask( interruption.Name );
+				var newActivity = _dataRepository.CreateNewActivity( interruption.Name );
+				newActivity.MakeToDo();
 				newActivity.AddInterruption( interruption );
 				DispatcherHelper.SafeDispatch( _dispatcher, () =>
 				{
@@ -200,26 +201,11 @@ namespace Laevo.Model
 
 		public Activity CreateNewTask()
 		{
-			var task = _dataRepository.CreateNewTask();
+			var task = _dataRepository.CreateNewActivity( "New Task" );
+			task.MakeToDo();
 			HandleActivity( task );
 
 			return task;
-		}
-
-		public void CreateActivityFromTask( Activity task )
-		{
-			_dataRepository.CreateActivityFromTask( task );
-		}
-
-		public void CreateTaskFromActivity( Activity activity )
-		{
-			_dataRepository.CreateTaskFromActivity( activity );
-		}
-
-		public void AddTask( Activity task )
-		{
-			HandleActivity( task );
-			_dataRepository.AddTask( task );
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )

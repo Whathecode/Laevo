@@ -617,8 +617,7 @@ namespace Laevo.View.ActivityOverview
 			if ( _isLinkedActivityDragged && !_taskExists )
 			{
 				var linkedActivity = GetLinkedActivityFromDragArg( e );
-				var overview = (ActivityOverviewViewModel)DataContext;
-				overview.AddTaskToActivity( linkedActivity );
+				linkedActivity.BaseActivity.MakeToDo();
 			}
 			ResetDragOverIndicators();
 		}

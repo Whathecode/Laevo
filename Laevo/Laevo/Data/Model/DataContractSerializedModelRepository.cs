@@ -53,7 +53,10 @@ namespace Laevo.Data.Model
 			{
 				using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Open ) )
 				{
-					MemoryActivities.AddRange( (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream ) );
+					var activities = (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream );
+					MemoryActivities.AddRange( activities );
+					// TODO: Can this design be improved so implementing repositories can't forget to hook up the ToDoChangedEvent?
+					activities.ForEach( a => a.ToDoChangedEvent += OnActivityToDoChanged );
 				}
 			}
 
@@ -67,7 +70,9 @@ namespace Laevo.Data.Model
 			{
 				using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Open ) )
 				{
-					MemoryTasks.AddRange( (List<Activity>)_activitySerializer.ReadObject( tasksFileStream ) );
+					var tasks = (List<Activity>)_activitySerializer.ReadObject( tasksFileStream );
+					MemoryTasks.AddRange( tasks );
+					tasks.ForEach( t => t.ToDoChangedEvent += OnActivityToDoChanged );
 				}
 			}
 
