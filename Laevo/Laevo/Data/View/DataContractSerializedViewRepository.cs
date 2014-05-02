@@ -90,6 +90,18 @@ namespace Laevo.Data.View
 			{
 				Tasks.Add( task );
 			}
+
+			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
+			// TODO: Improve activity identification, rather than DateCreated.
+			for ( int i = 0; i < Tasks.Count; ++i )
+			{
+				ActivityViewModel task = Tasks[ i ];
+				ActivityViewModel activity = Activities.FirstOrDefault( a => a.DateCreated == task.DateCreated );
+				if ( activity != null )
+				{
+					Tasks[ i ] = activity;
+				}
+			}
 		}
 
 

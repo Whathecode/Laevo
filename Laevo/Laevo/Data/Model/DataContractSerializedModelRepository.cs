@@ -89,6 +89,18 @@ namespace Laevo.Data.Model
 					MemoryAttentionShifts.AddRange( existingAttentionShifts );
 				}
 			}
+
+			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
+			// TODO: Improve activity identification, rather than DateCreated.
+			for ( int i = 0; i < Tasks.Count; ++i )
+			{
+				Activity task = MemoryTasks[ i ];
+				Activity activity = MemoryActivities.FirstOrDefault( a => a.DateCreated == task.DateCreated );
+				if ( activity != null )
+				{
+					MemoryTasks[ i ] = activity;
+				}
+			}
 		}
 
 
