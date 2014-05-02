@@ -149,9 +149,7 @@ namespace Laevo.Model
 
 		public static DateTime GetNearestTime( DateTime near )
 		{
-			const int snapToMinutes = 15;
-
-			return near.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( near.Minute % snapToMinutes ) );
+			return near.Round( DateTimePart.Minute ).SafeSubtract( TimeSpan.FromMinutes( near.Minute % SnapToMinutes ) );
 		}
 
 		public void Update( DateTime now )
