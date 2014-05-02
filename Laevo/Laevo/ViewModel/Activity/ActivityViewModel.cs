@@ -645,10 +645,21 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			TimeSpan plannedTime = TimeSpan.FromHours( 1 );
+			DateTime at = atTime;
+			TimeSpan duration = TimeSpan.FromHours( 1 );
 
-			WorkIntervals.Add( CreateLinkedActivity( atTime, plannedTime, true ) );
-			Activity.AddPlannedInterval( atTime, plannedTime );
+			try
+			{
+				Activity.AddPlannedInterval( at, duration );
+			}
+			catch ( InvalidOperationException )
+			{
+				// Planned too early, simply plan later.
+				at = at + TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes );
+				Activity.AddPlannedInterval( at, duration );
+			}
+
+			WorkIntervals.Add( CreateLinkedActivity( at, duration, true ) );
 		}
 
 		/// <summary>
