@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Laevo.ViewModel.Activity.LinkedActivity;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 
@@ -16,17 +17,29 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			ShowStartButton
+			WorkIntervalDataContext,
+			IsIntervalPast
 		}
 
 
-		[DependencyProperty( Properties.ShowStartButton, DefaultValue = true)]
-		public bool ShowStartButton { get; set; }
+		[DependencyProperty( Properties.WorkIntervalDataContext, DefaultValue = null )]
+		public LinkedActivityViewModel WorkIntervalDataContext { get; set; }
+
+		[DependencyProperty( Properties.IsIntervalPast )]
+		public bool IsIntervalPast { get; private set; }
 
 
 		public ActionButtons()
 		{
 			InitializeComponent();
+
+			IsVisibleChanged += ( sender, args ) =>
+			{
+				if ( WorkIntervalDataContext != null )
+				{
+					IsIntervalPast = WorkIntervalDataContext.IsPast();
+				}
+			};
 		}
 		
 
