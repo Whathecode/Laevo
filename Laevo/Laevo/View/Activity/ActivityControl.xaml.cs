@@ -82,22 +82,23 @@ namespace Laevo.View.Activity
 			dropTarget.BaseActivity.Merge( draggedTask );
 		}
 
-		void CreateToDoItem( object sender, MouseEventArgs e )
+		void StartDragActivityIcon( object sender, MouseEventArgs e )
 		{
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
+
+			// Creation of to do item should be possible only from the last visible work interval on the time line.
 			if ( e.LeftButton == MouseButtonState.Pressed
-				// Creation of to do item should be possible only using the newest linked activity.
 			     && linkedActivity.BaseActivity.WorkIntervals.Count == linkedActivity.BaseActivity.WorkIntervals.IndexOf( linkedActivity ) + 1 )
 			{
 				StartDrag( sender, LinkedActivityDragOption.ToDoCreate );
 			}
 		}
 
-		void ReschedulePlanned( object sender, MouseEventArgs e )
+		void StartDragReschedule( object sender, MouseEventArgs e )
 		{
-			// Second condition disables rescheduling planned activity which lays already in the past.
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
-			if ( e.LeftButton == MouseButtonState.Pressed && ( DateTime.Now < linkedActivity.Occurance && linkedActivity.IsPlanned ) )
+
+			if ( e.LeftButton == MouseButtonState.Pressed && linkedActivity.IsPlanned && !linkedActivity.IsPast() )
 			{
 				StartDrag( sender, LinkedActivityDragOption.Reschedule );
 			}
@@ -106,7 +107,7 @@ namespace Laevo.View.Activity
 		void StartDrag( object sender, LinkedActivityDragOption dragOption )
 		{
 			var draggedTask = (FrameworkElement)sender;
-			var draggedLinkedActivity = new DraggedLinkedActivity( DataContext as LinkedActivityViewModel, dragOption );
+			var draggedLinkedActivity = new DraggedLinkedActivity( (LinkedActivityViewModel)DataContext, dragOption );
 
 			DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move );
 		}

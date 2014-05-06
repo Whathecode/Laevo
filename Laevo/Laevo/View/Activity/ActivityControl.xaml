@@ -51,7 +51,6 @@
 		<converters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
 		<converters:ActivityBorderThicknessConverter x:Key="ActivityBorderThicknessConverter" />
 		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
-		<converters:ActivityDownIconMarginConverter x:Key="ActivityDownIconMarginConverter" />
 		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
 		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
 		<converters:ActivityDashedBorderThicknessConverter x:Key="ActivityDashedBorderThicknessConverter" />
@@ -68,31 +67,46 @@
 
 			<!-- Icon and text. -->
 			<StackPanel Orientation="Horizontal">
-				<Image
-					x:Name="Image"
-					Source="{Binding Path=Icon}"
-					Stretch="None"
-					Cursor="Hand"
-					PreviewMouseDown="CreateToDoItem"
-					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
-					<Image.Margin>
+				<StackPanel Orientation="Vertical">
+					<StackPanel.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
 							<Binding ElementName="Image" Path="ActualHeight" />
 						</MultiBinding>
-					</Image.Margin>
-				</Image>
+					</StackPanel.Margin>
+					<Grid>
+						<Image
+							x:Name="Image"
+							Source="{Binding Path=Icon}"
+							Stretch="None"
+							Cursor="Hand"
+							PreviewMouseDown="StartDragActivityIcon"
+							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
+						</Image>
+						<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
+						<Image
+							Source="../Common/linked.png"
+							Stretch="None"
+							Cursor="Hand"
+							Margin="-24, 24, 0, 0"
+							Visibility="{Binding
+								ElementName=Control,
+								Path=DataContext.Position,
+								Converter={wtcConverters:EnumHasFlagConverter
+									Flag={x:Static linkedActivity:ActivityPosition.End},
+									IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
+					</Grid>
 
-				<Image
-					Source="../Activity/ActionIcons/linked.png"
-					Stretch="None"
-					Cursor="Hand"
-					Margin="-56, 23, 0, 0"
-					Visibility="{Binding
-						ElementName=Control,
-						Path=DataContext.Position,
-						Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static linkedActivity:ActivityPosition.End}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
-
+					<!-- Icon shown for planned intervals. -->
+					<Image
+						DataContext="{Binding ElementName=Control, Path=DataContext}"
+						Source="../Common/calendar.png"
+						Stretch="None"
+						Cursor="Hand"
+						Margin="0, 6, 0, 0"
+						PreviewMouseDown="StartDragReschedule"
+						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
+				</StackPanel>
 
 				<TextBox
 					x:Name="ActivityName"
@@ -112,24 +126,6 @@
 				</TextBox>
 
 			</StackPanel>
-			
-			<Image
-				DataContext="{Binding ElementName=Control, Path=DataContext}"
-				Source="../Activity/ActionIcons/Calendar.png"
-				Stretch="None"
-				Cursor="Hand"
-				PreviewMouseDown="ReschedulePlanned"
-				Visibility="{Binding IsPlanned,
-					Converter={wtcConverters:SingleConditionConverter Expression='[0]', 
-					IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" >
-				<Image.Margin>
-					<MultiBinding Converter="{StaticResource ActivityDownIconMarginConverter}">
-						<Binding ElementName="Image" Path="ActualWidth" />
-						<Binding ElementName="Image" Path="ActualHeight" />
-						<Binding ElementName="Control" Path="ActualHeight" />
-					</MultiBinding>
-				</Image.Margin>
-			</Image>
 
 			<!-- Action buttons. -->
 			<!-- TODO: Disable start stop buttons in previous activity parts. -->
