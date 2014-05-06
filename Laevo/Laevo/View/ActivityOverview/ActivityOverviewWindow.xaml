@@ -235,7 +235,7 @@
 									Orientation ="Horizontal">
 									<StackPanel.Resources>
 										<BitmapImage x:Key="OpenTaskCursor" UriSource="Images\OpenTask.png" />
-										<BitmapImage x:Key="PlanActivityCursor" UriSource="Images\Calendar.png" />
+										<BitmapImage x:Key="PlanActivityCursor" UriSource="..\Common\calendar.png" />
 									</StackPanel.Resources>
 									<Image
 										x:Name="DragDropCursor"
