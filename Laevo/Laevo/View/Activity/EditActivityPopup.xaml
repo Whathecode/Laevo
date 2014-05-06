@@ -158,14 +158,8 @@
 				<StackPanel
 					DataContext="{Binding ElementName=Control, Path=PlannedInterval}"
 					Orientation="Vertical"
-					DockPanel.Dock="Left">
-					
-					<StackPanel.Visibility>
-						<MultiBinding Converter="{wtcConverters:EqualsConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}">
-							<Binding />
-							<Binding Source="{x:Null}" />
-						</MultiBinding>
-					</StackPanel.Visibility>
+					DockPanel.Dock="Left"
+					Visibility="{Binding Converter={wtcConverters:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Width="50">From: </TextBlock>

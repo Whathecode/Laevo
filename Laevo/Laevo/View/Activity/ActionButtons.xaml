@@ -51,13 +51,12 @@
 			Cursor="Hand"
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
 
-		<StackPanel>
-			<StackPanel.Visibility>
-				<MultiBinding Converter="{wtcConverters:EqualsConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}">
-					<Binding ElementName="Control" Path="WorkIntervalDataContext" />
-					<Binding Source="{x:Null}" />
-				</MultiBinding>
-			</StackPanel.Visibility>
+		<!-- Start and stop buttons, not shown for to-do items. -->
+		<StackPanel
+			Visibility="{Binding
+				ElementName=Control, Path=WorkIntervalDataContext,
+				Converter={wtcConverters:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
+
 			<!-- 'Start' button. -->
 			<Image
 				Focusable="True"
