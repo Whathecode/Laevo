@@ -482,7 +482,6 @@
       <DependentUpon>ActivityControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Activity\Converters\ActivityColorConverter.cs" />
-    <Compile Include="View\Activity\Converters\TimeChangeVisibilityConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
     <Compile Include="View\Activity\Converters\ActivityBorderConverter.cs" />

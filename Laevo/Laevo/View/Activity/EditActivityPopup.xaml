@@ -8,6 +8,7 @@
 	mc:Ignorable="d"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
@@ -34,7 +35,6 @@
 
 		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
 		<converters:EditActivityIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
-		<converters:TimeChangeVisibilityConverter x:Key="TimeChangeVisibilityConverter" />
 	</Window.Resources>
 
 	<Border
@@ -92,6 +92,7 @@
 					Text="{Binding Label}" />
 			</DockPanel>
 
+			<!-- Color selection. -->
 			<DockPanel Grid.Row="1" Grid.Column="0">
 				<Label DockPanel.Dock="Top">Color</Label>
 				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
@@ -119,6 +120,7 @@
 				</ScrollViewer>
 			</DockPanel>
 
+			<!-- Icon selection. -->
 			<DockPanel Grid.Row="2" Grid.Column="0">
 				<Label DockPanel.Dock="Top">Icon</Label>
 				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
@@ -147,17 +149,23 @@
 				</ScrollViewer>
 			</DockPanel>
 
+			<!-- Planned interval when set. -->
 			<DockPanel
 				Grid.Row="3"
 				Grid.Column="0"
 				LastChildFill="False">
 
-
 				<StackPanel
-					DataContext="{Binding WorkIntervals[0]}"
+					DataContext="{Binding ElementName=Control, Path=PlannedInterval}"
 					Orientation="Vertical"
-					DockPanel.Dock="Left"
-					Visibility="{Binding Occurance, Converter={StaticResource TimeChangeVisibilityConverter}, FallbackValue=Collapsed}">
+					DockPanel.Dock="Left">
+					
+					<StackPanel.Visibility>
+						<MultiBinding Converter="{wtcConverters:EqualsConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}">
+							<Binding />
+							<Binding Source="{x:Null}" />
+						</MultiBinding>
+					</StackPanel.Visibility>
 
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Width="50">From: </TextBlock>
