@@ -1,20 +1,48 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
+using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.Activity.LinkedActivity;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
+using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 using Xceed.Wpf.Toolkit;
 
 
 namespace Laevo.View.Activity
 {
 	/// <summary>
-	/// Interaction logic for EditActivityPopup.xaml
+	///   Interaction logic for EditActivityPopup.xaml
 	/// </summary>
+	[WpfControl( typeof( Properties ) )]
 	public partial class EditActivityPopup
 	{
+		[Flags]
+		public enum Properties
+		{
+			PlannedInterval
+		}
+
+
+		/// <summary>
+		///   Set to the interval where this activity is planned, or null when not a planned activity.
+		/// </summary>
+		[DependencyProperty( Properties.PlannedInterval )]
+		public LinkedActivityViewModel PlannedInterval { get; private set; }
+
+
 		public EditActivityPopup()
 		{
 			InitializeComponent();
+
+			// Check whether a future planned interval is set.
+			DataContextChanged += ( sender, args ) =>
+			{
+				var dataContext = (ActivityViewModel)DataContext;
+				PlannedInterval = dataContext.WorkIntervals.FirstOrDefault( i => i.IsPlanned && !i.IsPast() );
+			};
 		}
+
 
 		void OnCloseButtonClicked( object sender, RoutedEventArgs e )
 		{
