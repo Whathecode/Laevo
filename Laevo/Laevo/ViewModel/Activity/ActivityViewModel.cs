@@ -479,11 +479,16 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.EditActivity )]
 		public void EditActivity()
 		{
+			EditActivity( false );
+		}
+		public void EditActivity( bool focusPlannedInterval )
+		{
 			ActivityEditStartedEvent( this );
 
 			var popup = new EditActivityPopup
 			{
-				DataContext = this
+				DataContext = this,
+				OccurancePicker = { IsOpen = focusPlannedInterval }
 			};
 			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
 			popup.Show();

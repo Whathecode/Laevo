@@ -14,6 +14,7 @@
 	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:activity="clr-namespace:Laevo.View.Activity"
 	xmlns:linkedActivity="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity"
+	xmlns:lb="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity.Binding"
 	mc:Ignorable="d"
 	d:DesignHeight="118" d:DesignWidth="206"
 	d:DataContext="{d:DesignInstance Type=linkedActivity:LinkedActivityViewModel}"
@@ -80,7 +81,7 @@
 							Source="{Binding Path=Icon}"
 							Stretch="None"
 							Cursor="Hand"
-							PreviewMouseDown="StartDragActivityIcon"
+							MouseMove="StartDragActivityIcon"
 							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
 						</Image>
 						<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
@@ -104,7 +105,8 @@
 						Stretch="None"
 						Cursor="Hand"
 						Margin="0, 6, 0, 0"
-						PreviewMouseDown="StartDragReschedule"
+						MouseMove="StartDragReschedule"
+						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static lb:Commands.EditPlannedInterval}}"
 						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
 				</StackPanel>
 
