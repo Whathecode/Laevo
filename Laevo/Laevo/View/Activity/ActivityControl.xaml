@@ -110,14 +110,14 @@
 
 				<TextBox
 					x:Name="ActivityName"
-					Background="Transparent"
-					BorderBrush="Transparent"
+					VerticalAlignment="Top"
 					Foreground="White"
 					CaretBrush="White"
 					FontSize="20"
 					Text="{Binding Path=Label}"
 					Margin="5, -13, 0, 0"
 					PreviewKeyDown="LabelKeyDown">
+					<!-- Transparent background and no border. -->
 					<TextBox.Template>
 						<ControlTemplate TargetType="{x:Type TextBox}">
 							<ScrollViewer Name="PART_ContentHost" />
