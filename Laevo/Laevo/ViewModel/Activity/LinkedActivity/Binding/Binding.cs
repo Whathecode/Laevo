@@ -13,6 +13,6 @@
 
 	public enum Commands
 	{
-
+		EditPlannedInterval
 	}
 }

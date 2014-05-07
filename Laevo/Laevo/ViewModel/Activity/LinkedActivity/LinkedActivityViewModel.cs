@@ -4,6 +4,7 @@ using Laevo.ViewModel.Activity.LinkedActivity.Binding;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
+using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 
 namespace Laevo.ViewModel.Activity.LinkedActivity
@@ -12,7 +13,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 	public class LinkedActivityViewModel : AbstractViewModel
 	{
 		/// <summary>
-		///   Activity place with refering to other linked activities.
+		///   Activity place related to other linked activities.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Position )]
 		public ActivityPosition Position { get; set; }
@@ -70,6 +71,13 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 
 		[NotifyProperty( Binding.Properties.IsPlanned )]
 		public bool IsPlanned { get; set; }
+
+
+		[CommandExecute( Commands.EditPlannedInterval )]
+		public void EditActivity()
+		{
+			BaseActivity.EditActivity( true );
+		}
 
 		public bool IsPast()
 		{
