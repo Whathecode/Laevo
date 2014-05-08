@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Laevo.ViewModel.Activity.LinkedActivity.Binding;
 using Whathecode.System.Arithmetic.Range;
@@ -16,7 +17,7 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		///   Activity place related to other linked activities.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.Position )]
-		public ActivityPosition Position { get; set; }
+		public ActivityPosition Position { get; private set; }
 
 		/// <summary>
 		///   The time when the activity started or will start.
@@ -67,10 +68,52 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		public double OffsetPercentage { get; set; }
 
 		[NotifyProperty( Binding.Properties.BaseActivity )]
-		public ActivityViewModel BaseActivity { get; set; }
+		public ActivityViewModel BaseActivity { get; private set; }
 
 		[NotifyProperty( Binding.Properties.IsPlanned )]
 		public bool IsPlanned { get; set; }
+
+		/// <summary>
+		///   Determines whether or not the base activity has a more recent representation elsewhere.
+		///   This could be a work interval somewhere in the future, or a to-do item.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.HasMoreRecentRepresentation )]
+		public bool HasMoreRecentRepresentation { get; private set; }
+
+
+		public LinkedActivityViewModel( ActivityViewModel baseActivity )
+		{
+			BaseActivity = baseActivity;
+
+			ObservableCollection<LinkedActivityViewModel> intervals = BaseActivity.WorkIntervals;
+			intervals.CollectionChanged += ( sender, args ) =>
+			{
+				// Update Position.
+				int index = intervals.IndexOf( this );
+				var position = ActivityPosition.None;
+				if ( index == 0 )
+				{
+					position |= ActivityPosition.Start;
+				}
+				if ( index == intervals.Count - 1 )
+				{
+					position |= ActivityPosition.End;
+				}
+				Position = position;
+
+				UpdateHasMoreRecentRepresentation();
+			};
+
+			BaseActivity.ToDoChangedEvent += activity => UpdateHasMoreRecentRepresentation();
+		}
+
+		void UpdateHasMoreRecentRepresentation()
+		{
+			ObservableCollection<LinkedActivityViewModel> intervals = BaseActivity.WorkIntervals;
+			HasMoreRecentRepresentation =
+				BaseActivity.IsToDo ||
+				( intervals.Count != 1 && intervals.IndexOf(this) != intervals.Count - 1 );
+		}
 
 
 		[CommandExecute( Commands.EditPlannedInterval )]

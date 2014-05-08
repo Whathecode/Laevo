@@ -86,9 +86,8 @@ namespace Laevo.View.Activity
 		{
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
 
-			// Creation of to do item should be possible only from the last visible work interval on the time line.
-			if ( e.LeftButton == MouseButtonState.Pressed
-			     && linkedActivity.BaseActivity.WorkIntervals.Count == linkedActivity.BaseActivity.WorkIntervals.IndexOf( linkedActivity ) + 1 )
+			// Creation of to do item should be possible from the latest representation.
+			if ( e.LeftButton == MouseButtonState.Pressed && !linkedActivity.HasMoreRecentRepresentation )
 			{
 				StartDrag( sender, LinkedActivityDragOption.ToDoCreate );
 			}

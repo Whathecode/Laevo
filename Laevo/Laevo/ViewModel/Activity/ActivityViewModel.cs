@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -205,6 +204,13 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsOpen )]
 		public bool IsOpen { get; private set; }
 
+		/// <summary>
+		///   Determines whether or not the activity is a to-do item, meaning that currently it is not open, nor is work planned on it in the future at a specific interval.
+		///   When work will continue on the activity is undecided.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsToDo )]
+		public bool IsToDo { get; private set; }
+
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
 
@@ -261,7 +267,6 @@ namespace Laevo.ViewModel.Activity
 			_desktopManager = desktopManager;
 			_virtualDesktop = desktop;
 
-			Label = activity.Name;
 			Color = DefaultColor;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
@@ -281,7 +286,6 @@ namespace Laevo.ViewModel.Activity
 			_desktopManager = desktopManager;
 			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
 
-			Label = activity.Name;
 			Icon = storedViewModel.Icon;
 			Color = storedViewModel.Color;
 			HeightPercentage = storedViewModel.HeightPercentage;
@@ -346,6 +350,9 @@ namespace Laevo.ViewModel.Activity
 
 		void CommonInitialize()
 		{
+			Label = Activity.Name;
+			IsToDo = Activity.IsToDo;
+
 			Activity.ActivatedEvent += a => IsActive = true;
 			Activity.DeactivatedEvent += a => IsActive = false;
 			Activity.OpenedEvent += a => IsOpen = true;
@@ -355,14 +362,17 @@ namespace Laevo.ViewModel.Activity
 				Deactivated();
 				ActivityStoppedEvent( this );
 			};
-			Activity.ToDoChangedEvent += a => ToDoChangedEvent( this );
+			Activity.ToDoChangedEvent += a =>
+			{
+				IsToDo = Activity.IsToDo;
+				ToDoChangedEvent( this );
+			};
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
 
 			WorkIntervals = new ObservableCollection<LinkedActivityViewModel>();
-			WorkIntervals.CollectionChanged += UpdateLinkedActivitiesPositions;
 		}
 
 
@@ -823,11 +833,10 @@ namespace Laevo.ViewModel.Activity
 
 		LinkedActivityViewModel CreateLinkedActivity()
 		{
-			var newActivity = new LinkedActivityViewModel
+			var newActivity = new LinkedActivityViewModel( this )
 			{
 				HeightPercentage = WorkIntervals.Count == 0 ? HeightPercentage : WorkIntervals.Last().HeightPercentage,
 				OffsetPercentage = WorkIntervals.Count == 0 ? OffsetPercentage : WorkIntervals.Last().OffsetPercentage,
-				BaseActivity = this,
 				Occurance = DateTime.Now
 			};
 
@@ -842,20 +851,6 @@ namespace Laevo.ViewModel.Activity
 			newActivity.IsPlanned = isPlanned;
 
 			return newActivity;
-		}
-
-		void UpdateLinkedActivitiesPositions( object sender, NotifyCollectionChangedEventArgs e )
-		{
-			if ( WorkIntervals.Count == 1 )
-			{
-				WorkIntervals[ 0 ].Position = ActivityPosition.Start | ActivityPosition.End;
-			}
-			else if ( WorkIntervals.Count >= 1 )
-			{
-				WorkIntervals[ 0 ].Position = ActivityPosition.Start;
-				WorkIntervals.Skip( 1 ).Take( WorkIntervals.Count - 2 ).ForEach( a => a.Position = ActivityPosition.None );
-				WorkIntervals[ WorkIntervals.Count - 1 ].Position = ActivityPosition.End;
-			}
 		}
 
 		public override void Persist()

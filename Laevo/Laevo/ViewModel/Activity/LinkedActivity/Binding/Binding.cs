@@ -8,7 +8,8 @@
 		OffsetPercentage,
 		BaseActivity,
 		Position,
-		IsPlanned
+		IsPlanned,
+		HasMoreRecentRepresentation
 	}
 
 	public enum Commands

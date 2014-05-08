@@ -92,10 +92,8 @@
 							Margin="-24, 24, 0, 0"
 							Visibility="{Binding
 								ElementName=Control,
-								Path=DataContext.Position,
-								Converter={wtcConverters:EnumHasFlagConverter
-									Flag={x:Static linkedActivity:ActivityPosition.End},
-									IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
+								Path=DataContext.HasMoreRecentRepresentation,
+								Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}" />
 					</Grid>
 
 					<!-- Icon shown for planned intervals. -->
@@ -130,14 +128,13 @@
 			</StackPanel>
 
 			<!-- Action buttons. -->
-			<!-- TODO: Disable start stop buttons in previous activity parts. -->
-			<!-- ShowStartButton="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityShowStartButtonConverter}}">-->
 			<activity:ActionButtons
 				x:Name="Buttons"
 				WorkIntervalDataContext="{Binding ElementName=Control, Path=DataContext}">
 				<activity:ActionButtons.Visibility>
 					<MultiBinding
-						Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and ![2]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
+						Converter="{wtcConverters:ConditionConverter Expression='![0] and ([1] || [2]) and ![3]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
+						<Binding ElementName="Control" Path="DataContext.HasMoreRecentRepresentation" />
 						<Binding ElementName="Container" Path="IsMouseOver" />
 						<Binding ElementName="Buttons" Path="IsMouseOver" />
 						<Binding ElementName="Control" Path="IsDraggingActivity" />
