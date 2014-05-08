@@ -11,6 +11,7 @@
 		PossibleIcons,
 		IsActive,
 		IsOpen,
+		IsToDo,
 		HasOpenWindows,
 		IsSuspended,
 		HasUnattendedInterruptions,
