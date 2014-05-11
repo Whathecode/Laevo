@@ -1,4 +1,5 @@
 ﻿<UserControl
+	x:Name="Control"
 	x:ClassModifier="internal"
 	x:Class="Laevo.View.TaskList.TaskListControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -18,7 +19,9 @@
 	d:DataContext="{d:DesignInstance Type=activityOverview:ActivityOverviewViewModel}"
 	FontFamily="Segoe UI Light"
 	FontSize="20"
-	x:Name="Control">
+	AllowDrop="True"
+	DragEnter="OnTaskListDropOver" DragOver="OnTaskListDropOver" DragLeave="OnTaskListDropOver"
+	Drop="OnTaskListDrop">
 	
 	<UserControl.Resources>
 		<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
@@ -36,7 +39,6 @@
 		<Button
 			Command="{wtc:CommandBinding {x:Static b:Commands.NewTask}}"
 			Cursor="Hand"
-			AllowDrop="True"
 			Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
 			Margin="{Binding ElementName=Tasks, Path=HasItems, Converter={wtcConverters:FromBooleanConverter IfTrue='0, 0, 10, 0', IfFalse=0}}">
 			<Image Source="add.png" />
@@ -45,7 +47,7 @@
 		<ItemsControl
 			x:Name="Tasks"
 			AllowDrop="True"
-			DragOver="OnDragTask"
+			DragOver="OnReorderTasks"
 			ItemsSource="{Binding Tasks}">
 
 			<ItemsControl.ItemsPanel>
@@ -117,8 +119,8 @@
 							Margin="0, 0, 3, 0"
 							Padding="3"
 							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static ab:Commands.SelectActivity}}"
-							PreviewMouseMove="OnTaskDraggedPreview"
-							GiveFeedback="DragTaskFeedback">
+							MouseMove="OnStartDrag"
+							GiveFeedback="DragFeedback">
 							
 							<Border.Background>
 								<SolidColorBrush Color="{Binding Color}" />

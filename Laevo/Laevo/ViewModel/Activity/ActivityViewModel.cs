@@ -371,7 +371,6 @@ namespace Laevo.ViewModel.Activity
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
-
 			WorkIntervals = new ObservableCollection<LinkedActivityViewModel>();
 		}
 
@@ -514,9 +513,7 @@ namespace Laevo.ViewModel.Activity
 		public void OpenActivity()
 		{
 			IsOpen = true;
-			bool hasPlannedParts = WorkIntervals
-				.Where( linkedActivity => linkedActivity.IsPlanned )
-				.Any( plannedActivity => !plannedActivity.IsPast() );
+			bool hasPlannedParts = GetFutureWorkIntervals().Any();
 
 			if ( WorkIntervals.Count == 0 || !hasPlannedParts )
 			{
@@ -663,18 +660,34 @@ namespace Laevo.ViewModel.Activity
 			DateTime at = atTime;
 			TimeSpan duration = TimeSpan.FromHours( 1 );
 
-			try
+			LinkedActivityViewModel plannedInterval = GetFutureWorkIntervals().FirstOrDefault();
+			if ( plannedInterval == null )
 			{
-				Activity.AddPlannedInterval( at, duration );
+				try
+				{
+					Activity.AddPlannedInterval( at, duration );
+				}
+				catch ( InvalidOperationException )
+				{
+					// Planned too early, simply plan later.
+					at = at + TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes );
+					Activity.AddPlannedInterval( at, duration );
+				}
+				WorkIntervals.Add( CreateLinkedActivity( at, duration, true ) );
 			}
-			catch ( InvalidOperationException )
+			else
 			{
-				// Planned too early, simply plan later.
-				at = at + TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes );
-				Activity.AddPlannedInterval( at, duration );
+				// TODO: Support replanning in model, rather than doing this through the view model.
+				plannedInterval.Occurance = at;
 			}
+		}
 
-			WorkIntervals.Add( CreateLinkedActivity( at, duration, true ) );
+		/// <summary>
+		///   Return all planned work intervals which lie in the future.
+		/// </summary>
+		public List<LinkedActivityViewModel> GetFutureWorkIntervals()
+		{
+			return WorkIntervals.Where( i => i.IsPlanned && !i.IsPast() ).ToList();
 		}
 
 		/// <summary>

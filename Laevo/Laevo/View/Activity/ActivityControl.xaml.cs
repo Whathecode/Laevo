@@ -70,45 +70,52 @@ namespace Laevo.View.Activity
 			Buttons.Margin = new Thickness( xOffset, Container.ActualHeight, 0, 0 );
 		}
 
-		void OnTaskDropped( object sender, DragEventArgs e )
+		void OnDropOver( object sender, DragEventArgs e )
 		{
-			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
-			if ( draggedTask == null )
+			// For now only allow dropping to do items to merge.
+			var activity = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			if ( activity == null || !activity.IsToDo )
 			{
-				return;
+				e.Effects = DragDropEffects.None;
 			}
 
-			var dropTarget = (LinkedActivityViewModel)DataContext;
-			dropTarget.BaseActivity.Merge( draggedTask );
+			e.Handled = true;
 		}
 
-		void StartDragActivityIcon( object sender, MouseEventArgs e )
+		void OnDrop( object sender, DragEventArgs e )
+		{
+			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
+			var dropTarget = (LinkedActivityViewModel)DataContext;
+
+			dropTarget.BaseActivity.Merge( activity );
+
+			e.Handled = true;
+		}
+
+		void StartDrag( object sender, MouseEventArgs e )
 		{
 			var linkedActivity = (LinkedActivityViewModel)DataContext;
 
-			// Creation of to do item should be possible from the latest representation.
 			if ( e.LeftButton == MouseButtonState.Pressed && !linkedActivity.HasMoreRecentRepresentation )
 			{
-				StartDrag( sender, LinkedActivityDragOption.ToDoCreate );
+				var draggedTask = (FrameworkElement)sender;
+				var draggedLinkedActivity = linkedActivity.BaseActivity;
+				DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move | DragDropEffects.Link );
 			}
 		}
 
-		void StartDragReschedule( object sender, MouseEventArgs e )
+		void DragFeedback( object sender, GiveFeedbackEventArgs e )
 		{
-			var linkedActivity = (LinkedActivityViewModel)DataContext;
-
-			if ( e.LeftButton == MouseButtonState.Pressed && linkedActivity.IsPlanned && !linkedActivity.IsPast() )
+			if ( e.Effects == DragDropEffects.None )
 			{
-				StartDrag( sender, LinkedActivityDragOption.Reschedule );
+				Mouse.SetCursor( Cursors.No );
+				e.Handled = true;
 			}
-		}
-
-		void StartDrag( object sender, LinkedActivityDragOption dragOption )
-		{
-			var draggedTask = (FrameworkElement)sender;
-			var draggedLinkedActivity = new DraggedLinkedActivity( (LinkedActivityViewModel)DataContext, dragOption );
-
-			DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move );
+			else if ( e.Effects == DragDropEffects.Move )
+			{
+				Mouse.SetCursor( Cursors.None );
+				e.Handled = true;
+			}
 		}
 	}
 }

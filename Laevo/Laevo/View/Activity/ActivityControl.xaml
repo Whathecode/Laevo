@@ -81,7 +81,9 @@
 							Source="{Binding Path=Icon}"
 							Stretch="None"
 							Cursor="Hand"
-							MouseMove="StartDragActivityIcon"
+							AllowDrop="False"
+							MouseMove="StartDrag"
+							GiveFeedback="DragFeedback"
 							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
 						</Image>
 						<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
@@ -103,7 +105,9 @@
 						Stretch="None"
 						Cursor="Hand"
 						Margin="0, 6, 0, 0"
-						MouseMove="StartDragReschedule"
+						AllowDrop="False"
+						MouseMove="StartDrag"
+						GiveFeedback="DragFeedback"
 						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static lb:Commands.EditPlannedInterval}}"
 						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
 				</StackPanel>
@@ -153,7 +157,8 @@
 			Panel.ZIndex="15"
 			ClipToBounds="True"
 			AllowDrop="True"
-			Drop="OnTaskDropped">
+			DragEnter="OnDropOver" DragOver="OnDropOver" DragLeave="OnDropOver"
+			Drop="OnDrop">
 
 			<Border.CornerRadius>
 				<MultiBinding

@@ -96,7 +96,6 @@
 			DragLeave="OnTimeLineDragLeave"
 			DragOver="OnTimeLineDragOver"
 			Drop="OnTimeLineDragDropped"
-			GiveFeedback="ActivityDraggedGiveFeedback"
 			ContextMenuOpening="OnContextMenuOpening"
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
@@ -227,7 +226,7 @@
 							IsHitTestVisible="False" 
 							Visibility="{Binding
 							ElementName=Control,
-							Path=IsTimeLineDraggedOver,
+							Path=IsSchedulingActivity,
 							Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
 							<Canvas x:Name="DragDropCursorPosition">
@@ -259,44 +258,7 @@
 			</Viewport2DVisual3D>
 		</Viewport3D>
 
-		<!-- No 3D. -->
-		<!--
-		<Grid>
-			<Grid.Effect>
-				<Shaders:FadeEffect />
-			</Grid.Effect>
-
-			<Grid.CacheMode>
-				<BitmapCache />
-			</Grid.CacheMode>
-
-			<Grid
-				ClipToBounds="True"
-				Background="{StaticResource TimeLineBrush}">
-
-				<Grid.Width>
-					<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
-						<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-						<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-						<Binding ElementName="RotationTransform" Path="Angle" />
-						<Binding Path="TimeLineRenderScale" />
-					</MultiBinding>
-				</Grid.Width>
-
-				<Grid.Height>
-					<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
-						<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-						<Binding Path="TimeLineRenderScale" />
-					</MultiBinding>
-				</Grid.Height>
-
-				<ActivityOverview:TimeLineControl
-					x:Name="TimeLine"
-					Focusable="True" />
-			</Grid>
-		</Grid>
-		-->
-		
+		<!-- Bottom row icons, including to-do's and home activity. -->
 		<StackPanel
 			HorizontalAlignment="Stretch"
 			VerticalAlignment="Bottom"
@@ -311,10 +273,7 @@
 				<taskList:TaskListControl
 					VerticalAlignment="Bottom"
 					Margin="0, 0, 20, 2"
-					Height="35" 
-					Drop="OnTaskListDrop"
-					DragEnter="OnTaskListDragEnter"
-					DragLeave="OnTaskListDragLeave"/>
+					Height="35" />
 
 				<Border
 					Width="55"
@@ -323,16 +282,15 @@
 					VerticalAlignment="Bottom"
 					CornerRadius="5"
 					BorderThickness="0, 0, 0, 2"
-					DragEnter="OnHomeDragEnter"
-					DragLeave="OnHomeDragLeave"
+					AllowDrop="True"
+					DragEnter="OnHomeDropOver" DragOver="OnHomeDropOver" DragLeave="OnHomeDropOver"
+					Drop="OnHomeDrop"
 					BorderBrush="{Binding HomeActivity.IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue=Yellow, IfFalse=Transparent}}">
 
 					<Button
 						Cursor="Hand"
 						Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-						Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}"
-						AllowDrop="True"
-						Drop="OnHomeDrop">
+						Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}">
 						<Image Source="Images\Home.png" />
 					</Button>
 
