@@ -39,7 +39,7 @@ namespace Laevo.View.Activity
 			DataContextChanged += ( sender, args ) =>
 			{
 				var dataContext = (ActivityViewModel)DataContext;
-				PlannedInterval = dataContext.WorkIntervals.FirstOrDefault( i => i.IsPlanned && !i.IsPast() );
+				PlannedInterval = dataContext.GetFutureWorkIntervals().FirstOrDefault();
 			};
 		}
 

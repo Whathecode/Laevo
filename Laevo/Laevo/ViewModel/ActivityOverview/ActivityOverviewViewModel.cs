@@ -374,7 +374,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				AddTask( viewModel );
 
 				// Remove all future planned intervals.
-				var toRemove = viewModel.WorkIntervals.Where( i => !i.IsPast() ).ToList();
+				var toRemove = viewModel.GetFutureWorkIntervals();
 				foreach ( var r in toRemove )
 				{
 					viewModel.WorkIntervals.Remove( r );
@@ -393,7 +393,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
 		void OnEnableAttentionLinesChanged( bool oldIsEnabled, bool newIsEnabled )
 		{
-			foreach ( var activity in Activities )
+			foreach ( var activity in Activities.Concat( Tasks ) )
 			{
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
@@ -446,43 +446,30 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.DesktopManager.PasteWindows();
 		}
 
-		public void TaskDropped( ActivityViewModel task )
+		public void ActivityDropped( ActivityViewModel activity )
 		{
-			// Ensure it is a task being dropped.
-			if ( !Tasks.Contains( task ) )
+			if ( activity.IsToDo )
 			{
-				return;
+				// Convert to activity.
+				Tasks.Remove( activity );
+				if ( !Activities.Contains( activity ) ) // Activity can already have a presentation on the time line when it was converted to a to do item before.
+				{
+					Activities.Add( activity );
+				}
 			}
 
-			Tasks.Remove( task );
-
-			// Convert to activity.
-			// When "to do item" is placed again on the timeline, activity is already in the collection.
-			if ( !Activities.Contains( task ) )
-			{
-				task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
-				Activities.Add( task );
-				PositionActivityAtCurrentOffset( task );
-			}
-
-			// Based on where the task is dropped, open, or plan it.
+			// Based on where the to do item is dropped, open, or plan it.
 			if ( IsFocusedTimeBeforeNow )
 			{
-				task.OpenActivity();
+				activity.OpenActivity();
 			}
 			else
 			{
-				task.Plan( FocusedRoundedTime );
-				task.EditActivity();
+				activity.Plan( FocusedRoundedTime );
+				activity.EditActivity( true );
 			}
-		}
 
-		public void LinkedActivityDropped( LinkedActivityViewModel linkedActivity )
-		{
-			linkedActivity.Occurance = FocusedRoundedTime;
-			var offsetRange = new Interval<double>( linkedActivity.HeightPercentage, 1 );
-			var percentageInterval = new Interval<double>( 0, 1 );
-			linkedActivity.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 ) + linkedActivity.HeightPercentage;
+			PositionActivityAtCurrentOffset( activity );
 		}
 
 		void PositionActivityAtCurrentOffset( ActivityViewModel activity )
@@ -490,6 +477,18 @@ namespace Laevo.ViewModel.ActivityOverview
 			var offsetRange = new Interval<double>( activity.HeightPercentage, 1 );
 			var percentageInterval = new Interval<double>( 0, 1 );
 			activity.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
+
+			// Check whether it is a planned activity which is rescheduled, or an activity which has been opened.
+			// TODO: HeightPercentage and OffsetPercentage should only be stored in LinkedActivityViewModel.
+			var workInterval = activity.GetFutureWorkIntervals().FirstOrDefault();
+			if ( workInterval == null && activity.IsOpen )
+			{
+				workInterval = activity.WorkIntervals.Last();
+			}
+			if ( workInterval != null )
+			{
+				workInterval.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
+			}
 		}
 
 		public void FocusedTimeChanged( DateTime focusedTime )
