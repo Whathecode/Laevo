@@ -100,7 +100,7 @@ namespace Laevo.View.Activity
 			{
 				var draggedTask = (FrameworkElement)sender;
 				var draggedLinkedActivity = linkedActivity.BaseActivity;
-				DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move | DragDropEffects.Link );
+				DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move );
 			}
 		}
 
@@ -109,11 +109,6 @@ namespace Laevo.View.Activity
 			if ( e.Effects == DragDropEffects.None )
 			{
 				Mouse.SetCursor( Cursors.No );
-				e.Handled = true;
-			}
-			else if ( e.Effects == DragDropEffects.Move )
-			{
-				Mouse.SetCursor( Cursors.None );
 				e.Handled = true;
 			}
 		}
