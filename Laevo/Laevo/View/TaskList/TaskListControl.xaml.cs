@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Laevo.View.Activity;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System.Extensions;
@@ -70,6 +69,8 @@ namespace Laevo.View.TaskList
 
 		void OnReorderTasks( object sender, DragEventArgs e )
 		{
+			IgnoreDrop( sender, e );
+
 			// Is it a task being reordered?
 			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
 			var overview = (ActivityOverviewViewModel)DataContext;
@@ -88,8 +89,11 @@ namespace Laevo.View.TaskList
 			{
 				viewModel.SwapTaskOrder( _draggedTaskViewModel, tasks[ currentIndex ] );
 			}
+		}
 
-			e.Effects = DragDropEffects.Move;
+		void IgnoreDrop( object sender, DragEventArgs e )
+		{
+			e.Effects = DragDropEffects.None;
 			e.Handled = true;
 		}
 
@@ -103,7 +107,7 @@ namespace Laevo.View.TaskList
 			else
 			{
 				var overview = (ActivityOverviewViewModel)DataContext;
-				e.Effects = overview.Tasks.Contains( activity ) ? DragDropEffects.None : DragDropEffects.Link;
+				e.Effects = overview.Tasks.Contains( activity ) ? DragDropEffects.None : DragDropEffects.Move;
 			}
 
 			e.Handled = true;
@@ -120,11 +124,6 @@ namespace Laevo.View.TaskList
 			if ( e.Effects == DragDropEffects.None )
 			{
 				Mouse.SetCursor( Cursors.No );
-				e.Handled = true;
-			}
-			else if ( e.Effects == DragDropEffects.Move )
-			{
-				Mouse.SetCursor( Cursors.None );
 				e.Handled = true;
 			}
 		}
