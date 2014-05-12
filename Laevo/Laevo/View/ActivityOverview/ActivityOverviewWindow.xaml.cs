@@ -419,44 +419,39 @@ namespace Laevo.View.ActivityOverview
 			IsSchedulingActivity = !_isDragOverActivity;
 			_timeLinePosition = _timeIndicator.TranslatePoint( new Point( 0, 0 ), TimeLineContainer ).X;
 
-			HandleTimeLineDragOver( e );
+			HandleTimeLineDrag( e );
 		}
 
-		readonly TimeGate _throttleDragEvents = new TimeGate( TimeSpan.FromMilliseconds( 15 ), true );
 		void OnTimeLineDragOver( object sender, DragEventArgs e )
 		{
-			// TODO: GetPosition on the 3D viewport seems to be so expensive that it locks up the rendering thread.
-			//       Throttling the events somehwat resolves this, but is there a cleaner solution?
-			if ( _throttleDragEvents.TryEnter() )
-			{
-				UpdateFocusedTime( e.GetPosition( this ).X );
-
-				// Update cursor.
-				// TODO: The reverse calculation of GetFocusedTime might speed up things.
-				Point mouse = e.GetPosition( TimeLineContainer );
-				double x = mouse.X;
-				double y = mouse.Y;
-				if ( x <= _timeLinePosition )
-				{
-					x -= DragDropCursor.ActualWidth;
-				}
-				y -= DragDropCursor.ActualHeight / 2;
-				DragDropCursorPosition.SetValue( Canvas.LeftProperty, x );
-				DragDropCursorPosition.SetValue( Canvas.TopProperty, y );
-			}
-
-			HandleTimeLineDragOver( e );
+			HandleTimeLineDrag( e );
 		}
 
 		void OnTimeLineDragLeave( object sender, DragEventArgs e )
 		{
 			IsSchedulingActivity = false;
 
-			HandleTimeLineDragOver( e );
+			HandleTimeLineDrag( e );
 		}
 
-		static void HandleTimeLineDragOver( DragEventArgs e )
+		void HandleTimeLineDrag( DragEventArgs e )
 		{
+			UpdateFocusedTime( e.GetPosition( this ).X );
+
+			// Update cursor.
+			// TODO: The reverse calculation of GetFocusedTime might speed up things.
+			Point mouse = e.GetPosition( TimeLineContainer );
+			double x = mouse.X;
+			double y = mouse.Y;
+			if ( x <= _timeLinePosition )
+			{
+				x -= DragDropCursor.ActualWidth;
+			}
+			y -= DragDropCursor.ActualHeight / 2;
+			DragDropCursorPosition.SetValue( Canvas.LeftProperty, x );
+			DragDropCursorPosition.SetValue( Canvas.TopProperty, y );
+
+			// Set the allowed drop targets.
 			var activity = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
 			if ( activity == null )
 			{
@@ -466,7 +461,6 @@ namespace Laevo.View.ActivityOverview
 			{
 				e.Effects = DragDropEffects.Move;
 			}
-
 			e.Handled = true;	
 		}
 
