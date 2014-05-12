@@ -277,6 +277,22 @@ namespace Laevo.Model
 		}
 
 		/// <summary>
+		///   Removes all planned intervals (or to do state) of this activity.
+		/// </summary>
+		public void RemovePlanning()
+		{
+			if ( IsToDo )
+			{
+				IsToDo = false;
+			}
+			else
+			{
+				DateTime now = DateTime.Now;
+				_plannedIntervals.RemoveAll( p => p.Interval.Start > now );
+			}
+		}
+
+		/// <summary>
 		///   Merges the passed activity into this activity.
 		/// </summary>
 		/// <param name = "activity">The activity to merge into this activity.</param>
