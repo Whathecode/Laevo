@@ -211,6 +211,12 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsToDo )]
 		public bool IsToDo { get; private set; }
 
+		/// <summary>
+		///   Determines whether or not the activity is a to-do item, or has a planned future interval.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsPlanned )]
+		public bool IsPlanned { get; private set; }
+
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
 
@@ -296,8 +302,7 @@ namespace Laevo.ViewModel.Activity
 			CommonInitialize();
 
 			// Initialize all work intervals.
-
-			// In case of planned activity, all open intervals laying between a date of cration and an end of work interval, should not be shown on the timeline.
+			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the timeline.
 			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
 			var openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
@@ -512,6 +517,11 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
+			if ( !CanOpenActivity() )
+			{
+				return;
+			}
+
 			IsOpen = true;
 			bool hasPlannedParts = GetFutureWorkIntervals().Any();
 
@@ -635,6 +645,23 @@ namespace Laevo.ViewModel.Activity
 			return !Activity.IsToDo;
 		}
 
+		[CommandExecute( Commands.RemovePlanning )]
+		public void RemovePlanning()
+		{
+			Activity.RemovePlanning();
+
+			foreach ( var i in GetFutureWorkIntervals() )
+			{
+				WorkIntervals.Remove( i );
+			}
+		}
+
+		[CommandCanExecute( Commands.RemovePlanning )]
+		public bool CanRemovePlanning()
+		{
+			return IsToDo || GetFutureWorkIntervals().Any();
+		}
+
 		public void UpdateHasOpenWindows()
 		{
 			HasOpenWindows = _virtualDesktop.Windows.Count > 0;
@@ -657,6 +684,8 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
+			StopActivity();
+
 			DateTime at = atTime;
 			TimeSpan duration = TimeSpan.FromHours( 1 );
 
@@ -797,6 +826,7 @@ namespace Laevo.ViewModel.Activity
 		public void Update( DateTime now )
 		{
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
+			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
 
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )

@@ -60,7 +60,7 @@ namespace Laevo.View.Activity
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				Common.ForceUpdate( ActivityName );
+				Common.Actions.ForceUpdate( ActivityName );
 			}
 		}
 

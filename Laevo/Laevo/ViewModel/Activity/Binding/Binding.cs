@@ -12,6 +12,7 @@
 		IsActive,
 		IsOpen,
 		IsToDo,
+		IsPlanned,
 		HasOpenWindows,
 		IsSuspended,
 		HasUnattendedInterruptions,
@@ -31,6 +32,7 @@
 		ForceSuspend,
 		Remove,
 		MakeToDo,
+		RemovePlanning,
 		ChangeColor,
 		ChangeIcon
 	}

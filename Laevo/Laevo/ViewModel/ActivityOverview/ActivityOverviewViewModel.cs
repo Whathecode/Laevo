@@ -6,7 +6,6 @@ using System.Windows.Media.Imaging;
 using ABC.Windows;
 using Laevo.Data.View;
 using Laevo.ViewModel.Activity;
-using Laevo.ViewModel.Activity.LinkedActivity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -380,6 +379,10 @@ namespace Laevo.ViewModel.ActivityOverview
 					viewModel.WorkIntervals.Remove( r );
 				}
 			}
+			else
+			{
+				Tasks.Remove( viewModel );
+			}
 		}
 
 		[CommandExecute( Commands.OpenHome )]
@@ -461,6 +464,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			// Based on where the to do item is dropped, open, or plan it.
 			if ( IsFocusedTimeBeforeNow )
 			{
+				if ( activity.GetFutureWorkIntervals().Any() )
+				{
+					activity.RemovePlanning();
+				}
+
 				activity.OpenActivity();
 			}
 			else

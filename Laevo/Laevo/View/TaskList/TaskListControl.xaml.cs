@@ -44,7 +44,7 @@ namespace Laevo.View.TaskList
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				Common.ForceUpdate( (TextBox)e.Source );
+				Common.Actions.ForceUpdate( (TextBox)e.Source );
 				e.Handled = true;
 			}
 		}
