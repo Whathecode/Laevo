@@ -33,7 +33,7 @@
 			<Setter Property="Padding" Value="10, 0, 10, 0" />
 		</Style>
 
-		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
+		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
 		<converters:EditActivityIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
 	</Window.Resources>
 
@@ -54,7 +54,7 @@
 				<GradientStop
 					Color="{Binding Color}" Offset="1" />
 				<GradientStop
-					Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
+					Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
 			</LinearGradientBrush>
 		</Border.Background>
 

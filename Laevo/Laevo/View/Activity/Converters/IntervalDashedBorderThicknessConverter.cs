@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Windows;
-using Laevo.ViewModel.Activity.LinkedActivity;
-using Whathecode.System.Extensions;
+using Laevo.ViewModel.Activity;
 using Whathecode.System.Windows.Data;
 
 
 namespace Laevo.View.Activity.Converters
 {
-	class ActivityDashedBorderThicknessConverter : AbstractValueConverter<object, Thickness>
+	class IntervalDashedBorderThicknessConverter : AbstractValueConverter<object, Thickness>
 	{
 		public override Thickness Convert( object value )
 		{

@@ -5,7 +5,7 @@ using Whathecode.System.Windows.Data;
 
 namespace Laevo.View.Activity.Converters
 {
-	public class ActivityHeightConverter : AbstractMultiValueConverter<double, double>
+	public class IntervalHeightConverter : AbstractMultiValueConverter<double, double>
 	{
 		public override double Convert( double[] values )
 		{

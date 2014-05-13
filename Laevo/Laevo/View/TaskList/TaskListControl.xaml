@@ -21,7 +21,7 @@
 	FontSize="20">
 	
 	<UserControl.Resources>
-		<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+		<activityConverters:BorderBrushConverter x:Key="BorderBrushConverter" />
 		<taskList:TaskInformationOffsetConverter x:Key="TaskInformationOffsetConverter" />
 
 		<!-- Cursors embedded in dummy elements to allow relative loading: http://stackoverflow.com/a/410517/590790 -->
@@ -128,7 +128,7 @@
 							</Border.Background>
 
 							<Border.BorderBrush>
-								<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+								<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 									<Binding Path="IsActive" />
 									<Binding Path="IsOpen" />
 									<Binding Path="HasOpenWindows" />

@@ -6,7 +6,7 @@ using Whathecode.System.Windows.Media.Extensions;
 
 namespace Laevo.View.Activity.Converters
 {
-	class ActivityColorConverter : AbstractValueConverter<Color, Color>
+	class ColorGradientConverter : AbstractValueConverter<Color, Color>
 	{
 		public override Color Convert( Color value )
 		{

@@ -400,9 +400,8 @@
     <Compile Include="ViewModel\ActivityOverview\Binding\Binding.cs" />
     <Compile Include="ViewModel\Activity\Binding\Binding.cs" />
     <Compile Include="ViewModel\Activity\ActivityViewModel.cs" />
-    <Compile Include="ViewModel\Activity\LinkedActivity\ActivityPosition.cs" />
-    <Compile Include="ViewModel\Activity\LinkedActivity\Binding\Binding.cs" />
-    <Compile Include="ViewModel\Activity\LinkedActivity\LinkedActivityViewModel.cs" />
+    <Compile Include="ViewModel\Activity\ActivityPosition.cs" />
+    <Compile Include="ViewModel\Activity\WorkIntervalViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
@@ -437,10 +436,10 @@
     <Compile Include="View\Activity\ActionButtons.xaml.cs">
       <DependentUpon>ActionButtons.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Activity\Converters\ActivityDashedBorderThicknessConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityCornerRadiusConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityBorderThicknessConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityIconMarginConverter.cs" />
+    <Compile Include="View\Activity\Converters\IntervalDashedBorderThicknessConverter.cs" />
+    <Compile Include="View\Activity\Converters\IntervalCornerRadiusConverter.cs" />
+    <Compile Include="View\Activity\Converters\IntervalBorderThicknessConverter.cs" />
+    <Compile Include="View\Activity\Converters\IntervalIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Common\Common.cs" />
     <Compile Include="View\Main\IconConverter.cs" />
@@ -476,15 +475,15 @@
     </Compile>
     <Compile Include="View\ActivityOverview\VisibleIntervalAnimation.cs" />
     <Compile Include="View\ActivityOverview\VisibleIntervalCoercion.cs" />
-    <Compile Include="View\Activity\ActivityControl.xaml.cs">
-      <DependentUpon>ActivityControl.xaml</DependentUpon>
+    <Compile Include="View\Activity\WorkIntervalControl.xaml.cs">
+      <DependentUpon>WorkIntervalControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Activity\Converters\ActivityColorConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityHeightConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityOffsetConverter.cs" />
-    <Compile Include="View\Activity\Converters\ActivityBorderConverter.cs" />
+    <Compile Include="View\Activity\Converters\ColorGradientConverter.cs" />
+    <Compile Include="View\Activity\Converters\IntervalHeightConverter.cs" />
+    <Compile Include="View\Activity\Converters\IntervalOffsetConverter.cs" />
+    <Compile Include="View\Activity\Converters\BorderBrushConverter.cs" />
     <Compile Include="View\Activity\Converters\EditActivityIconMarginConverter.cs" />
-    <Compile Include="View\Activity\Converters\TimeSpanConverter.cs" />
+    <Compile Include="View\Activity\Converters\AttentionTimeSpanConverter.cs" />
     <Compile Include="View\Activity\EditActivityPopup.xaml.cs">
       <DependentUpon>EditActivityPopup.xaml</DependentUpon>
     </Compile>
@@ -553,7 +552,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Activity\ActivityControl.xaml">
+    <Page Include="View\Activity\WorkIntervalControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

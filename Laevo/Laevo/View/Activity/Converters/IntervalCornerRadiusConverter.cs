@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Windows;
-using Laevo.ViewModel.Activity.LinkedActivity;
+using Laevo.ViewModel.Activity;
 using Whathecode.System.Windows.Data;
 
 
 namespace Laevo.View.Activity.Converters
 {
-	class ActivityCornerRadiusConverter : AbstractMultiValueConverter<object, CornerRadius>
+	class IntervalCornerRadiusConverter : AbstractMultiValueConverter<object, CornerRadius>
 	{
 		public override CornerRadius Convert( object[] values )
 		{

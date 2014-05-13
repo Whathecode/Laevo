@@ -5,7 +5,7 @@ using Whathecode.System.Windows.Data;
 
 namespace Laevo.View.Activity.Converters
 {
-	public class ActivityIconMarginConverter : AbstractMultiValueConverter<double, Thickness>
+	public class IntervalIconMarginConverter : AbstractMultiValueConverter<double, Thickness>
 	{
 		public override Thickness Convert( double[] values )
 		{

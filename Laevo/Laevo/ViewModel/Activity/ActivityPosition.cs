@@ -1,10 +1,10 @@
 ﻿using System;
 
 
-namespace Laevo.ViewModel.Activity.LinkedActivity
+namespace Laevo.ViewModel.Activity
 {
 	/// <summary>
-	///   Determines which part of the activity a <see cref="LinkedActivityViewModel" /> shows.
+	///   Determines which part of the activity a <see cref="WorkIntervalViewModel" /> shows.
 	/// </summary>
 	[Flags]
 	public enum ActivityPosition

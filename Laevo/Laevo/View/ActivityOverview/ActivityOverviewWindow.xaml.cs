@@ -13,10 +13,8 @@ using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
 using Laevo.ViewModel.Activity;
-using Laevo.ViewModel.Activity.LinkedActivity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
-using Whathecode.System.Algorithm;
 using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Collections.Generic;
@@ -52,7 +50,7 @@ namespace Laevo.View.ActivityOverview
 
 		readonly List<UnitLabels> _unitLabels = new List<UnitLabels>();
 		readonly List<ILabels> _labels = new List<ILabels>();
-		readonly Dictionary<LinkedActivityViewModel, ActivityControl> _activities = new Dictionary<LinkedActivityViewModel, ActivityControl>();
+		readonly Dictionary<WorkIntervalViewModel, WorkIntervalControl> _activityWorkIntervals = new Dictionary<WorkIntervalViewModel, WorkIntervalControl>();
 
 		[DependencyProperty( Properties.MoveTimeLine )]
 		public ICommand MoveTimeLineCommand { get; private set; }
@@ -196,7 +194,7 @@ namespace Laevo.View.ActivityOverview
 				oldViewModel.Activities.CollectionChanged -= ActivitiesChanged;
 				foreach ( var activityViewModel in oldViewModel.Activities )
 				{
-					activityViewModel.WorkIntervals.CollectionChanged -= LinkedActivitiesChanged;
+					activityViewModel.WorkIntervals.CollectionChanged -= WorkIntervalsChanged;
 				}
 			}
 
@@ -207,8 +205,8 @@ namespace Laevo.View.ActivityOverview
 			}
 			foreach ( var activityViewModel in overviewViewModel.Activities )
 			{
-				activityViewModel.WorkIntervals.CollectionChanged += LinkedActivitiesChanged;
-				activityViewModel.WorkIntervals.ForEach( NewActivity );
+				activityViewModel.WorkIntervals.CollectionChanged += WorkIntervalsChanged;
+				activityViewModel.WorkIntervals.ForEach( NewActivityWorkInterval );
 			}
 			overviewViewModel.Activities.CollectionChanged += ActivitiesChanged;
 		}
@@ -220,8 +218,8 @@ namespace Laevo.View.ActivityOverview
 			{
 				foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
 				{
-					activity.WorkIntervals.CollectionChanged -= LinkedActivitiesChanged;
-					activity.WorkIntervals.ForEach( DeleteActivity );
+					activity.WorkIntervals.CollectionChanged -= WorkIntervalsChanged;
+					activity.WorkIntervals.ForEach( DeleteActivityWorkInterval );
 				}
 			}
 
@@ -230,38 +228,38 @@ namespace Laevo.View.ActivityOverview
 			{
 				foreach ( var activity in e.NewItems.Cast<ActivityViewModel>() )
 				{
-					activity.WorkIntervals.CollectionChanged += LinkedActivitiesChanged;
+					activity.WorkIntervals.CollectionChanged += WorkIntervalsChanged;
 				}
 			}
 		}
 
-		void DeleteActivity( LinkedActivityViewModel viewModel )
+		void DeleteActivityWorkInterval( WorkIntervalViewModel viewModel )
 		{
-			ActivityControl control = _activities[ viewModel ];
+			WorkIntervalControl control = _activityWorkIntervals[ viewModel ];
 			control.DragEnter -= OnActivityDragEnter;
 			control.DragLeave -= OnActivityDragLeave;
 			TimeLine.Children.Remove( control );
-			_activities.Remove( viewModel );
+			_activityWorkIntervals.Remove( viewModel );
 		}
 
-		void LinkedActivitiesChanged( object sender, NotifyCollectionChangedEventArgs e )
+		void WorkIntervalsChanged( object sender, NotifyCollectionChangedEventArgs e )
 		{
 			// Remove old items.
 			if ( e.OldItems != null )
 			{
-				e.OldItems.Cast<LinkedActivityViewModel>().ForEach( DeleteActivity );
+				e.OldItems.Cast<WorkIntervalViewModel>().ForEach( DeleteActivityWorkInterval );
 			}
 
 			// Add new items.
 			if ( e.NewItems != null )
 			{
-				e.NewItems.Cast<LinkedActivityViewModel>().ForEach( NewActivity );
+				e.NewItems.Cast<WorkIntervalViewModel>().ForEach( NewActivityWorkInterval );
 			}
 		}
 
-		void NewActivity( LinkedActivityViewModel viewModel )
+		void NewActivityWorkInterval( WorkIntervalViewModel viewModel )
 		{
-			var control = new ActivityControl
+			var control = new WorkIntervalControl
 			{
 				DataContext = viewModel,
 				HorizontalAlignment = HorizontalAlignment.Left,
@@ -269,7 +267,7 @@ namespace Laevo.View.ActivityOverview
 			control.DragEnter += OnActivityDragEnter;
 			control.DragLeave += OnActivityDragLeave;
 
-			_activities.Add( viewModel, control );
+			_activityWorkIntervals.Add( viewModel, control );
 			TimeLine.Children.Add( control );
 		}
 

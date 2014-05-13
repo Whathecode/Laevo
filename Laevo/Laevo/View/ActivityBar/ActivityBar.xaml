@@ -35,7 +35,7 @@
 			</ResourceDictionary.MergedDictionaries>
 			
 			<activityBar:ActivityBackgroundConverter x:Key="ActivityBackgroundConverter" />
-			<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+			<activityConverters:BorderBrushConverter x:Key="BorderBrushConverter" />
 
 			<Style x:Key="NoButtonHover" TargetType="Button">
 				<Setter Property="OverridesDefaultStyle" Value="True"/>
@@ -174,7 +174,7 @@
 								</Button.Background>
 
 								<Button.BorderBrush>
-									<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+									<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 										<Binding Path="IsActive" />
 										<Binding Path="IsOpen" />
 										<Binding Path="HasOpenWindows" />
