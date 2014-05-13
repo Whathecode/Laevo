@@ -20,7 +20,6 @@ using ABC.Windows;
 using ABC.Windows.Desktop;
 using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
-using Laevo.ViewModel.Activity.LinkedActivity;
 using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;
 using Whathecode.System.Arithmetic.Range;
@@ -243,8 +242,8 @@ namespace Laevo.ViewModel.Activity
 		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
 		///   TODO: The collection should only be allowed to be modified from the view model.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.LinkedActivities )]
-		public ObservableCollection<LinkedActivityViewModel> WorkIntervals { get; private set; }
+		[NotifyProperty( Binding.Properties.WorkIntervals )]
+		public ObservableCollection<WorkIntervalViewModel> WorkIntervals { get; private set; }
 
 
 		static ActivityViewModel()
@@ -376,7 +375,7 @@ namespace Laevo.ViewModel.Activity
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
-			WorkIntervals = new ObservableCollection<LinkedActivityViewModel>();
+			WorkIntervals = new ObservableCollection<WorkIntervalViewModel>();
 		}
 
 
@@ -689,7 +688,7 @@ namespace Laevo.ViewModel.Activity
 			DateTime at = atTime;
 			TimeSpan duration = TimeSpan.FromHours( 1 );
 
-			LinkedActivityViewModel plannedInterval = GetFutureWorkIntervals().FirstOrDefault();
+			WorkIntervalViewModel plannedInterval = GetFutureWorkIntervals().FirstOrDefault();
 			if ( plannedInterval == null )
 			{
 				try
@@ -714,7 +713,7 @@ namespace Laevo.ViewModel.Activity
 		/// <summary>
 		///   Return all planned work intervals which lie in the future.
 		/// </summary>
-		public List<LinkedActivityViewModel> GetFutureWorkIntervals()
+		public List<WorkIntervalViewModel> GetFutureWorkIntervals()
 		{
 			return WorkIntervals.Where( i => i.IsPlanned && !i.IsPast() ).ToList();
 		}
@@ -874,9 +873,9 @@ namespace Laevo.ViewModel.Activity
 			_currentActiveTimeSpan = null;
 		}
 
-		LinkedActivityViewModel CreateLinkedActivity()
+		WorkIntervalViewModel CreateLinkedActivity()
 		{
-			var newActivity = new LinkedActivityViewModel( this )
+			var newActivity = new WorkIntervalViewModel( this )
 			{
 				HeightPercentage = WorkIntervals.Count == 0 ? HeightPercentage : WorkIntervals.Last().HeightPercentage,
 				OffsetPercentage = WorkIntervals.Count == 0 ? OffsetPercentage : WorkIntervals.Last().OffsetPercentage,
@@ -886,7 +885,7 @@ namespace Laevo.ViewModel.Activity
 			return newActivity;
 		}
 
-		LinkedActivityViewModel CreateLinkedActivity( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
+		WorkIntervalViewModel CreateLinkedActivity( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
 		{
 			var newActivity = CreateLinkedActivity();
 			newActivity.Occurance = occurence;

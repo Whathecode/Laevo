@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows;
 using Laevo.ViewModel.Activity;
-using Laevo.ViewModel.Activity.LinkedActivity;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
@@ -28,7 +27,7 @@ namespace Laevo.View.Activity
 		///   Set to the interval where this activity is planned, or null when not a planned activity.
 		/// </summary>
 		[DependencyProperty( Properties.PlannedInterval )]
-		public LinkedActivityViewModel PlannedInterval { get; private set; }
+		public WorkIntervalViewModel PlannedInterval { get; private set; }
 
 
 		public EditActivityPopup()

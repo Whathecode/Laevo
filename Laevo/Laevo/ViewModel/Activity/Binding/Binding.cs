@@ -17,7 +17,7 @@
 		IsSuspended,
 		HasUnattendedInterruptions,
 		IsEditable,
-		LinkedActivities
+		WorkIntervals
 	}
 
 	public enum Commands
@@ -35,5 +35,22 @@
 		RemovePlanning,
 		ChangeColor,
 		ChangeIcon
+	}
+
+	public enum WorkIntervalProperties
+	{
+		Occurance,
+		TimeSpan,
+		HeightPercentage,
+		OffsetPercentage,
+		BaseActivity,
+		Position,
+		IsPlanned,
+		HasMoreRecentRepresentation
+	}
+
+	public enum WorkIntervalCommands
+	{
+		EditPlannedInterval
 	}
 }

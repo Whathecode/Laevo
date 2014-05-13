@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Laevo.ViewModel.Activity.LinkedActivity.Binding;
+using Laevo.ViewModel.Activity.Binding;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 
-namespace Laevo.ViewModel.Activity.LinkedActivity
+namespace Laevo.ViewModel.Activity
 {
-	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
-	public class LinkedActivityViewModel : AbstractViewModel
+	[ViewModel( typeof( WorkIntervalProperties ), typeof( WorkIntervalCommands ) )]
+	public class WorkIntervalViewModel : AbstractViewModel
 	{
 		/// <summary>
-		///   Activity place related to other linked activities.
+		///   Activity place related to other work intervals.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.Position )]
+		[NotifyProperty( WorkIntervalProperties.Position )]
 		public ActivityPosition Position { get; private set; }
 
 		/// <summary>
 		///   The time when the activity started or will start.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.Occurance )]
+		[NotifyProperty( WorkIntervalProperties.Occurance )]
 		public DateTime Occurance { get; set; }
 
-		[NotifyPropertyChanged( Binding.Properties.Occurance )]
+		[NotifyPropertyChanged( WorkIntervalProperties.Occurance )]
 		public void OnOccuranceChanged( DateTime oldOccurance, DateTime newOccurance )
 		{
 			if ( IsPlanned )
@@ -37,10 +37,10 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		/// <summary>
 		///   The entire timespan during which the activity has been open, regardless of whether it was closed in between.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.TimeSpan )]
+		[NotifyProperty( WorkIntervalProperties.TimeSpan )]
 		public TimeSpan TimeSpan { get; set; }
 
-		[NotifyPropertyChanged( Binding.Properties.TimeSpan )]
+		[NotifyPropertyChanged( WorkIntervalProperties.TimeSpan )]
 		public void OnTimeSpanChanged( TimeSpan oldDuration, TimeSpan newDuration )
 		{
 			if ( IsPlanned )
@@ -58,34 +58,40 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 		/// <summary>
 		///   The percentage of the available height the activity box occupies.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.HeightPercentage )]
+		[NotifyProperty( WorkIntervalProperties.HeightPercentage )]
 		public double HeightPercentage { get; set; }
 
 		/// <summary>
 		///   The offset, as a percentage of the total available height, where to position the activity box, from the bottom.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.OffsetPercentage )]
+		[NotifyProperty( WorkIntervalProperties.OffsetPercentage )]
 		public double OffsetPercentage { get; set; }
 
-		[NotifyProperty( Binding.Properties.BaseActivity )]
+		/// <summary>
+		///   The activity this work interval shows a segment of.
+		/// </summary>
+		[NotifyProperty( WorkIntervalProperties.BaseActivity )]
 		public ActivityViewModel BaseActivity { get; private set; }
 
-		[NotifyProperty( Binding.Properties.IsPlanned )]
+		/// <summary>
+		///   Determines whether or not this work interval shows a planned interval.
+		/// </summary>
+		[NotifyProperty( WorkIntervalProperties.IsPlanned )]
 		public bool IsPlanned { get; set; }
 
 		/// <summary>
 		///   Determines whether or not the base activity has a more recent representation elsewhere.
 		///   This could be a work interval somewhere in the future, or a to-do item.
 		/// </summary>
-		[NotifyProperty( Binding.Properties.HasMoreRecentRepresentation )]
+		[NotifyProperty( WorkIntervalProperties.HasMoreRecentRepresentation )]
 		public bool HasMoreRecentRepresentation { get; private set; }
 
 
-		public LinkedActivityViewModel( ActivityViewModel baseActivity )
+		public WorkIntervalViewModel( ActivityViewModel baseActivity )
 		{
 			BaseActivity = baseActivity;
 
-			ObservableCollection<LinkedActivityViewModel> intervals = BaseActivity.WorkIntervals;
+			ObservableCollection<WorkIntervalViewModel> intervals = BaseActivity.WorkIntervals;
 			intervals.CollectionChanged += ( sender, args ) =>
 			{
 				// Update Position.
@@ -109,15 +115,15 @@ namespace Laevo.ViewModel.Activity.LinkedActivity
 
 		void UpdateHasMoreRecentRepresentation()
 		{
-			ObservableCollection<LinkedActivityViewModel> intervals = BaseActivity.WorkIntervals;
+			ObservableCollection<WorkIntervalViewModel> intervals = BaseActivity.WorkIntervals;
 			HasMoreRecentRepresentation =
 				BaseActivity.IsToDo ||
 				( intervals.Count != 1 && intervals.IndexOf(this) != intervals.Count - 1 );
 		}
 
 
-		[CommandExecute( Commands.EditPlannedInterval )]
-		public void EditActivity()
+		[CommandExecute( WorkIntervalCommands.EditPlannedInterval )]
+		public void EditPlannedInterval()
 		{
 			BaseActivity.EditActivity( true );
 		}

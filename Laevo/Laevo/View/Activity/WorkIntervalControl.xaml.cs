@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Input;
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.Activity;
-using Laevo.ViewModel.Activity.LinkedActivity;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
@@ -17,7 +16,7 @@ namespace Laevo.View.Activity
 	/// Interaction logic for ActivityControl.xaml
 	/// </summary>
 	[WpfControl( typeof( Properties ) )]
-	public partial class ActivityControl
+	public partial class WorkIntervalControl
 	{
 		[Flags]
 		public enum Properties
@@ -33,7 +32,7 @@ namespace Laevo.View.Activity
 		public bool IsDraggingActivity { get; private set; }
 
 
-		public ActivityControl()
+		public WorkIntervalControl()
 		{
 			InitializeComponent();
 
@@ -85,7 +84,7 @@ namespace Laevo.View.Activity
 		void OnDrop( object sender, DragEventArgs e )
 		{
 			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
-			var dropTarget = (LinkedActivityViewModel)DataContext;
+			var dropTarget = (WorkIntervalViewModel)DataContext;
 
 			dropTarget.BaseActivity.Merge( activity );
 
@@ -94,13 +93,13 @@ namespace Laevo.View.Activity
 
 		void StartDrag( object sender, MouseEventArgs e )
 		{
-			var linkedActivity = (LinkedActivityViewModel)DataContext;
+			var activity = (WorkIntervalViewModel)DataContext;
 
-			if ( e.LeftButton == MouseButtonState.Pressed && !linkedActivity.HasMoreRecentRepresentation )
+			if ( e.LeftButton == MouseButtonState.Pressed && !activity.HasMoreRecentRepresentation )
 			{
 				var draggedTask = (FrameworkElement)sender;
-				var draggedLinkedActivity = linkedActivity.BaseActivity;
-				DragDrop.DoDragDrop( draggedTask, draggedLinkedActivity, DragDropEffects.Move );
+				var draggedActivity = activity.BaseActivity;
+				DragDrop.DoDragDrop( draggedTask, draggedActivity, DragDropEffects.Move );
 			}
 		}
 

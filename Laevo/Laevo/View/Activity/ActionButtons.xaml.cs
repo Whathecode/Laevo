@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
-using Laevo.ViewModel.Activity.LinkedActivity;
+using Laevo.ViewModel.Activity;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 
@@ -23,7 +23,7 @@ namespace Laevo.View.Activity
 
 
 		[DependencyProperty( Properties.WorkIntervalDataContext, DefaultValue = null )]
-		public LinkedActivityViewModel WorkIntervalDataContext { get; set; }
+		public WorkIntervalViewModel WorkIntervalDataContext { get; set; }
 
 		[DependencyProperty( Properties.IsIntervalPast )]
 		public bool IsIntervalPast { get; private set; }

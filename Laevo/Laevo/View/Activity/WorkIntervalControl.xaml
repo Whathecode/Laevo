@@ -1,6 +1,6 @@
 ﻿<UserControl
 	x:Name="Control"
-	x:Class="Laevo.View.Activity.ActivityControl"
+	x:Class="Laevo.View.Activity.WorkIntervalControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,15 +9,14 @@
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:activity="clr-namespace:Laevo.View.Activity"
-	xmlns:linkedActivity="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity"
-	xmlns:lb="clr-namespace:Laevo.ViewModel.Activity.LinkedActivity.Binding"
 	mc:Ignorable="d"
 	d:DesignHeight="118" d:DesignWidth="206"
-	d:DataContext="{d:DesignInstance Type=linkedActivity:LinkedActivityViewModel}"
+	d:DataContext="{d:DesignInstance Type=vm:WorkIntervalViewModel}"
 	Panel.ZIndex="10"
 	activityOverview:TimeLineControl.Occurance="{Binding Occurance}"
 	activityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
@@ -26,7 +25,7 @@
 	<activityOverview:TimeLineControl.Offset>
 		<MultiBinding Mode="TwoWay">
 			<MultiBinding.Converter>
-				<converters:ActivityOffsetConverter />
+				<converters:IntervalOffsetConverter />
 			</MultiBinding.Converter>
 			<Binding Path="OffsetPercentage" Mode="TwoWay" />
 			<Binding Path="ActualHeight">
@@ -48,13 +47,13 @@
 	</UserControl.MinWidth>
 
 	<UserControl.Resources>
-		<converters:ActivityColorConverter x:Key="ActivityColorConverter" />
-		<converters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
-		<converters:ActivityBorderThicknessConverter x:Key="ActivityBorderThicknessConverter" />
-		<converters:ActivityIconMarginConverter x:Key="ActivityIconMarginConverter" />
-		<converters:ActivityHeightConverter x:Key="ActivityHeightConverter" />
-		<converters:ActivityCornerRadiusConverter x:Key="ActivityCornerRadiusConverter" />
-		<converters:ActivityDashedBorderThicknessConverter x:Key="ActivityDashedBorderThicknessConverter" />
+		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
+		<converters:BorderBrushConverter x:Key="BorderBrushConverter" />
+		<converters:IntervalBorderThicknessConverter x:Key="BorderThicknessConverter" />
+		<converters:IntervalIconMarginConverter x:Key="IconMarginConverter" />
+		<converters:IntervalHeightConverter x:Key="HeightConverter" />
+		<converters:IntervalCornerRadiusConverter x:Key="CornerRadiusConverter" />
+		<converters:IntervalDashedBorderThicknessConverter x:Key="DashedBorderThicknessConverter" />
 	</UserControl.Resources>
 
 	<StackPanel
@@ -70,7 +69,7 @@
 			<StackPanel Orientation="Horizontal">
 				<StackPanel Orientation="Vertical">
 					<StackPanel.Margin>
-						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
+						<MultiBinding Converter="{StaticResource IconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
 							<Binding ElementName="Image" Path="ActualHeight" />
 						</MultiBinding>
@@ -108,7 +107,7 @@
 						AllowDrop="False"
 						MouseMove="StartDrag"
 						GiveFeedback="DragFeedback"
-						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static lb:Commands.EditPlannedInterval}}"
+						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:WorkIntervalCommands.EditPlannedInterval}}"
 						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
 				</StackPanel>
 
@@ -162,7 +161,7 @@
 
 			<Border.CornerRadius>
 				<MultiBinding
-					Converter="{StaticResource ActivityCornerRadiusConverter}">
+					Converter="{StaticResource CornerRadiusConverter}">
 					<Binding Path="IsOpen" />
 					<Binding ElementName="Control" Path="DataContext.Position" />
 					<Binding ElementName="Control" Path="DataContext.IsPlanned" />
@@ -171,14 +170,14 @@
 
 			<Border.BorderThickness>
 				<MultiBinding
-					Converter="{StaticResource ActivityBorderThicknessConverter}">
+					Converter="{StaticResource BorderThicknessConverter}">
 					<Binding Path="IsOpen" />
 					<Binding ElementName="Control" Path="DataContext.Position" />
 				</MultiBinding>
 			</Border.BorderThickness>
 
 			<Border.BorderBrush>
-				<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+				<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 					<Binding Path="IsActive" />
 					<Binding Path="IsOpen" />
 					<Binding Path="HasOpenWindows" />
@@ -187,7 +186,7 @@
 			</Border.BorderBrush>
 
 			<Border.Height>
-				<MultiBinding Converter="{StaticResource ActivityHeightConverter}">
+				<MultiBinding Converter="{StaticResource HeightConverter}">
 					<Binding ElementName="Control" Path="DataContext.HeightPercentage" />
 					<Binding ElementName="Header" Path="ActualHeight" />
 					<Binding Path="ActualHeight">
@@ -203,14 +202,14 @@
 					<GradientStop
 						Color="{Binding Color}" Offset="1" />
 					<GradientStop
-						Color="{Binding Color, Converter={StaticResource ActivityColorConverter}}" Offset="0" />
+						Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
 				</LinearGradientBrush>
 			</Border.Background>
 
 			<Border.Resources>
-				<converters:TimeSpanConverter x:Key="TimeSpanConverter" />
+				<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
 				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
-				<DataTemplate x:Key="TimeSpanTemplate">
+				<DataTemplate x:Key="AttentionTimeSpanTemplate">
 					<Line
 						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
 						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
@@ -241,7 +240,7 @@
 			</Border.Resources>
 
 			<Border
-				BorderThickness="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource ActivityDashedBorderThicknessConverter}}">
+				BorderThickness="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource DashedBorderThicknessConverter}}">
 
 				<Border.BorderBrush>
 					<VisualBrush>
@@ -253,7 +252,7 @@
 								Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}">
 
 								<Rectangle.Stroke>
-									<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+									<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 										<Binding Path="IsActive" />
 										<Binding Path="IsOpen" />
 										<Binding Path="HasOpenWindows" />
@@ -269,7 +268,7 @@
 				<!-- Attention time spans. -->
 				<ItemsControl
 					Visibility="{Binding ShowActiveTimeSpans, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-					ItemTemplate="{StaticResource TimeSpanTemplate}">
+					ItemTemplate="{StaticResource AttentionTimeSpanTemplate}">
 
 					<ItemsControl.Style>
 						<Style TargetType="ItemsControl">
