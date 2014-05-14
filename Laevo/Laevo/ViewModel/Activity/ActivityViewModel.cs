@@ -134,18 +134,6 @@ namespace Laevo.ViewModel.Activity
 
 		public bool IsUnnamed { get; set; }
 
-		/// <summary>
-		///   Default percentage of the available height the activity box occupies.
-		/// </summary>
-		[DataMember]
-		public double HeightPercentage { get; set; }
-
-		/// <summary>
-		///   Default offset, as a percentage of the total available height, where to position the activity box, from the bottom.
-		/// </summary>
-		[DataMember]
-		public double OffsetPercentage { get; set; }
-
 		Interval<DateTime> _currentActiveTimeSpan;
 		/// <summary>
 		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
@@ -273,8 +261,6 @@ namespace Laevo.ViewModel.Activity
 			_virtualDesktop = desktop;
 
 			Color = DefaultColor;
-			HeightPercentage = 0.2;
-			OffsetPercentage = 1;
 			IsEditable = isEditable;
 
 			CommonInitialize();
@@ -293,8 +279,6 @@ namespace Laevo.ViewModel.Activity
 
 			Icon = storedViewModel.Icon;
 			Color = storedViewModel.Color;
-			HeightPercentage = storedViewModel.HeightPercentage;
-			OffsetPercentage = storedViewModel.OffsetPercentage;
 			IsSuspended = storedViewModel.IsSuspended;
 			IsEditable = true;
 
@@ -305,12 +289,12 @@ namespace Laevo.ViewModel.Activity
 			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
 			var openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
-				.Select( interval => CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ) ) )
+				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
 				.ToList();
 			
 			var plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
-				.Select( interval => CreateLinkedActivity( interval.Start, interval.End.Subtract( interval.Start ), true ) );
+				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
 			
 			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
@@ -526,7 +510,7 @@ namespace Laevo.ViewModel.Activity
 
 			if ( WorkIntervals.Count == 0 || !hasPlannedParts )
 			{
-				WorkIntervals.Add( CreateLinkedActivity() );
+				WorkIntervals.Add( CreateWorkInterval() );
 			}
 			Activity.Open();
 		}
@@ -701,7 +685,7 @@ namespace Laevo.ViewModel.Activity
 					at = at + TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes );
 					Activity.AddPlannedInterval( at, duration );
 				}
-				WorkIntervals.Add( CreateLinkedActivity( at, duration, true ) );
+				WorkIntervals.Add( CreateWorkInterval( at, duration, true ) );
 			}
 			else
 			{
@@ -873,21 +857,26 @@ namespace Laevo.ViewModel.Activity
 			_currentActiveTimeSpan = null;
 		}
 
-		WorkIntervalViewModel CreateLinkedActivity()
+		WorkIntervalViewModel CreateWorkInterval()
 		{
 			var newActivity = new WorkIntervalViewModel( this )
 			{
-				HeightPercentage = WorkIntervals.Count == 0 ? HeightPercentage : WorkIntervals.Last().HeightPercentage,
-				OffsetPercentage = WorkIntervals.Count == 0 ? OffsetPercentage : WorkIntervals.Last().OffsetPercentage,
 				Occurance = DateTime.Now
 			};
+
+			var lastInterval = WorkIntervals.LastOrDefault();
+			if ( lastInterval != null )
+			{
+				newActivity.HeightPercentage = lastInterval.HeightPercentage;
+				newActivity.OffsetPercentage = lastInterval.OffsetPercentage;
+			}
 
 			return newActivity;
 		}
 
-		WorkIntervalViewModel CreateLinkedActivity( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
+		WorkIntervalViewModel CreateWorkInterval( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
 		{
-			var newActivity = CreateLinkedActivity();
+			var newActivity = CreateWorkInterval();
 			newActivity.Occurance = occurence;
 			newActivity.TimeSpan = timeSpan;
 			newActivity.IsPlanned = isPlanned;
