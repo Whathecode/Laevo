@@ -230,6 +230,7 @@ namespace Laevo.ViewModel.Activity
 		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
 		///   TODO: The collection should only be allowed to be modified from the view model.
 		/// </summary>
+		[DataMember]
 		[NotifyProperty( Binding.Properties.WorkIntervals )]
 		public ObservableCollection<WorkIntervalViewModel> WorkIntervals { get; private set; }
 
@@ -291,7 +292,7 @@ namespace Laevo.ViewModel.Activity
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
 				.ToList();
-			
+
 			var plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
@@ -299,6 +300,12 @@ namespace Laevo.ViewModel.Activity
 			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
 				WorkIntervals.Add( i );
+			}
+
+			for ( var i = 0; i < WorkIntervals.Count; i++ )
+			{
+				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
+				WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals[ i ].OffsetPercentage;
 			}
 
 			// Initiate attention history.
