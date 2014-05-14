@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using Laevo.ViewModel.Activity.Binding;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -10,6 +11,7 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 namespace Laevo.ViewModel.Activity
 {
+	[DataContract]
 	[ViewModel( typeof( WorkIntervalProperties ), typeof( WorkIntervalCommands ) )]
 	public class WorkIntervalViewModel : AbstractViewModel
 	{
@@ -58,12 +60,14 @@ namespace Laevo.ViewModel.Activity
 		/// <summary>
 		///   The percentage of the available height the activity box occupies.
 		/// </summary>
+	 	[DataMember]
 		[NotifyProperty( WorkIntervalProperties.HeightPercentage )]
 		public double HeightPercentage { get; set; }
 
 		/// <summary>
 		///   The offset, as a percentage of the total available height, where to position the activity box, from the bottom.
 		/// </summary>
+		[DataMember]
 		[NotifyProperty( WorkIntervalProperties.OffsetPercentage )]
 		public double OffsetPercentage { get; set; }
 
