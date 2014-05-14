@@ -211,8 +211,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void NewActivity()
 		{
 			ActivityViewModel activity = CreateNewActivity();
-			PositionActivityAtCurrentOffset( activity );
 			activity.OpenActivity();
+			PositionActivityAtCurrentOffset( activity );
+
 			activity.EditActivity();
 		}
 
@@ -220,8 +221,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void PlanActivity()
 		{
 			ActivityViewModel activity = CreateNewActivity();
-			PositionActivityAtCurrentOffset( activity );
 			activity.Plan( FocusedRoundedTime );
+			PositionActivityAtCurrentOffset( activity );
+
 			activity.EditActivity();
 		}
 
@@ -462,6 +464,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			// Based on where the to do item is dropped, open, or plan it.
+			bool openEdit = false;
 			if ( IsFocusedTimeBeforeNow )
 			{
 				if ( activity.GetFutureWorkIntervals().Any() )
@@ -474,29 +477,25 @@ namespace Laevo.ViewModel.ActivityOverview
 			else
 			{
 				activity.Plan( FocusedRoundedTime );
-				activity.EditActivity( true );
+				openEdit = true;
 			}
 
 			PositionActivityAtCurrentOffset( activity );
+
+			// In case the activity was planned, open edit dialog.
+			// Opening the dialog takes some time, so the PositionActivityAtCurrentOffset() is visually noticeable if called before EditActivity(). Hence the boolean.
+			if ( openEdit )
+			{
+				activity.EditActivity( true );
+			}
 		}
 
 		void PositionActivityAtCurrentOffset( ActivityViewModel activity )
 		{
-			var offsetRange = new Interval<double>( activity.HeightPercentage, 1 );
+			var workInterval = activity.WorkIntervals.Last();
+			var offsetRange = new Interval<double>( workInterval.HeightPercentage, 1 );
 			var percentageInterval = new Interval<double>( 0, 1 );
-			activity.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
-
-			// Check whether it is a planned activity which is rescheduled, or an activity which has been opened.
-			// TODO: HeightPercentage and OffsetPercentage should only be stored in LinkedActivityViewModel.
-			var workInterval = activity.GetFutureWorkIntervals().FirstOrDefault();
-			if ( workInterval == null && activity.IsOpen )
-			{
-				workInterval = activity.WorkIntervals.Last();
-			}
-			if ( workInterval != null )
-			{
-				workInterval.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
-			}
+			workInterval.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
 		}
 
 		public void FocusedTimeChanged( DateTime focusedTime )

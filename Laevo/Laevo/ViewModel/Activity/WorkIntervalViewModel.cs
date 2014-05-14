@@ -90,6 +90,8 @@ namespace Laevo.ViewModel.Activity
 		public WorkIntervalViewModel( ActivityViewModel baseActivity )
 		{
 			BaseActivity = baseActivity;
+			HeightPercentage = 0.2;
+			OffsetPercentage = 1;
 
 			ObservableCollection<WorkIntervalViewModel> intervals = BaseActivity.WorkIntervals;
 			intervals.CollectionChanged += ( sender, args ) =>

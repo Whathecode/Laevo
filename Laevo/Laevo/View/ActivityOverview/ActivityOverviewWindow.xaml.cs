@@ -466,13 +466,12 @@ namespace Laevo.View.ActivityOverview
 		{
 			UpdateFocusedTime( e.GetPosition( this ).X );
 			UpdateOffsetPercentage( e.GetPosition( TimeLineContainer ).Y );
+			IsSchedulingActivity = false;
 
 			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
 			var overview = (ActivityOverviewViewModel)DataContext;
 
 			overview.ActivityDropped( activity );
-
-			IsSchedulingActivity = false;
 		}
 
 		void OnContextMenuOpening( object sender, ContextMenuEventArgs e )
