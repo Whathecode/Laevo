@@ -213,6 +213,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Analytics.NET">
+      <HintPath>..\packages\Analytics.1.1.0\lib\Analytics.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
     </Reference>
@@ -224,6 +227,9 @@
     </Reference>
     <Reference Include="MouseKeyboardActivityMonitor">
       <HintPath>..\..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PostSharp, Version=3.1.28.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
       <Private>True</Private>

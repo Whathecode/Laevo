@@ -12,6 +12,7 @@ using ABC.Windows.Desktop.Settings;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Model.AttentionShifts;
+using Segmentio;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Threading;
@@ -26,6 +27,7 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	public class Laevo
 	{
+		public static string UserId = Properties.Settings.Default.AnalyticsID.ToString();
 		public const string DefaultActivityName = "New Activity";
 
 		readonly Dispatcher _dispatcher;
@@ -75,6 +77,8 @@ namespace Laevo.Model
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger, PersistenceProvider persistenceProvider )
 		{
+			Analytics.Client.Track( UserId, "Startup" );
+
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
 			_interruptionTrigger = interruptionTrigger;
@@ -213,6 +217,8 @@ namespace Laevo.Model
 
 		public void Exit()
 		{
+			Analytics.Client.Track( UserId, "Exit" );
+
 			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
 
 			_processTracker.Stop();
