@@ -44,13 +44,14 @@ namespace Laevo.View.TaskList
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				Common.ForceUpdate( (TextBox)e.Source );
+				Common.Actions.ForceUpdate( (TextBox)e.Source );
 				e.Handled = true;
 			}
 		}
 
 		ActivityViewModel _draggedTaskViewModel;
-		void OnTaskDraggedPreview( object sender, MouseEventArgs e )
+
+		void OnStartDrag( object sender, MouseEventArgs e )
 		{
 			if ( e.LeftButton != MouseButtonState.Pressed )
 			{
@@ -60,17 +61,20 @@ namespace Laevo.View.TaskList
 			// Start the drag operation.
 			var draggedTask = (FrameworkElement)sender;
 			_draggedTaskViewModel = (ActivityViewModel)draggedTask.DataContext;
-			DragDrop.DoDragDrop( draggedTask, draggedTask.DataContext, DragDropEffects.Move );
+			DragDrop.DoDragDrop( draggedTask, _draggedTaskViewModel, DragDropEffects.Move );
 
 			// Finish the drag operation.
 			_draggedTaskViewModel = null;
 		}
 
-		void OnDragTask( object sender, DragEventArgs e )
+		void OnReorderTasks( object sender, DragEventArgs e )
 		{
-			// Is it a task being dragged?
+			IgnoreDrop( sender, e );
+
+			// Is it a task being reordered?
 			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
-			if ( draggedTask == null )
+			var overview = (ActivityOverviewViewModel)DataContext;
+			if ( draggedTask == null || !overview.Tasks.Contains( draggedTask ) )
 			{
 				return;
 			}
@@ -87,12 +91,41 @@ namespace Laevo.View.TaskList
 			}
 		}
 
-		void DragTaskFeedback( object sender, GiveFeedbackEventArgs e )
+		void IgnoreDrop( object sender, DragEventArgs e )
 		{
-			// TODO: Optionally hide default cursors in order to enable specialized visualizations.
-			/*e.UseDefaultCursors = false;
-			Mouse.SetCursor( Cursors.None );
-			e.Handled = true;*/
+			e.Effects = DragDropEffects.None;
+			e.Handled = true;
+		}
+
+		void OnTaskListDropOver( object sender, DragEventArgs e )
+		{
+			var activity = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			if ( activity == null )
+			{
+				e.Effects = DragDropEffects.None;
+			}
+			else
+			{
+				var overview = (ActivityOverviewViewModel)DataContext;
+				e.Effects = overview.Tasks.Contains( activity ) ? DragDropEffects.None : DragDropEffects.Move;
+			}
+
+			e.Handled = true;
+		}
+
+		void OnTaskListDrop( object sender, DragEventArgs e )
+		{
+			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
+			activity.Activity.MakeToDo();
+		}
+
+		void DragFeedback( object sender, GiveFeedbackEventArgs e )
+		{
+			if ( e.Effects == DragDropEffects.None )
+			{
+				Mouse.SetCursor( Cursors.No );
+				e.Handled = true;
+			}
 		}
 	}
 }

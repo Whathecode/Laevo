@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,9 +12,11 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ABC.Windows;
 using ABC.Windows.Desktop;
 using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
@@ -32,8 +36,8 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( StoredSession ) )]
-	[KnownType( typeof( ABC.Windows.Window ))]
-	class ActivityViewModel : AbstractViewModel
+	[KnownType( typeof( ABC.Windows.Window ) )]
+	public class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
 
@@ -99,16 +103,26 @@ namespace Laevo.ViewModel.Activity
 		public event ActivityEventHandler ActivityStoppedEvent;
 
 		/// <summary>
-		///   Event which is triggered when activity is opended.
+		///   Event which is triggered before activity suspension is started.
 		/// </summary>
-		public event ActivityEventHandler ActivityOpenedEvent;
+		public event ActivityEventHandler SuspendingActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered after an activity has been suspended and no longer contains any open resources.
+		/// </summary>
+		public event ActivityEventHandler SuspendedActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when the activity changes from or to a to-do item.
+		/// </summary>
+		public event ActivityEventHandler ToDoChangedEvent;
 
 		internal readonly Model.Activity Activity;
+
 		readonly VirtualDesktopManager _desktopManager;
 
 		[DataMember]
 		VirtualDesktop _virtualDesktop;
-
 
 		/// <summary>
 		///   The time when the activity was created.
@@ -118,41 +132,9 @@ namespace Laevo.ViewModel.Activity
 			get { return Activity.DateCreated; }
 		}
 
-		/// <summary>
-		///   The time when the activity started or will start.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.Occurance )]
-		public DateTime Occurance { get; private set; }
-
-		[NotifyPropertyChanged( Binding.Properties.Occurance )]
-		public void OnOccuranceChanged( DateTime oldOccurance, DateTime newOccurance )
-		{
-			if ( IsPlannedActivity )
-			{
-				Activity.Plan( newOccurance, TimeSpan );
-			}
-		}
-
-		[NotifyProperty( Binding.Properties.IsPlannedActivity )]
-		public bool IsPlannedActivity { get; private set; }
-
-		/// <summary>
-		///   The entire timespan during which the activity has been open, regardless of whether it was closed in between.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.TimeSpan )]
-		public TimeSpan TimeSpan { get; private set; }
-
-		[NotifyPropertyChanged( Binding.Properties.TimeSpan )]
-		public void OnTimeSpanChanged( TimeSpan oldDuration, TimeSpan newDuration )
-		{
-			if ( IsPlannedActivity )
-			{
-				Activity.Plan( Occurance, newDuration );
-			}
-		}
+		public bool IsUnnamed { get; set; }
 
 		Interval<DateTime> _currentActiveTimeSpan;
-
 		/// <summary>
 		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
 		/// </summary>
@@ -188,6 +170,7 @@ namespace Laevo.ViewModel.Activity
 		[NotifyPropertyChanged( Binding.Properties.Label )]
 		public void OnLabelChanged( string oldLabel, string newLabel )
 		{
+			IsUnnamed = false;
 			Activity.Name = newLabel;
 
 			if ( _overview != null && _overview.CurrentActivityViewModel == this )
@@ -197,30 +180,29 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		/// <summary>
-		///   The percentage of the available height the activity box occupies.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.HeightPercentage )]
-		[DataMember]
-		public double HeightPercentage { get; set; }
-
-		/// <summary>
-		///   The offset, as a percentage of the total available height, where to position the activity box, from the bottom.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.OffsetPercentage )]
-		[DataMember]
-		public double OffsetPercentage { get; set; }
-
-		/// <summary>
 		///   Determines whether or not the activity is currently active (working on it).
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsActive )]
-		public bool IsActive { get; set; }
+		public bool IsActive { get; private set; }
 
 		/// <summary>
 		///   Determines whether or not the activity is currently open, but not necessarily active (working on it).
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsOpen )]
-		public bool IsOpen { get; set; }
+		public bool IsOpen { get; private set; }
+
+		/// <summary>
+		///   Determines whether or not the activity is a to-do item, meaning that currently it is not open, nor is work planned on it in the future at a specific interval.
+		///   When work will continue on the activity is undecided.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsToDo )]
+		public bool IsToDo { get; private set; }
+
+		/// <summary>
+		///   Determines whether or not the activity is a to-do item, or has a planned future interval.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.IsPlanned )]
+		public bool IsPlanned { get; private set; }
 
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
@@ -236,13 +218,21 @@ namespace Laevo.ViewModel.Activity
 		public bool HasUnattendedInterruptions { get; private set; }
 
 		[NotifyProperty( Binding.Properties.PossibleColors )]
-		public ObservableCollection<Color> PossibleColors { get; set; }
+		public ObservableCollection<Color> PossibleColors { get; private set; }
 
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
-		public ObservableCollection<BitmapImage> PossibleIcons { get; set; }
+		public ObservableCollection<BitmapImage> PossibleIcons { get; private set; }
 
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; private set; }
+
+		/// <summary>
+		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
+		///   TODO: The collection should only be allowed to be modified from the view model.
+		/// </summary>
+		[DataMember]
+		[NotifyProperty( Binding.Properties.WorkIntervals )]
+		public ObservableCollection<WorkIntervalViewModel> WorkIntervals { get; private set; }
 
 
 		static ActivityViewModel()
@@ -264,15 +254,14 @@ namespace Laevo.ViewModel.Activity
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop, bool isEditable = true )
 		{
+			Contract.Requires( activity != null );
+
 			Activity = activity;
 
 			_desktopManager = desktopManager;
 			_virtualDesktop = desktop;
 
-			Label = activity.Name;
 			Color = DefaultColor;
-			HeightPercentage = 0.2;
-			OffsetPercentage = 1;
 			IsEditable = isEditable;
 
 			CommonInitialize();
@@ -289,15 +278,36 @@ namespace Laevo.ViewModel.Activity
 			_desktopManager = desktopManager;
 			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
 
-			Label = activity.Name;
 			Icon = storedViewModel.Icon;
 			Color = storedViewModel.Color;
-			HeightPercentage = storedViewModel.HeightPercentage;
-			OffsetPercentage = storedViewModel.OffsetPercentage;
 			IsSuspended = storedViewModel.IsSuspended;
 			IsEditable = true;
 
 			CommonInitialize();
+
+			// Initialize all work intervals.
+			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the timeline.
+			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
+			var openIntervals = Activity.OpenIntervals
+				.Where( i => !dontDisplay.Any( i.Intersects ) )
+				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
+				.ToList();
+
+			var plannedIntervals = Activity.PlannedIntervals
+				.Select( planned => planned.Interval )
+				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
+			
+			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
+			{
+				WorkIntervals.Add( i );
+			}
+
+			// Update work intervals properties. They are ordered by date of occurance.
+			for ( var i = 0; i < WorkIntervals.Count; i++ )
+			{
+				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
+				WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals[ i ].OffsetPercentage;
+			}
 
 			// Initiate attention history.
 			Model.Activity lastActivity = null;
@@ -314,7 +324,7 @@ namespace Laevo.ViewModel.Activity
 					}
 
 					// Activity opened.
-					_currentActiveTimeSpan = new Interval<DateTime>( s.Time, s.Time );
+					_currentActiveTimeSpan = new Interval<DateTime>( DateTime.Now, DateTime.Now );
 					ActiveTimeSpans.Add( _currentActiveTimeSpan );
 				}
 				else if ( _currentActiveTimeSpan != null )
@@ -336,14 +346,28 @@ namespace Laevo.ViewModel.Activity
 
 		void CommonInitialize()
 		{
+			Label = Activity.Name;
+			IsToDo = Activity.IsToDo;
+
 			Activity.ActivatedEvent += a => IsActive = true;
 			Activity.DeactivatedEvent += a => IsActive = false;
 			Activity.OpenedEvent += a => IsOpen = true;
-			Activity.StoppedEvent += a => IsOpen = false;
+			Activity.StoppedEvent += a =>
+			{
+				IsOpen = false;
+				Deactivated();
+				ActivityStoppedEvent( this );
+			};
+			Activity.ToDoChangedEvent += a =>
+			{
+				IsToDo = Activity.IsToDo;
+				ToDoChangedEvent( this );
+			};
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+			WorkIntervals = new ObservableCollection<WorkIntervalViewModel>();
 		}
 
 
@@ -396,10 +420,35 @@ namespace Laevo.ViewModel.Activity
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
 			// Initialize desktop.
-			_desktopManager.SwitchToDesktop( _virtualDesktop );
+			try
+			{
+				_desktopManager.SwitchToDesktop( _virtualDesktop );
+			}
+			catch ( UnresponsiveWindowsException e )
+			{
+				var unresponsive = e.UnresponsiveWindows.GroupBy( u => u.Window.GetProcess().ProcessName ).ToList();
+
+				// Ask user whether to ignore the locking application windows from now on.
+				// TODO: The error message could be made topmost when we could access the overview window. This exception might need to be propagated to the view.
+				string error = unresponsive.Aggregate(
+					"The following applications stopped responding and are locking up the window manager:\n\n",
+					( info, processWindows ) => info + "- " + processWindows.Key + "\n" );
+				error += "\nWould you like to ignore them from now on?";
+				MessageBoxResult result = MessageBox.Show( error, "Unresponsive Applications", MessageBoxButton.YesNo, MessageBoxImage.Exclamation );
+				if ( result == MessageBoxResult.Yes )
+				{
+					e.IgnoreAllWindows();
+				}
+			}
 			InitializeLibrary();
 
 			OpenInterruptions();
+
+			// Resume the activity in case it was suspended.
+			if ( IsSuspended )
+			{
+				ResumeActivity();
+			}
 
 			ActivatedActivityEvent( this );
 		}
@@ -421,26 +470,30 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.SelectActivity )]
 		public void SelectActivity()
 		{
-			switch ( _overview.ActivityMode )
+			if ( _overview.ActivityMode.HasFlag( Mode.Select ) )
 			{
-				case Mode.Select:
-					SelectedActivityEvent( this );
-					break;
-				case Mode.Activate:
-					// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
-					ActivateActivity( Activity.IsOpen );
-					break;
+				SelectedActivityEvent( this );
+			}
+			else
+			{
+				// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
+				ActivateActivity( Activity.IsOpen );
 			}
 		}
 
 		[CommandExecute( Commands.EditActivity )]
 		public void EditActivity()
 		{
+			EditActivity( false );
+		}
+		public void EditActivity( bool focusPlannedInterval )
+		{
 			ActivityEditStartedEvent( this );
 
 			var popup = new EditActivityPopup
 			{
-				DataContext = this
+				DataContext = this,
+				OccurancePicker = { IsOpen = focusPlannedInterval }
 			};
 			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
 			popup.Show();
@@ -455,27 +508,95 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivity )]
 		public void OpenActivity()
 		{
+			if ( !CanOpenActivity() )
+			{
+				return;
+			}
+
+			IsOpen = true;
+			bool hasPlannedParts = GetFutureWorkIntervals().Any();
+
+			if ( WorkIntervals.Count == 0 || !hasPlannedParts )
+			{
+				WorkIntervals.Add( CreateWorkInterval() );
+			}
 			Activity.Open();
-			ActivityOpenedEvent( this );
+		}
+
+		[CommandCanExecute( Commands.OpenActivity )]
+		public bool CanOpenActivity()
+		{
+			return !Activity.IsOpen;
 		}
 
 		[CommandExecute( Commands.StopActivity )]
 		public void StopActivity()
 		{
-			Deactivated();
 			Activity.Stop();
-			ActivityStoppedEvent( this );
 		}
 
+		[CommandCanExecute( Commands.StopActivity )]
+		public bool CanStopActivity()
+		{
+			return IsEditable && Activity.IsOpen && !_isSuspending;
+		}
+
+		bool _isSuspending;
+
+		[CommandExecute( Commands.SuspendActivity )]
 		public void SuspendActivity()
 		{
+			_desktopManager.UpdateWindowAssociations();
+
 			if ( IsSuspended )
 			{
 				return;
 			}
 
-			IsSuspended = true;
+			_isSuspending = true;
+			SuspendingActivityEvent( this );
+
+			// Await full suspension in background.
+			var awaitSuspend = new BackgroundWorker();
+			awaitSuspend.DoWork += ( sender, args ) =>
+			{
+				do
+				{
+					// When all windows are closed, assume suspension was successful.
+					_desktopManager.UpdateWindowAssociations();
+					Thread.Sleep( TimeSpan.FromSeconds( 1 ) );
+				} while ( _virtualDesktop.Windows.Count != 0 );
+			};
+			awaitSuspend.RunWorkerCompleted += ( sender, args ) =>
+			{
+				IsSuspended = true;
+				_isSuspending = false;
+				StopActivity();
+				SuspendedActivityEvent( this );
+			};
+			awaitSuspend.RunWorkerAsync();
+
+			// Initiate the actual suspension.
 			_virtualDesktop.Suspend();
+		}
+
+		[CommandCanExecute( Commands.SuspendActivity )]
+		public bool CanSuspendActivity()
+		{
+			return IsEditable && !IsSuspended && !_isSuspending;
+		}
+
+		[CommandExecute( Commands.ForceSuspend )]
+		public void ForceSuspend()
+		{
+			// By moving the remaining windows to the home activity, suspension will finish.
+			_virtualDesktop.TransferWindows( _virtualDesktop.Windows.ToList(), _overview.HomeActivity._virtualDesktop );
+		}
+
+		[CommandCanExecute( Commands.ForceSuspend )]
+		public bool CanForceSuspend()
+		{
+			return _isSuspending;
 		}
 
 		public void ResumeActivity()
@@ -492,6 +613,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.Remove )]
 		public void Remove()
 		{
+			// TODO: Consider partial activity remove?
 			StopActivity();
 			_overview.Remove( this );
 		}
@@ -500,6 +622,35 @@ namespace Laevo.ViewModel.Activity
 		public bool CanRemoveActivity()
 		{
 			return !HasOpenWindows && !IsOpen;
+		}
+
+		[CommandExecute( Commands.MakeToDo )]
+		public void MakeToDo()
+		{
+			Activity.MakeToDo();
+		}
+
+		[CommandCanExecute( Commands.MakeToDo )]
+		public bool CanMakeToDo()
+		{
+			return !Activity.IsToDo;
+		}
+
+		[CommandExecute( Commands.RemovePlanning )]
+		public void RemovePlanning()
+		{
+			Activity.RemovePlanning();
+
+			foreach ( var i in GetFutureWorkIntervals() )
+			{
+				WorkIntervals.Remove( i );
+			}
+		}
+
+		[CommandCanExecute( Commands.RemovePlanning )]
+		public bool CanRemovePlanning()
+		{
+			return IsToDo || GetFutureWorkIntervals().Any();
 		}
 
 		public void UpdateHasOpenWindows()
@@ -519,11 +670,44 @@ namespace Laevo.ViewModel.Activity
 			Icon = newIcon;
 		}
 
+		/// <summary>
+		///   Creates default 1 hour long planned activity.
+		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			Occurance = atTime;
-			TimeSpan = TimeSpan.FromHours( 1 );
-			Activity.Plan( atTime, TimeSpan );
+			StopActivity();
+
+			DateTime at = atTime;
+			TimeSpan duration = TimeSpan.FromHours( 1 );
+
+			WorkIntervalViewModel plannedInterval = GetFutureWorkIntervals().FirstOrDefault();
+			if ( plannedInterval == null )
+			{
+				try
+				{
+					Activity.AddPlannedInterval( at, duration );
+				}
+				catch ( InvalidOperationException )
+				{
+					// Planned too early, simply plan later.
+					at = at + TimeSpan.FromMinutes( Model.Laevo.SnapToMinutes );
+					Activity.AddPlannedInterval( at, duration );
+				}
+				WorkIntervals.Add( CreateWorkInterval( at, duration, true ) );
+			}
+			else
+			{
+				// TODO: Support replanning in model, rather than doing this through the view model.
+				plannedInterval.Occurance = at;
+			}
+		}
+
+		/// <summary>
+		///   Return all planned work intervals which lie in the future.
+		/// </summary>
+		public List<WorkIntervalViewModel> GetFutureWorkIntervals()
+		{
+			return WorkIntervals.Where( i => i.IsPlanned && !i.IsPast() ).ToList();
 		}
 
 		/// <summary>
@@ -632,18 +816,17 @@ namespace Laevo.ViewModel.Activity
 
 		public void Update( DateTime now )
 		{
-			IsPlannedActivity = Occurance > DateTime.Now;
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
+			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
 
 			// Update the interval which indicates when the activity was open.
-			if ( Activity.OpenIntervals.Count > 0 )
+			if ( WorkIntervals.Count > 0 && Activity.OpenIntervals.Count > 0 )
 			{
-				Occurance = Activity.OpenIntervals.First().Start;
-				TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.First().Start;
-			}
-			else
-			{
-				Occurance = Activity.DateCreated;
+				if ( IsOpen && !WorkIntervals.Last().IsPlanned )
+				{
+					WorkIntervals.Last().Occurance = Activity.OpenIntervals.Last().Start;
+					WorkIntervals.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
+				}
 			}
 
 			// Update the intervals which indicate when the activity was active.
@@ -680,6 +863,33 @@ namespace Laevo.ViewModel.Activity
 
 			Activity.Deactivate();
 			_currentActiveTimeSpan = null;
+		}
+
+		WorkIntervalViewModel CreateWorkInterval()
+		{
+			var newActivity = new WorkIntervalViewModel( this )
+			{
+				Occurance = DateTime.Now
+			};
+
+			var lastInterval = WorkIntervals.LastOrDefault();
+			if ( lastInterval != null )
+			{
+				newActivity.HeightPercentage = lastInterval.HeightPercentage;
+				newActivity.OffsetPercentage = lastInterval.OffsetPercentage;
+			}
+
+			return newActivity;
+		}
+
+		WorkIntervalViewModel CreateWorkInterval( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
+		{
+			var newActivity = CreateWorkInterval();
+			newActivity.Occurance = occurence;
+			newActivity.TimeSpan = timeSpan;
+			newActivity.IsPlanned = isPlanned;
+
+			return newActivity;
 		}
 
 		public override void Persist()

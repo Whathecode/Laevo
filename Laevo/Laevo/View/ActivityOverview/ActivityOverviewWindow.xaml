@@ -23,16 +23,9 @@
 	ShowInTaskbar="False"
 	FontFamily="Segoe UI Light"
 	FontSize="20"
-	Foreground="White">
+	Foreground="White"
+	Topmost="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Edit}, IfTrue=False, IfFalse=True}}">
 
-	<Window.Topmost>
-		<Binding Path="ActivityMode">
-			<Binding.Converter>
-				<converters:ActivityModeToTopMostConverter />
-			</Binding.Converter>
-		</Binding>
-	</Window.Topmost>
-	
 	<Window.Resources>
 		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
 			<GradientStop Color="#606c88" Offset="0" />
@@ -233,7 +226,7 @@
 							IsHitTestVisible="False" 
 							Visibility="{Binding
 							ElementName=Control,
-							Path=IsTimeLineDraggedOver,
+							Path=IsSchedulingActivity,
 							Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
 							<Canvas x:Name="DragDropCursorPosition">
@@ -241,7 +234,7 @@
 									Orientation ="Horizontal">
 									<StackPanel.Resources>
 										<BitmapImage x:Key="OpenTaskCursor" UriSource="Images\OpenTask.png" />
-										<BitmapImage x:Key="PlanActivityCursor" UriSource="Images\PlanActivity.png" />
+										<BitmapImage x:Key="PlanActivityCursor" UriSource="..\Common\calendar.png" />
 									</StackPanel.Resources>
 									<Image
 										x:Name="DragDropCursor"
@@ -265,44 +258,7 @@
 			</Viewport2DVisual3D>
 		</Viewport3D>
 
-		<!-- No 3D. -->
-		<!--
-		<Grid>
-			<Grid.Effect>
-				<Shaders:FadeEffect />
-			</Grid.Effect>
-
-			<Grid.CacheMode>
-				<BitmapCache />
-			</Grid.CacheMode>
-
-			<Grid
-				ClipToBounds="True"
-				Background="{StaticResource TimeLineBrush}">
-
-				<Grid.Width>
-					<MultiBinding Converter="{StaticResource TimeLineWidthConverter}">
-						<Binding ElementName="TimeLineContainer" Path="ActualWidth" />
-						<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-						<Binding ElementName="RotationTransform" Path="Angle" />
-						<Binding Path="TimeLineRenderScale" />
-					</MultiBinding>
-				</Grid.Width>
-
-				<Grid.Height>
-					<MultiBinding Converter="{StaticResource TimeLineHeightConverter}">
-						<Binding ElementName="TimeLineContainer" Path="ActualHeight" />
-						<Binding Path="TimeLineRenderScale" />
-					</MultiBinding>
-				</Grid.Height>
-
-				<ActivityOverview:TimeLineControl
-					x:Name="TimeLine"
-					Focusable="True" />
-			</Grid>
-		</Grid>
-		-->
-		
+		<!-- Bottom row icons, including to-do's and home activity. -->
 		<StackPanel
 			HorizontalAlignment="Stretch"
 			VerticalAlignment="Bottom"
@@ -326,14 +282,15 @@
 					VerticalAlignment="Bottom"
 					CornerRadius="5"
 					BorderThickness="0, 0, 0, 2"
+					AllowDrop="True"
+					DragEnter="OnHomeDropOver" DragOver="OnHomeDropOver" DragLeave="OnHomeDropOver"
+					Drop="OnHomeDrop"
 					BorderBrush="{Binding HomeActivity.IsActive, Converter={wtcConverters:FromBooleanConverter IfTrue=Yellow, IfFalse=Transparent}}">
 
 					<Button
 						Cursor="Hand"
 						Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-						Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}"
-						AllowDrop="True"
-						Drop="OnHomeDrop">
+						Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}">
 						<Image Source="Images\Home.png" />
 					</Button>
 

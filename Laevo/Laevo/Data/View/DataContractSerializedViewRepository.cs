@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using ABC.Applications.Persistence;
 using ABC.Windows.Desktop;
 using Laevo.Data.Model;
 using Laevo.Model.AttentionShifts;
@@ -25,7 +26,7 @@ namespace Laevo.Data.View
 		readonly DataContractSerializer _activitySerializer;
 
 
-		public DataContractSerializedViewRepository( string programDataFolder, VirtualDesktopManager desktopManager, IModelRepository modelData )
+		public DataContractSerializedViewRepository( string programDataFolder, VirtualDesktopManager desktopManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
 		{
 			_activitiesFile = Path.Combine( programDataFolder, "ActivityRepresentations.xml" );
 			_tasksFile = Path.Combine( programDataFolder, "TaskRepresentations.xml" );
@@ -33,7 +34,8 @@ namespace Laevo.Data.View
 			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(
 				typeof( Dictionary<DateTime, ActivityViewModel> ),
-				null, Int32.MaxValue, true, false,
+				persistenceProvider.GetPersistedDataTypes(),
+				Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( desktopManager ) );
 			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
 			if ( File.Exists( _activitiesFile ) )
@@ -87,6 +89,18 @@ namespace Laevo.Data.View
 			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
 			{
 				Tasks.Add( task );
+			}
+
+			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
+			// TODO: Improve activity identification, rather than DateCreated.
+			for ( int i = 0; i < Tasks.Count; ++i )
+			{
+				ActivityViewModel task = Tasks[ i ];
+				ActivityViewModel activity = Activities.FirstOrDefault( a => a.DateCreated == task.DateCreated );
+				if ( activity != null )
+				{
+					Tasks[ i ] = activity;
+				}
 			}
 		}
 

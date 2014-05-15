@@ -13,13 +13,12 @@
 		ShowActivityOverview,
 		HideActivityOverview,
 		SwitchActivityOverview,
-		OpenCurrentActivityLibrary,
-		StopActivity,
 		NewActivity,
 		CutWindow,
 		PasteWindows,
 		SwitchActivity,
 		ShowActivityBar,
+		HideActivityBar,
 		ActivateSelectedActivity
 	}
 }
