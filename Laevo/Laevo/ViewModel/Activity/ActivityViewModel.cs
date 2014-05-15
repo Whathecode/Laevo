@@ -302,6 +302,7 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals.Add( i );
 			}
 
+			// Update work intervals properties. They are ordered by date of occurance.
 			for ( var i = 0; i < WorkIntervals.Count; i++ )
 			{
 				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
@@ -819,7 +820,7 @@ namespace Laevo.ViewModel.Activity
 			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
 
 			// Update the interval which indicates when the activity was open.
-			if ( Activity.OpenIntervals.Count > 0 )
+			if ( WorkIntervals.Count > 0 && Activity.OpenIntervals.Count > 0 )
 			{
 				if ( IsOpen && !WorkIntervals.Last().IsPlanned )
 				{

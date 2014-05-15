@@ -50,7 +50,7 @@ namespace Laevo
 
 			// Persist current application state once per 5 minutes. 
 			var dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-			dispatcherTimer.Tick += (s, e) => _viewModel.Persist();
+			dispatcherTimer.Tick += ( s, e ) => _viewModel.Persist();
 			dispatcherTimer.Interval = new TimeSpan( 0, 5, 0 );
 			dispatcherTimer.Start();
 		}
