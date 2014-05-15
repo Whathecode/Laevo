@@ -6,6 +6,7 @@ using ABC.Windows.Desktop;
 using Laevo.Data.Model;
 using Laevo.Data.View;
 using Laevo.Model;
+using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Whathecode.System.Extensions;
 
@@ -37,7 +38,7 @@ namespace Laevo.Data
 
 	class ScrumModelRepository : AbstractMemoryModelRepository
 	{
-		readonly TimeSpan _sprintLenght = TimeSpan.FromDays( 14 );
+		readonly TimeSpan _sprintLength = TimeSpan.FromDays( 14 );
 
 
 		readonly List<Activity> _sprints = new List<Activity>();
@@ -69,7 +70,7 @@ namespace Laevo.Data
 			for ( int i = 1; i < 5; ++i )
 			{
 				CreateSprint( i, start );
-				start += _sprintLenght;
+				start += _sprintLength;
 			}
 			CreateUserStory( "Transfer payment", featureIcon );
 			CreateUserStory( "Ability to tip", featureIcon );
@@ -83,7 +84,7 @@ namespace Laevo.Data
 		void CreateSprint( int i, DateTime start )
 		{
 			var sprint = new Activity( "Sprint " + i );
-			sprint.Plan( start, _sprintLenght );
+			sprint.AddPlannedInterval( start, _sprintLength );
 			MemoryActivities.Add( sprint );
 			_sprints.Add( sprint );
 		}
@@ -91,6 +92,7 @@ namespace Laevo.Data
 		void CreateUserStory( string name, BitmapImage icon )
 		{
 			var userStory = new Activity( name );
+			userStory.MakeToDo();
 			MemoryTasks.Add( userStory );
 			_productBacklog.Add( Tuple.Create( userStory, icon ) );
 		}
@@ -109,9 +111,15 @@ namespace Laevo.Data
 			// Create view models for sprints.
 			foreach ( var activity in modelRepository.Sprints )
 			{
-				var viewModel = new ActivityViewModel( activity, desktopManager );
-				viewModel.ChangeIcon( ActivityViewModel.PresetIcons.First( i => i.UriSource.AbsolutePath.Contains( "flag.png" ) ) );
-				viewModel.ChangeColor( ActivityViewModel.PresetColors[ 7 ] );
+				var sprintViewModel = new ActivityViewModel( activity, desktopManager );
+				sprintViewModel.ChangeIcon( ActivityViewModel.PresetIcons.First( i => i.UriSource.AbsolutePath.Contains( "flag.png" ) ) );
+				sprintViewModel.ChangeColor( ActivityViewModel.PresetColors[ 7 ] );
+				foreach ( var workInterval in activity.PlannedIntervals.Select( planned => new WorkIntervalViewModel( sprintViewModel ) ) )
+				{
+					sprintViewModel.WorkIntervals.Add( workInterval );
+				}
+
+				var viewModel = new ActivityViewModel( activity, desktopManager, sprintViewModel, new ActivityAttentionShift[] { } );
 				Activities.Add( viewModel );
 			}
 
