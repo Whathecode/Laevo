@@ -1,4 +1,5 @@
 ﻿<UserControl
+	x:Name="Control"
 	x:ClassModifier="internal"
 	x:Class="Laevo.View.TaskList.TaskListControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -17,11 +18,10 @@
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=activityOverview:ActivityOverviewViewModel}"
 	FontFamily="Segoe UI Light"
-	FontSize="20"
-	x:Name="Control">
+	FontSize="20">
 	
 	<UserControl.Resources>
-		<activityConverters:ActivityBorderConverter x:Key="ActivityBorderConverter" />
+		<activityConverters:BorderBrushConverter x:Key="BorderBrushConverter" />
 		<taskList:TaskInformationOffsetConverter x:Key="TaskInformationOffsetConverter" />
 
 		<!-- Cursors embedded in dummy elements to allow relative loading: http://stackoverflow.com/a/410517/590790 -->
@@ -37,14 +37,18 @@
 			Command="{wtc:CommandBinding {x:Static b:Commands.NewTask}}"
 			Cursor="Hand"
 			Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-			Margin="{Binding ElementName=Tasks, Path=HasItems, Converter={wtcConverters:FromBooleanConverter IfTrue='0, 0, 10, 0', IfFalse=0}}">
+			Margin="{Binding ElementName=Tasks, Path=HasItems, Converter={wtcConverters:FromBooleanConverter IfTrue='0, 0, 10, 0', IfFalse=0}}"
+			AllowDrop="True"
+			DragEnter="OnTaskListDropOver" DragOver="OnTaskListDropOver" DragLeave="OnTaskListDropOver"
+			Drop="OnTaskListDrop">
 			<Image Source="add.png" />
 		</Button>
 
 		<ItemsControl
 			x:Name="Tasks"
 			AllowDrop="True"
-			DragOver="OnDragTask"
+			DragEnter="IgnoreDrop" DragLeave="IgnoreDrop"
+			DragOver="OnReorderTasks"
 			ItemsSource="{Binding Tasks}">
 
 			<ItemsControl.ItemsPanel>
@@ -102,7 +106,6 @@
 									</TextBox>
 									<activity:ActionButtons
 										VerticalAlignment="Center"
-										ShowStartButton="False"
 										Margin="0, 0, 0, 0" />
 								</StackPanel>
 
@@ -117,15 +120,15 @@
 							Margin="0, 0, 3, 0"
 							Padding="3"
 							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static ab:Commands.SelectActivity}}"
-							PreviewMouseMove="OnTaskDraggedPreview"
-							GiveFeedback="DragTaskFeedback">
+							MouseMove="OnStartDrag"
+							GiveFeedback="DragFeedback">
 							
 							<Border.Background>
 								<SolidColorBrush Color="{Binding Color}" />
 							</Border.Background>
 
 							<Border.BorderBrush>
-								<MultiBinding Converter="{StaticResource ActivityBorderConverter}">
+								<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 									<Binding Path="IsActive" />
 									<Binding Path="IsOpen" />
 									<Binding Path="HasOpenWindows" />

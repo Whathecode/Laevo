@@ -2,24 +2,22 @@
 {
 	public enum Properties
 	{
-		Occurance,
-		TimeSpan,
 		ActiveTimeSpans,
 		ShowActiveTimeSpans,
 		Icon,
 		Color,
 		Label,
-		HeightPercentage,
-		OffsetPercentage,
 		PossibleColors,
 		PossibleIcons,
 		IsActive,
 		IsOpen,
+		IsToDo,
+		IsPlanned,
 		HasOpenWindows,
 		IsSuspended,
 		HasUnattendedInterruptions,
-		IsPlannedActivity,
-		IsEditable
+		IsEditable,
+		WorkIntervals
 	}
 
 	public enum Commands
@@ -30,8 +28,29 @@
 		EditActivity,
 		OpenActivity,
 		StopActivity,
+		SuspendActivity,
+		ForceSuspend,
 		Remove,
+		MakeToDo,
+		RemovePlanning,
 		ChangeColor,
 		ChangeIcon
+	}
+
+	public enum WorkIntervalProperties
+	{
+		Occurance,
+		TimeSpan,
+		HeightPercentage,
+		OffsetPercentage,
+		BaseActivity,
+		Position,
+		IsPlanned,
+		HasMoreRecentRepresentation
+	}
+
+	public enum WorkIntervalCommands
+	{
+		EditPlannedInterval
 	}
 }

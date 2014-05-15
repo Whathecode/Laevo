@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
@@ -20,13 +19,13 @@ namespace Laevo.Data.Model
 			get { return MemoryActivities.AsReadOnly(); }
 		}
 
-		protected readonly List<Activity> MemoryTasks = new List<Activity>(); 
+		protected readonly List<Activity> MemoryTasks = new List<Activity>();
 		public ReadOnlyCollection<Activity> Tasks
 		{
 			get { return MemoryTasks.AsReadOnly(); }
 		}
 
-		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>(); 
+		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>();
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
 		{
 			get { return MemoryAttentionShifts.AsReadOnly(); }
@@ -46,40 +45,35 @@ namespace Laevo.Data.Model
 		public Activity CreateNewActivity( string name )
 		{
 			var newActivity = new Activity( name );
+			newActivity.ToDoChangedEvent += OnActivityToDoChanged;
+
 			MemoryActivities.Add( newActivity );
 
 			return newActivity;
 		}
 
-		public Activity CreateNewTask( string name )
-		{
-			var newTask = new Activity( name );
-			MemoryTasks.Add( newTask );
-
-			return newTask;
-		}
-
-		public void CreateActivityFromTask( Activity task )
-		{
-			// Ensure it is a task which is passed.
-			if ( !MemoryTasks.Contains( task ) )
-			{
-				throw new InvalidOperationException( "The passed activity is not a task from the task list." );
-			}
-
-			MemoryTasks.Remove( task );
-			MemoryActivities.Add( task );
-		}
-
 		public void RemoveActivity( Activity activity )
 		{
-			if ( MemoryActivities.Contains( activity ) )
+			activity.ToDoChangedEvent -= OnActivityToDoChanged;
+
+			MemoryActivities.Remove( activity );
+			MemoryTasks.Remove( activity );
+		}
+
+		protected void OnActivityToDoChanged( Activity activity )
+		{
+			if ( activity.IsToDo )
 			{
-				MemoryActivities.Remove( activity );
+				//MemoryActivities.Remove( activity );
+				MemoryTasks.Add( activity );
 			}
 			else
 			{
 				MemoryTasks.Remove( activity );
+				if ( !MemoryActivities.Contains( activity ) )
+				{
+					MemoryActivities.Add( activity );
+				}
 			}
 		}
 
@@ -92,7 +86,6 @@ namespace Laevo.Data.Model
 		{
 			MemoryAttentionShifts.Add( attentionShift );
 		}
-
 
 		public abstract void SaveChanges();
 	}

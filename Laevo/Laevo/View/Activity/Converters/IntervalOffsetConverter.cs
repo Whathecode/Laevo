@@ -7,7 +7,7 @@ using Whathecode.System.Extensions;
 
 namespace Laevo.View.Activity.Converters
 {
-	public class ActivityOffsetConverter : IMultiValueConverter
+	public class IntervalOffsetConverter : IMultiValueConverter
 	{
 		// TODO: Get these offsets from somewhere else instead.
 		const double TopOffset = ActivityOverviewWindow.TopOffset;

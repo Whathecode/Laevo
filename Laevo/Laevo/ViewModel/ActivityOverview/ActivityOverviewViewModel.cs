@@ -17,7 +17,7 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 namespace Laevo.ViewModel.ActivityOverview
 {
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
-	class ActivityOverviewViewModel : AbstractViewModel
+	public class ActivityOverviewViewModel : AbstractViewModel
 	{
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
 
@@ -48,6 +48,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler StoppedActivityEvent;
 
 		/// <summary>
+		///   Event which is triggered when an activity is being suspended.
+		/// </summary>
+		public event ActivityViewModel.ActivityEventHandler SuspendingActivityEvent;
+
+		/// <summary>
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
 		public event Action NoCurrentActiveActivityEvent;
@@ -76,8 +81,9 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		/// <summary>
 		///   The ViewModel of the activity which is currently open.
+		///   TODO: Think if property should be moved to MainViewModel.
 		/// </summary>
-		/// TODO: Think if property should be moved to MainViewModel.
+		[NotifyProperty( Binding.Properties.CurrentActivityViewModel )]
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
@@ -88,6 +94,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsFocusedTimeBeforeNow )]
 		public bool IsFocusedTimeBeforeNow { get; private set; }
+
 
 		/// <summary>
 		///   The time which currently has input focus and can be acted upon. This is rounded to nearest values.
@@ -163,7 +170,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.DesktopManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
-				Icon = _defaultIcon
+				Icon = _defaultIcon,
+				IsUnnamed = true
 			};
 			lock ( Activities )
 			{
@@ -187,11 +195,15 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void AddTask( ActivityViewModel task )
 		{
+			if ( !task.Activity.IsToDo )
+			{
+				throw new ArgumentException( "The passed activity is not a to-do item.", "task" );
+			}
+
 			lock ( Tasks )
 			{
 				Tasks.Insert( 0, task );
 			}
-
 			HookActivityToOverview( task );
 		}
 
@@ -199,8 +211,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void NewActivity()
 		{
 			ActivityViewModel activity = CreateNewActivity();
-			PositionActivityAtCurrentOffset( activity );
 			activity.OpenActivity();
+			PositionActivityAtCurrentOffset( activity );
+
 			activity.EditActivity();
 		}
 
@@ -208,8 +221,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void PlanActivity()
 		{
 			ActivityViewModel activity = CreateNewActivity();
-			PositionActivityAtCurrentOffset( activity );
 			activity.Plan( FocusedRoundedTime );
+			PositionActivityAtCurrentOffset( activity );
+
 			activity.EditActivity();
 		}
 
@@ -233,28 +247,16 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			_model.Remove( activity.Activity );
 
-			if ( Activities.Contains( activity ) )
+			lock ( Activities )
 			{
-				lock ( Activities )
-				{
-					Activities.Remove( activity );
-				}
+				Activities.Remove( activity );
 			}
-			else
+			lock ( Tasks )
 			{
-				lock ( Tasks )
-				{
-					Tasks.Remove( activity );
-				}
+				Tasks.Remove( activity );
 			}
 
-			activity.ActivatingActivityEvent -= OnActivityActivating;
-			activity.ActivatedActivityEvent -= OnActivityActivated;
-			activity.SelectedActivityEvent -= OnActivitySelected;
-			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
-			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
-			activity.ActivityStoppedEvent -= OnActivityStopped;
-			activity.ActivityOpenedEvent -= OnActivityOpened;
+			UnHookActivityFromOverview( activity );
 
 			RemovedActivityEvent( activity );
 		}
@@ -275,9 +277,25 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.SwapTaskOrder( task1.Activity, task2.Activity );
 		}
 
+		void UnHookActivityFromOverview( ActivityViewModel activity )
+		{
+			activity.ActivatingActivityEvent -= OnActivityActivating;
+			activity.ActivatedActivityEvent -= OnActivityActivated;
+			activity.SelectedActivityEvent -= OnActivitySelected;
+			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
+			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
+			activity.ActivityStoppedEvent -= OnActivityStopped;
+			activity.SuspendingActivityEvent -= OnSuspendingActivity;
+			activity.SuspendedActivityEvent -= OnSuspendedActivity;
+			activity.ToDoChangedEvent -= OnToDoChanged;
+		}
+
 		void HookActivityToOverview( ActivityViewModel activity )
 		{
 			activity.SetOverviewManager( this );
+
+			// Make sure the events are never hooked twice.
+			UnHookActivityFromOverview( activity );
 
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
@@ -285,7 +303,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
 			activity.ActivityStoppedEvent += OnActivityStopped;
-			activity.ActivityOpenedEvent += OnActivityOpened;
+			activity.SuspendingActivityEvent += OnSuspendingActivity;
+			activity.SuspendedActivityEvent += OnSuspendedActivity;
+			activity.ToDoChangedEvent += OnToDoChanged;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -327,17 +347,44 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnActivityEditStarted( ActivityViewModel viewModel )
 		{
-			ActivityMode = Mode.Edit;
+			ActivityMode |= Mode.Edit;
 		}
 
 		void OnActivityEditFinished( ActivityViewModel viewModel )
 		{
-			ActivityMode = Mode.Activate;
+			ActivityMode &= ~Mode.Edit;
 		}
 
-		void OnActivityOpened( ActivityViewModel viewModel )
+		void OnSuspendingActivity( ActivityViewModel viewModel )
 		{
-			OpenedActivityEvent( viewModel );
+			ActivityMode |= Mode.Suspending;
+			SuspendingActivityEvent( viewModel );
+		}
+
+		void OnSuspendedActivity( ActivityViewModel viewModel )
+		{
+			ActivityMode &= ~Mode.Suspending;
+		}
+
+		void OnToDoChanged( ActivityViewModel viewModel )
+		{
+			bool isTurnedIntoToDo = viewModel.Activity.IsToDo;
+
+			if ( isTurnedIntoToDo )
+			{
+				AddTask( viewModel );
+
+				// Remove all future planned intervals.
+				var toRemove = viewModel.GetFutureWorkIntervals();
+				foreach ( var r in toRemove )
+				{
+					viewModel.WorkIntervals.Remove( r );
+				}
+			}
+			else
+			{
+				Tasks.Remove( viewModel );
+			}
 		}
 
 		[CommandExecute( Commands.OpenHome )]
@@ -351,12 +398,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
 		void OnEnableAttentionLinesChanged( bool oldIsEnabled, bool newIsEnabled )
 		{
-			foreach ( var activity in Activities )
+			foreach ( var activity in Activities.Concat( Tasks ) )
 			{
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
-
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -405,39 +451,51 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.DesktopManager.PasteWindows();
 		}
 
-		public void TaskDropped( ActivityViewModel task )
+		public void ActivityDropped( ActivityViewModel activity )
 		{
-			// Ensure it is a task being dropped.
-			if ( !Tasks.Contains( task ) )
+			if ( activity.IsToDo )
 			{
-				return;
+				// Convert to activity.
+				Tasks.Remove( activity );
+				if ( !Activities.Contains( activity ) ) // Activity can already have a presentation on the time line when it was converted to a to do item before.
+				{
+					Activities.Add( activity );
+				}
 			}
 
-			// Convert to activity.
-			_model.CreateActivityFromTask( task.Activity );
-			task.ShowActiveTimeSpans = _model.Settings.EnableAttentionLines;
-			Tasks.Remove( task );
-			Activities.Add( task );
-
-			PositionActivityAtCurrentOffset( task );
-
-			// Based on where the task is dropped, open, or plan it.
+			// Based on where the to do item is dropped, open, or plan it.
+			bool openEdit = false;
 			if ( IsFocusedTimeBeforeNow )
 			{
-				task.OpenActivity();
+				if ( activity.GetFutureWorkIntervals().Any() )
+				{
+					activity.RemovePlanning();
+				}
+
+				activity.OpenActivity();
 			}
 			else
 			{
-				task.Plan( FocusedRoundedTime );
-				task.EditActivity();
+				activity.Plan( FocusedRoundedTime );
+				openEdit = true;
+			}
+
+			PositionActivityAtCurrentOffset( activity );
+
+			// In case the activity was planned, open edit dialog.
+			// Opening the dialog takes some time, so the PositionActivityAtCurrentOffset() is visually noticeable if called before EditActivity(). Hence the boolean.
+			if ( openEdit )
+			{
+				activity.EditActivity( true );
 			}
 		}
 
-		void PositionActivityAtCurrentOffset( ActivityViewModel task )
+		void PositionActivityAtCurrentOffset( ActivityViewModel activity )
 		{
-			var offsetRange = new Interval<double>( task.HeightPercentage, 1 );
+			var workInterval = activity.WorkIntervals.Last();
+			var offsetRange = new Interval<double>( workInterval.HeightPercentage, 1 );
 			var percentageInterval = new Interval<double>( 0, 1 );
-			task.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
+			workInterval.OffsetPercentage = offsetRange.Map( FocusedOffsetPercentage, percentageInterval ).Clamp( 0, 1 );
 		}
 
 		public void FocusedTimeChanged( DateTime focusedTime )

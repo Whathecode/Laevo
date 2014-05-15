@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Laevo.ViewModel.Activity;
 using Microsoft.Win32;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
+using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 
 
 namespace Laevo.View.ActivityBar
@@ -15,54 +16,59 @@ namespace Laevo.View.ActivityBar
 	/// <summary>
 	/// Interaction logic for ActivityBar.xaml
 	/// </summary>
+	[WpfControl( typeof( Properties ) )]
 	public partial class ActivityBar
 	{
-		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
-		public static extern IntPtr DefWindowProc( IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam );
-
-		const int WindowsHitTest = 0x0084;
-		const int HitBorder = 18;
-		const int HitBottomBorder = 15;
-		const int HitBottomleftBorderCorner = 16;
-		const int HitBottomRightBorderCorner = 17;
-		const int HitLeftBorder = 10;
-		const int HitRightBorder = 11;
-		const int HitTopBorder = 12;
-		const int HitTopLeftBorderCorner = 13;
-		const int HitTopRightBorderCorner = 14;
-
-		[DllImport( "dwmapi.dll", EntryPoint = "#127" )]
-		static extern void DwmGetColorizationParameters( out Dwmcolorizationparams parameters );
-
-		public struct Dwmcolorizationparams
+		public enum Properties
 		{
-			public uint
-				ColorizationColor,
-				ColorizationAfterglow,
-				ColorizationColorBalance,
-				ColorizationAfterglowBalance,
-				ColorizationBlurBalance,
-				ColorizationGlassReflectionIntensity,
-				ColorizationOpaqueBlend;
+			SelectedActivity,
+			CurrentActivity
 		}
 
-		const string ActivityButtonName = "ActivityButton";
-		const double TopWhenVisible = -3;
+		const double TopWhenVisible = -5;
 
 		readonly TimeSpan _displayTime = TimeSpan.FromSeconds( 4 );
 		readonly DoubleAnimation _hideAnimation;
 
-		private bool _barGotClosed;
+		bool _barGotClosed;
+		readonly ActivityMenu _activityMenu = new ActivityMenu();
+
+		[DependencyProperty( Properties.CurrentActivity )]
+		public ActivityViewModel CurrentActivity { get; set; }
+
+		[DependencyPropertyChanged( Properties.CurrentActivity )]
+		public static void OnCurrentActivityChanged( DependencyObject sender, DependencyPropertyChangedEventArgs args )
+		{
+			var bar = (ActivityBar)sender;
+
+			if ( bar.CurrentActivity != null && bar.CurrentActivity.IsUnnamed )
+			{
+				bar.CurrentActivity.IsUnnamed = false;
+				bar.Activate();
+				bar.Focus();
+
+				bar.ActivityName.Select( 0, bar.ActivityName.Text.Length );
+				bar.ActivityName.Focus();
+			}
+		}
+
+		[DependencyProperty( Properties.SelectedActivity )]
+		public ActivityViewModel SelectedActivity { get; set; }
 
 
 		public ActivityBar()
 		{
 			InitializeComponent();
 
+			// Set up two way binding for the necessary properties to the viewmodel.
+			var selectedBinding = new Binding( "SelectedActivity" ) { Mode = BindingMode.TwoWay };
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.SelectedActivity ), selectedBinding );
+			var currentBinding = new Binding( "Overview.CurrentActivityViewModel" );
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.CurrentActivity ), currentBinding );
+
 			ResizeToScreenWidth();
 			SystemEvents.DisplaySettingsChanged += ( s, a ) => ResizeToScreenWidth();
 
-			Loaded += OnLoaded;
 			Deactivated += OnDeactivated;
 
 			Activated += ( s, args ) => PinTaskbar();
@@ -76,6 +82,13 @@ namespace Laevo.View.ActivityBar
 				FillBehavior = FillBehavior.Stop,
 				BeginTime = _displayTime
 			};
+
+			// When menu is deactivated, hide entire activity bar.
+			_activityMenu.Deactivated += ( sender, args ) =>
+			{
+				_activityMenu.Hide();
+				ShowBarFor( TimeSpan.Zero );
+			};
 		}
 
 
@@ -84,78 +97,35 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		void ResizeToScreenWidth()
 		{
-			Left = -5;
-			Width = SystemParameters.PrimaryScreenWidth + 10;
-		}
+			// Sets width of Activity Bar to half of the screen and places it in the middle.
+			Width = SystemParameters.PrimaryScreenWidth / 2;
+			Left = ( SystemParameters.PrimaryScreenWidth / 2 ) - ( Width / 2 );
 
-		/// <summary>
-		/// Gets a color from windows registry in order to apply it to a window in both Aero and othere themes. (Not used for now)
-		/// </summary>
-		Color GetWindowColorizationColor( bool opaque )
-		{
-			Dwmcolorizationparams windowsColors;
-			DwmGetColorizationParameters( out windowsColors );
-
-			return Color.FromArgb(
-				(byte)( opaque ? 255 : windowsColors.ColorizationColor >> 24 ),
-				(byte)( windowsColors.ColorizationColor >> 16 ),
-				(byte)( windowsColors.ColorizationColor >> 8 ),
-				(byte)windowsColors.ColorizationColor );
-		}
-
-		void OnLoaded( object sender, RoutedEventArgs e )
-		{
-			// Disable default resize behavior by overriding default events.
-			var mainWindowPointer = new WindowInteropHelper( this ).Handle;
-			var mainWindowSource = HwndSource.FromHwnd( mainWindowPointer );
-			if ( mainWindowSource != null )
-			{
-				mainWindowSource.AddHook( HandleWindowHits );
-			}
-		}
-
-		/// <summary>
-		/// Override the window hit test. If the cursor is over a resize border, return a standard border result instead.
-		/// </summary>
-		IntPtr HandleWindowHits( IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled )
-		{
-			if ( message != WindowsHitTest )
-			{
-				return IntPtr.Zero;
-			}
-
-			handled = true;
-			var hitLocation = DefWindowProc( hwnd, message, wParam, lParam ).ToInt32();
-			switch ( hitLocation )
-			{
-				case HitBottomBorder:
-				case HitBottomleftBorderCorner:
-				case HitBottomRightBorderCorner:
-				case HitLeftBorder:
-				case HitRightBorder:
-				case HitTopBorder:
-				case HitTopLeftBorderCorner:
-				case HitTopRightBorderCorner:
-					hitLocation = HitBorder;
-					break;
-			}
-
-			return new IntPtr( hitLocation );
+			_activityMenu.Left = Left;
+			_activityMenu.Top = Height + TopWhenVisible;
 		}
 
 		/// <summary>
 		/// Show the activity bar and hide it after some time.
 		/// </summary>
-		public void ShowActivityBar( bool activate )
+		public void ShowActivityBar( bool autoHide )
+		{
+			// When the bar is reshown, hide menu.
+			_activityMenu.Hide();
+
+			if ( autoHide )
+			{
+				ShowBarFor( _displayTime );
+			}
+			else
+			{
+				PinTaskbar();
+			}
+		}
+
+		public void HideActivityBar()
 		{
 			ShowBarFor( _displayTime );
-
-			if ( activate )
-			{
-				Activate();
-				ActivityName.Select( 0, ActivityName.Text.Length );
-				ActivityName.Focus();
-			}
 		}
 
 		void ShowBarFor( TimeSpan delay )
@@ -185,7 +155,7 @@ namespace Laevo.View.ActivityBar
 		/// </summary>
 		public bool IsInUse()
 		{
-			return IsActive && !_barGotClosed;
+			return ( IsActive || _activityMenu.IsActive ) && !_barGotClosed;
 		}
 
 		void HideCompleted( object sender, EventArgs e )
@@ -202,8 +172,8 @@ namespace Laevo.View.ActivityBar
 				nameBinding.UpdateSource();
 			}
 
-			// Hide the infobox.
-			if ( !_barGotClosed )
+			// Hide the infobox when needed.
+			if ( !_barGotClosed && !_activityMenu.IsVisible )
 			{
 				_hideAnimation.BeginTime = TimeSpan.Zero;
 				BeginAnimation( TopProperty, _hideAnimation );
@@ -217,39 +187,34 @@ namespace Laevo.View.ActivityBar
 			{
 				_barGotClosed = true;
 
-				// TODO: Why is the focus moved here?
-				ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
-
+				ActivityButton.Focus();
 				ShowBarFor( TimeSpan.Zero );
+
+				e.Handled = true;
 			}
 		}
 
-		/// <summary>
-		/// Sets bar to be closed and passes the focus.
-		/// </summary>
-		internal void CloseAndPassFocus()
+		void SwitchActivityMenu( object sender, RoutedEventArgs e )
 		{
-			// TODO: There are still some problems left with activity switching and bar hiding/showing.
-			_barGotClosed = true;
-
-			// TODO: Why is the focus moved here?
-			ActivityName.MoveFocus( new TraversalRequest( FocusNavigationDirection.Previous ) );
-
-			ShowBarFor( _displayTime );
+			if ( _activityMenu.IsVisible )
+			{
+				_activityMenu.Hide();
+				return;
+			}
+			
+			_activityMenu.DataContext = CurrentActivity;
+			_activityMenu.Show();
 		}
 
-		/// <summary>
-		/// Switches between current and opened activities.
-		/// </summary>
-		internal void SelectNextActivity( int selectionIndex )
+		void OnActivityHover( object sender, MouseEventArgs e )
 		{
-			Activate();
-			_barGotClosed = false;
+			var button = (FrameworkElement)sender;
+			SelectedActivity = (ActivityViewModel)button.DataContext;
+		}
 
-			// Move focus to next activity button.
-			var contentPresenter = (ContentPresenter)ItemsControlActivities.ItemContainerGenerator.ContainerFromIndex( selectionIndex );
-			var activityButton = (Button)contentPresenter.ContentTemplate.FindName( ActivityButtonName, contentPresenter );
-			activityButton.Focus();
+		void OnActivityHoverLeave( object sender, MouseEventArgs e )
+		{
+			SelectedActivity = null;
 		}
 	}
 }

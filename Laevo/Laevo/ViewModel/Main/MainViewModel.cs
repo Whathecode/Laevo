@@ -30,7 +30,7 @@ namespace Laevo.ViewModel.Main
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
 
-		readonly ActivityBarViewModel _activityBarViewModel = new ActivityBarViewModel();
+		readonly ActivityBarViewModel _activityBarViewModel;
 		readonly View.ActivityBar.ActivityBar _activityBar = new View.ActivityBar.ActivityBar();
 
 		readonly Dispatcher _dispatcher;
@@ -39,6 +39,7 @@ namespace Laevo.ViewModel.Main
 
 		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
 		public int UnattendedInterruptions { get; private set; }
+
 
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
@@ -52,17 +53,15 @@ namespace Laevo.ViewModel.Main
 
 			EnsureActivityOverview();
 
-			_activityBarViewModel.ActivityBar = _activityBar;
-			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
-			_activityBarViewModel.HomeActivity = _activityOverviewViewModel.HomeActivity;
-			_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, _activityOverviewViewModel.HomeActivity );
+			_activityBarViewModel = new ActivityBarViewModel( _activityOverviewViewModel );
 			_activityBar.DataContext = _activityBarViewModel;
-			ShowActivityBar();
+			ShowActivityBar( true );
 		}
+
 
 		/// <summary>
 		///   HACK: This functionality is provided since this is still a prototype and sometimes the GUI seems to hang.
-		///         This could be due to a possible WPF bug:
+		///			This could be due to a possible WPF bug:
 		///			https://connect.microsoft.com/VisualStudio/feedback/details/602232/when-using-cachemode-bitmapcache-upon-waking-up-from-sleep-wpf-rendering-thread-consumes-40-cpu#tabs
 		/// </summary>
 		void ResetGui()
@@ -71,7 +70,7 @@ namespace Laevo.ViewModel.Main
 			{
 				_activityOverview.Close();
 				_activityOverview = null;
-				if ( _activityOverviewViewModel.ActivityMode == Mode.Select )
+				if ( _activityOverviewViewModel.ActivityMode.HasFlag( Mode.Select ) )
 				{
 					ShowActivityOverview();
 				}
@@ -85,9 +84,17 @@ namespace Laevo.ViewModel.Main
 			UnattendedInterruptions = _model.Activities.Concat( _model.Tasks ).Sum( a => a.Interruptions.Count( i => !i.AttendedTo ) );
 		}
 
+		public ActivityViewModel GetCurrentActivity()
+		{
+			return _activityOverviewViewModel.CurrentActivityViewModel;
+		}
+
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
+			// Make sure newly opened windows on the current desk are stored as well.
+			_model.DesktopManager.UpdateWindowAssociations();
+
 			_activityOverviewViewModel.Exit();
 			Persist();
 			_model.Exit();
@@ -130,20 +137,26 @@ namespace Laevo.ViewModel.Main
 			_activityOverview.Activate();
 		}
 
+		[CommandCanExecute( Commands.ShowActivityOverview )]
+		public bool CanShowActivityOverview()
+		{
+			return CanSwitchActivityOverview();
+		}
+
 		/// <summary>
-		/// Opens the activity overview in order to select one of the activities.
+		///   Opens the activity overview in order to select one of the activities.
 		/// </summary>
 		/// <param name="selectedActivity">The action to perform on the selected activity.</param>
 		public void SelectActivity( Action<ActivityViewModel> selectedActivity )
 		{
-			_activityOverviewViewModel.ActivityMode = Mode.Select;
+			_activityOverviewViewModel.ActivityMode |= Mode.Select;
 			var awaitOpen = Observable.FromEvent<ActivityViewModel.ActivityEventHandler, ActivityViewModel>(
 				h => _activityOverviewViewModel.SelectedActivityEvent += h,
 				h => _activityOverviewViewModel.SelectedActivityEvent -= h ).Take( 1 );
 			awaitOpen.Subscribe( a =>
 			{
 				selectedActivity( a );
-				_activityOverviewViewModel.ActivityMode = Mode.Activate;
+				_activityOverviewViewModel.ActivityMode &= ~Mode.Select;
 				HideActivityOverview();
 			} );
 			ShowActivityOverview();
@@ -160,7 +173,7 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) && !_activityBar.IsInUse() )
+			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
 			{
 				ShowActivityOverview();
 			}
@@ -173,42 +186,25 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
+			return _activityOverviewViewModel.ActivityMode == Mode.Activate && !_activityBar.IsInUse();
 		}
 
 		[CommandExecute( Commands.ShowActivityBar )]
-		public void ShowActivityBar( bool activate = false )
+		public void ShowActivityBar( bool autoHide )
 		{
 			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
 			{
-				_activityBar.ShowActivityBar( activate );
+				_activityBar.ShowActivityBar( autoHide );
 			}
 		}
 
-		[CommandExecute( Commands.OpenCurrentActivityLibrary )]
-		public void OpenCurrentActivityLibrary()
-		{
-			_activityOverviewViewModel.CurrentActivityViewModel.OpenActivityLibrary();
-		}
-
-		[CommandExecute( Commands.StopActivity )]
-		public void StopActivity()
+		[CommandExecute( Commands.HideActivityBar )]
+		public void HideActivityBar()
 		{
 			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
 			{
-				_activityOverviewViewModel.CurrentActivityViewModel.StopActivity();
+				_activityBar.HideActivityBar();
 			}
-		}
-
-		[CommandCanExecute( Commands.StopActivity )]
-		public bool CanStopActivity()
-		{
-			var currentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
-
-			return
-				currentActivity != null &&
-				currentActivity != _activityOverviewViewModel.HomeActivity &&
-				currentActivity.IsOpen;
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -221,7 +217,7 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.NewActivity )]
 		public bool CanNewActivity()
 		{
-			return _activityOverviewViewModel.ActivityMode != Mode.Select;
+			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
 		}
 
 		[CommandExecute( Commands.CutWindow )]
@@ -267,10 +263,8 @@ namespace Laevo.ViewModel.Main
 				};
 
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
-				_activityOverviewViewModel.RemovedActivityEvent += OnRemovedActivityEvent;
+				_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
-				_activityOverviewViewModel.OpenedActivityEvent += OnOpenedActivityEvent;
-				_activityOverviewViewModel.StoppedActivityEvent += OnStoppedActivityEvent;
 			}
 			_activityOverview = new ActivityOverviewWindow
 			{
@@ -283,56 +277,21 @@ namespace Laevo.ViewModel.Main
 		{
 			UpdateUnattendedInterruptions();
 
-			// Links CurrentActivity to Current Activity notify property in ActivityBarViewModel.
-			_activityBarViewModel.CurrentActivity = _activityOverviewViewModel.CurrentActivityViewModel;
-
-			if ( oldActivity != newActivity )
-			{
-				if ( oldActivity != null && !oldActivity.IsOpen )
-				{
-					_activityBarViewModel.OpenPlusCurrentActivities.Remove( oldActivity );
-				}
-
-				// Checks if new activity is in the list, if no adds it on front, if yes changes its positoin to first- behavior to simulate windows alt+tab switching.
-				int newActivityIndex = _activityBarViewModel.OpenPlusCurrentActivities.IndexOf( newActivity );
-				if ( newActivity != null && newActivityIndex == -1 )
-				{
-					_activityBarViewModel.OpenPlusCurrentActivities.Insert( 0, newActivity );
-				}
-				else if ( newActivityIndex != -1 )
-				{
-					_activityBarViewModel.OpenPlusCurrentActivities.Move( newActivityIndex, 0 );
-				}
-			}
-
 			HideActivityOverview();
 
 			// TODO: Is there a better way to check whether the name has been set already? Perhaps it's also not desirable to activate the activity bar each time as long as the name isn't changed?
-			ShowActivityBar( newActivity.Label == Model.Laevo.DefaultActivityName );
+			ShowActivityBar( newActivity.Label != Model.Laevo.DefaultActivityName );
 		}
 
-		void OnRemovedActivityEvent( ActivityViewModel removed )
+		void OnSuspendingActivityEvent( ActivityViewModel viewmodel )
 		{
-			_activityBarViewModel.OpenPlusCurrentActivities.Remove( removed );
+			ShowActivityBar( false );
 		}
 
 		void OnNoCurrentActiveActivityEvent()
 		{
 			// Open time line in order to select a new activity to continue work on.
 			SelectActivity( a => a.ActivateActivity( a.IsOpen ) );
-		}
-
-		void OnOpenedActivityEvent( ActivityViewModel opened )
-		{
-			if ( !_activityBarViewModel.OpenPlusCurrentActivities.Contains( opened ) )
-			{
-				_activityBarViewModel.OpenPlusCurrentActivities.Add( opened );
-			}
-		}
-
-		void OnStoppedActivityEvent( ActivityViewModel stopped )
-		{
-			_activityBarViewModel.OpenPlusCurrentActivities.Remove( stopped );
 		}
 
 		public override void Persist()

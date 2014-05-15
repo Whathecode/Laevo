@@ -3,14 +3,10 @@ namespace Laevo.ViewModel.ActivityBar.Binding
 {
 	public enum Properties
 	{
-		CurrentActivity,
 		OpenPlusCurrentActivities,
-		HomeActivity,
-		SelectedActivity
+		SelectedActivity,
+		Overview
 	}
 
-	public enum Commands
-	{
-
-	}
+	public enum Commands { }
 }

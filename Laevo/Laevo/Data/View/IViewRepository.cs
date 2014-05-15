@@ -8,7 +8,7 @@ namespace Laevo.Data.View
 	///   Provides access to the persisted view data of Laevo.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	interface IViewRepository
+	public interface IViewRepository
 	{
 		ObservableCollection<ActivityViewModel> Activities { get; }
 		ObservableCollection<ActivityViewModel> Tasks { get; }

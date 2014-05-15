@@ -7,7 +7,7 @@ using Whathecode.System.Arithmetic.Range;
 
 namespace Laevo.View.Activity.Converters
 {
-	public class TimeSpanConverter : IMultiValueConverter
+	public class AttentionTimeSpanConverter : IMultiValueConverter
 	{
 		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 		{

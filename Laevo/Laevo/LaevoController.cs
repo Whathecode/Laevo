@@ -19,10 +19,11 @@ namespace Laevo
 	{
 		static readonly string ProgramLocalDataFolder
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "Laevo" );
+
 		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
 
-		PersistenceProvider _applicationPersistence;
+		readonly PersistenceProvider _persistenceProvider;
 
 		readonly MainViewModel _viewModel;
 		readonly TrayIconControl _trayIcon;
@@ -32,13 +33,13 @@ namespace Laevo
 		{
 			// Create Services.
 			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
-			_applicationPersistence = new PersistenceProvider( PersistencePluginLibrary );
+			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
 			//var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator );
 			var repositoryFactory = new ScrumExampleDataFactory();
-			
+
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _applicationPersistence );
+			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
 
 			// Create ViewModel.
 			// TODO: Move DesktopManager to ViewModel?
@@ -47,12 +48,18 @@ namespace Laevo
 
 			// Create View.
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
+
+			// Persist current application state once per 5 minutes. 
+			var dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+			dispatcherTimer.Tick += ( s, e ) => _viewModel.Persist();
+			dispatcherTimer.Interval = new TimeSpan( 0, 5, 0 );
+			dispatcherTimer.Start();
 		}
 
 
 		protected override void FreeManagedResources()
 		{
-			_applicationPersistence.Dispose();
+			_persistenceProvider.Dispose();
 		}
 
 		protected override void FreeUnmanagedResources()

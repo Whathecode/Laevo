@@ -11,12 +11,12 @@ using Whathecode.System.Xaml.Behaviors;
 
 
 namespace Laevo.View.Activity
-{	
+{
 	/// <summary>
 	/// Interaction logic for ActivityControl.xaml
 	/// </summary>
 	[WpfControl( typeof( Properties ) )]
-	public partial class ActivityControl
+	public partial class WorkIntervalControl
 	{
 		[Flags]
 		public enum Properties
@@ -32,7 +32,7 @@ namespace Laevo.View.Activity
 		public bool IsDraggingActivity { get; private set; }
 
 
-		public ActivityControl()
+		public WorkIntervalControl()
 		{
 			InitializeComponent();
 
@@ -59,7 +59,7 @@ namespace Laevo.View.Activity
 		{
 			if ( e.Key.EqualsAny( Key.Enter, Key.Escape ) )
 			{
-				Common.ForceUpdate( ActivityName );
+				Common.Actions.ForceUpdate( ActivityName );
 			}
 		}
 
@@ -69,16 +69,47 @@ namespace Laevo.View.Activity
 			Buttons.Margin = new Thickness( xOffset, Container.ActualHeight, 0, 0 );
 		}
 
-		void OnTaskDropped( object sender, DragEventArgs e )
+		void OnDropOver( object sender, DragEventArgs e )
 		{
-			var draggedTask = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
-			if ( draggedTask == null )
+			// For now only allow dropping to do items to merge.
+			var activity = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
+			if ( activity == null || !activity.IsToDo )
 			{
-				return;
+				e.Effects = DragDropEffects.None;
 			}
 
-			var dropTarget = (ActivityViewModel)DataContext;
-			dropTarget.Merge( draggedTask );
+			e.Handled = true;
+		}
+
+		void OnDrop( object sender, DragEventArgs e )
+		{
+			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
+			var dropTarget = (WorkIntervalViewModel)DataContext;
+
+			dropTarget.BaseActivity.Merge( activity );
+
+			e.Handled = true;
+		}
+
+		void StartDrag( object sender, MouseEventArgs e )
+		{
+			var activity = (WorkIntervalViewModel)DataContext;
+
+			if ( e.LeftButton == MouseButtonState.Pressed && !activity.HasMoreRecentRepresentation )
+			{
+				var draggedTask = (FrameworkElement)sender;
+				var draggedActivity = activity.BaseActivity;
+				DragDrop.DoDragDrop( draggedTask, draggedActivity, DragDropEffects.Move );
+			}
+		}
+
+		void DragFeedback( object sender, GiveFeedbackEventArgs e )
+		{
+			if ( e.Effects == DragDropEffects.None )
+			{
+				Mouse.SetCursor( Cursors.No );
+				e.Handled = true;
+			}
 		}
 	}
 }

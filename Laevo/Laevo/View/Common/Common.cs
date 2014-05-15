@@ -2,9 +2,9 @@
 using System.Windows.Input;
 
 
-namespace Laevo.View
+namespace Laevo.View.Common
 {
-	static class Common
+	static class Actions
 	{
 		/// <summary>
 		///   For the source of an UIelement to be updated by moving the focus.

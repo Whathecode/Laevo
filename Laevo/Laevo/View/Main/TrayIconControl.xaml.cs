@@ -19,6 +19,7 @@ using Whathecode.System.Windows.Input.InputController.Trigger;
 using Whathecode.System.Windows.Threading;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Timer = System.Timers.Timer;
+using ActivityCommands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
 namespace Laevo.View.Main
@@ -30,6 +31,7 @@ namespace Laevo.View.Main
 	{
 		const int UpdatesPerSecond = 25;
 
+		MainViewModel _viewModel;
 		readonly Timer _updateLoop = new Timer();
 		KeyboardHookListener _keyboardListener;
 
@@ -45,6 +47,7 @@ namespace Laevo.View.Main
 
 		public TrayIconControl( MainViewModel viewModel )
 		{
+			_viewModel = viewModel;
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
 			viewModel.GuiReset += () =>
@@ -81,24 +84,30 @@ namespace Laevo.View.Main
 			ResetKeyStates();
 			var capsLockPressed = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Pressed );
 			AddExclusiveKeysTrigger( capsLockPressed, Keys.CapsLock, Commands.ShowActivityBar, false );
+			var hideActivityBar = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
+			AddExclusiveKeysTrigger( hideActivityBar, Keys.CapsLock, Commands.HideActivityBar );
 			var switchOverview = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up );
 			AddExclusiveKeysTrigger( switchOverview, Keys.CapsLock, Commands.SwitchActivityOverview );
-			var newActivity = new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, newActivity ), Keys.CapsLock | Keys.N, Commands.NewActivity );
-			var stopActivity = new KeyInputCondition( () => _keyStates[ Keys.W ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, stopActivity ), Keys.CapsLock | Keys.W, Commands.StopActivity );
-			var openLibrary = new KeyInputCondition( () => _keyStates[ Keys.L ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, openLibrary ), Keys.CapsLock | Keys.L, Commands.OpenCurrentActivityLibrary );
-			var cutWindow = new KeyInputCondition( () => _keyStates[ Keys.X ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, cutWindow ), Keys.CapsLock | Keys.X, Commands.CutWindow );
-			var pasteWindows = new KeyInputCondition( () => _keyStates[ Keys.V ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, pasteWindows ), Keys.CapsLock | Keys.V, Commands.PasteWindows );
-			var switchCapsLock = new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchCapsLock ), Keys.CapsLock | Keys.A, SwitchCapsLock );
-			var switchActivity = new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down );
-			AddExclusiveKeysTrigger( new AndCondition( capsLockPressed, switchActivity ), Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
-			var activateSelectedActivity = new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Released );
-			AddExclusiveKeysTrigger( activateSelectedActivity, Keys.CapsLock, Commands.ActivateSelectedActivity );
+			var newActivity = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.N ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( newActivity, Keys.CapsLock | Keys.N, Commands.NewActivity );
+			var cutWindow = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.X ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( cutWindow, Keys.CapsLock | Keys.X, Commands.CutWindow );
+			var pasteWindows = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.V ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( pasteWindows, Keys.CapsLock | Keys.V, Commands.PasteWindows );
+			var switchCapsLock = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.A ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( switchCapsLock, Keys.CapsLock | Keys.A, SwitchCapsLock );
+			var switchActivity = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( switchActivity, Keys.CapsLock | Keys.Tab, Commands.SwitchActivity );
+			var activateSelected = new SequentialCondition(
+				new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.Tab ], KeyInputCondition.KeyState.Down ) ),
+				new KeyInputCondition( () => _keyStates[ Keys.CapsLock ], KeyInputCondition.KeyState.Up ) );
+			AddExclusiveKeysTrigger( activateSelected, Keys.CapsLock | Keys.Tab, Commands.ActivateSelectedActivity );
+
+			// Add triggers for activity commands.
+			var stopActivity = new AndCondition( capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.W ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( stopActivity, Keys.CapsLock | Keys.W, ActivityCommands.StopActivity );
+			var openLibrary = new AndCondition(	capsLockPressed, new KeyInputCondition( () => _keyStates[ Keys.L ], KeyInputCondition.KeyState.Down ) );
+			AddExclusiveKeysTrigger( openLibrary, Keys.CapsLock | Keys.L, ActivityCommands.OpenActivityLibrary );
 
 			// Add trigger which resets the exclusive key triggers when keys are no longer pressed.
 			var anyKeyDown = new DelegateCondition( () => _keyStates.All( s => !s.Value ) );
@@ -155,6 +164,16 @@ namespace Laevo.View.Main
 			CreateExclusiveTrigger(
 				condition, exclusiveKeys,
 				c => new CommandBindingTrigger<Commands>( c, this, command, parameter ) );
+		}
+
+		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, ViewModel.Activity.Binding.Commands command, object parameter = null )
+		{
+			CreateExclusiveTrigger(
+				condition, exclusiveKeys,
+				c => new DynamicCommandBindingTrigger<ViewModel.Activity.Binding.Commands>(
+					c,
+					() => _viewModel.GetCurrentActivity(),
+					command, parameter ) );
 		}
 
 		void AddExclusiveKeysTrigger( AbstractCondition condition, Keys exclusiveKeys, Action action )

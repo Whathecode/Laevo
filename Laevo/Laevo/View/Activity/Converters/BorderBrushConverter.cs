@@ -8,12 +8,12 @@ using Whathecode.System.Windows.Data;
 
 namespace Laevo.View.Activity.Converters
 {
-	class ActivityBorderConverter : AbstractMultiValueConverter<bool, Brush>
+	class BorderBrushConverter : AbstractMultiValueConverter<bool, Brush>
 	{
 		readonly Dictionary<Brush, Brush> _unattendBrushes = new Dictionary<Brush, Brush>();
 
 
-		public ActivityBorderConverter()
+		public BorderBrushConverter()
 		{
 			var borderBrushes = new[] { Brushes.DarkOrange, Brushes.White };
 			foreach ( var brush in borderBrushes )

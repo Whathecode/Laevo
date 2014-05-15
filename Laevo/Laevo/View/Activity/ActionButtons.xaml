@@ -2,85 +2,126 @@
 	x:Class="Laevo.View.Activity.ActionButtons"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
-	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
-	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
+	xmlns:activity="clr-namespace:Laevo.ViewModel.Activity"
+	d:DataContext="{d:DesignInstance Type=activity:ActivityViewModel}"
 	mc:Ignorable="d"
 	x:Name="Control">
-	
+
 	<StackPanel
 		x:Name="Buttons"
 		Orientation="Horizontal">
-		
+
 		<StackPanel.Resources>
 			<ScaleTransform
 				x:Key="ResizeActionIcon"
 				ScaleX="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}"
 				ScaleY="{Binding ElementName=Buttons, Path=IsMouseOver, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.5}}" />
+
+			<Style
+				x:Key="CommandButton"
+				TargetType="Image">
+				<Setter Property="Focusable" Value="True" />
+				<Setter Property="Cursor" Value="Hand" />
+				<EventSetter Event="PreviewMouseDown" Handler="SetFocus" />
+			</Style>
+			<Style
+				x:Key="ResizedCommandButton"
+				BasedOn="{StaticResource CommandButton}"
+				TargetType="Image">
+				<Setter Property="RenderTransformOrigin" Value="0.5, 0.5" />
+				<Setter Property="RenderTransform" Value="{StaticResource ResizeActionIcon}" />
+			</Style>
+			<Style
+				x:Key="RemoveButton"
+				TargetType="Image"
+				BasedOn="{StaticResource ResizedCommandButton}">
+				<Setter Property="Source" Value="../Activity/ActionIcons/delete.png" />
+			</Style>
+			<Style
+				x:Key="EditButton"
+				TargetType="Image"
+				BasedOn="{StaticResource CommandButton}">
+				<Setter Property="Source" Value="../Activity/ActionIcons/edit.png" />
+			</Style>
+			<Style
+				x:Key="StartButton"
+				TargetType="Image"
+				BasedOn="{StaticResource ResizedCommandButton}">
+				<Setter Property="Source" Value="../Activity/ActionIcons/start.png" />
+			</Style>
+			<Style
+				x:Key="StopButton"
+				TargetType="Image"
+				BasedOn="{StaticResource ResizedCommandButton}">
+				<Setter Property="Width" Value="32" />
+				<Setter Property="Height" Value="32" />
+				<Setter Property="Source" Value="../Activity/ActionIcons/stop.png" />
+			</Style>
+			<Style
+				x:Key="RemovePlanningButton"
+				TargetType="Image"
+				BasedOn="{StaticResource ResizedCommandButton}">
+				<Setter Property="Source" Value="../Activity/ActionIcons/close.png" />
+			</Style>
 		</StackPanel.Resources>
 
-		<!-- Remove button. -->
-		<Image
-			Focusable="True"
-			PreviewMouseDown="SetFocus"
-			Source="../Activity/ActionIcons/delete.png"
-			Cursor="Hand"
-			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
-			RenderTransformOrigin="0.5, 0.5"
-			RenderTransform="{StaticResource ResizeActionIcon}">
-			<Image.Opacity>
-				<MultiBinding Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1]', IfTrue=0.3, IfFalse=1}">
-					<Binding Path="HasOpenWindows" />
-					<Binding Path="IsOpen" />
-				</MultiBinding>
-			</Image.Opacity>
-		</Image>
-		
-		<!-- Edit button. -->
-		<Image
-			Focusable="True"
-			PreviewMouseDown="SetFocus"
-			Source="../Activity/ActionIcons/edit.png"
-			Cursor="Hand"
-			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}" />
-		
+		<!-- Menu for work intervals on time line. -->
 		<StackPanel
-			Visibility="{Binding
-				ElementName=Control,
-				Path=ShowStartButton,
-				Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
-			<!-- 'Start' button. -->
+			Orientation="Horizontal"
+			Visibility="{Binding IsToDo, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 			<Image
-				Focusable="True"
-				PreviewMouseDown="SetFocus"
-				Source="{Binding
-					IsPlannedActivity,
-					Converter={wtcConverters:FromBooleanConverter IfTrue='../Activity/ActionIcons/start_planned.png', IfFalse='../Activity/ActionIcons/start.png'}}"
-				Cursor="Hand"
-				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
-				RenderTransformOrigin="0.5, 0.5"
-				RenderTransform="{StaticResource ResizeActionIcon}" />
-			<!-- Stop button. -->
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
+				Style="{StaticResource RemoveButton}">
+				<Image.Opacity>
+					<MultiBinding
+						Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1]', IfTrue=0.3, IfFalse=1}">
+						<Binding Path="HasOpenWindows" />
+						<Binding Path="IsOpen" />
+					</MultiBinding>
+				</Image.Opacity>
+			</Image>
 			<Image
-				Focusable="True"
-				PreviewMouseDown="SetFocus"
-				Source="../Activity/ActionIcons/stop.png"
-				Width="32"
-				Height="32"
-				Cursor="Hand"
-				Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.StopActivity}}"
-				RenderTransformOrigin="0.5, 0.5"
-				RenderTransform="{StaticResource ResizeActionIcon}" />
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"
+				Style="{StaticResource EditButton}" />
+			
+			<!-- Open button, or remove planning for planned intervals. -->
+			<Image
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.RemovePlanning}}"
+				Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
+				Style="{StaticResource RemovePlanningButton}" />
+			<StackPanel
+				Orientation="Horizontal"
+				Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
+				<Image
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
+					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+					Style="{StaticResource StartButton}" />
+				<Image
+					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.StopActivity}}"
+					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
+					Style="{StaticResource StopButton}" />
+			</StackPanel>
 		</StackPanel>
 		
+		<!-- To do item menu. -->
+		<StackPanel
+			Orientation="Horizontal"
+			Visibility="{Binding IsToDo, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+			<Image
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.RemovePlanning}}"
+				Style="{StaticResource RemovePlanningButton}" />
+			<Image
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"
+				Style="{StaticResource EditButton}" />
+		</StackPanel>
+
 	</StackPanel>
-	
+
 </UserControl>

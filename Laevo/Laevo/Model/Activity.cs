@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -17,17 +17,20 @@ namespace Laevo.Model
 	/// </summary>
 	/// <author>Steven Jeuris</author>
 	[DataContract]
-	class Activity
+	public class Activity
 	{
 		public const string DefaultActivityName = "New Activity";
 		public static readonly string ProgramMyDocumentsFolder = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), "Laevo" );
 		static readonly string ActivityContextPath = Path.Combine( ProgramMyDocumentsFolder, "Activities" );
+		const int MaxPathLength = 259;
 
 		public event Action<Activity> OpenedEvent;
 		public event Action<Activity> StoppedEvent;
 
 		public event Action<Activity> ActivatedEvent;
 		public event Action<Activity> DeactivatedEvent;
+
+		public event Action<Activity> ToDoChangedEvent;
 
 		/// <summary>
 		///   A name describing this activity.
@@ -45,6 +48,25 @@ namespace Laevo.Model
 		/// </summary>
 		public bool IsActive { get; private set; }
 
+		[DataMember]
+		bool _isToDo;
+		/// <summary>
+		///   Determines whether or not the activity is a to-do item, meaning that currently it is not open, nor is work planned on it in the future at a specific interval.
+		///   When work will continue on the activity is undecided.
+		/// </summary>
+		public bool IsToDo
+		{
+			get { return _isToDo; }
+			private set
+			{
+				if ( value != _isToDo )
+				{
+					_isToDo = value;
+					ToDoChangedEvent( this );
+				}
+			}
+		}
+
 		/// <summary>
 		///   The date when this activity was first created.
 		/// </summary>
@@ -55,6 +77,7 @@ namespace Laevo.Model
 
 		[DataMember]
 		List<Interval<DateTime>> _openIntervals;
+
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
@@ -64,7 +87,19 @@ namespace Laevo.Model
 		}
 
 		[DataMember]
+		List<PlannedInterval> _plannedIntervals;
+
+		/// <summary>
+		///   The intervals during which the activity is planned.
+		/// </summary>
+		public IReadOnlyCollection<PlannedInterval> PlannedIntervals
+		{
+			get { return _plannedIntervals; }
+		}
+
+		[DataMember]
 		List<AbstractInterruption> _interruptions;
+
 		/// <summary>
 		///   Interruptions which interrupted the activity.
 		/// </summary>
@@ -88,7 +123,7 @@ namespace Laevo.Model
 
 
 		public Activity()
-			: this( "" ) { }
+			: this( "" ) {}
 
 		public Activity( string name )
 		{
@@ -115,6 +150,7 @@ namespace Laevo.Model
 		{
 			_dataPaths = new List<Uri>();
 			_openIntervals = new List<Interval<DateTime>>();
+			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
 		}
 
@@ -135,6 +171,13 @@ namespace Laevo.Model
 		{
 			string folderName = DateCreated.ToString( "d" ) + " " + Name;
 			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
+
+			// Cut a folder name in order not to exceed max path length.
+			int maxFolderNameLength = MaxPathLength - ActivityContextPath.Length;
+			if ( safeName.Length > maxFolderNameLength )
+			{
+				safeName = safeName.Remove( maxFolderNameLength );
+			}
 
 			return safeName;
 		}
@@ -185,8 +228,9 @@ namespace Laevo.Model
 			var now = DateTime.Now;
 			_currentOpenInterval = new Interval<DateTime>( now, now );
 			_openIntervals.Add( _currentOpenInterval );
-			IsOpen = true;
 
+			IsToDo = false;
+			IsOpen = true;
 			OpenedEvent( this );
 		}
 
@@ -206,12 +250,46 @@ namespace Laevo.Model
 			StoppedEvent( this );
 		}
 
-		public void Plan( DateTime atTime, TimeSpan duration )
+		public void AddPlannedInterval( DateTime atTime, TimeSpan duration )
 		{
-			// Set the planned time as an interval when the activity will be open.
-			_openIntervals.Clear();
-			_currentOpenInterval = new Interval<DateTime>( atTime, atTime + duration );
-			_openIntervals.Add( _currentOpenInterval );
+			if ( atTime < DateTime.Now )
+			{
+				throw new InvalidOperationException( "A planned interval needs to lie in the future." );
+			}
+
+			var plannedInterval = new PlannedInterval( atTime, atTime + duration );
+			_plannedIntervals.Add( plannedInterval );
+
+			IsToDo = false;
+		}
+
+		/// <summary>
+		///   Turns the activity into a to-do item. This removes all future planned intervals, as a to-do items implies it is unknown when work will continue.
+		///   In case the activity is open, it is also stopped.
+		/// </summary>
+		public void MakeToDo()
+		{
+			Stop();
+
+			DateTime now = DateTime.Now;
+			_plannedIntervals.RemoveAll( p => p.Interval.Start > now );
+			IsToDo = true;
+		}
+
+		/// <summary>
+		///   Removes all planned intervals (or to do state) of this activity.
+		/// </summary>
+		public void RemovePlanning()
+		{
+			if ( IsToDo )
+			{
+				IsToDo = false;
+			}
+			else
+			{
+				DateTime now = DateTime.Now;
+				_plannedIntervals.RemoveAll( p => p.Interval.Start > now );
+			}
 		}
 
 		/// <summary>
@@ -286,7 +364,7 @@ namespace Laevo.Model
 
 			// Attempt rename.
 			string newFolder = CreateSafeFolderName();
-			if ( newFolder == currentName )
+			if ( newFolder.Split( Path.DirectorySeparatorChar ).Last() == currentName )
 			{
 				// The current folder name is already a 'safe' desired name.
 				return;
