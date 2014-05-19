@@ -12,6 +12,7 @@ using ABC.Windows.Desktop.Settings;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Model.AttentionShifts;
+using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Threading;

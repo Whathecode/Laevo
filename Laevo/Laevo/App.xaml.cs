@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using NLog;
 using Whathecode.System.Aspects;
-
 
 [assembly: InitializeEventHandlers( AttributeTargetTypes = "Laevo.*" )]
 
@@ -63,8 +62,7 @@ namespace Laevo
 			Thread.CurrentThread.CurrentCulture = english;
 
 			// Create exception logger.
-			DispatcherUnhandledException += ( s, a )
-				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramLocalDataFolder, "log.txt" ), a.Exception.ToString() + Environment.NewLine );
+			DispatcherUnhandledException += ( s, a ) => LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.Exception );
 
 			// Initiate the controller which sets up the MVVM classes.
 			_controller = new LaevoController();
