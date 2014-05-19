@@ -8,9 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using NLog;
-using Whathecode.System.Aspects;
 
-[assembly: InitializeEventHandlers( AttributeTargetTypes = "Laevo.*" )]
 
 namespace Laevo
 {
@@ -62,7 +60,7 @@ namespace Laevo
 			Thread.CurrentThread.CurrentCulture = english;
 
 			// Create exception logger.
-			DispatcherUnhandledException += ( s, a ) => LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.Exception );
+			AppDomain.CurrentDomain.UnhandledException += ( s, a ) => LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
 
 			// Initiate the controller which sets up the MVVM classes.
 			_controller = new LaevoController();
