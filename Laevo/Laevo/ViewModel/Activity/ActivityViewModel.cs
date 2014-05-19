@@ -820,7 +820,7 @@ namespace Laevo.ViewModel.Activity
 			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
 
 			// Update the interval which indicates when the activity was open.
-			if ( WorkIntervals.Count > 0 && Activity.OpenIntervals.Count > 0 )
+			if ( Activity.OpenIntervals.Count > 0 )
 			{
 				if ( IsOpen && !WorkIntervals.Last().IsPlanned )
 				{
