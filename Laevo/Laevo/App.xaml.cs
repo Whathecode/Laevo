@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using Segmentio;
-using Segmentio.Model;
+using NLog;
 using Whathecode.System.Aspects;
-
 
 [assembly: InitializeEventHandlers( AttributeTargetTypes = "Laevo.*" )]
 
@@ -45,31 +42,6 @@ namespace Laevo
 
 		protected override void OnStartup( StartupEventArgs e )
 		{
-			// Initialize analytics for the project stevenjeuris/laevo.
-			const string analyticsKey = "32gkxq3ekp";
-			Laevo.Properties.Settings.Default.Reset();
-			Guid userGuid = Laevo.Properties.Settings.Default.AnalyticsID;
-			if ( userGuid == Guid.Empty )
-			{
-				userGuid = Guid.NewGuid();
-				Laevo.Properties.Settings.Default.AnalyticsID = userGuid;
-				Laevo.Properties.Settings.Default.FirstRun = DateTime.Now;
-				Laevo.Properties.Settings.Default.Save();
-			}
-			var userTraits = new Traits()
-			{
-				{ "createdAt", Laevo.Properties.Settings.Default.FirstRun }
-			};
-#if DEBUG
-			Analytics.Initialize( analyticsKey, new Options().SetAsync( false ) );
-			userTraits.Add( "name", "Debug" );
-			userTraits.Add( "description", "User used during debugging." );
-#else
-			Analytics.Initialize( analyticsKey );
-#endif
-			string userId = userGuid.ToString();
-			Analytics.Client.Identify( userId, userTraits );
-
 			base.OnStartup( e );
 			ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
@@ -90,8 +62,7 @@ namespace Laevo
 			Thread.CurrentThread.CurrentCulture = english;
 
 			// Create exception logger.
-			DispatcherUnhandledException += ( s, a )
-				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramLocalDataFolder, "log.txt" ), a.Exception.ToString() + Environment.NewLine );
+			DispatcherUnhandledException += ( s, a ) => LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.Exception );
 
 			// Initiate the controller which sets up the MVVM classes.
 			_controller = new LaevoController();
