@@ -211,13 +211,9 @@ namespace Laevo.ViewModel.Main
 		public void NewActivity()
 		{
 			ActivityViewModel activity = _activityOverviewViewModel.CreateNewActivity();
+			activity.OpenActivity();
 			activity.ActivateActivity();
-		}
-
-		[CommandCanExecute( Commands.NewActivity )]
-		public bool CanNewActivity()
-		{
-			return _activityOverviewViewModel.ActivityMode == Mode.Activate;
+			_activityOverviewViewModel.ActivityMode &= ~Mode.Select;
 		}
 
 		[CommandExecute( Commands.CutWindow )]
