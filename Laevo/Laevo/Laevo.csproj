@@ -229,9 +229,11 @@
       <HintPath>..\packages\NLog.2.1.0\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="PostSharp, Version=3.1.40.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PostSharp.3.1.40\lib\net20\PostSharp.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\packages\PostSharp.3.1.40\lib\net20\PostSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PostSharp.Patterns.Diagnostics">
+      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.3.1.40\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -386,6 +388,7 @@
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
     <Compile Include="Data\PersistenceException.cs" />
+    <Compile Include="GlobalAspects.cs" />
     <Compile Include="LaevoController.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
@@ -516,6 +519,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Laevo.psproj" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
