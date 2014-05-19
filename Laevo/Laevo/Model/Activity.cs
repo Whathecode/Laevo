@@ -252,10 +252,11 @@ namespace Laevo.Model
 
 		public void AddPlannedInterval( DateTime atTime, TimeSpan duration )
 		{
-			if ( atTime < DateTime.Now )
+			// TODO: Disabled for Scrum branch, since fake history is added at the moment. This probably isn't permanent.
+			/*if ( atTime < DateTime.Now )
 			{
 				throw new InvalidOperationException( "A planned interval needs to lie in the future." );
-			}
+			}*/
 
 			var plannedInterval = new PlannedInterval( atTime, atTime + duration );
 			_plannedIntervals.Add( plannedInterval );
