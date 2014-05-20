@@ -74,6 +74,13 @@ namespace Laevo
 			{
 				mainWindowSource.AddHook( HandleChangedColor );
 			}
+
+			// Hook to an event rised when user shuts down a computer or logs out in order to exit application properly. 
+			SessionEnding += ( o, args ) =>
+			{
+				_controller.Exit();
+				LogManager.GetCurrentClassLogger().Info( "User was logged out without shutting down Laevo." );
+			};
 		}
 
 		/// <summary>
@@ -109,6 +116,7 @@ namespace Laevo
 				(byte)aeroColors.Color );
 		}
 
+		// TODO: Unused method, can be removed?
 		protected override void OnExit( ExitEventArgs e )
 		{
 			_controller.Dispose();

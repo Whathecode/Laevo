@@ -55,6 +55,10 @@ namespace Laevo
 			dispatcherTimer.Start();
 		}
 
+		public void Exit()
+		{
+			_viewModel.Exit();
+		}
 
 		protected override void FreeManagedResources()
 		{
