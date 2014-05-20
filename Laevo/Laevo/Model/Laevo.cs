@@ -217,6 +217,11 @@ namespace Laevo.Model
 
 			_processTracker.Stop();
 
+			Persist();
+		}
+
+		public void Persist()
+		{
 			try
 			{
 				_dataRepository.SaveChanges();
