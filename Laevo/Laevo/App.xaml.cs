@@ -59,8 +59,13 @@ namespace Laevo
 			var english = new CultureInfo( "en-US" );
 			Thread.CurrentThread.CurrentCulture = english;
 
-			// Create exception logger.
-			AppDomain.CurrentDomain.UnhandledException += ( s, a ) => LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+			// Try to bring back all open windows on unhandled exceptions.
+			AppDomain.CurrentDomain.UnhandledException += ( s, a ) =>
+			{
+				LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+				_controller.ExitDesktopManager();
+				OnExit(null);
+			};
 
 			// Initiate the controller which sets up the MVVM classes.
 			_controller = new LaevoController();
@@ -76,11 +81,7 @@ namespace Laevo
 			}
 
 			// Hook to an event rised when user shuts down a computer or logs out in order to exit application properly. 
-			SessionEnding += ( o, args ) =>
-			{
-				_controller.Exit();
-				LogManager.GetCurrentClassLogger().Info( "User was logged out without shutting down Laevo." );
-			};
+			SessionEnding += ( o, args ) => _controller.Exit();
 		}
 
 		/// <summary>
@@ -116,7 +117,6 @@ namespace Laevo
 				(byte)aeroColors.Color );
 		}
 
-		// TODO: Unused method, can be removed?
 		protected override void OnExit( ExitEventArgs e )
 		{
 			_controller.Dispose();

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using ABC.Applications.Persistence;
 using ABC.Windows.Desktop;
+using Laevo.Data.Common;
 using Laevo.Data.Model;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
@@ -111,20 +112,14 @@ namespace Laevo.Data.View
 			lock ( Activities )
 			{
 				Activities.ForEach( a => a.Persist() );
-			}
-			using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Create ) )
-			{
-				_activitySerializer.WriteObject( activitiesFileStream, Activities.ToDictionary( a => a.DateCreated, a => a ) );
+				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, Activities.ToDictionary( a => a.DateCreated, a => a ) );
 			}
 
 			// Persist tasks.
 			lock ( Tasks )
 			{
 				Tasks.ForEach( t => t.Persist() );
-			}
-			using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Create ) )
-			{
-				_activitySerializer.WriteObject( tasksFileStream, Tasks.ToDictionary( t => t.DateCreated, t => t ) );
+				PersistanceHelper.Persist( _tasksFile, _activitySerializer, Tasks.ToDictionary( a => a.DateCreated, a => a ) );
 			}
 		}
 	}
