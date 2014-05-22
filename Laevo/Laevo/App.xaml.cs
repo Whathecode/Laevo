@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Laevo.Logging;
 using NLog;
 
 
@@ -17,6 +18,8 @@ namespace Laevo
 	/// </summary>
 	public partial class App
 	{
+		static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
 		const int AeroColorChanged = 0x320;
 		const int AeroColorChanged2 = 26;
 
@@ -35,6 +38,12 @@ namespace Laevo
 				BlurBalance,
 				GlassReflectionIntensity,
 				OpaqueBlend;
+		}
+
+
+		static App()
+		{
+			NLog.Config.ConfigurationItemFactory.Default.LayoutRenderers.RegisterDefinition( "fullcontext", typeof( FullContextLayoutRenderer ) );
 		}
 
 
@@ -62,7 +71,7 @@ namespace Laevo
 			// Try to bring back all open windows on unhandled exceptions.
 			AppDomain.CurrentDomain.UnhandledException += ( s, a ) =>
 			{
-				LogManager.GetCurrentClassLogger().FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+				Logger.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
 				_controller.ExitDesktopManager();
 				OnExit(null);
 			};
@@ -81,7 +90,11 @@ namespace Laevo
 			}
 
 			// Hook to an event rised when user shuts down a computer or logs out in order to exit application properly. 
-			SessionEnding += ( o, args ) => _controller.Exit();
+			SessionEnding += ( o, args ) =>
+			{
+				Logger.Info( String.Format( "Windows session ended. ({0})", args.ReasonSessionEnding ) );
+				_controller.Exit();
+			};
 		}
 
 		/// <summary>

@@ -11,7 +11,9 @@ using ABC.Windows.Desktop;
 using ABC.Windows.Desktop.Settings;
 using Laevo.Data;
 using Laevo.Data.Model;
+using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
+using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Threading;
@@ -26,7 +28,10 @@ namespace Laevo.Model
 	/// <author>Steven Jeuris</author>
 	public class Laevo
 	{
+		static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
 		public const string DefaultActivityName = "New Activity";
+		public const string DefaultTaskName = "New Task";
 
 		readonly Dispatcher _dispatcher;
 
@@ -70,11 +75,23 @@ namespace Laevo.Model
 		}
 
 		public Activity HomeActivity { get; private set; }
-		public Activity CurrentActivity { get; private set; }
+
+		Activity _currentActivity;
+		public Activity CurrentActivity
+		{
+			get { return _currentActivity; }
+			private set
+			{
+				_currentActivity = value;
+				Log.DebugWithData( "Current activity changed.", new LogData( "Activity", _currentActivity ) );
+			}
+		}
 
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger, PersistenceProvider persistenceProvider )
 		{
+			Log.Info( "Starting." );
+
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
 			_interruptionTrigger = interruptionTrigger;
@@ -104,6 +121,7 @@ namespace Laevo.Model
 				}
 			}
 			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
+			Log.Debug( "Desktop manager initialized." );
 
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;
@@ -120,6 +138,7 @@ namespace Laevo.Model
 			_interruptionTrigger.InterruptionReceived += interruption =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
+				Log.InfoWithData( "Incoming interruption", new LogData( "Type", interruption.GetType() ) );
 				var newActivity = _dataRepository.CreateNewActivity( interruption.Name );
 				newActivity.MakeToDo();
 				newActivity.AddInterruption( interruption );
@@ -137,6 +156,7 @@ namespace Laevo.Model
 				// TODO: Improved verification, rather than just name.
 				if ( p.Name == "LogonUI.exe" )
 				{
+					Log.Info( "Returned from log on screen." );
 					LogonScreenExited();
 				}
 			};
@@ -164,6 +184,8 @@ namespace Laevo.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name = DefaultActivityName )
 		{
+			Log.InfoWithData( "New activity.", new LogData( "Name", name ) );
+
 			var activity = _dataRepository.CreateNewActivity( name );
 			HandleActivity( activity );
 
@@ -188,6 +210,8 @@ namespace Laevo.Model
 		/// <param name = "activity">The task or activity to remove.</param>
 		public void Remove( Activity activity )
 		{
+			Log.InfoWithData( "Remove activity.", new LogData( "Activity", activity ) );
+
 			activity.ActivatedEvent -= OnActivityActivated;
 
 			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity == activity ).ForEach( a => a.ActivityRemoved() );
@@ -197,9 +221,11 @@ namespace Laevo.Model
 			ActivityRemoved( activity );
 		}
 
-		public Activity CreateNewTask()
+		public Activity CreateNewTask( string name = DefaultTaskName )
 		{
-			var task = _dataRepository.CreateNewActivity( "New Task" );
+			Log.InfoWithData( "New task.", new LogData( "Activity", name ) );
+
+			var task = _dataRepository.CreateNewActivity( name );
 			task.MakeToDo();
 			HandleActivity( task );
 
@@ -208,11 +234,15 @@ namespace Laevo.Model
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )
 		{
+			Log.InfoWithData( "Swap task order.", new LogData( "Task 1", task1 ), new LogData( "Task 2", task2 ) );
+
 			_dataRepository.SwapTaskOrder( task1, task2 );
 		}
 
 		public void Exit()
 		{
+			Log.Info( "Exiting." );
+
 			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
 
 			_processTracker.Stop();
@@ -222,6 +252,8 @@ namespace Laevo.Model
 
 		public void Persist()
 		{
+			Log.Debug( "Persisting." );
+
 			try
 			{
 				_dataRepository.SaveChanges();
