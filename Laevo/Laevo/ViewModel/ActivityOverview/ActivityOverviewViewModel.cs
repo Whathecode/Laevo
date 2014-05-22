@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
+using System.Windows;
 using System.Windows.Media.Imaging;
-using ABC.Windows;
+using Laevo.Data;
 using Laevo.Data.View;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -12,6 +14,7 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Window = ABC.Windows.Window;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -403,6 +406,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
+
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -522,7 +526,14 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public override void Persist()
 		{
-			_dataRepository.SaveChanges();
+			try
+			{
+				_dataRepository.SaveChanges();
+			}
+			catch ( PersistenceException pe )
+			{
+				MessageBox.Show( pe.Message, "Saving view data failed", MessageBoxButton.OK );
+			}
 		}
 
 		protected override void FreeUnmanagedResources()
