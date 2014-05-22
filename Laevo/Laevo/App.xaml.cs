@@ -68,8 +68,13 @@ namespace Laevo
 			var english = new CultureInfo( "en-US" );
 			Thread.CurrentThread.CurrentCulture = english;
 
-			// Create exception logger.
-			AppDomain.CurrentDomain.UnhandledException += ( s, a ) => Log.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+			// Try to bring back all open windows on unhandled exceptions.
+			AppDomain.CurrentDomain.UnhandledException += ( s, a ) =>
+			{
+				Logger.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+				_controller.ExitDesktopManager();
+				OnExit(null);
+			};
 
 			// Initiate the controller which sets up the MVVM classes.
 			_controller = new LaevoController();

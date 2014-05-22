@@ -27,7 +27,7 @@ namespace Laevo
 
 		readonly MainViewModel _viewModel;
 		readonly TrayIconControl _trayIcon;
-
+		readonly Model.Laevo _model;
 
 		public LaevoController()
 		{
@@ -38,12 +38,12 @@ namespace Laevo
 
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			var model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
+			_model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
 
 			// Create ViewModel.
 			// TODO: Move DesktopManager to ViewModel?
-			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, model.DesktopManager );
-			_viewModel = new MainViewModel( model, viewDataRepository );
+			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, _model.DesktopManager );
+			_viewModel = new MainViewModel( _model, viewDataRepository );
 
 			// Create View.
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
@@ -53,7 +53,7 @@ namespace Laevo
 			dispatcherTimer.Tick += ( s, e ) =>
 			{
 				_viewModel.Persist();
-				model.Persist();
+				_model.Persist();
 			};
 			dispatcherTimer.Interval = new TimeSpan( 0, 5, 0 );
 			dispatcherTimer.Start();
@@ -61,7 +61,12 @@ namespace Laevo
 
 		public void Exit()
 		{
-			_viewModel.Exit();
+			_viewModel.Exit();			
+		}
+
+		public void ExitDesktopManager()
+		{
+			_model.DesktopManager.Close();
 		}
 
 		protected override void FreeManagedResources()

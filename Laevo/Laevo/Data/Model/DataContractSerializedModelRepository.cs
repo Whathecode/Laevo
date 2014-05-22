@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using ABC.Interruptions;
+using Laevo.Data.Common;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System.Linq;
@@ -103,54 +103,31 @@ namespace Laevo.Data.Model
 			}
 		}
 
-
 		public override void SaveChanges()
 		{
 			// Persist settings.
-			Persist( _settingsFile, SettingsSerializer, Settings );
+			lock ( Settings )
+			{
+				PersistanceHelper.Persist( _settingsFile, SettingsSerializer, Settings );
+			}
 
 			// Persist activities.
 			// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
-			Persist( _activitiesFile, _activitySerializer, MemoryActivities );
+			lock ( MemoryActivities )
+			{
+				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, MemoryActivities );
+			}
 
 			// Persist tasks.
-			Persist( _tasksFile, _activitySerializer, MemoryTasks );
+			lock ( MemoryTasks )
+			{
+				PersistanceHelper.Persist( _tasksFile, _activitySerializer, MemoryTasks );
+			}
 
 			// Persist attention shifts.
-			Persist( _attentionShiftsFile, _attentionShiftSerializer, MemoryAttentionShifts );
-		}
-
-		static void Persist( string file, XmlObjectSerializer serializer, object toSerialize )
-		{
-			// Make a backup first, so if serialization fails, no data is lost.
-			string backupFile = file + ".backup";
-			if ( File.Exists( file ) )
+			lock ( MemoryAttentionShifts )
 			{
-				File.Copy( file, backupFile );
-			}
-
-			// Serialize the data.
-			try
-			{
-				using ( var fileStream = new FileStream( file, FileMode.Create ) )
-				{
-					serializer.WriteObject( fileStream, toSerialize );
-				}
-			}
-			catch ( Exception e )
-			{
-				if ( File.Exists( backupFile ) )
-				{
-					File.Delete( file );
-					File.Move( backupFile, file );
-				}
-				throw new PersistenceException( "Serialization of data to file \"" + file + "\" failed. Recent data will be lost.", e );
-			}
-
-			// Remove temporary backup file.
-			if ( File.Exists( backupFile ) )
-			{
-				File.Delete( backupFile );
+				PersistanceHelper.Persist( _attentionShiftsFile, _attentionShiftSerializer, MemoryAttentionShifts );
 			}
 		}
 	}
