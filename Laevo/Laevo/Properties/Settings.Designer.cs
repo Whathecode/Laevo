@@ -45,5 +45,17 @@ namespace Laevo.Properties {
                 this["FirstRun"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsLoggingAnonymous {
+            get {
+                return ((bool)(this["IsLoggingAnonymous"]));
+            }
+            set {
+                this["IsLoggingAnonymous"] = value;
+            }
+        }
     }
 }

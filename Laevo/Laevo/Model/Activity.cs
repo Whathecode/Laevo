@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using ABC.Interruptions;
+using Laevo.Logging;
+using NLog;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.IO;
@@ -19,10 +21,10 @@ namespace Laevo.Model
 	[DataContract]
 	public class Activity
 	{
-		public const string DefaultActivityName = "New Activity";
+		static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
 		public static readonly string ProgramMyDocumentsFolder = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments ), "Laevo" );
 		static readonly string ActivityContextPath = Path.Combine( ProgramMyDocumentsFolder, "Activities" );
-		const int MaxPathLength = 259;
 
 		public event Action<Activity> OpenedEvent;
 		public event Action<Activity> StoppedEvent;
@@ -32,11 +34,20 @@ namespace Laevo.Model
 
 		public event Action<Activity> ToDoChangedEvent;
 
+		[DataMember]
+		string _name;
 		/// <summary>
 		///   A name describing this activity.
 		/// </summary>
-		[DataMember]
-		public string Name { get; set; }
+		public string Name
+		{
+			get { return _name; }
+			set
+			{
+				Log.InfoWithData( "Name changed.", new LogData( this ), new LogData( "New name", value, "Anonymized" ) );
+				_name = value;
+			}
+		}
 
 		/// <summary>
 		///   Determines whether or not the activity is currently open, but not necessarily active (working on it).
@@ -129,7 +140,7 @@ namespace Laevo.Model
 		{
 			SetDefaults();
 
-			Name = name;
+			_name = name; // Change field rather than property to prevent logging activity creation as a name change.
 			DateCreated = DateTime.Now;
 
 			// Create initial data path.
@@ -173,7 +184,8 @@ namespace Laevo.Model
 			string safeName = PathHelper.ReplaceInvalidChars( folderName, '-' );
 
 			// Cut a folder name in order not to exceed max path length.
-			int maxFolderNameLength = MaxPathLength - ActivityContextPath.Length;
+			const int maxPathLength = 259;
+			int maxFolderNameLength = maxPathLength - ActivityContextPath.Length;
 			if ( safeName.Length > maxFolderNameLength )
 			{
 				safeName = safeName.Remove( maxFolderNameLength );
