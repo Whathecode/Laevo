@@ -18,7 +18,7 @@ namespace Laevo
 	/// </summary>
 	public partial class App
 	{
-		static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+		static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
 		const int AeroColorChanged = 0x320;
 		const int AeroColorChanged2 = 26;
@@ -69,12 +69,12 @@ namespace Laevo
 			Thread.CurrentThread.CurrentCulture = english;
 
 			// Create exception logger.
-			AppDomain.CurrentDomain.UnhandledException += ( s, a ) => Logger.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+			AppDomain.CurrentDomain.UnhandledException += ( s, a ) => Log.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
 
 			// Initiate the controller which sets up the MVVM classes.
 			_controller = new LaevoController();
 
-			// Hack- Create empty window to catch aero theme color changes.
+			// HACK: Create empty window to catch aero theme color changes.
 			var hiddenWindow = new Window { ShowActivated = false, Focusable = false, Visibility = Visibility.Hidden, Width = 0, Height = 0, Left = -100, Top = -100 };
 			hiddenWindow.Show();
 			var mainWindowPointer = new WindowInteropHelper( hiddenWindow ).Handle;
@@ -87,7 +87,7 @@ namespace Laevo
 			// Hook to an event rised when user shuts down a computer or logs out in order to exit application properly. 
 			SessionEnding += ( o, args ) =>
 			{
-				Logger.Info( String.Format( "Windows session ended. ({0})", args.ReasonSessionEnding ) );
+				Log.InfoWithData( "Windows session ended.", new LogData( "Reason", args.ReasonSessionEnding ) );
 				_controller.Exit();
 			};
 		}
@@ -125,7 +125,6 @@ namespace Laevo
 				(byte)aeroColors.Color );
 		}
 
-		// TODO: Unused method, can be removed?
 		protected override void OnExit( ExitEventArgs e )
 		{
 			_controller.Dispose();

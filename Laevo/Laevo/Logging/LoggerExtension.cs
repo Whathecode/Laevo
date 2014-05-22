@@ -33,7 +33,8 @@ namespace Laevo.Logging
 			var log = new LogEventInfo( logLevel, logger.Name, message );
 			foreach ( var p in properties )
 			{
-				log.Properties.Add( p.Key, p.Value );
+				object value = Properties.Settings.Default.IsLoggingAnonymous ? p.ValueAnonymized : p.Value;
+				log.Properties.Add( p.Key, value );
 			}
 
 			logger.Log( typeof( LoggerExtension ), log );

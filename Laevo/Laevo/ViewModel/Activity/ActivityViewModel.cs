@@ -170,6 +170,12 @@ namespace Laevo.ViewModel.Activity
 		[NotifyPropertyChanged( Binding.Properties.Label )]
 		public void OnLabelChanged( string oldLabel, string newLabel )
 		{
+			// Don't trigger a name change upon initializing the view model.
+			if ( oldLabel == null )
+			{
+				return;
+			}
+
 			IsUnnamed = false;
 			Activity.Name = newLabel;
 

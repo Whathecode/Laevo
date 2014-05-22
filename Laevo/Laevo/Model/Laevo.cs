@@ -83,14 +83,14 @@ namespace Laevo.Model
 			private set
 			{
 				_currentActivity = value;
-				Log.DebugWithData( "Current activity changed.", new LogData( "Activity", _currentActivity ) );
+				Log.DebugWithData( "Current activity changed.", new LogData( _currentActivity ) );
 			}
 		}
 
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger, PersistenceProvider persistenceProvider )
 		{
-			Log.Info( "Starting." );
+			Log.Info( "Startup." );
 
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
@@ -138,7 +138,7 @@ namespace Laevo.Model
 			_interruptionTrigger.InterruptionReceived += interruption =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
-				Log.InfoWithData( "Incoming interruption", new LogData( "Type", interruption.GetType() ) );
+				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
 				var newActivity = _dataRepository.CreateNewActivity( interruption.Name );
 				newActivity.MakeToDo();
 				newActivity.AddInterruption( interruption );
@@ -184,9 +184,8 @@ namespace Laevo.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name = DefaultActivityName )
 		{
-			Log.InfoWithData( "New activity.", new LogData( "Name", name ) );
-
 			var activity = _dataRepository.CreateNewActivity( name );
+			Log.InfoWithData( "New activity.", new LogData( activity ) );
 			HandleActivity( activity );
 
 			CurrentActivity = activity;
@@ -210,7 +209,7 @@ namespace Laevo.Model
 		/// <param name = "activity">The task or activity to remove.</param>
 		public void Remove( Activity activity )
 		{
-			Log.InfoWithData( "Remove activity.", new LogData( "Activity", activity ) );
+			Log.InfoWithData( "Remove activity.", new LogData( activity ) );
 
 			activity.ActivatedEvent -= OnActivityActivated;
 
@@ -223,9 +222,8 @@ namespace Laevo.Model
 
 		public Activity CreateNewTask( string name = DefaultTaskName )
 		{
-			Log.InfoWithData( "New task.", new LogData( "Activity", name ) );
-
 			var task = _dataRepository.CreateNewActivity( name );
+			Log.InfoWithData( "New task.", new LogData( task ) );
 			task.MakeToDo();
 			HandleActivity( task );
 
@@ -241,13 +239,13 @@ namespace Laevo.Model
 
 		public void Exit()
 		{
-			Log.Info( "Exiting." );
-
 			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
 
 			_processTracker.Stop();
 
 			Persist();
+
+			Log.Info( "Exited." );
 		}
 
 		public void Persist()
