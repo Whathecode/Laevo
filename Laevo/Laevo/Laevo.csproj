@@ -391,6 +391,10 @@
     <Compile Include="Data\PersistenceException.cs" />
     <Compile Include="GlobalAspects.cs" />
     <Compile Include="LaevoController.cs" />
+    <Compile Include="Logging\FullContextLayoutRenderer.cs" />
+    <Compile Include="Logging\LogData.cs" />
+    <Compile Include="Logging\LoggerExtension.cs" />
+    <Compile Include="Logging\GlobalLoggingAspects.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
@@ -521,7 +525,7 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="Laevo.psproj" />
-    <None Include="NLog.xsd">
+    <None Include="Logging\NLog.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
