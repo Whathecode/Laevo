@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using NLog;
 using NLog.Targets;
 using Segment;
 using Segment.Model;
 
 
-namespace Laevo
+namespace Laevo.Logging
 {
 	/// <summary>
 	///   Logging target used to send logging data as analytics events.
@@ -15,8 +17,13 @@ namespace Laevo
 	[Target( "Analytics" )]
 	class AnalyticsLogTarget : TargetWithLayout
 	{
-		static readonly string UserId = Properties.Settings.Default.AnalyticsID.ToString();
+		static readonly string UserId;
 
+		// MongoDB
+		const string DatabaseName = "laevo";
+		const string CollectionName = "log_data";
+		const string ConnectionString = "mongodb://laevoUser:test1234@ds037007.mongolab.com:37007/laevo";
+		static readonly MongoCollection LogCollection;
 
 		static AnalyticsLogTarget()
 		{
@@ -41,40 +48,68 @@ namespace Laevo
 #else
 			Analytics.Initialize( analyticsKey );
 #endif
-			string userId = userGuid.ToString();
-			Analytics.Client.Identify( userId, userTraits );
+			UserId = Properties.Settings.Default.AnalyticsID.ToString();
+			Analytics.Client.Identify( UserId, userTraits );
+
+			var client = new MongoClient( ConnectionString );
+			LogCollection = client.GetServer().GetDatabase( DatabaseName ).GetCollection( CollectionName );
 		}
 
 
 		protected override void Write( LogEventInfo logEvent )
 		{
+			Segment.Model.Properties properties;
+			string eventName;
+
 			// Log warnings and errors.
 			if ( logEvent.Level > LogLevel.Info )
 			{
-				var properties = new Segment.Model.Properties { { "Message", logEvent.FormattedMessage } };
+				properties = new Segment.Model.Properties { { "Message", logEvent.FormattedMessage } };
 				if ( logEvent.Exception != null )
 				{
 					properties.Add( "Exception", logEvent.Exception.ToString() );
 				}
-				Analytics.Client.Track( UserId, logEvent.Level.ToString(), properties );
+				eventName = logEvent.Level.ToString();
 			}
-			// Log info messages.
+				// Log info messages.
 			else
 			{
 				// Create event name.
 				string loggerName = logEvent.LoggerName;
-				string eventName = loggerName.Split( new[] { '.' }, StringSplitOptions.RemoveEmptyEntries ).FirstOrDefault() ?? loggerName;
+				eventName = loggerName.Split( new[] { '.' }, StringSplitOptions.RemoveEmptyEntries ).FirstOrDefault() ?? loggerName;
 				eventName += ": " + logEvent.FormattedMessage;
 
 				// Create properties.
-				var properties = new Segment.Model.Properties();
+				properties = new Segment.Model.Properties();
 				foreach ( var p in logEvent.Properties )
 				{
 					properties.Add( p.Key.ToString(), p.Value );
 				}
-
-				Analytics.Client.Track( UserId, eventName, properties );
 			}
+
+			Analytics.Client.Track( UserId, eventName, properties );
+			SaveToMongo( UserId, eventName, properties );
+		}
+
+		void SaveToMongo( string userId, string eventName, Segment.Model.Properties properties )
+		{
+			// Add main event data.
+			var eventData = new BsonDocument
+			{
+				{ "UserId", userId },
+				{ "EventName", eventName },
+			};
+
+			// Add all properties data to nested node of main.
+			if ( properties.Count > 0 )
+			{
+				var propertiesData = new BsonDocument();
+				propertiesData.AddRange( properties );
+				eventData.Add( new BsonElement( "Properties", propertiesData ) );
+			}
+
+			// Automaticaly connect to dababase and insert data.
+			LogCollection.Insert( eventData );
 		}
 	}
 }
