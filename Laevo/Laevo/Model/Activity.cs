@@ -35,6 +35,9 @@ namespace Laevo.Model
 		public event Action<Activity> ToDoChangedEvent;
 
 		[DataMember]
+		public Guid Identifier { get; private set; }
+
+		[DataMember]
 		string _name;
 		/// <summary>
 		///   A name describing this activity.
@@ -141,6 +144,7 @@ namespace Laevo.Model
 			SetDefaults();
 
 			_name = name; // Change field rather than property to prevent logging activity creation as a name change.
+			Identifier = Guid.NewGuid();
 			DateCreated = DateTime.Now;
 
 			// Create initial data path.
@@ -406,6 +410,23 @@ namespace Laevo.Model
 		public void AddInterruption( AbstractInterruption interruption )
 		{
 			_interruptions.Add( interruption );
+		}
+
+		public override bool Equals( object obj )
+		{
+			var activity = obj as Activity;
+
+			if ( activity == null )
+			{
+				return false;
+			}
+
+			return Identifier.Equals( activity.Identifier );
+		}
+
+		public override int GetHashCode()
+		{
+			return Identifier.GetHashCode();
 		}
 	}
 }
