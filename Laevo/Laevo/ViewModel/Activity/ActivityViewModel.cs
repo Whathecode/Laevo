@@ -125,11 +125,11 @@ namespace Laevo.ViewModel.Activity
 		VirtualDesktop _virtualDesktop;
 
 		/// <summary>
-		///   The time when the activity was created.
+		///   The unique identifier of the activity this view model represents.
 		/// </summary>
-		public DateTime DateCreated
+		public Guid Identifier
 		{
-			get { return Activity.DateCreated; }
+			get { return Activity.Identifier; }
 		}
 
 		public bool IsUnnamed { get; set; }

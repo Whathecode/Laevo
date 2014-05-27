@@ -34,31 +34,31 @@ namespace Laevo.Data.View
 
 			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(
-				typeof( Dictionary<DateTime, ActivityViewModel> ),
+				typeof( Dictionary<Guid, ActivityViewModel> ),
 				persistenceProvider.GetPersistedDataTypes(),
 				Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( desktopManager ) );
-			var existingActivities = new Dictionary<DateTime, ActivityViewModel>();
+			var existingActivities = new Dictionary<Guid, ActivityViewModel>();
 			if ( File.Exists( _activitiesFile ) )
 			{
 				using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Open ) )
 				{
-					existingActivities = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( activitiesFileStream );
+					existingActivities = (Dictionary<Guid, ActivityViewModel>)_activitySerializer.ReadObject( activitiesFileStream );
 				}
 			}
-			var existingTasks = new Dictionary<DateTime, ActivityViewModel>();
+			var existingTasks = new Dictionary<Guid, ActivityViewModel>();
 			if ( File.Exists( _tasksFile ) )
 			{
 				using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Open ) )
 				{
-					existingTasks = (Dictionary<DateTime, ActivityViewModel>)_activitySerializer.ReadObject( tasksFileStream );
+					existingTasks = (Dictionary<Guid, ActivityViewModel>)_activitySerializer.ReadObject( tasksFileStream );
 				}
 			}
 
 			// Initialize a view model for all activities from previous sessions.
-			foreach ( var activity in modelData.Activities.Where( a => a != modelData.HomeActivity ) )
+			foreach ( var activity in modelData.Activities.Where( a => !a.Equals( modelData.HomeActivity ) ) )
 			{
-				if ( !existingActivities.ContainsKey( activity.DateCreated ) )
+				if ( !existingActivities.ContainsKey( activity.Identifier ) )
 				{
 					continue;
 				}
@@ -72,7 +72,7 @@ namespace Laevo.Data.View
 				// Create and hook up the view model.
 				var viewModel = new ActivityViewModel(
 					activity, desktopManager,
-					existingActivities[ activity.DateCreated ],
+					existingActivities[ activity.Identifier ],
 					attentionShifts );
 				Activities.Add( viewModel );
 			}
@@ -81,10 +81,10 @@ namespace Laevo.Data.View
 			// ReSharper disable ImplicitlyCapturedClosure
 			var taskViewModels =
 				from task in modelData.Tasks
-				where existingTasks.ContainsKey( task.DateCreated )
+				where existingTasks.ContainsKey( task.Identifier )
 				select new ActivityViewModel(
 					task, desktopManager,
-					existingTasks[ task.DateCreated ],
+					existingTasks[ task.Identifier ],
 					new ActivityAttentionShift[] { } );
 			// ReSharper restore ImplicitlyCapturedClosure
 			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
@@ -93,11 +93,10 @@ namespace Laevo.Data.View
 			}
 
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
-			// TODO: Improve activity identification, rather than DateCreated.
 			for ( int i = 0; i < Tasks.Count; ++i )
 			{
 				ActivityViewModel task = Tasks[ i ];
-				ActivityViewModel activity = Activities.FirstOrDefault( a => a.DateCreated == task.DateCreated );
+				ActivityViewModel activity = Activities.FirstOrDefault( a => a.Equals( task ) );
 				if ( activity != null )
 				{
 					Tasks[ i ] = activity;
@@ -112,14 +111,14 @@ namespace Laevo.Data.View
 			lock ( Activities )
 			{
 				Activities.ForEach( a => a.Persist() );
-				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, Activities.ToDictionary( a => a.DateCreated, a => a ) );
+				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, Activities.ToDictionary( a => a.Identifier, a => a ) );
 			}
 
 			// Persist tasks.
 			lock ( Tasks )
 			{
 				Tasks.ForEach( t => t.Persist() );
-				PersistanceHelper.Persist( _tasksFile, _activitySerializer, Tasks.ToDictionary( a => a.DateCreated, a => a ) );
+				PersistanceHelper.Persist( _tasksFile, _activitySerializer, Tasks.ToDictionary( a => a.Identifier, a => a ) );
 			}
 		}
 	}
