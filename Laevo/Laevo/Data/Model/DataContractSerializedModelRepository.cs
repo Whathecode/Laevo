@@ -76,20 +76,6 @@ namespace Laevo.Data.Model
 				}
 			}
 
-			// Add attention spans from previous sessions.
-			_attentionShiftSerializer = new DataContractSerializer(
-				typeof( List<AbstractAttentionShift> ), new[] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
-				int.MaxValue, true, false,
-				new DataContractSurrogate( Activities.Concat( Tasks ).ToList() ) );
-			if ( File.Exists( _attentionShiftsFile ) )
-			{
-				using ( var attentionFileStream = new FileStream( _attentionShiftsFile, FileMode.Open ) )
-				{
-					var existingAttentionShifts = (List<AbstractAttentionShift>)_attentionShiftSerializer.ReadObject( attentionFileStream );
-					MemoryAttentionShifts.AddRange( existingAttentionShifts );
-				}
-			}
-
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
 			for ( int i = 0; i < Tasks.Count; ++i )
 			{
@@ -98,6 +84,20 @@ namespace Laevo.Data.Model
 				if ( activity != null )
 				{
 					MemoryTasks[ i ] = activity;
+				}
+			}
+
+			// Add attention spans from previous sessions.
+			_attentionShiftSerializer = new DataContractSerializer(
+				typeof( List<AbstractAttentionShift> ), new[] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
+				int.MaxValue, true, false,
+				new DataContractSurrogate( Activities.ToList() ) );
+			if ( File.Exists( _attentionShiftsFile ) )
+			{
+				using ( var attentionFileStream = new FileStream( _attentionShiftsFile, FileMode.Open ) )
+				{
+					var existingAttentionShifts = (List<AbstractAttentionShift>)_attentionShiftSerializer.ReadObject( attentionFileStream );
+					MemoryAttentionShifts.AddRange( existingAttentionShifts );
 				}
 			}
 		}
