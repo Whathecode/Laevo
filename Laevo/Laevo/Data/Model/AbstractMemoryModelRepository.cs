@@ -64,7 +64,6 @@ namespace Laevo.Data.Model
 		{
 			if ( activity.IsToDo )
 			{
-				//MemoryActivities.Remove( activity );
 				MemoryTasks.Add( activity );
 			}
 			else

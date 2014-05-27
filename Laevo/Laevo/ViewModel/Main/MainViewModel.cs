@@ -81,7 +81,7 @@ namespace Laevo.ViewModel.Main
 
 		void UpdateUnattendedInterruptions()
 		{
-			UnattendedInterruptions = _model.Activities.Concat( _model.Tasks ).Sum( a => a.Interruptions.Count( i => !i.AttendedTo ) );
+			UnattendedInterruptions = _model.Activities.Sum( a => a.Interruptions.Count( i => !i.AttendedTo ) );
 		}
 
 		public ActivityViewModel GetCurrentActivity()

@@ -124,14 +124,11 @@ namespace Laevo.Model
 
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;
+			HomeActivity.Activate();
 			CurrentActivity = HomeActivity;
 
 			// Handle activities and tasks from previous sessions.
-			_dataRepository
-				.Activities
-				.Concat( _dataRepository.Tasks )
-				.Concat( new[] { HomeActivity } )
-				.ForEach( HandleActivity );
+			_dataRepository.Activities.ForEach( HandleActivity );
 
 			// Set up interruption handlers.
 			_interruptionTrigger.InterruptionReceived += interruption =>
