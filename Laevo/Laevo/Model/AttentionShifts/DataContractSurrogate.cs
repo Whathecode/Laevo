@@ -15,11 +15,11 @@ namespace Laevo.Model.AttentionShifts
 		class SerializedActivity
 		{
 			[DataMember]
-			public DateTime DateCreated { get; private set; }
+			public Guid Identifier { get; private set; }
 
-			public SerializedActivity( DateTime dateCreated )
+			public SerializedActivity( Guid identifier )
 			{
-				DateCreated = dateCreated;
+				Identifier = identifier;
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace Laevo.Model.AttentionShifts
 		{
 			if ( targetType == typeof( SerializedActivity ) )
 			{
-				return new SerializedActivity( ((Activity)obj).DateCreated );
+				return new SerializedActivity( ((Activity)obj).Identifier );
 			}
 
 			return obj;
@@ -59,7 +59,7 @@ namespace Laevo.Model.AttentionShifts
 			var activity = obj as SerializedActivity;
 			if ( activity != null )
 			{
-				return _activities.First( a => a.DateCreated == activity.DateCreated );
+				return _activities.First( a => a.Identifier == activity.Identifier );
 			}
 
 			return obj;

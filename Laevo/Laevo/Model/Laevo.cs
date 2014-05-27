@@ -23,7 +23,6 @@ namespace Laevo.Model
 {
 	/// <summary>
 	///   The main model of the Laevo Virtual Desktop Manager.
-	///   TODO: Make tasks typesafe?
 	/// </summary>
 	/// <author>Steven Jeuris</author>
 	public class Laevo
@@ -213,7 +212,7 @@ namespace Laevo.Model
 
 			activity.ActivatedEvent -= OnActivityActivated;
 
-			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity == activity ).ForEach( a => a.ActivityRemoved() );
+			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity.Equals( activity ) ).ForEach( a => a.ActivityRemoved() );
 
 			_dataRepository.RemoveActivity( activity );
 
