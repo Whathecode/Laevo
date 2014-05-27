@@ -39,8 +39,8 @@ namespace Laevo.Logging
 		public LogData( string key, Activity activity )
 		{
 			Key = key;
-			Value = new { activity.Name, activity.DateCreated };
-			ValueAnonymized = new { Name = "Anonymized", activity.DateCreated };
+			Value = new { activity.Name, activity.Identifier };
+			ValueAnonymized = new { Name = "Anonymized", activity.Identifier };
 		}
 	}
 }
