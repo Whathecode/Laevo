@@ -82,7 +82,7 @@ namespace Laevo.Model
 			private set
 			{
 				_currentActivity = value;
-				Log.DebugWithData( "Current activity changed.", new LogData( _currentActivity ) );
+				Log.InfoWithData( "Current activity changed.", new LogData( _currentActivity ) );
 			}
 		}
 
@@ -122,13 +122,12 @@ namespace Laevo.Model
 			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			Log.Debug( "Desktop manager initialized." );
 
+			// Handle activities and tasks from previous sessions.
+			_dataRepository.Activities.ForEach( HandleActivity );
+
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;
 			HomeActivity.Activate();
-			CurrentActivity = HomeActivity;
-
-			// Handle activities and tasks from previous sessions.
-			_dataRepository.Activities.ForEach( HandleActivity );
 
 			// Set up interruption handlers.
 			_interruptionTrigger.InterruptionReceived += interruption =>
@@ -175,7 +174,7 @@ namespace Laevo.Model
 		}
 
 		/// <summary>
-		///   Create and add a new activity and sets it as the current activity.
+		///   Create and add a new activity.
 		/// </summary>
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name = DefaultActivityName )
@@ -184,7 +183,6 @@ namespace Laevo.Model
 			Log.InfoWithData( "New activity.", new LogData( activity ) );
 			HandleActivity( activity );
 
-			CurrentActivity = activity;
 			return activity;
 		}
 
