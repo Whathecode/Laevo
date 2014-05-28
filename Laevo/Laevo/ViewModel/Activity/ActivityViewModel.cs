@@ -733,7 +733,6 @@ namespace Laevo.ViewModel.Activity
 
 		/// <summary>
 		///   Merges the passed activity with this activity.
-		///   TODO: For now only merging tasks with activities is supported, but this might need to be extended.
 		/// </summary>
 		/// <param name = "activity">The activity to merge with this activity.</param>
 		public void Merge( ActivityViewModel activity )
@@ -752,7 +751,7 @@ namespace Laevo.ViewModel.Activity
 			// Ensure the correct activity is activated and its initialized properly.
 			if ( _overview.CurrentActivityViewModel == activity )
 			{
-				// A virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
+				// One virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
 				ActivateActivity( false );
 			}
 			else if ( _overview.CurrentActivityViewModel == this )
@@ -762,8 +761,15 @@ namespace Laevo.ViewModel.Activity
 			}
 			_desktopManager.Merge( activity._virtualDesktop, _virtualDesktop );
 
-			// Only at the end, when nothing from the activity is 'active' anymore, remove it.
-			_overview.Remove( activity );
+			// Only at the end, when nothing from the activity is 'active' anymore, convert it to the required state.
+			if ( activity.IsToDo || activity.GetFutureWorkIntervals().Any() )
+			{
+				activity.RemovePlanning();
+			}
+			else
+			{
+				activity.StopActivity();
+			}
 		}
 
 		/// <summary>
