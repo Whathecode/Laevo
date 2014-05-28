@@ -368,6 +368,14 @@ namespace Laevo.ViewModel.Activity
 			Activity.ToDoChangedEvent += a =>
 			{
 				IsToDo = Activity.IsToDo;
+
+				// Remove all future planned intervals.
+				var toRemove = GetFutureWorkIntervals();
+				foreach ( var r in toRemove )
+				{
+					WorkIntervals.Remove( r );
+				}
+
 				ToDoChangedEvent( this );
 			};
 
@@ -651,6 +659,12 @@ namespace Laevo.ViewModel.Activity
 			foreach ( var i in GetFutureWorkIntervals() )
 			{
 				WorkIntervals.Remove( i );
+			}
+
+			// When no intervals are left, also remove the activity.
+			if ( WorkIntervals.Count == 0 )
+			{
+				Remove();
 			}
 		}
 
