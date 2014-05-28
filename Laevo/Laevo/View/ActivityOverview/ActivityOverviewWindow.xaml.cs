@@ -499,9 +499,8 @@ namespace Laevo.View.ActivityOverview
 
 		void OnHomeDropOver( object sender, DragEventArgs e )
 		{
-			// For now only allow dropping to do items to merge.
 			var activity = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
-			if ( activity == null || !activity.IsToDo )
+			if ( activity == null )
 			{
 				e.Effects = DragDropEffects.None;
 			}

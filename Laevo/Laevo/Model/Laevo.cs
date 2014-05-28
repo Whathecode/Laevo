@@ -207,7 +207,7 @@ namespace Laevo.Model
 
 			activity.ActivatedEvent -= OnActivityActivated;
 
-			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => s.Activity.Equals( activity ) ).ForEach( a => a.ActivityRemoved() );
+			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => activity.Equals( s.Activity ) ).ForEach( a => a.ActivityRemoved() );
 
 			_dataRepository.RemoveActivity( activity );
 
