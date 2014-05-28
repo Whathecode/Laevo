@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -138,9 +138,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity();
 
-
 			// Initialize the activities and tasks to work with this overview.
-			Activities.Concat( Tasks ).ForEach( a =>
+			Activities.Concat( Tasks ).Distinct().ForEach( a =>
 			{
 				HookActivityToOverview( a ); // Hook up activity view models from previous sessions.
 				a.UpdateHasOpenWindows(); // Update the activity states now that the VDM has been initialized.
@@ -376,13 +375,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			if ( isTurnedIntoToDo )
 			{
 				AddTask( viewModel );
-
-				// Remove all future planned intervals.
-				var toRemove = viewModel.GetFutureWorkIntervals();
-				foreach ( var r in toRemove )
-				{
-					viewModel.WorkIntervals.Remove( r );
-				}
 			}
 			else
 			{
@@ -401,7 +393,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
 		void OnEnableAttentionLinesChanged( bool oldIsEnabled, bool newIsEnabled )
 		{
-			foreach ( var activity in Activities.Concat( Tasks ) )
+			foreach ( var activity in Activities.Concat( Tasks ).Distinct() )
 			{
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
@@ -539,7 +531,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		protected override void FreeUnmanagedResources()
 		{
 			_updateTimer.Stop();
-			Activities.ForEach( a => a.Dispose() );
+			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
 
 			_model.DesktopManager.Close();
 		}
