@@ -15,6 +15,7 @@
 		IsPlanned,
 		HasOpenWindows,
 		IsSuspended,
+		NeedsSuspension,
 		HasUnattendedInterruptions,
 		IsEditable,
 		WorkIntervals

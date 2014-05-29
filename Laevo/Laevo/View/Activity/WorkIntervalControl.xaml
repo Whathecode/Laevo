@@ -179,8 +179,7 @@
 			<Border.BorderBrush>
 				<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 					<Binding Path="IsActive" />
-					<Binding Path="IsOpen" />
-					<Binding Path="HasOpenWindows" />
+					<Binding Path="NeedsSuspension" />
 					<Binding Path="HasUnattendedInterruptions" />
 				</MultiBinding>
 			</Border.BorderBrush>
@@ -254,8 +253,7 @@
 								<Rectangle.Stroke>
 									<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 										<Binding Path="IsActive" />
-										<Binding Path="IsOpen" />
-										<Binding Path="HasOpenWindows" />
+										<Binding Path="NeedsSuspension" />
 										<Binding Path="HasUnattendedInterruptions" />
 									</MultiBinding>
 								</Rectangle.Stroke>

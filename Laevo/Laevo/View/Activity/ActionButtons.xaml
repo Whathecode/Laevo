@@ -78,14 +78,8 @@
 			Visibility="{Binding IsToDo, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
-				Style="{StaticResource RemoveButton}">
-				<Image.Opacity>
-					<MultiBinding
-						Converter="{wtcConverters:ConditionConverter Type={x:Type system:Double}, Expression='[0] || [1]', IfTrue=0.3, IfFalse=1}">
-						<Binding Path="HasOpenWindows" />
-						<Binding Path="IsOpen" />
-					</MultiBinding>
-				</Image.Opacity>
+				Style="{StaticResource RemoveButton}"
+				Opacity="{Binding NeedsSuspension, Converter={wtcConverters:FromBooleanConverter IfTrue=0.3, IfFalse=1}}">
 			</Image>
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"

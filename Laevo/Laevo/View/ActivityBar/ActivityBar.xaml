@@ -176,8 +176,7 @@
 								<Button.BorderBrush>
 									<MultiBinding Converter="{StaticResource BorderBrushConverter}">
 										<Binding Path="IsActive" />
-										<Binding Path="IsOpen" />
-										<Binding Path="HasOpenWindows" />
+										<Binding Path="NeedsSuspension" />
 										<Binding Path="HasUnattendedInterruptions" />
 									</MultiBinding>
 								</Button.BorderBrush>
