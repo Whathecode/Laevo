@@ -237,6 +237,8 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.ActivateSelectedActivity )]
 		public void ActivateSelectedActivity()
 		{
+			_model.DesktopManager.UpdateWindowAssociations();
+
 			_activityBarViewModel.ActivateSelectedActivity();
 		}
 
