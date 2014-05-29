@@ -83,6 +83,11 @@ namespace Laevo.ViewModel.Activity
 		public event ActivityEventHandler ActivatedActivityEvent;
 
 		/// <summary>
+		///   Event which is triggered when the activity is deactivated.
+		/// </summary>
+		public event ActivityEventHandler DeactivatedActivityEvent;
+
+		/// <summary>
 		///   Event which is triggered when an activity is selected.
 		/// </summary>
 		public event ActivityEventHandler SelectedActivityEvent;
@@ -364,7 +369,11 @@ namespace Laevo.ViewModel.Activity
 			IsToDo = Activity.IsToDo;
 
 			Activity.ActivatedEvent += a => IsActive = true;
-			Activity.DeactivatedEvent += a => IsActive = false;
+			Activity.DeactivatedEvent += a =>
+			{
+				IsActive = false;
+				DeactivatedActivityEvent( this );
+			};
 			Activity.OpenedEvent += a => IsOpen = true;
 			Activity.StoppedEvent += a =>
 			{
@@ -555,6 +564,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.StopActivity )]
 		public void StopActivity()
 		{
+			Activity.Deactivate();
 			Activity.Stop();
 		}
 
