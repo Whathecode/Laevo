@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityBar.Binding;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 
 
@@ -34,6 +36,7 @@ namespace Laevo.ViewModel.ActivityBar
 		{
 			Overview = overview;
 			OpenPlusCurrentActivities = new ObservableCollection<ActivityViewModel> { overview.HomeActivity };
+			overview.Activities.Where( a => a.NeedsSuspension && !a.Equals( overview.HomeActivity  ) ).ForEach( OpenPlusCurrentActivities.Add );
 
 			// TODO: Better decoupling from ActivityOverviewViewModel. These events could be provided as services through a central mechanism. Perhaps they don't belong in overview either way.
 			overview.OpenedActivityEvent += opened =>

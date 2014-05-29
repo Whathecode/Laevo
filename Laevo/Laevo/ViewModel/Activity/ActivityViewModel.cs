@@ -220,6 +220,12 @@ namespace Laevo.ViewModel.Activity
 		[DataMember]
 		public bool IsSuspended { get; private set; }
 
+		/// <summary>
+		///   Determines that the activity might be taking up resources since it has been activated, and hasn't been suspended since.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.NeedsSuspension )]
+		public bool NeedsSuspension { get; private set; }
+
 		[NotifyProperty( Binding.Properties.HasUnattendedInterruptions )]
 		public bool HasUnattendedInterruptions { get; private set; }
 
@@ -283,6 +289,7 @@ namespace Laevo.ViewModel.Activity
 
 			_desktopManager = desktopManager;
 			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
+			NeedsSuspension = _virtualDesktop.Windows.Count > 0;
 
 			Icon = storedViewModel.Icon;
 			Color = storedViewModel.Color;
@@ -415,6 +422,7 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
+			NeedsSuspension = true;
 			ActivatingActivityEvent( this );
 
 			// Activate. (model logic)
@@ -585,6 +593,7 @@ namespace Laevo.ViewModel.Activity
 			awaitSuspend.RunWorkerCompleted += ( sender, args ) =>
 			{
 				IsSuspended = true;
+				NeedsSuspension = false;
 				_isSuspending = false;
 				StopActivity();
 				SuspendedActivityEvent( this );
@@ -636,7 +645,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.Remove )]
 		public bool CanRemoveActivity()
 		{
-			return !HasOpenWindows && !IsOpen;
+			return !NeedsSuspension;
 		}
 
 		[CommandExecute( Commands.MakeToDo )]
