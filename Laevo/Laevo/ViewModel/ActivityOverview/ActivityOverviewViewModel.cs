@@ -283,6 +283,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
+			activity.DeactivatedActivityEvent -= OnActivityDeactivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
@@ -301,6 +302,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
+			activity.DeactivatedActivityEvent += OnActivityDeactivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
@@ -326,11 +328,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			ActivatedActivityEvent( oldActivity, CurrentActivityViewModel );
 		}
 
-		void OnActivityStopped( ActivityViewModel viewModel )
+		void OnActivityDeactivated( ActivityViewModel viewModel )
 		{
 			if ( viewModel == CurrentActivityViewModel )
 			{
-				// HACK: Since this activity is stopped, CurrentActivityViewModel will be set to null next time the overview is activated and its state won't be updated.
+				// HACK: Since this activity is deactivated, CurrentActivityViewModel will be null next time the overview is activated and its state won't be updated.
 				//       Therefore, already update the window states now. This is a temporary solution.
 				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
 				_model.DesktopManager.UpdateWindowAssociations();
@@ -339,6 +341,10 @@ namespace Laevo.ViewModel.ActivityOverview
 				CurrentActivityViewModel = null;
 				NoCurrentActiveActivityEvent();
 			}
+		}
+
+		void OnActivityStopped( ActivityViewModel viewModel )
+		{
 			StoppedActivityEvent( viewModel );
 		}
 
