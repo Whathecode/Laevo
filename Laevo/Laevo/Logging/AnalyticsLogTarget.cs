@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using MongoDB.Bson;
-using MongoDB.Driver;
+using Newtonsoft.Json;
 using NLog;
 using NLog.Targets;
 using Segment;
@@ -19,15 +22,17 @@ namespace Laevo.Logging
 	{
 		static readonly string UserId;
 
-		// MongoDB
-		const string DatabaseName = "laevo";
-		const string CollectionName = "log_data";
-		const string ConnectionString = "mongodb://laevoUser:test1234@ds037007.mongolab.com:37007/laevo";
-		static readonly MongoCollection LogCollection;
+		static readonly string AnalyticsCacheFileName
+			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "Laevo", "AnalyticsCache.xml" );
+
+		static readonly DataContractSerializer AnalyticsSerializer;
+		static readonly Queue<AnalyticsData> AnalyticsQueue = new Queue<AnalyticsData>();
+		static bool _isClosing;
+
+		static readonly MongoDb Mongo = new MongoDb();
 
 		static AnalyticsLogTarget()
 		{
-			// Initialize analytics for the project stevenjeuris/laevo.
 			const string analyticsKey = "32gkxq3ekp";
 			Guid userGuid = Properties.Settings.Default.AnalyticsID;
 			if ( userGuid == Guid.Empty )
@@ -42,74 +47,158 @@ namespace Laevo.Logging
 				{ "createdAt", Properties.Settings.Default.FirstRun }
 			};
 #if DEBUG
-			Analytics.Initialize( analyticsKey, new Config().SetAsync( false ) );
+			Analytics.Initialize( analyticsKey, new Config().SetAsync( true ) );
 			userTraits.Add( "name", "Debug" );
 			userTraits.Add( "description", "User used during debugging." );
 #else
 			Analytics.Initialize( analyticsKey );
 #endif
+			Analytics.Client.Succeeded += ClientSucceeded;
+			Analytics.Client.Failed += ClientFailed;
 			UserId = Properties.Settings.Default.AnalyticsID.ToString();
-			Analytics.Client.Identify( UserId, userTraits );
 
-			var client = new MongoClient( ConnectionString );
-			LogCollection = client.GetServer().GetDatabase( DatabaseName ).GetCollection( CollectionName );
+			AnalyticsSerializer = new DataContractSerializer( typeof( Queue<AnalyticsData> ) );
+
+			if ( File.Exists( AnalyticsCacheFileName ) )
+			{
+				using ( var analyticsFileStream = new FileStream( AnalyticsCacheFileName, FileMode.Open ) )
+				{
+					AnalyticsQueue = (Queue<AnalyticsData>)AnalyticsSerializer.ReadObject( analyticsFileStream );
+				}
+			}
+
+			var identifyProperties = new Segment.Model.Properties();
+			foreach ( var ut in userTraits )
+			{
+				identifyProperties.Add( ut.Key, ut.Value );
+			}
+			AnalyticsQueue.Enqueue( new AnalyticsData( UserId, "Identify", identifyProperties ) );
+
+			Analytics.Client.Identify( UserId, userTraits );
+		}
+
+
+		static void PersistCache()
+		{
+			// TODO: Improve data persistance. 
+			// In order to persist properties data, values have to be converted to string (some data will be lost). 
+			// DataContract serializer cannot serialize list of unknown type.
+			Queue<AnalyticsData> tempAnalyticsQueue = AnalyticsQueue;
+			foreach ( var analyticsData in tempAnalyticsQueue )
+			{
+				var tempProperties = new Segment.Model.Properties();
+				foreach ( var property in analyticsData.Properties )
+				{
+					tempProperties.Add( property.Key, property.Value.ToString() );
+				}
+				analyticsData.Properties = tempProperties;
+			}
+
+			using ( var analyticsFileStream = new FileStream( AnalyticsCacheFileName, FileMode.Create ) )
+			{
+				AnalyticsSerializer.WriteObject( analyticsFileStream, tempAnalyticsQueue );
+			}
 		}
 
 
 		protected override void Write( LogEventInfo logEvent )
 		{
-			Segment.Model.Properties properties;
-			string eventName;
+			var currentData = new AnalyticsData( UserId );
+
+			// Used to pass actual event properties as object. In order to serialize them to Json or XML they have to be cast to string.
+			var tempProperties = new Segment.Model.Properties();
 
 			// Log warnings and errors.
 			if ( logEvent.Level > LogLevel.Info )
 			{
-				properties = new Segment.Model.Properties { { "Message", logEvent.FormattedMessage } };
+				currentData.Properties = new Segment.Model.Properties { { "Message", logEvent.FormattedMessage } };
 				if ( logEvent.Exception != null )
 				{
-					properties.Add( "Exception", logEvent.Exception.ToString() );
+					currentData.Properties.Add( "Exception", logEvent.Exception.ToString() );
 				}
-				eventName = logEvent.Level.ToString();
+				currentData.EventName = logEvent.Level.ToString();
 			}
 				// Log info messages.
 			else
 			{
 				// Create event name.
 				string loggerName = logEvent.LoggerName;
-				eventName = loggerName.Split( new[] { '.' }, StringSplitOptions.RemoveEmptyEntries ).FirstOrDefault() ?? loggerName;
-				eventName += ": " + logEvent.FormattedMessage;
+				currentData.EventName = loggerName.Split( new[] { '.' }, StringSplitOptions.RemoveEmptyEntries ).FirstOrDefault() ?? loggerName;
+				currentData.EventName += ": " + logEvent.FormattedMessage;
 
 				// Create properties.
-				properties = new Segment.Model.Properties();
+				currentData.Properties = new Segment.Model.Properties();
+
 				foreach ( var p in logEvent.Properties )
 				{
-					properties.Add( p.Key.ToString(), p.Value );
+					currentData.Properties.Add( p.Key.ToString(), p.Value );
+					tempProperties.Add( p.Key.ToString(), p.Value );
 				}
 			}
 
-			Analytics.Client.Track( UserId, eventName, properties );
-			SaveToMongo( UserId, eventName, properties );
+			AnalyticsQueue.Enqueue( currentData );
+			Analytics.Client.Track( currentData.UserId, currentData.EventName, tempProperties );
+
+			// TODO: Change this dirty hack to detect application shutdown.
+			if ( currentData.EventName == "Laevo: Exiting." )
+			{
+				_isClosing = true;
+			}
 		}
 
-		void SaveToMongo( string userId, string eventName, Segment.Model.Properties properties )
+		static void ClientFailed( BaseAction action, Exception e )
 		{
-			// Add main event data.
-			var eventData = new BsonDocument
+			lock ( AnalyticsQueue )
 			{
-				{ "UserId", userId },
-				{ "EventName", eventName },
-			};
+				PersistCache();
+			}
+		}
 
-			// Add all properties data to nested node of main.
-			if ( properties.Count > 0 )
+		static void ClientSucceeded( BaseAction action )
+		{
+			lock ( AnalyticsQueue )
 			{
-				var propertiesData = new BsonDocument();
-				propertiesData.AddRange( properties );
-				eventData.Add( new BsonElement( "Properties", propertiesData ) );
+				var analyticsData = AnalyticsQueue.FirstOrDefault();
+				if ( analyticsData != null )
+				{
+					analyticsData.IsMongoItem = true;
+					PersistCache();
+					bool insertResult = Mongo.Insert( BsonDocument.Parse( JsonConvert.SerializeObject( analyticsData ) ) );
+					if ( insertResult )
+					{
+						AnalyticsQueue.Dequeue();
+						PersistCache();
+					}
+				}
+
+				// Reupload cached data.
+				var cachedAnalitycsData = AnalyticsQueue.FirstOrDefault();
+				if ( cachedAnalitycsData != null )
+				{
+					// Reupload data only to MongoDB.
+					if ( cachedAnalitycsData.IsMongoItem )
+					{
+						bool insertResult = Mongo.Insert( BsonDocument.Parse( JsonConvert.SerializeObject( cachedAnalitycsData ) ) );
+						if ( insertResult )
+						{
+							AnalyticsQueue.Dequeue();
+							PersistCache();
+						}
+					}
+						// Reupload data to analytics segment and MongoDB.
+					else
+					{
+						Analytics.Client.Track( cachedAnalitycsData.UserId, cachedAnalitycsData.EventName, cachedAnalitycsData.Properties,
+							new Options().SetTimestamp( cachedAnalitycsData.TimeStamp ) );
+					}
+				}
 			}
 
-			// Automaticaly connect to dababase and insert data.
-			LogCollection.Insert( eventData );
+			// When Analytics is started in async mode is has to be disposed to avoid infinite thread running in the background.
+			if ( _isClosing )
+			{
+				Analytics.Dispose();
+			}
 		}
 	}
 }
