@@ -9,6 +9,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Laevo.Logging;
 using NLog;
+using NLog.Config;
 
 
 namespace Laevo
@@ -43,7 +44,9 @@ namespace Laevo
 
 		static App()
 		{
-			NLog.Config.ConfigurationItemFactory.Default.LayoutRenderers.RegisterDefinition( "fullcontext", typeof( FullContextLayoutRenderer ) );
+			// Load custom NLog components.
+			ConfigurationItemFactory.Default.LayoutRenderers.RegisterDefinition( "fullcontext", typeof( FullContextLayoutRenderer ) );
+			ConfigurationItemFactory.Default.Targets.RegisterDefinition( "Analytics", typeof( AnalyticsLogTarget ) );
 		}
 
 

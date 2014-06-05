@@ -213,6 +213,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Analytics.NET">
+      <HintPath>..\packages\Analytics.2.0.0\lib\Analytics.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\..\Libraries\wpf-notifyicon\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
     </Reference>
@@ -222,18 +225,28 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell">
       <HintPath>..\..\Libraries\Windows API Code Pack 1.1\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\packages\mongocsharpdriver.1.9.1\lib\net35\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\packages\mongocsharpdriver.1.9.1\lib\net35\MongoDB.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="MouseKeyboardActivityMonitor">
       <HintPath>..\..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.2.1.0\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=3.1.40.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+    <Reference Include="PostSharp, Version=3.1.42.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\PostSharp.3.1.40\lib\net20\PostSharp.dll</HintPath>
+      <HintPath>..\packages\PostSharp.3.1.42\lib\net20\PostSharp.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp.Patterns.Diagnostics">
-      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.3.1.40\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
+    <Reference Include="PostSharp.Patterns.Diagnostics, Version=3.1.42.9, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.3.1.42\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -375,6 +388,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Logging\AnalyticsData.cs" />
+    <Compile Include="Logging\AnalyticsLogTarget.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -395,6 +412,7 @@
     <Compile Include="Logging\LogData.cs" />
     <Compile Include="Logging\LoggerExtension.cs" />
     <Compile Include="Logging\GlobalLoggingAspects.cs" />
+    <Compile Include="Logging\MongoDb.cs" />
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\AttentionShifts\AbstractAttentionShift.cs" />
     <Compile Include="Model\AttentionShifts\ActivityAttentionShift.cs" />
@@ -708,10 +726,10 @@
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\PostSharp.3.1.40\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.1.40\tools\PostSharp.targets')" />
+  <Import Project="..\packages\PostSharp.3.1.42\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.1.42\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('..\packages\PostSharp.3.1.40\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('..\packages\PostSharp.3.1.40\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="!Exists('..\packages\PostSharp.3.1.42\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('..\packages\PostSharp.3.1.42\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
