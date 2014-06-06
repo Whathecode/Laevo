@@ -22,12 +22,16 @@ namespace Laevo
 
 		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
+		public static readonly string BackupFolder = Path.Combine( ProgramLocalDataFolder, "Backups" );
 
 		readonly PersistenceProvider _persistenceProvider;
 
 		readonly MainViewModel _viewModel;
 		readonly TrayIconControl _trayIcon;
 		readonly Model.Laevo _model;
+
+		readonly IModelRepository _dataRepository;
+		readonly IViewRepository _viewDataRepository;
 
 		public LaevoController()
 		{
@@ -37,35 +41,44 @@ namespace Laevo
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider );
 
 			// Create Model.
-			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			_model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
+			_dataRepository = repositoryFactory.CreateModelRepository();
+			_model = new Model.Laevo( ProgramLocalDataFolder, _dataRepository, interruptionAggregator, _persistenceProvider );
 
 			// Create ViewModel.
 			// TODO: Move DesktopManager to ViewModel?
-			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, _model.DesktopManager );
-			_viewModel = new MainViewModel( _model, viewDataRepository );
+			_viewDataRepository = repositoryFactory.CreateViewRepository( _dataRepository, _model.DesktopManager );
+			_viewModel = new MainViewModel( _model, _viewDataRepository );
 
 			// Create View.
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
 
+			// Set up backups container.
+			if ( !Directory.Exists( BackupFolder ) )
+			{
+				Directory.CreateDirectory( BackupFolder );
+			}
+
 			// Persist current application state once per 5 minutes. 
 			var dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-			dispatcherTimer.Tick += ( s, e ) =>
-			{
-				_viewModel.Persist();
-				_model.Persist();
-			};
+			dispatcherTimer.Tick += ( s, e ) => Persist();
 			dispatcherTimer.Interval = new TimeSpan( 0, 5, 0 );
 			dispatcherTimer.Start();
 		}
 
-		public void Exit()
+		void Persist()
 		{
-			_viewModel.Exit();			
+			_dataRepository.SaveChanges();
+			_viewDataRepository.SaveChanges();
 		}
 
-		public void ExitDesktopManager()
+		public void Exit()
 		{
+			_viewModel.Exit();
+		}
+
+		public void TryPersistExitDesktopManager()
+		{
+			Persist();
 			_model.DesktopManager.Close();
 		}
 

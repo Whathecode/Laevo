@@ -75,8 +75,8 @@ namespace Laevo
 			{
 				Log.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
 
-				// Try to bring back all open windows on unhandled exceptions.
-				_controller.ExitDesktopManager();
+				// Try to bring back all open windows on unhandled exceptions and persist current state.
+				_controller.TryPersistExitDesktopManager();
 
 				OnExit( null );
 			};

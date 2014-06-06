@@ -56,8 +56,7 @@ namespace Laevo.Logging
 			Analytics.Client.Succeeded += ClientSucceeded;
 			Analytics.Client.Failed += ClientFailed;
 			UserId = Properties.Settings.Default.AnalyticsID.ToString();
-
-			AnalyticsSerializer = new DataContractSerializer( typeof( Queue<AnalyticsData> ) );
+			AnalyticsSerializer = new DataContractSerializer( typeof( Queue<AnalyticsData> ), new[] { typeof(List<string>) } );
 
 			if ( File.Exists( AnalyticsCacheFileName ) )
 			{
@@ -140,7 +139,7 @@ namespace Laevo.Logging
 			Analytics.Client.Track( currentData.UserId, currentData.EventName, tempProperties );
 
 			// TODO: Change this dirty hack to detect application shutdown.
-			if ( currentData.EventName == "Laevo: Exiting." )
+			if ( currentData.EventName == "Laevo: Exited." )
 			{
 				_isClosing = true;
 			}

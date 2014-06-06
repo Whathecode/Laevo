@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Windows;
 using ABC.Interruptions;
 using Laevo.Data.Common;
 using Laevo.Model;
@@ -38,10 +40,7 @@ namespace Laevo.Data.Model
 			// Load settings.
 			if ( File.Exists( _settingsFile ) )
 			{
-				using ( var settingsFileStream = new FileStream( _settingsFile, FileMode.Open ) )
-				{
-					Settings = (Settings)SettingsSerializer.ReadObject( settingsFileStream );
-				}
+				Settings = (Settings)PersistanceHelper.ReadData( _settingsFile, SettingsSerializer, Settings.GetType() );
 			}
 
 			// Initialize activity serializer.
@@ -51,13 +50,10 @@ namespace Laevo.Data.Model
 			// Add activities from previous sessions.
 			if ( File.Exists( _activitiesFile ) )
 			{
-				using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Open ) )
-				{
-					var activities = (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream );
-					MemoryActivities.AddRange( activities );
-					// TODO: Can this design be improved so implementing repositories can't forget to hook up the ToDoChangedEvent?
-					activities.ForEach( a => a.ToDoChangedEvent += OnActivityToDoChanged );
-				}
+				var activities = (List<Activity>)PersistanceHelper.ReadData( _activitiesFile, _activitySerializer, MemoryActivities.GetType() );
+				MemoryActivities.AddRange( activities );
+				// TODO: Can this design be improved so implementing repositories can't forget to hook up the ToDoChangedEvent?
+				activities.ForEach( a => a.ToDoChangedEvent += OnActivityToDoChanged );
 			}
 
 			// Set home activity.
@@ -68,12 +64,9 @@ namespace Laevo.Data.Model
 			// Add tasks from previous sessions.
 			if ( File.Exists( _tasksFile ) )
 			{
-				using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Open ) )
-				{
-					var tasks = (List<Activity>)_activitySerializer.ReadObject( tasksFileStream );
-					MemoryTasks.AddRange( tasks );
-					tasks.ForEach( t => t.ToDoChangedEvent += OnActivityToDoChanged );
-				}
+				var tasks = (List<Activity>)PersistanceHelper.ReadData( _tasksFile, _activitySerializer, MemoryTasks.GetType() );
+				MemoryTasks.AddRange( tasks );
+				tasks.ForEach( t => t.ToDoChangedEvent += OnActivityToDoChanged );
 			}
 
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
@@ -87,18 +80,16 @@ namespace Laevo.Data.Model
 				}
 			}
 
-			// Add attention spans from previous sessions.
 			_attentionShiftSerializer = new DataContractSerializer(
 				typeof( List<AbstractAttentionShift> ), new[] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
 				int.MaxValue, true, false,
 				new DataContractSurrogate( Activities.ToList() ) );
+
+			// Add attention spans from previous sessions.
 			if ( File.Exists( _attentionShiftsFile ) )
 			{
-				using ( var attentionFileStream = new FileStream( _attentionShiftsFile, FileMode.Open ) )
-				{
-					var existingAttentionShifts = (List<AbstractAttentionShift>)_attentionShiftSerializer.ReadObject( attentionFileStream );
-					MemoryAttentionShifts.AddRange( existingAttentionShifts );
-				}
+				var existingAttentionShifts = (List<AbstractAttentionShift>)PersistanceHelper.ReadData( _attentionShiftsFile, _attentionShiftSerializer, MemoryAttentionShifts.GetType() );
+				MemoryAttentionShifts.AddRange( existingAttentionShifts );
 			}
 		}
 

@@ -39,20 +39,18 @@ namespace Laevo.Data.View
 				Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( desktopManager ) );
 			var existingActivities = new Dictionary<Guid, ActivityViewModel>();
+
+			// Add activities representation from previous sessions.
 			if ( File.Exists( _activitiesFile ) )
 			{
-				using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Open ) )
-				{
-					existingActivities = (Dictionary<Guid, ActivityViewModel>)_activitySerializer.ReadObject( activitiesFileStream );
-				}
+				existingActivities = (Dictionary<Guid, ActivityViewModel>)PersistanceHelper.ReadData( _activitiesFile, _activitySerializer, existingActivities.GetType() );
 			}
 			var existingTasks = new Dictionary<Guid, ActivityViewModel>();
+
+			// Add tasks representation from previous sessions.
 			if ( File.Exists( _tasksFile ) )
 			{
-				using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Open ) )
-				{
-					existingTasks = (Dictionary<Guid, ActivityViewModel>)_activitySerializer.ReadObject( tasksFileStream );
-				}
+				existingTasks = (Dictionary<Guid, ActivityViewModel>)PersistanceHelper.ReadData( _tasksFile, _activitySerializer, existingTasks.GetType() );
 			}
 
 			// Initialize a view model for all activities from previous sessions.
