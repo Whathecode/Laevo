@@ -5,7 +5,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"	
+	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:binding="clr-namespace:Laevo.ViewModel.ActivityOverview.Binding"
 	xmlns:taskList="clr-namespace:Laevo.View.TaskList"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
@@ -32,14 +32,14 @@
 			<GradientStop Color="#282944" Offset="1" />
 		</LinearGradientBrush>
 		<SolidColorBrush x:Key="TimeLineBrush" Color="Transparent" options:Freeze="True" />
-		
+
 		<converters:AspectRatioToGeometryConverter x:Key="AspectRatioToPositions" />
 		<converters:AspectRatioToFovConverter x:Key="AspectRatioToFov" />
 		<converters:AspectRatioToTransformOffset x:Key="AspectRatioToTransformOffset" />
 		<converters:TimeLineWidthConverter x:Key="TimeLineWidthConverter" />
 		<converters:TimeLineHeightConverter x:Key="TimeLineHeightConverter" />
 	</Window.Resources>
-	
+
 	<Grid
 		x:Name="Container2D"
 		Background="{StaticResource BackgroundBrush}"
@@ -89,7 +89,40 @@
 			</Style>
 		</Grid.Style>-->
 
+		<!-- Feedback buttons -->
+
+		<StackPanel
+			Orientation="Horizontal"
+			VerticalAlignment="Top"
+			HorizontalAlignment="Right">
+			<Button
+				Cursor="Hand"
+				Name="SmileButton"
+				ToolTip="Send a Smile"
+				Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+				Click="FeedbackClick"
+				Background="Transparent">
+				<Image
+					Source="Images\Happy.png"
+					Height="32"
+					Width="32" />
+			</Button>
+			<Button
+				Cursor="Hand"
+				Name="FrownButton"
+				ToolTip="Send a Frown"
+				Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+				Click="FeedbackClick"
+				Background="Transparent">
+				<Image
+					Source="Images\Sad.png"
+					Height="32"
+					Width="32" />
+			</Button>
+		</StackPanel>
+
 		<!-- Time Line 3D -->
+
 		<Viewport3D
 			AllowDrop="True"
 			DragEnter="OnTimeLineDragEnter"
@@ -99,7 +132,7 @@
 			ContextMenuOpening="OnContextMenuOpening"
 			ClipToBounds="False"
 			RenderOptions.EdgeMode="Aliased">
-			
+
 			<Viewport3D.ContextMenu>
 				<ContextMenu>
 					<MenuItem
@@ -118,7 +151,7 @@
 					</MenuItem>
 				</ContextMenu>
 			</Viewport3D.ContextMenu>
-			
+
 			<Viewport3D.CacheMode>
 				<BitmapCache />
 			</Viewport3D.CacheMode>
@@ -181,7 +214,7 @@
 						</MeshGeometry3D.Positions>
 					</MeshGeometry3D>
 				</Viewport2DVisual3D.Geometry>
-				
+
 				<Viewport2DVisual3D.Material>
 					<DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" />
 				</Viewport2DVisual3D.Material>
@@ -215,7 +248,7 @@
 								<Binding Path="TimeLineRenderScale" />
 							</MultiBinding>
 						</Grid.Height>
-						
+
 						<activityOverview:TimeLineControl
 							x:Name="TimeLine"
 							Focusable="True" />
@@ -223,7 +256,7 @@
 						<!-- Drag and drop icons. -->
 						<!-- Setting IsHitTestVisible to false prevents the icon getting in the way of the dragging operation. -->
 						<Canvas
-							IsHitTestVisible="False" 
+							IsHitTestVisible="False"
 							Visibility="{Binding
 							ElementName=Control,
 							Path=IsSchedulingActivity,
@@ -231,7 +264,7 @@
 
 							<Canvas x:Name="DragDropCursorPosition">
 								<StackPanel
-									Orientation ="Horizontal">
+									Orientation="Horizontal">
 									<StackPanel.Resources>
 										<BitmapImage x:Key="OpenTaskCursor" UriSource="Images\OpenTask.png" />
 										<BitmapImage x:Key="PlanActivityCursor" UriSource="..\Common\calendar.png" />
@@ -263,7 +296,7 @@
 			HorizontalAlignment="Stretch"
 			VerticalAlignment="Bottom"
 			ClipToBounds="True">	<!-- Clipping is needed here so grid layout is never stretched too far when the contents of this panel get too wide. -->
-			
+
 			<StackPanel
 				Orientation="Horizontal"
 				HorizontalAlignment="Right"
@@ -301,7 +334,7 @@
 					VerticalAlignment="Bottom"
 					Time="{Binding CurrentTime}" />
 			</StackPanel>
-			
+
 		</StackPanel>
 
 		<!-- Background drop for popups. -->
@@ -341,7 +374,7 @@
 				</Style>
 			</Grid.Style>
 		</Grid>
-		
+
 	</Grid>
 
 </Window>

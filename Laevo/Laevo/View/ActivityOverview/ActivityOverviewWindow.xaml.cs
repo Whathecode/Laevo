@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
 using Laevo.View.ActivityOverview.Labels;
@@ -459,7 +460,7 @@ namespace Laevo.View.ActivityOverview
 			{
 				e.Effects = DragDropEffects.Move;
 			}
-			e.Handled = true;	
+			e.Handled = true;
 		}
 
 		void OnTimeLineDragDropped( object sender, DragEventArgs e )
@@ -514,6 +515,33 @@ namespace Laevo.View.ActivityOverview
 			var overview = (ActivityOverviewViewModel)DataContext;
 
 			overview.HomeActivity.Merge( activity );
+		}
+
+		void FeedbackClick( object sender, RoutedEventArgs routedEventArgs )
+		{
+			// TODO: Improve feedback feature, make own viewmodel, etc.
+			var button = (Button)sender;
+			
+			// Params for good feedback.
+			var image = new BitmapImage( new Uri( "Images/Happy.png", UriKind.Relative ));
+			var sendText = "Send a Smile";
+			var feedbackLabel = "We appreciate your feedback. What did you like?";
+
+			// Params for bad feedback.
+			if ( button.Name == "FrownButton" )
+			{
+				image = new BitmapImage( new Uri( "Images/Sad.png", UriKind.Relative ) );
+				sendText = "Send a Frown";
+				feedbackLabel = "We appreciate your feedback. Is there something we can do better?";
+			}
+
+			var feedbackWidnow = new FeedbackWindow
+			{
+				Image = { Source = image },
+				SendButton = { Content = sendText },
+				FeedbackLabel = { Content = feedbackLabel }
+			};
+			feedbackWidnow.Show();
 		}
 	}
 }

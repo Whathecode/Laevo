@@ -104,9 +104,6 @@ namespace Laevo.Logging
 		{
 			var currentData = new AnalyticsData( UserId );
 
-			// Used to pass actual event properties as object. In order to serialize them to Json or XML they have to be cast to string.
-			var tempProperties = new Segment.Model.Properties();
-
 			// Log warnings and errors.
 			if ( logEvent.Level > LogLevel.Info )
 			{
@@ -131,12 +128,11 @@ namespace Laevo.Logging
 				foreach ( var p in logEvent.Properties )
 				{
 					currentData.Properties.Add( p.Key.ToString(), p.Value );
-					tempProperties.Add( p.Key.ToString(), p.Value );
 				}
 			}
 
 			AnalyticsQueue.Enqueue( currentData );
-			Analytics.Client.Track( currentData.UserId, currentData.EventName, tempProperties );
+			Analytics.Client.Track( currentData.UserId, currentData.EventName, currentData.Properties );
 
 			// TODO: Change this dirty hack to detect application shutdown.
 			if ( currentData.EventName == "Laevo: Exited." )
