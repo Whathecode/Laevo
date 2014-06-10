@@ -51,7 +51,7 @@ namespace Laevo.Data.Common
 			catch ( Exception exception)
 			{
 				Log.ErrorException( "Deserialization failed.", exception );
-				string backupPath = LaevoController.BackupFolder + filePath.Substring( filePath.LastIndexOf( '\\' ) ) + PersistanceHelper.BackupExtention;
+				string backupPath = LaevoController.BackupFolder + filePath.Substring( filePath.LastIndexOf( '\\' ) ) + BackupExtention;
 				if ( File.Exists( backupPath ) )
 				{
 					try

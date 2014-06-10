@@ -459,6 +459,9 @@
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToTransformOffset.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineHeightConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
+    <Compile Include="View\ActivityOverview\FeedbackWindow.xaml.cs">
+      <DependentUpon>FeedbackWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ActivityOverview\Shaders\FadeEffect.cs" />
     <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
     <Compile Include="ViewModel\ActivityOverview\Mode.cs" />
@@ -534,6 +537,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\ActivityOverview\Images\Happy.png" />
+    <Resource Include="View\ActivityOverview\Images\Sad.png" />
     <None Include="app.config" />
     <None Include="app.manifest">
       <SubType>Designer</SubType>
@@ -576,6 +581,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ActivityOverview\ClockControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ActivityOverview\FeedbackWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
