@@ -517,31 +517,43 @@ namespace Laevo.View.ActivityOverview
 			overview.HomeActivity.Merge( activity );
 		}
 
+		readonly FeedbackWindow _feedbackWidnow = new FeedbackWindow();
 		void FeedbackClick( object sender, RoutedEventArgs routedEventArgs )
 		{
-			// TODO: Improve feedback feature, make own viewmodel, etc.
-			var button = (Button)sender;
-			
-			// Params for good feedback.
-			var image = new BitmapImage( new Uri( "Images/Happy.png", UriKind.Relative ));
-			var sendText = "Send a Smile";
-			var feedbackLabel = "We appreciate your feedback. What did you like?";
-
-			// Params for bad feedback.
-			if ( button.Name == "FrownButton" )
+			var feedbackViewModel = new FeedbackViewModel
 			{
-				image = new BitmapImage( new Uri( "Images/Sad.png", UriKind.Relative ) );
-				sendText = "Send a Frown";
-				feedbackLabel = "We appreciate your feedback. Is there something we can do better?";
-			}
-
-			var feedbackWidnow = new FeedbackWindow
-			{
-				Image = { Source = image },
-				SendButton = { Content = sendText },
-				FeedbackLabel = { Content = feedbackLabel }
+				Color = Color.FromRgb( 88, 160, 2 ),
+				FeedbackText = "We appreciate your feedback. What did you like?",
+				FeedbackTextHint = "Tell us what you liked",
+				SendText = "Send a Smile",
+				Image = new BitmapImage( new Uri( "Images/Happy.png", UriKind.Relative ))
 			};
-			feedbackWidnow.Show();
+			
+			ClearFeedback();
+			_feedbackWidnow.DataContext = feedbackViewModel;
+			_feedbackWidnow.Show();
+		}
+
+		void FeedbackBadClick( object sender, RoutedEventArgs e )
+		{
+			var feedbackViewModel = new FeedbackViewModel
+			{
+				Color = Color.FromRgb( 212, 50, 38 ),
+				FeedbackText = "We appreciate your feedback. Is there something we can do better?",
+				FeedbackTextHint = "Tell us what you didn't like or what went wrong",
+				SendText = "Send a Frown",
+				Image = new BitmapImage( new Uri( "Images/Sad.png", UriKind.Relative ))
+			};
+			
+			ClearFeedback();
+			_feedbackWidnow.DataContext = feedbackViewModel;
+			_feedbackWidnow.Show();
+		}
+
+		void ClearFeedback()
+		{
+			_feedbackWidnow.FeedbackTextBox.Clear();
+			_feedbackWidnow.EmailTextBox.Clear();
 		}
 	}
 }

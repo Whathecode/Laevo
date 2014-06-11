@@ -7,6 +7,8 @@
 	mc:Ignorable="d"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:activityOverview="clr-namespace:Laevo.ViewModel.ActivityOverview"
+	xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 	WindowStyle="None"
 	ShowInTaskbar="False"
 	WindowStartupLocation="CenterScreen"
@@ -16,7 +18,8 @@
 	FontFamily="Segoe UI Light"
 	FontSize="18"
 	Foreground="White"
-	Topmost="True">
+	Topmost="True"
+	d:DataContext="{d:DesignInstance Type=activityOverview:FeedbackViewModel}" d:DesignWidth="587" d:DesignHeight="472">
 
 	<Window.Resources>
 		<!-- Styles -->
@@ -27,30 +30,32 @@
 			<Setter Property="Padding" Value="10, 0, 10, 0" />
 		</Style>
 		<converters:EditActivityIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
+		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
+		<DataTemplate x:Key="WatermarkDataTemplate">
+			<TextBlock Text="{Binding}" FontSize="12" Margin="5, 4, 0 ,0" Foreground="Gray"/>
+		</DataTemplate>
 	</Window.Resources>
 
 	<Border
 		Margin="20"
 		CornerRadius="3"
-		BorderThickness="1"
-		BorderBrush="{StaticResource AeroThemeColor}"
-		Background="{StaticResource AeroThemeColor}">
+		BorderThickness="1">
 
-		<!--<Border.BorderBrush>
+		<Border.BorderBrush>
 			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 				<GradientStop Offset="0" Color="White" />
 				<GradientStop Offset="1" Color="{Binding Color}" />
 			</LinearGradientBrush>
-		</Border.BorderBrush>-->
+		</Border.BorderBrush>
 
-		<!--<Border.Background>
+		<Border.Background>
 			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 				<GradientStop
 					Color="{Binding Color}" Offset="1" />
 				<GradientStop
 					Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
 			</LinearGradientBrush>
-		</Border.Background>-->
+		</Border.Background>
 
 		<Border.Effect>
 			<DropShadowEffect />
@@ -65,7 +70,7 @@
 			</Grid.RowDefinitions>
 
 			<Canvas>
-				<Image x:Name="Image">
+				<Image x:Name="Image" Source="{Binding Image}" Width="35" Height="35">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
@@ -79,25 +84,31 @@
 			<DockPanel
 				Grid.Row="0" Grid.Column="0"
 				Margin="0, 10, 0, 10">
-				<Label 
+				<Label
 					DockPanel.Dock="Top"
-					Name="FeedbackLabel"/>
-				<TextBox
+					Content="{Binding FeedbackText}" />
+				<xctk:WatermarkTextBox
 					DockPanel.Dock="Bottom"
 					x:Name="FeedbackTextBox"
 					HorizontalAlignment="Stretch"
 					MinHeight="150"
-					VerticalAlignment="Stretch"/>
+					VerticalAlignment="Stretch"
+					Watermark="{Binding FeedbackTextHint}"
+					WatermarkTemplate="{StaticResource WatermarkDataTemplate}"/>
 			</DockPanel>
 
 			<!-- Email. -->
 			<DockPanel
 				Grid.Row="1" Grid.Column="0">
 				<Label>Email address</Label>
-				<TextBox
-					x:Name="EmailTextBox"
+				<xctk:WatermarkTextBox
+					Name="EmailTextBox"
 					Margin="10, 0, 0, 0"
-					HorizontalAlignment="Stretch" />
+					HorizontalAlignment="Stretch"
+					Height="30" VerticalScrollBarVisibility="Disabled"
+					MinWidth="300"
+					Watermark="Provide an email address if you want us to contact you"
+					WatermarkTemplate="{StaticResource WatermarkDataTemplate}"/>
 			</DockPanel>
 
 			<!-- Close, send. -->
@@ -107,21 +118,19 @@
 				LastChildFill="False">
 
 				<Button
-					Name="SendButton"
+					Content="{Binding SendText}"
 					Margin="10, 0, 0, 0"
 					Click="OnSendButtonClicked"
-					HorizontalAlignment="Right"
 					VerticalAlignment="Bottom"
 					DockPanel.Dock="Right" />
 
 				<Button
 					Click="OnCancelButtonClicked"
 					Content="Close"
-					HorizontalAlignment="Right"
 					VerticalAlignment="Bottom"
 					DockPanel.Dock="Right" />
 			</DockPanel>
-			
+
 		</Grid>
 	</Border>
 
