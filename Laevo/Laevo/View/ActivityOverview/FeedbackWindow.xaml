@@ -14,7 +14,8 @@
 	WindowStartupLocation="CenterScreen"
 	AllowsTransparency="True"
 	Background="Transparent"
-	SizeToContent="WidthAndHeight"
+	Width="605"
+	Height="500"
 	FontFamily="Segoe UI Light"
 	FontSize="18"
 	Foreground="White"
@@ -90,6 +91,9 @@
 				<xctk:WatermarkTextBox
 					DockPanel.Dock="Bottom"
 					x:Name="FeedbackTextBox"
+					AcceptsReturn="True"
+					TextWrapping="Wrap"
+					HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
 					HorizontalAlignment="Stretch"
 					MinHeight="150"
 					VerticalAlignment="Stretch"
@@ -107,7 +111,8 @@
 					HorizontalAlignment="Stretch"
 					Height="30" VerticalScrollBarVisibility="Disabled"
 					MinWidth="300"
-					Watermark="Provide an email address if you want us to contact you"
+					Watermark="Provide an email address if you want us to contact you."
+
 					WatermarkTemplate="{StaticResource WatermarkDataTemplate}"/>
 			</DockPanel>
 

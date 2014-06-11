@@ -524,14 +524,11 @@ namespace Laevo.View.ActivityOverview
 			{
 				Color = Color.FromRgb( 88, 160, 2 ),
 				FeedbackText = "We appreciate your feedback. What did you like?",
-				FeedbackTextHint = "Tell us what you liked",
+				FeedbackTextHint = "Tell us what you liked.",
 				SendText = "Send a Smile",
 				Image = new BitmapImage( new Uri( "Images/Happy.png", UriKind.Relative ))
 			};
-			
-			ClearFeedback();
-			_feedbackWidnow.DataContext = feedbackViewModel;
-			_feedbackWidnow.Show();
+			ShowFeedbackwindow( feedbackViewModel );
 		}
 
 		void FeedbackBadClick( object sender, RoutedEventArgs e )
@@ -540,20 +537,31 @@ namespace Laevo.View.ActivityOverview
 			{
 				Color = Color.FromRgb( 212, 50, 38 ),
 				FeedbackText = "We appreciate your feedback. Is there something we can do better?",
-				FeedbackTextHint = "Tell us what you didn't like or what went wrong",
+				FeedbackTextHint = "Tell us what you didn't like or what went wrong.",
 				SendText = "Send a Frown",
 				Image = new BitmapImage( new Uri( "Images/Sad.png", UriKind.Relative ))
-			};
-			
-			ClearFeedback();
-			_feedbackWidnow.DataContext = feedbackViewModel;
-			_feedbackWidnow.Show();
+			};		
+			ShowFeedbackwindow( feedbackViewModel );
 		}
 
-		void ClearFeedback()
+		void ShowFeedbackwindow( FeedbackViewModel feedbackViewModel )
 		{
 			_feedbackWidnow.FeedbackTextBox.Clear();
 			_feedbackWidnow.EmailTextBox.Clear();
+			_feedbackWidnow.DataContext = feedbackViewModel;
+			_feedbackWidnow.IsVisibleChanged += ( o, args ) =>
+			{
+				var overview = (ActivityOverviewViewModel)DataContext;
+				if ( _feedbackWidnow.Visibility == Visibility.Visible )
+				{
+					overview.ActivityMode |= Mode.Edit;
+				}
+				else
+				{
+					overview.ActivityMode &= ~Mode.Edit;
+				}
+			};
+			_feedbackWidnow.Show();
 		}
 	}
 }
