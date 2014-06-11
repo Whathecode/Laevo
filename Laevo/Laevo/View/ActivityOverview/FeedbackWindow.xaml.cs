@@ -23,12 +23,12 @@ namespace Laevo.View.ActivityOverview
 			var button = (Button)sender;
 			var logDatas = new[] { new LogData( "Feedback text", FeedbackTextBox.Text ), new LogData( "Email", EmailTextBox.Text ), new LogData( "Type", button.Content ) };
 			Log.InfoWithData( "Feedback sent.", logDatas );
-			Close();
+			Hide();
 		}
 
 		void OnCancelButtonClicked( object sender, RoutedEventArgs e )
 		{
-			Close();
+			Hide();
 		}
 	}
 }
