@@ -133,7 +133,7 @@ namespace Laevo.Model
 		///   All paths to relevant data sources which are part of this activity context.
 		/// </summary>
 		[DataMember]
-		List<Uri> _dataPaths;
+		HashSet<Uri> _dataPaths;
 
 
 		public Activity()
@@ -163,7 +163,7 @@ namespace Laevo.Model
 
 		void SetDefaults()
 		{
-			_dataPaths = new List<Uri>();
+			_dataPaths = new HashSet<Uri>();
 			_openIntervals = new List<Interval<DateTime>>();
 			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
@@ -248,6 +248,8 @@ namespace Laevo.Model
 			IsToDo = false;
 			IsOpen = true;
 			OpenedEvent( this );
+
+			Log.InfoWithData( "Opened.", new LogData( this ) );
 		}
 
 		/// <summary>
@@ -264,6 +266,8 @@ namespace Laevo.Model
 			_currentOpenInterval = null;
 			IsOpen = false;
 			StoppedEvent( this );
+
+			Log.InfoWithData( "Stopped.", new LogData( this ) );
 		}
 
 		public void AddPlannedInterval( DateTime atTime, TimeSpan duration )
@@ -277,6 +281,8 @@ namespace Laevo.Model
 			_plannedIntervals.Add( plannedInterval );
 
 			IsToDo = false;
+
+			Log.InfoWithData( "Added planned interval.", new LogData( this ) );
 		}
 
 		/// <summary>
@@ -290,6 +296,8 @@ namespace Laevo.Model
 			DateTime now = DateTime.Now;
 			_plannedIntervals.RemoveAll( p => p.Interval.Start > now );
 			IsToDo = true;
+
+			Log.InfoWithData( "Made to-do.", new LogData( this ) );
 		}
 
 		/// <summary>
@@ -305,6 +313,8 @@ namespace Laevo.Model
 			{
 				DateTime now = DateTime.Now;
 				_plannedIntervals.RemoveAll( p => p.Interval.Start > now );
+
+				Log.InfoWithData( "Removed planning.", new LogData( this ) );
 			}
 		}
 
@@ -315,7 +325,9 @@ namespace Laevo.Model
 		public void Merge( Activity activity )
 		{
 			_interruptions.AddRange( activity.Interruptions );
-			_dataPaths.AddRange( activity._dataPaths );
+			activity._dataPaths.ForEach( p => _dataPaths.Add( p ) );
+
+			Log.InfoWithData( "Activities merged.", new LogData( "Source", activity ), new LogData( "Target", this ) );
 		}
 
 		/// <summary>
@@ -323,7 +335,7 @@ namespace Laevo.Model
 		/// </summary>
 		public ReadOnlyCollection<Uri> GetUpdatedDataPaths()
 		{
-			var existingPaths = _dataPaths.Where( p => Directory.Exists( p.LocalPath ) ).ToList();
+			var existingPaths = new HashSet<Uri>( _dataPaths.Where( p => Directory.Exists( p.LocalPath ) ) );
 			_dataPaths = existingPaths;
 
 			if ( SpecificFolder != null && !Directory.Exists( SpecificFolder.LocalPath ) )
@@ -335,7 +347,7 @@ namespace Laevo.Model
 				AttemptActivityFolderRename();
 			}
 
-			return _dataPaths.AsReadOnly();
+			return _dataPaths.ToList().AsReadOnly();
 		}
 
 		/// <summary>
@@ -345,8 +357,12 @@ namespace Laevo.Model
 		/// <param name = "paths">The paths to replace the existing context paths with.</param>
 		public void SetNewDataPaths( List<Uri> paths )
 		{
-			_dataPaths = new List<Uri>();
-			_dataPaths.AddRange( paths );
+			if ( _dataPaths.SetEquals( paths ) )
+			{
+				return;
+			}
+
+			_dataPaths = new HashSet<Uri>( paths );
 
 			// Check whether the activity-specific folder was removed.
 			if ( !paths.Contains( SpecificFolder ) )
@@ -357,6 +373,9 @@ namespace Laevo.Model
 			{
 				AttemptActivityFolderRename();
 			}
+
+			string dataPaths = "[ " + String.Join( ", ", _dataPaths.Select( uri => "\"" + uri.ToString() + "\"" ) ) + " ]";
+			Log.InfoWithData( "New data paths.", new LogData( this ), new LogData( "Paths", dataPaths, _dataPaths.Count ) );
 		}
 
 		/// <summary>
