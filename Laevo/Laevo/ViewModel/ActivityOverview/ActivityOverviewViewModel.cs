@@ -327,23 +327,8 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnActivityStopped( ActivityViewModel viewModel )
 		{
-			if ( viewModel == CurrentActivityViewModel )
-			{
-				// HACK: Since this activity is deactivated, CurrentActivityViewModel will be null next time the overview is activated and its state won't be updated.
-				//       Therefore, already update the window states now. This is a temporary solution.
-				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
-				_model.DesktopManager.UpdateWindowAssociations();
-				viewModel.UpdateHasOpenWindows();
-
-				DeactivateActivity( viewModel );
-			}
+			DeactivateWithoutSwitch( viewModel );
 			StoppedActivityEvent( viewModel );
-		}
-
-		void DeactivateActivity( ActivityViewModel viewModel )
-		{
-			CurrentActivityViewModel = null;
-			NoCurrentActiveActivityEvent();
 		}
 
 		void OnActivitySelected( ActivityViewModel viewModel )
@@ -370,7 +355,25 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnSuspendedActivity( ActivityViewModel viewModel )
 		{
 			ActivityMode &= ~Mode.Suspending;
-			DeactivateActivity( viewModel );
+			DeactivateWithoutSwitch( viewModel );
+		}
+
+		/// <summary>
+		///   Needs to be called when an activity is deactived without immediately switching to another activity, meaning no activity is active at all.
+		/// </summary>
+		void DeactivateWithoutSwitch( ActivityViewModel viewModel )
+		{
+			if ( viewModel == CurrentActivityViewModel )
+			{
+				// HACK: Since this activity is deactivated, CurrentActivityViewModel will be null next time the overview is activated and its state won't be updated.
+				//       Therefore, already update the window states now. This is a temporary solution.
+				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
+				_model.DesktopManager.UpdateWindowAssociations();
+				viewModel.UpdateHasOpenWindows();
+
+				CurrentActivityViewModel = null;
+				NoCurrentActiveActivityEvent();
+			}
 		}
 
 		void OnToDoChanged( ActivityViewModel viewModel )
