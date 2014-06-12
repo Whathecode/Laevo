@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -283,7 +282,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
-			activity.DeactivatedActivityEvent -= OnActivityDeactivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
@@ -302,7 +300,6 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
-			activity.DeactivatedActivityEvent += OnActivityDeactivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
@@ -328,7 +325,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			ActivatedActivityEvent( oldActivity, CurrentActivityViewModel );
 		}
 
-		void OnActivityDeactivated( ActivityViewModel viewModel )
+		void OnActivityStopped( ActivityViewModel viewModel )
 		{
 			if ( viewModel == CurrentActivityViewModel )
 			{
@@ -338,14 +335,15 @@ namespace Laevo.ViewModel.ActivityOverview
 				_model.DesktopManager.UpdateWindowAssociations();
 				viewModel.UpdateHasOpenWindows();
 
-				CurrentActivityViewModel = null;
-				NoCurrentActiveActivityEvent();
+				DeactivateActivity( viewModel );
 			}
+			StoppedActivityEvent( viewModel );
 		}
 
-		void OnActivityStopped( ActivityViewModel viewModel )
+		void DeactivateActivity( ActivityViewModel viewModel )
 		{
-			StoppedActivityEvent( viewModel );
+			CurrentActivityViewModel = null;
+			NoCurrentActiveActivityEvent();
 		}
 
 		void OnActivitySelected( ActivityViewModel viewModel )
@@ -372,6 +370,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnSuspendedActivity( ActivityViewModel viewModel )
 		{
 			ActivityMode &= ~Mode.Suspending;
+			DeactivateActivity( viewModel );
 		}
 
 		void OnToDoChanged( ActivityViewModel viewModel )
