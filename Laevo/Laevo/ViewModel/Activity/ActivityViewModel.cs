@@ -893,19 +893,9 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			UpdateHasOpenWindows();
-			UpdateLibrary();
 
-			// Store activity context paths.
-			// This can't be done in Persist(), since the same library is shared across activities.
-			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
-			{
-				var dataPaths = new List<Uri>();
-				foreach ( var folder in activityContext )
-				{
-					dataPaths.Add( new Uri( folder.Path ) );
-				}
-				Activity.SetNewDataPaths( dataPaths );
-			}
+			// Storing activity context paths can't be done in Persist(), since the same library is shared across activities.
+			UpdateLibrary();
 
 			Activity.Deactivate();
 			_currentActiveTimeSpan = null;
