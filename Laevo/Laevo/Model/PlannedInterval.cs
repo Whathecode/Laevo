@@ -29,5 +29,11 @@ namespace Laevo.Model
 			Interval = new Interval<DateTime>( start, end );
 			PlannedAt = DateTime.Now;
 		}
+
+
+		public override string ToString()
+		{
+			return "{ PlannedAt = " + PlannedAt + ", Interval = " + Interval + " }";
+		}
 	}
 }
