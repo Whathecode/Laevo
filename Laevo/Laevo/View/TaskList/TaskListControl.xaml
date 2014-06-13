@@ -132,6 +132,7 @@
 									<Binding Path="IsActive" />
 									<Binding Path="NeedsSuspension" />
 									<Binding Path="HasUnattendedInterruptions" />
+									<Binding Path="IsOpen" />
 								</MultiBinding>
 							</Border.BorderBrush>
 
