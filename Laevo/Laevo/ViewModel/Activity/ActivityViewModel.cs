@@ -365,6 +365,7 @@ namespace Laevo.ViewModel.Activity
 		void CommonInitialize()
 		{
 			IsActive = Activity.IsActive;
+			IsOpen = Activity.IsOpen;
 			Label = Activity.Name;
 			IsToDo = Activity.IsToDo;
 

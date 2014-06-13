@@ -50,7 +50,7 @@
 								Padding="3"
 								BorderBrush="{TemplateBinding BorderBrush}"
 								Background="{TemplateBinding Background}">
-								
+
 									<ContentPresenter
 										Margin="2"
 										HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -178,6 +178,7 @@
 										<Binding Path="IsActive" />
 										<Binding Path="NeedsSuspension" />
 										<Binding Path="HasUnattendedInterruptions" />
+										<Binding Path="IsOpen" />
 									</MultiBinding>
 								</Button.BorderBrush>
 

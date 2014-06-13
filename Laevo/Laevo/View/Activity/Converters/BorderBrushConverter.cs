@@ -35,6 +35,7 @@ namespace Laevo.View.Activity.Converters
 			bool isActive = value[ 0 ];
 			bool needsSuspension = value[ 1 ];
 			bool hasUnattendedInterruptions = value[ 2 ];
+			bool isOpen = value[ 3 ];
 
 			if ( isActive )
 			{
@@ -42,7 +43,7 @@ namespace Laevo.View.Activity.Converters
 			}
 			else
 			{
-				Brush desiredBrush = needsSuspension ? Brushes.DarkOrange : Brushes.White;
+				Brush desiredBrush = needsSuspension && !isOpen ? Brushes.DarkOrange : Brushes.White;
 				return hasUnattendedInterruptions ? _interruptionBrushes[ desiredBrush ] : desiredBrush;
 			}
 		}
