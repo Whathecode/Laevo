@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -283,7 +282,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
-			activity.DeactivatedActivityEvent -= OnActivityDeactivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
 			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
@@ -302,7 +300,6 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
-			activity.DeactivatedActivityEvent += OnActivityDeactivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
 			activity.ActivityEditStartedEvent += OnActivityEditStarted;
 			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
@@ -328,23 +325,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			ActivatedActivityEvent( oldActivity, CurrentActivityViewModel );
 		}
 
-		void OnActivityDeactivated( ActivityViewModel viewModel )
-		{
-			if ( viewModel == CurrentActivityViewModel )
-			{
-				// HACK: Since this activity is deactivated, CurrentActivityViewModel will be null next time the overview is activated and its state won't be updated.
-				//       Therefore, already update the window states now. This is a temporary solution.
-				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
-				_model.DesktopManager.UpdateWindowAssociations();
-				viewModel.UpdateHasOpenWindows();
-
-				CurrentActivityViewModel = null;
-				NoCurrentActiveActivityEvent();
-			}
-		}
-
 		void OnActivityStopped( ActivityViewModel viewModel )
 		{
+			DeactivateWithoutSwitch( viewModel );
 			StoppedActivityEvent( viewModel );
 		}
 
@@ -372,6 +355,25 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnSuspendedActivity( ActivityViewModel viewModel )
 		{
 			ActivityMode &= ~Mode.Suspending;
+			DeactivateWithoutSwitch( viewModel );
+		}
+
+		/// <summary>
+		///   Needs to be called when an activity is deactived without immediately switching to another activity, meaning no activity is active at all.
+		/// </summary>
+		void DeactivateWithoutSwitch( ActivityViewModel viewModel )
+		{
+			if ( viewModel == CurrentActivityViewModel )
+			{
+				// HACK: Since this activity is deactivated, CurrentActivityViewModel will be null next time the overview is activated and its state won't be updated.
+				//       Therefore, already update the window states now. This is a temporary solution.
+				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
+				_model.DesktopManager.UpdateWindowAssociations();
+				viewModel.UpdateHasOpenWindows();
+
+				CurrentActivityViewModel = null;
+				NoCurrentActiveActivityEvent();
+			}
 		}
 
 		void OnToDoChanged( ActivityViewModel viewModel )

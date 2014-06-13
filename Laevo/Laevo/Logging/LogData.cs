@@ -1,4 +1,5 @@
-﻿using Laevo.Model;
+﻿using System.Linq;
+using Laevo.Model;
 
 
 namespace Laevo.Logging
@@ -39,7 +40,13 @@ namespace Laevo.Logging
 		public LogData( string key, Activity activity )
 		{
 			Key = key;
-			Value = new { activity.Name, activity.Identifier };
+			var plannedInterval = activity.PlannedIntervals.FirstOrDefault();
+			Value = new
+			{
+				activity.Name, activity.Identifier, activity.DateCreated,
+				activity.IsActive, activity.IsOpen, activity.IsToDo,
+				PlannedInterval = plannedInterval
+			};
 			ValueAnonymized = new { Name = "Anonymized", activity.Identifier };
 		}
 	}
