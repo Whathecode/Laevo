@@ -122,6 +122,11 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public event ActivityEventHandler ToDoChangedEvent;
 
+		/// <summary>
+		///   Event which is triggered when the activity is being removed.
+		/// </summary>
+		public event ActivityEventHandler RemovingActivityEvent;
+
 		internal readonly Model.Activity Activity;
 
 		readonly VirtualDesktopManager _desktopManager;
@@ -648,6 +653,8 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.Remove )]
 		public void Remove()
 		{
+			RemovingActivityEvent( this );
+
 			// TODO: Consider partial activity remove?
 			StopActivity();
 			_overview.Remove( this );
