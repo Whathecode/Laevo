@@ -18,7 +18,7 @@
 	AllowsTransparency="True"
 	Background="Transparent"
 	Width="600"
-	Height="500"
+	Height="525"
 	FontFamily="Segoe UI Light"
 	FontSize="18"
 	Foreground="White"
@@ -67,8 +67,8 @@
 			<Grid.RowDefinitions>
 				<RowDefinition Height="30" />
 				<RowDefinition Height="80" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="60" />
+				<RowDefinition Height="*" /> 
+				<RowDefinition Height="100" />
 			</Grid.RowDefinitions>
 
 			<Canvas>
@@ -149,16 +149,16 @@
 				</ScrollViewer>
 			</DockPanel>
 
-			<!-- Planned interval when set. -->
-			<DockPanel
+			<StackPanel
 				Grid.Row="3"
 				Grid.Column="0"
-				LastChildFill="False">
+				VerticalAlignment="Bottom">
 
+				<!-- Planned interval when set. -->
 				<StackPanel
+					Margin="0, 0, 0, 15"
 					DataContext="{Binding ElementName=Control, Path=PlannedInterval}"
 					Orientation="Vertical"
-					DockPanel.Dock="Left"
 					Visibility="{Binding Converter={wtcConverters:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 
 					<StackPanel Orientation="Horizontal">
@@ -203,23 +203,23 @@
 					</StackPanel>
 				</StackPanel>
 
+				<!-- Remove/save buttons. -->
 				<StackPanel
 					Orientation="Horizontal"
 					HorizontalAlignment="Right"
-					VerticalAlignment="Bottom"
-					DockPanel.Dock="Right">
+					VerticalAlignment="Bottom">
 
 					<Button
 						Margin="0, 0, 8, 0"
 						Command="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
-						Content="Remove" />
+						Content="_Remove" />
 					
 					<Button
 						Click="OnCloseButtonClicked"
-						Content="Save" />
+						Content="_Save" />
 
 				</StackPanel>
-			</DockPanel>
+			</StackPanel>
 		</Grid>
 	</Border>
 
