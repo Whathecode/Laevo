@@ -203,22 +203,12 @@
 					</StackPanel>
 				</StackPanel>
 
-				<!-- Remove/save buttons. -->
-				<StackPanel
-					Orientation="Horizontal"
+				<!-- Save button. -->
+				<Button
 					HorizontalAlignment="Right"
-					VerticalAlignment="Bottom">
-
-					<Button
-						Margin="0, 0, 8, 0"
-						Command="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
-						Content="_Remove" />
-					
-					<Button
-						Click="OnCloseButtonClicked"
-						Content="_Save" />
-
-				</StackPanel>
+					VerticalAlignment="Bottom"
+					Click="OnCloseButtonClicked"
+					Content="_Save" />
 			</StackPanel>
 		</Grid>
 	</Border>
