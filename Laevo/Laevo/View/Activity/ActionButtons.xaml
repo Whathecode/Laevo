@@ -8,8 +8,8 @@
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
-	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	xmlns:activity="clr-namespace:Laevo.ViewModel.Activity"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	d:DataContext="{d:DesignInstance Type=activity:ActivityViewModel}"
 	mc:Ignorable="d"
 	x:Name="Control">
@@ -45,6 +45,12 @@
 				<Setter Property="Source" Value="../Activity/ActionIcons/delete.png" />
 			</Style>
 			<Style
+				x:Key="SuspendButton"
+				TargetType="Image"
+				BasedOn="{StaticResource ResizedCommandButton}">
+				<Setter Property="Source" Value="../Activity/ActionIcons/suspend.png" />
+			</Style>
+			<Style
 				x:Key="EditButton"
 				TargetType="Image"
 				BasedOn="{StaticResource CommandButton}">
@@ -77,10 +83,13 @@
 			Orientation="Horizontal"
 			Visibility="{Binding IsToDo, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 			<Image
+				Visibility="{Binding NeedsSuspension, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SuspendActivity}}"
+				Style="{StaticResource SuspendButton}" />
+			<Image
+				Visibility="{Binding NeedsSuspension, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
-				Style="{StaticResource RemoveButton}"
-				Opacity="{Binding NeedsSuspension, Converter={wtcConverters:FromBooleanConverter IfTrue=0.3, IfFalse=1}}">
-			</Image>
+				Style="{StaticResource RemoveButton}" />
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"
 				Style="{StaticResource EditButton}" />
@@ -89,7 +98,8 @@
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.RemovePlanning}}"
 				Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-				Style="{StaticResource RemovePlanningButton}" />
+				Style="{StaticResource RemovePlanningButton}"
+				Opacity="{Binding CanRemovePlanning, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.3}}" />
 			<StackPanel
 				Orientation="Horizontal"
 				Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
@@ -110,7 +120,12 @@
 			Visibility="{Binding IsToDo, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.RemovePlanning}}"
+				Visibility="{Binding CanRemovePlanning, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
 				Style="{StaticResource RemovePlanningButton}" />
+			<Image
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SuspendActivity}}"
+				Visibility="{Binding CanRemovePlanning, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+				Style="{StaticResource SuspendButton}" />
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.EditActivity}}"
 				Style="{StaticResource EditButton}" />

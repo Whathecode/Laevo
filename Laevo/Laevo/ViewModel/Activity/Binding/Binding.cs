@@ -13,6 +13,7 @@
 		IsOpen,
 		IsToDo,
 		IsPlanned,
+		ContainsHistory,
 		HasOpenWindows,
 		IsSuspended,
 		NeedsSuspension,
