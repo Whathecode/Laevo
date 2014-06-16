@@ -38,26 +38,12 @@ namespace Laevo.View.Activity
 			DataContextChanged += ( sender, args ) =>
 			{
 				var dataContext = (ActivityViewModel)DataContext;
-
-				// Hook up activity removed event.
-				var old = args.OldValue as ActivityViewModel;
-				if ( old != null )
-				{
-					old.RemovingActivityEvent -= OnRemoved;
-				}
-				dataContext.RemovingActivityEvent += OnRemoved;
-
 				PlannedInterval = dataContext.GetFutureWorkIntervals().FirstOrDefault();
 			};
 		}
 
 
 		void OnCloseButtonClicked( object sender, RoutedEventArgs e )
-		{
-			Close();
-		}
-
-		void OnRemoved( ActivityViewModel viewmodel )
 		{
 			Close();
 		}
