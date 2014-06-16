@@ -220,6 +220,12 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsPlanned )]
 		public bool IsPlanned { get; private set; }
 
+		/// <summary>
+		///   Determines whether an activity contains old intervals, as opposed to only a planned part or to-do item.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.ContainsHistory )]
+		public bool CanRemovePlanning { get; private set; }
+
 		[NotifyProperty( Binding.Properties.HasOpenWindows )]
 		public bool HasOpenWindows { get; private set; }
 
@@ -585,6 +591,9 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.SuspendActivity )]
 		public void SuspendActivity()
 		{
+			// Be sure the activity is activated prior to suspending it.
+			ActivateActivity();
+
 			_desktopManager.UpdateWindowAssociations();
 
 			if ( IsSuspended )
@@ -696,9 +705,9 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		[CommandCanExecute( Commands.RemovePlanning )]
-		public bool CanRemovePlanning()
+		public bool CanRemovePlanningCommand()
 		{
-			return IsToDo || GetFutureWorkIntervals().Any();
+			return CanRemovePlanning;
 		}
 
 		public void UpdateHasOpenWindows()
@@ -872,6 +881,10 @@ namespace Laevo.ViewModel.Activity
 		{
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
 			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
+			// Be sure not to allow removing planning when it would result in removal without suspension first.
+			bool containsHistory = (IsToDo && WorkIntervals.Count > 0) || WorkIntervals.Count > 1;
+			CanRemovePlanning = IsPlanned && (!NeedsSuspension || containsHistory);
+			
 
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
