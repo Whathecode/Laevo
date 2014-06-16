@@ -203,13 +203,22 @@
 					</StackPanel>
 				</StackPanel>
 
-				<Button
-					Click="OnCloseButtonClicked"
-					Content="Save"
+				<StackPanel
+					Orientation="Horizontal"
 					HorizontalAlignment="Right"
 					VerticalAlignment="Bottom"
-					DockPanel.Dock="Right" />
+					DockPanel.Dock="Right">
 
+					<Button
+						Margin="0, 0, 8, 0"
+						Command="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
+						Content="Remove" />
+					
+					<Button
+						Click="OnCloseButtonClicked"
+						Content="Save" />
+
+				</StackPanel>
 			</DockPanel>
 		</Grid>
 	</Border>
