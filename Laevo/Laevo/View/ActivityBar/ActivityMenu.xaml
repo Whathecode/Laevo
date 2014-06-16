@@ -181,25 +181,14 @@
 				Orientation="Horizontal"
 				Visibility="{Binding IsEditable, Converter={data:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
-				<!-- Open/Stop. -->
+				<!-- Suspend. -->
 				<Button
-					Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
 					HorizontalAlignment="Left"
 					Margin="0,0,1,0"
 					VerticalAlignment="Top"
 					Width="100" Height="26"
-					Content="Stop"
-					Command="{commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}"
-					Foreground="#FFFFFFFF"
-					Template="{DynamicResource StatesButtonTemplate}" />
-				<Button
-					Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
-					HorizontalAlignment="Left"
-					Margin="0,0,1,0"
-					VerticalAlignment="Top"
-					Width="100" Height="26"
-					Content="Open"
-					Command="{commandFactory:CommandBinding {x:Static binding:Commands.OpenActivity}}"
+					Content="Suspend"
+					Command="{commandFactory:CommandBinding {x:Static binding:Commands.SuspendActivity}}"
 					Foreground="#FFFFFFFF"
 					Template="{DynamicResource StatesButtonTemplate}" />
 
@@ -213,21 +202,27 @@
 					Template="{DynamicResource StatesButtonTemplate}"
 					ContextMenuService.Placement="Right"
 					Click="ShowOtherStatesMenu"
-					MouseRightButtonDown="HideOtherStatesMenu">
+					MouseRightButtonDown="HideOtherStatesMenu"
+					IsEnabled="{Binding IsPlanned, Converter={data:InverseBooleanConverter}}">
 
 					<Button.Content>
 						<Polygon
 							Points="0,2 5,5, 0,8"
-							Stroke="White"
-							Fill="White" />
+							Stroke="{Binding IsPlanned, Converter={data:FromBooleanConverter IfTrue={x:Static Brushes.Gray}, IfFalse={x:Static Brushes.White}}}"
+							Fill="{Binding IsPlanned, Converter={data:FromBooleanConverter IfTrue={x:Static Brushes.Gray}, IfFalse={x:Static Brushes.White}}}" />
 					</Button.Content>
 
 					<Button.ContextMenu>
 						<ContextMenu>
+							<!-- Stop and open. -->
 							<MenuItem
-								Header="Suspend"
-								Command="{commandFactory:CommandBinding {x:Static binding:Commands.SuspendActivity}}"
-								Visibility="{Binding IsSuspended, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
+								Header="Stop"
+								Command="{commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}"
+								Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}" />
+							<MenuItem
+								Header="Open"
+								Command="{commandFactory:CommandBinding {x:Static binding:Commands.OpenActivity}}"
+								Visibility="{Binding IsOpen, Converter={converters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}" />
 						</ContextMenu>
 					</Button.ContextMenu>
 				</Button>
