@@ -18,7 +18,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ABC.Windows;
 using ABC.Windows.Desktop;
-using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -145,17 +144,20 @@ namespace Laevo.ViewModel.Activity
 		public bool IsUnnamed { get; set; }
 
 		Interval<DateTime> _currentActiveTimeSpan;
-		/// <summary>
-		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.ActiveTimeSpans )]
-		public ObservableCollection<Interval<DateTime>> ActiveTimeSpans { get; private set; }
 
-		/// <summary>
-		///   Determines whether or not the active timespans should be shown.
-		/// </summary>
-		[NotifyProperty( Binding.Properties.ShowActiveTimeSpans )]
-		public bool ShowActiveTimeSpans { get; set; }
+		bool _showActiveTimeSpans;
+
+		public bool ShowActiveTimeSpans
+		{
+			set
+			{
+				_showActiveTimeSpans = value;
+				foreach ( var workIntervalViewModel in WorkIntervals )
+				{
+					workIntervalViewModel.ShowActiveTimeSpans = _showActiveTimeSpans;
+				}
+			}
+		}
 
 		/// <summary>
 		///   An icon representing the activity.
@@ -298,8 +300,7 @@ namespace Laevo.ViewModel.Activity
 		public ActivityViewModel(
 			Model.Activity activity,
 			VirtualDesktopManager desktopManager,
-			ActivityViewModel storedViewModel,
-			IEnumerable<ActivityAttentionShift> activitySwitches )
+			ActivityViewModel storedViewModel )
 		{
 			Activity = activity;
 
@@ -325,7 +326,7 @@ namespace Laevo.ViewModel.Activity
 			var plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
-			
+
 			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
 				WorkIntervals.Add( i );
@@ -336,41 +337,10 @@ namespace Laevo.ViewModel.Activity
 			{
 				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
 				WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals[ i ].OffsetPercentage;
+				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
+				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
 			}
-
-			// Initiate attention history.
-			Model.Activity lastActivity = null;
-			ActivityAttentionShift lastShift = null;
-			foreach ( var s in activitySwitches )
-			{
-				if ( s.Activity == activity )
-				{
-					if ( _currentActiveTimeSpan != null && lastShift != null )
-					{
-						// Activity reopened. First close previous open interval.
-						var closedInterval = activity.OpenIntervals.First( i => i.LiesInInterval( lastShift.Time ) );
-						_currentActiveTimeSpan.ExpandTo( closedInterval.End );
-					}
-
-					// Activity opened.
-					_currentActiveTimeSpan = new Interval<DateTime>( DateTime.Now, DateTime.Now );
-					ActiveTimeSpans.Add( _currentActiveTimeSpan );
-				}
-				else if ( _currentActiveTimeSpan != null )
-				{
-					// Switched from this activity, to other activity.
-					_currentActiveTimeSpan.ExpandTo( s.Time );
-					_currentActiveTimeSpan = null;
-				}
-				lastShift = s;
-				lastActivity = s.Activity;
-			}
-			if ( _currentActiveTimeSpan != null && lastActivity != null )
-			{
-				// Since the application shut down, the activity wasn't open afterwards.
-				_currentActiveTimeSpan.ExpandTo( lastActivity.OpenIntervals.Last().End );
-				_currentActiveTimeSpan = null;
-			}
+			_currentActiveTimeSpan = null;
 		}
 
 		void CommonInitialize()
@@ -409,7 +379,6 @@ namespace Laevo.ViewModel.Activity
 
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
-			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
 			WorkIntervals = new ObservableCollection<WorkIntervalViewModel>();
 		}
 
@@ -455,13 +424,14 @@ namespace Laevo.ViewModel.Activity
 			{
 				Activity.View();
 			}
-			if ( ActiveTimeSpans == null )
-			{
-				ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
-			}
 			DateTime now = DateTime.Now;
 			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
-			ActiveTimeSpans.Add( _currentActiveTimeSpan );
+
+			// The only activity which can be active and do not have work intervals is home- avoid adding active intervals.
+			if ( WorkIntervals.Count > 0 )
+			{
+				WorkIntervals.Last().ActiveTimeSpans.Add( _currentActiveTimeSpan );
+			}
 
 			// Initialize desktop.
 			try
@@ -530,6 +500,7 @@ namespace Laevo.ViewModel.Activity
 		{
 			EditActivity( false );
 		}
+
 		public void EditActivity( bool focusPlannedInterval )
 		{
 			ActivityEditStartedEvent( this );
@@ -564,6 +535,15 @@ namespace Laevo.ViewModel.Activity
 			{
 				WorkIntervals.Add( CreateWorkInterval() );
 			}
+
+			if ( IsActive )
+			{
+				var beforeLastWorkInterval = WorkIntervals[ WorkIntervals.Count - 2 ];
+				var lastActiveTimeSpan = beforeLastWorkInterval.ActiveTimeSpans.Last();
+				beforeLastWorkInterval.ActiveTimeSpans.Remove( lastActiveTimeSpan );
+				WorkIntervals.Last().ActiveTimeSpans.Add( lastActiveTimeSpan );
+			}
+
 			Activity.Open();
 		}
 
@@ -895,7 +875,6 @@ namespace Laevo.ViewModel.Activity
 					WorkIntervals.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
 				}
 			}
-
 			// Update the intervals which indicate when the activity was active.
 			if ( _currentActiveTimeSpan != null )
 			{
@@ -926,7 +905,8 @@ namespace Laevo.ViewModel.Activity
 		{
 			var newActivity = new WorkIntervalViewModel( this )
 			{
-				Occurance = DateTime.Now
+				Occurance = DateTime.Now,
+				ShowActiveTimeSpans = _showActiveTimeSpans
 			};
 
 			var lastInterval = WorkIntervals.LastOrDefault();

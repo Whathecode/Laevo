@@ -7,9 +7,7 @@ using ABC.Applications.Persistence;
 using ABC.Windows.Desktop;
 using Laevo.Data.Common;
 using Laevo.Data.Model;
-using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
-using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 
 
@@ -63,17 +61,10 @@ namespace Laevo.Data.View
 					continue;
 				}
 
-				// Find the attention shifts which occured while the activity was open.
-				IReadOnlyCollection<Interval<DateTime>> openIntervals = activity.OpenIntervals;
-				var attentionShifts = modelData.AttentionShifts
-					.OfType<ActivityAttentionShift>()
-					.Where( shift => openIntervals.Any( i => i.LiesInInterval( shift.Time ) ) );
-
 				// Create and hook up the view model.
 				var viewModel = new ActivityViewModel(
 					activity, desktopManager,
-					existingActivities[ activity.Identifier ],
-					attentionShifts );
+					existingActivities[ activity.Identifier ]);
 				Activities.Add( viewModel );
 			}
 
@@ -84,8 +75,7 @@ namespace Laevo.Data.View
 				where existingTasks.ContainsKey( task.Identifier )
 				select new ActivityViewModel(
 					task, desktopManager,
-					existingTasks[ task.Identifier ],
-					new ActivityAttentionShift[] { } );
+					existingTasks[ task.Identifier ]);
 			// ReSharper restore ImplicitlyCapturedClosure
 			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
 			{
