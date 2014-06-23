@@ -83,8 +83,7 @@
 							AllowDrop="False"
 							MouseMove="StartDrag"
 							GiveFeedback="DragFeedback"
-							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}">
-						</Image>
+							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}" />
 						<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
 						<Image
 							Source="../Common/linked.png"
@@ -205,43 +204,10 @@
 				</LinearGradientBrush>
 			</Border.Background>
 
-			<Border.Resources>
-				<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
-				<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
-				<DataTemplate x:Key="AttentionTimeSpanTemplate">
-					<Line
-						Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-						Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-						Stroke="Yellow" StrokeThickness="4">
-
-						<Line.X1>
-							<MultiBinding
-								Converter="{StaticResource TimeSpanConverter}"
-								ConverterParameter="Start">
-								<Binding Path="." />
-								<Binding ElementName="Control" Path="DataContext.Occurance" />
-								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-								<Binding ElementName="Container" Path="ActualWidth" />
-							</MultiBinding>
-						</Line.X1>
-						<Line.X2>
-							<MultiBinding
-								Converter="{StaticResource TimeSpanConverter}"
-								ConverterParameter="End">
-								<Binding Path="." />
-								<Binding ElementName="Control" Path="DataContext.Occurance" />
-								<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-								<Binding ElementName="Container" Path="ActualWidth" />
-							</MultiBinding>
-						</Line.X2>
-					</Line>
-				</DataTemplate>
-			</Border.Resources>
-
 			<Border
 				BorderThickness="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource DashedBorderThicknessConverter}}">
 
-				<Border.BorderBrush>
+				<Border.BorderBrush >
 					<VisualBrush>
 						<VisualBrush.Visual>
 							<Rectangle
@@ -264,15 +230,54 @@
 				</Border.BorderBrush>
 
 				<!-- Attention time spans. -->
-				<ItemsControl
-					Visibility="{Binding ShowActiveTimeSpans, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}"
-					ItemTemplate="{StaticResource AttentionTimeSpanTemplate}">
+				<ItemsControl Name="ActiveItemsControl"
+					Visibility="{Binding ElementName=Control, 
+						Path=DataContext.ShowActiveTimeSpans,
+						Converter={wtcConverters:FromBooleanConverter 
+						IfTrue={x:Static Visibility.Visible}, 
+						IfFalse={x:Static Visibility.Collapsed}}}">
+
+					<ItemsControl.Resources>
+						<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
+						<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
+					</ItemsControl.Resources>
+
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Line
+								Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+								Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+								Stroke="Yellow" StrokeThickness="4">
+
+								<Line.X1>
+									<MultiBinding
+										Converter="{StaticResource TimeSpanConverter}"
+										ConverterParameter="Start">
+										<Binding Path="." />
+										<Binding ElementName="Control" Path="DataContext.Occurance" />
+										<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+										<Binding ElementName="Container" Path="ActualWidth" />
+									</MultiBinding>
+								</Line.X1>
+								<Line.X2>
+									<MultiBinding
+										Converter="{StaticResource TimeSpanConverter}"
+										ConverterParameter="End">
+										<Binding Path="." />
+										<Binding ElementName="Control" Path="DataContext.Occurance" />
+										<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+										<Binding ElementName="Container" Path="ActualWidth" />
+									</MultiBinding>
+								</Line.X2>
+							</Line>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
 
 					<ItemsControl.Style>
 						<Style TargetType="ItemsControl">
 							<Style.Triggers>
 								<Trigger Property="ItemsControl.Visibility" Value="Visible">
-									<Setter Property="ItemsSource" Value="{Binding ActiveTimeSpans}" />
+									<Setter Property="ItemsSource" Value="{Binding ElementName=Control, Path=DataContext.ActiveTimeSpans}" />
 								</Trigger>
 								<Trigger Property="ItemsControl.Visibility" Value="Hidden">
 									<Setter Property="ItemsSource" Value="{x:Null}" />
