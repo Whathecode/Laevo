@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.Activity;
 using Whathecode.System.Extensions;
@@ -31,10 +33,34 @@ namespace Laevo.View.Activity
 		[DependencyProperty( Properties.IsDraggingActivity )]
 		public bool IsDraggingActivity { get; private set; }
 
+		/// <summary>
+		///   Timer used to update active time spans.
+		/// </summary>
+		readonly Timer _updateTimer = new Timer( 100 );
 
 		public WorkIntervalControl()
 		{
 			InitializeComponent();
+			DataContextChanged += ( s, a ) =>
+			{
+				var dataContext = (WorkIntervalViewModel)DataContext;
+
+				// Hack- Additional binding refresh to show active time spans for planned activities (they are not redrawn when are opened).
+				if ( dataContext.BaseActivity.IsPlanned )
+				{
+					// Hook up timer.
+					_updateTimer.Elapsed += ( sender, args ) => ActiveItemsControl.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
+					{
+						if ( dataContext.ShowActiveTimeSpans && dataContext.BaseActivity.IsActive )
+						{
+							// To reevaluate ActiveItemsControl itemsSource which is boud to trigger I reset the value bound to that trigger.
+							dataContext.ShowActiveTimeSpans = false;
+							dataContext.ShowActiveTimeSpans = true;
+						}
+					} ) );
+					_updateTimer.Start();
+				}
+			};
 
 			MouseDragged = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveActivity );
 		}

@@ -60,7 +60,7 @@ namespace Laevo.ViewModel.Activity
 		/// <summary>
 		///   The percentage of the available height the activity box occupies.
 		/// </summary>
-	 	[DataMember]
+		[DataMember]
 		[NotifyProperty( WorkIntervalProperties.HeightPercentage )]
 		public double HeightPercentage { get; set; }
 
@@ -90,9 +90,23 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( WorkIntervalProperties.HasMoreRecentRepresentation )]
 		public bool HasMoreRecentRepresentation { get; private set; }
 
+		/// <summary>
+		///   The timespans during which the activity was active. Multiple activities can be open, but only one can be active at a time.
+		/// </summary>
+		[DataMember]
+		[NotifyProperty( WorkIntervalProperties.ActiveTimeSpans )]
+		public ObservableCollection<Interval<DateTime>> ActiveTimeSpans { get; set; }
+
+		/// <summary>
+		///   Determines whether or not the active timespans should be shown.
+		/// </summary>
+		[NotifyProperty(WorkIntervalProperties.ShowActiveTimeSpans )]
+		public bool ShowActiveTimeSpans { get; set; }
+
 
 		public WorkIntervalViewModel( ActivityViewModel baseActivity )
 		{
+			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
 			BaseActivity = baseActivity;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;
@@ -124,7 +138,7 @@ namespace Laevo.ViewModel.Activity
 			ObservableCollection<WorkIntervalViewModel> intervals = BaseActivity.WorkIntervals;
 			HasMoreRecentRepresentation =
 				BaseActivity.IsToDo ||
-				( intervals.Count != 1 && intervals.IndexOf(this) != intervals.Count - 1 );
+				( intervals.Count != 1 && intervals.IndexOf( this ) != intervals.Count - 1 );
 		}
 
 
