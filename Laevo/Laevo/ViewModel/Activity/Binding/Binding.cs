@@ -2,8 +2,6 @@
 {
 	public enum Properties
 	{
-		ActiveTimeSpans,
-		ShowActiveTimeSpans,
 		Icon,
 		Color,
 		Label,
@@ -48,7 +46,9 @@
 		BaseActivity,
 		Position,
 		IsPlanned,
-		HasMoreRecentRepresentation
+		HasMoreRecentRepresentation,
+		ActiveTimeSpans,
+		ShowActiveTimeSpans
 	}
 
 	public enum WorkIntervalCommands
