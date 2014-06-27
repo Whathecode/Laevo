@@ -107,12 +107,12 @@
 				<Label>Email address</Label>
 				<xctk:WatermarkTextBox
 					Name="EmailTextBox"
+					TextChanged="EmailChanged"
 					Margin="10, 0, 0, 0"
 					HorizontalAlignment="Stretch"
 					Height="30" VerticalScrollBarVisibility="Disabled"
 					MinWidth="300"
-					Watermark="Provide an email address if you want us to contact you."
-
+					Watermark="{Binding EmailTextHint}"
 					WatermarkTemplate="{StaticResource WatermarkDataTemplate}"/>
 			</DockPanel>
 
@@ -123,6 +123,7 @@
 				LastChildFill="False">
 
 				<Button
+					Name="SendButton"
 					Content="{Binding SendText}"
 					Margin="10, 0, 0, 0"
 					Click="OnSendButtonClicked"

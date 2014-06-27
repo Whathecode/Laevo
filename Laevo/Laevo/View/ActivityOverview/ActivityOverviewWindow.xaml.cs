@@ -518,15 +518,18 @@ namespace Laevo.View.ActivityOverview
 		}
 
 		readonly FeedbackWindow _feedbackWidnow = new FeedbackWindow();
+
 		void FeedbackClick( object sender, RoutedEventArgs routedEventArgs )
 		{
 			var feedbackViewModel = new FeedbackViewModel
 			{
+				FeedbackType = FeedbackType.Smile,
 				Color = Color.FromRgb( 88, 160, 2 ),
 				FeedbackText = "We appreciate your feedback. What did you like?",
 				FeedbackTextHint = "Tell us what you liked.",
 				SendText = "Send a Smile",
-				Image = new BitmapImage( new Uri( "Images/Happy.png", UriKind.Relative ))
+				EmailTextHint = "Provide an email address if you want us to contact you.",
+				Image = new BitmapImage( new Uri( "Images/Happy.png", UriKind.Relative ) )
 			};
 			ShowFeedbackwindow( feedbackViewModel );
 		}
@@ -535,12 +538,14 @@ namespace Laevo.View.ActivityOverview
 		{
 			var feedbackViewModel = new FeedbackViewModel
 			{
+				FeedbackType = FeedbackType.Frown,
 				Color = Color.FromRgb( 212, 50, 38 ),
 				FeedbackText = "We appreciate your feedback. Is there something we can do better?",
 				FeedbackTextHint = "Tell us what you didn't like or what went wrong.",
 				SendText = "Send a Frown",
-				Image = new BitmapImage( new Uri( "Images/Sad.png", UriKind.Relative ))
-			};		
+				EmailTextHint = "Provide an email address if you want us to contact you.",
+				Image = new BitmapImage( new Uri( "Images/Sad.png", UriKind.Relative ) )
+			};
 			ShowFeedbackwindow( feedbackViewModel );
 		}
 
@@ -562,6 +567,21 @@ namespace Laevo.View.ActivityOverview
 				}
 			};
 			_feedbackWidnow.Show();
+		}
+
+		void FeedbackQuestionClick( object sender, RoutedEventArgs e )
+		{
+			var feedbackViewModel = new FeedbackViewModel
+			{
+				FeedbackType = FeedbackType.Question,
+				Color = Color.FromRgb( 37, 70, 136 ),
+				FeedbackText = "We appreciate your feedback. Do you have any questions?",
+				FeedbackTextHint = "Write here your question.",
+				SendText = "Send a Question",
+				EmailTextHint = "Provide an email address.",
+				Image = new BitmapImage( new Uri( "Images/Question.png", UriKind.Relative ) )
+			};
+			ShowFeedbackwindow( feedbackViewModel );
 		}
 	}
 }

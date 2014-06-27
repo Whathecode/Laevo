@@ -120,6 +120,18 @@
 					Height="35"
 					Width="35" />
 			</Button>
+			<Button
+				Cursor="Hand"
+				Name="QuestionButton"
+				ToolTip="Send a Frown"
+				Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+				Click="FeedbackQuestionClick"
+				Background="Transparent">
+				<Image
+					Source="Images\Question.png"
+					Height="35"
+					Width="35" />
+			</Button>
 		</StackPanel>
 
 		<!-- Time Line 3D -->
