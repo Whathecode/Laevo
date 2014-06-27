@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 
@@ -17,9 +18,20 @@ namespace Laevo.Logging
 			_logCollection = client.GetServer().GetDatabase( DatabaseName ).GetCollection( CollectionName );
 		}
 
+		/// <summary>
+		/// Istert data to MongoDB.
+		/// </summary>
+		/// <returns>True if success, false if fail.</returns>
 		public bool Insert( BsonDocument document )
 		{
-			return _logCollection.Insert( document ).Ok;
+			try
+			{
+				return _logCollection.Insert( document ).Ok;
+			}
+			catch ( Exception )
+			{
+				return false;
+			}
 		}
 	}
 }
