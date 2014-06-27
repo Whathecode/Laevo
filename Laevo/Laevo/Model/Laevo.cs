@@ -76,6 +76,7 @@ namespace Laevo.Model
 		public Activity HomeActivity { get; private set; }
 
 		Activity _currentActivity;
+
 		public Activity CurrentActivity
 		{
 			get { return _currentActivity; }
@@ -119,6 +120,7 @@ namespace Laevo.Model
 					// Simply ignore invalid files.
 				}
 			}
+
 			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			Log.Debug( "Desktop manager initialized." );
 
@@ -132,6 +134,18 @@ namespace Laevo.Model
 			// Set up interruption handlers.
 			_interruptionTrigger.InterruptionReceived += interruption =>
 			{
+				// Check if target user id is defined in survey interruption.
+				var propertyInfo = interruption.GetType().GetProperty( "TargetUserId" );
+				if ( propertyInfo != null )
+				{
+					// Check if survey is for specific user or all.
+					var propertyValue = propertyInfo.GetValue( interruption, null ).ToString();
+					if ( propertyValue != Properties.Settings.Default.AnalyticsID.ToString() && propertyValue != "all" )
+					{
+						return;
+					}
+				}
+
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
 				var newActivity = _dataRepository.CreateNewActivity( interruption.Name );
