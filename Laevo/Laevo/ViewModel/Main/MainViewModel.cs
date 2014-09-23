@@ -127,14 +127,14 @@ namespace Laevo.ViewModel.Main
 		/// <param name="selectedActivity">The action to perform on the selected activity.</param>
 		public void SelectActivity( Action<ActivityViewModel> selectedActivity )
 		{
-			_activityOverviewViewModel.ActivityMode = Mode.Select;
+			_activityOverviewViewModel.ActivityMode |= Mode.Select;
 			var awaitOpen = Observable.FromEvent<ActivityViewModel.ActivityEventHandler, ActivityViewModel>(
 				h => _activityOverviewViewModel.SelectedActivityEvent += h,
 				h => _activityOverviewViewModel.SelectedActivityEvent -= h ).Take( 1 );
 			awaitOpen.Subscribe( a =>
 			{
 				selectedActivity( a );
-				_activityOverviewViewModel.ActivityMode = Mode.Activate;
+				_activityOverviewViewModel.ActivityMode &= ~Mode.Select;
 				HideActivityOverview();
 			} );
 			ShowActivityOverview();

@@ -448,7 +448,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		
 		public void CutWindow()
 		{
-			_desktopManager.CutWindow( WindowManager.GetForegroundWindow() );
+			_desktopManager.CutWindow( Window.GetForegroundWindow() );
 		}
 
 		public void PasteWindows()

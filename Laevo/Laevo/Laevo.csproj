@@ -17,6 +17,8 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <DontImportPostSharp>True</DontImportPostSharp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,10 +31,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <DontImportPostSharp>True</DontImportPostSharp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -226,42 +226,48 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libraries\MouseKeyboardActivityMonitor\Any CPU\MouseKeyboardActivityMonitor.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=3.0.35.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+    <Reference Include="PostSharp, Version=3.1.51.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PostSharp.3.0.35\lib\net20\PostSharp.dll</HintPath>
+      <HintPath>..\packages\PostSharp.3.1.51\lib\net20\PostSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Management" />
-    <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Reactive Extensions SDK\v1.0.10621\Binaries\.NETFramework\v3.5\System.Reactive.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Reactive.Core, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
+    <Reference Include="System.Reactive.Interfaces, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
+    <Reference Include="System.Reactive.Linq, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
+    <Reference Include="System.Reactive.PlatformServices, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="Xceed.Wpf.AvalonDock">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.DataGrid, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=2.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.2.1\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.2.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=2.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.2.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=2.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.2.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.DataGrid, Version=2.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.2.1\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=2.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.2.1\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
@@ -287,22 +293,7 @@
         </ProjectReference>
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="ABC.Windows">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.Windows.dll</HintPath>
-        </Reference>
-        <Reference Include="ABC.PInvoke">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.PInvoke.dll</HintPath>
-        </Reference>
-        <Reference Include="ABC.Interruptions">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.Interruptions.dll</HintPath>
-        </Reference>
-        <Reference Include="ABC.Applications">
-          <HintPath>..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
-        </Reference>
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <Choose>
     <When Condition="Exists($(Framework-Class-Library-Extension))">
@@ -325,22 +316,7 @@
         </ProjectReference>
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Whathecode.System">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.System.dll</HintPath>
-        </Reference>
-        <Reference Include="Whathecode.System.Aspects">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.System.Aspects.dll</HintPath>
-        </Reference>
-        <Reference Include="Whathecode.PresentationFramework">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.dll</HintPath>
-        </Reference>
-        <Reference Include="Whathecode.PresentationFramework.Aspects">
-          <HintPath>..\Libraries\Framework Class Library Extension\Whathecode.PresentationFramework.Aspects.dll</HintPath>
-        </Reference>
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -361,7 +337,6 @@
     <Compile Include="Model\ProcessTracker.cs" />
     <Compile Include="Model\LaevoServiceProvider.cs" />
     <Compile Include="Model\Settings.cs" />
-    <Compile Include="RequiresPostSharp.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />
@@ -463,6 +438,7 @@
     <None Include="app.config" />
     <None Include="app.manifest" />
     <None Include="packages.config" />
+    <None Include="PostSharp.license" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -610,11 +586,57 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.Applications\ABC.Applications.csproj">
+      <Project>{4fd0d614-3f1d-4c4b-ae41-69ef8660c94f}</Project>
+      <Name>ABC.Applications</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.Common\ABC.Common.csproj">
+      <Project>{d53f1095-6dc0-4950-982f-3322aae74a50}</Project>
+      <Name>ABC.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj">
+      <Project>{582661ff-ff3d-4cd3-8a52-3c75447e9f69}</Project>
+      <Name>ABC.Interruptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.PInvoke\ABC.PInvoke.csproj">
+      <Project>{072142c4-284e-4f1a-a1fe-f886e8ecf728}</Project>
+      <Name>ABC.PInvoke</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ABC\ABC\ABC.Windows\ABC.Windows.csproj">
+      <Project>{db8dbdf2-70bf-4712-86da-06674986bc12}</Project>
+      <Name>ABC.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.Interop\Whathecode.Interop.csproj">
+      <Project>{93706064-ef4a-4f46-abb8-d93e4c0d2732}</Project>
+      <Name>Whathecode.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
+      <Project>{b51bf379-1ef4-4f1c-a5e8-3123e34298dd}</Project>
+      <Name>Whathecode.PresentationFramework.Aspects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj">
+      <Project>{9c755f97-8302-4415-ac95-fabfcdce14b2}</Project>
+      <Name>Whathecode.PresentationFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj">
+      <Project>{ede62a57-c6ba-4604-a727-7bc0476a5ee4}</Project>
+      <Name>Whathecode.System.Aspects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj">
+      <Project>{6ff11324-46a9-4ae3-a802-4cfd47c59ba6}</Project>
+      <Name>Whathecode.System</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby $(SolutionDir)UpdateLibraryDlls.rb $(SolutionDir)</PostBuildEvent>
+    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\PostSharp.3.0.35\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.0.35\tools\PostSharp.targets')" />
+  <Import Project="..\packages\PostSharp.3.1.51\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.1.51\tools\PostSharp.targets')" />
+  <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
+    <Error Condition="!Exists('..\packages\PostSharp.3.1.51\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('..\packages\PostSharp.3.1.51\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
