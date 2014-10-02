@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
 using System.Threading;
 using System.Windows;
 using Laevo.View.Main;
@@ -11,6 +13,7 @@ using Whathecode.System.Aspects;
 
 
 [assembly: InitializeEventHandlers( AttributeTargetTypes = "Laevo.*" )]
+
 namespace Laevo
 {
 	/// <summary>
@@ -38,22 +41,67 @@ namespace Laevo
 				return;
 			}
 
-			// TODO: Support multiple languages, for now force english.
-			var english = new CultureInfo( "en-US" );
-			Thread.CurrentThread.CurrentCulture = english;
+			// TODO: Remove this temporary hack. It is used only for ClickOnce publish feature. 
+			// RequestedExecutionLevel in the manifest file should be set to highestPossible instead of this.
+			var windowsIdentity = WindowsIdentity.GetCurrent();
+			if ( windowsIdentity != null )
+			{
+				var windowsPrincipal = new WindowsPrincipal( windowsIdentity );
 
-			// Create exception logger.
-			DispatcherUnhandledException += ( s, a )
-				=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramDataFolder, "log.txt" ), a.Exception.ToString() + Environment.NewLine );
+				bool runAsAdmin = windowsPrincipal.IsInRole( WindowsBuiltInRole.Administrator );
 
-			// Create Model.
-			_model = new Model.Laevo();
+				if ( !runAsAdmin )
+				{
+					// It is not possible to launch a ClickOnce app as administrator directly,
+					// so instead we launch the app as administrator in a new process.
+					var processInfo = new ProcessStartInfo( Assembly.GetExecutingAssembly().CodeBase )
+					{
+						UseShellExecute = true,
+						Verb = "runas"
+					};
 
-			// Create ViewModel.
-			_viewModel = new MainViewModel( _model );
+					// The following properties run the new process as administrator
 
-			// Create View.
-			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
+					// Start the new process
+					try
+					{
+						Process.Start( processInfo );
+					}
+					catch ( Exception )
+					{
+						// The user did not allow the application to run as administrator
+						MessageBox.Show( "Please run Laevo with administrator privileges." );
+					}
+
+					// Shut down the current process
+					Current.Shutdown();
+					return;
+				}
+
+				// We are running as administrator
+				// TODO: Support multiple languages, for now force english.
+				var english = new CultureInfo( "en-US" );
+				Thread.CurrentThread.CurrentCulture = english;
+
+				// Create exception logger.
+				DispatcherUnhandledException += ( s, a )
+					=> File.AppendAllText( Path.Combine( Model.Laevo.ProgramDataFolder, "log.txt" ), a.Exception.ToString() + Environment.NewLine );
+
+				// Create Model.
+				_model = new Model.Laevo();
+
+				// Create ViewModel.
+				_viewModel = new MainViewModel( _model );
+
+				// Create View.
+				_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
+			}
+			else
+			{
+				// The user did not allow the application to run as administrator
+				MessageBox.Show( "Laevo is not able to determine your user privileges, please run application as an administrator!" );
+				Current.Shutdown();
+			}
 		}
 
 		protected override void OnExit( ExitEventArgs e )
