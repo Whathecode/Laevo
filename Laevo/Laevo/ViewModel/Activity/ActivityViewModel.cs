@@ -13,6 +13,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ABC.Windows;
 using ABC.Windows.Desktop;
 using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
@@ -374,7 +375,26 @@ namespace Laevo.ViewModel.Activity
 			ActiveTimeSpans.Add( _currentActiveTimeSpan );
 
 			// Initialize desktop.
-			_desktopManager.SwitchToDesktop( _virtualDesktop );
+			try
+			{
+				_desktopManager.SwitchToDesktop( _virtualDesktop );
+			}
+			catch ( UnresponsiveWindowsException e )
+			{
+				var unresponsive = e.UnresponsiveWindows.GroupBy( u => u.Window.GetProcess().ProcessName ).ToList();
+
+				// Ask user whether to ignore the locking application windows from now on.
+				// TODO: The error message could be made topmost when we could access the overview window. This exception might need to be propagated to the view.
+				string error = unresponsive.Aggregate(
+					"The following applications stopped responding and are locking up the window manager:\n\n",
+					( info, processWindows ) => info + "- " + processWindows.Key + "\n" );
+				error += "\nWould you like to ignore them from now on?";
+				MessageBoxResult result = MessageBox.Show( error, "Unresponsive Applications", MessageBoxButton.YesNo, MessageBoxImage.Exclamation );
+				if ( result == MessageBoxResult.Yes )
+				{
+					e.IgnoreAllWindows();
+				}
+			}
 			InitializeLibrary();
 
 			OpenInterruptions();
