@@ -5,7 +5,7 @@ require 'nokogiri'
 Dir.chdir(ARGV[0].to_s())
 
 # Get ABC and FCL project paths from ProjectReferences.txt.
-doc = Nokogiri::XML(open("..\\ProjectReferences.txt"))
+doc = Nokogiri::XML(open("ProjectReferences.txt"))
 abc = doc.xpath("//nameSpace:PropertyGroup/nameSpace:ABC-Toolkit", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 fcl = doc.xpath("//nameSpace:PropertyGroup/nameSpace:Framework-Class-Library-Extension", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 
