@@ -1,8 +1,8 @@
-<!-- The paths specified here should be either absolute, or relative to the Laevo project folder, not the solution folder. -->
+<!-- The paths specified here should be either absolute, or relative to the Laevo solution folder, not the project folder. -->
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="$(Configuration) == 'Debug With Project References'">
-	<ABC-Toolkit>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\ABC\ABC</ABC-Toolkit>
-	<Framework-Class-Library-Extension>..\..\..\..\Users\Steven Jeuris\Documents\GitHub\Framework-Class-Library-Extension</Framework-Class-Library-Extension>
+	<ABC-Toolkit>..\..\ABC\ABC</ABC-Toolkit>
+	<Framework-Class-Library-Extension>..\..\Framework-Class-Library-Extension</Framework-Class-Library-Extension>
   </PropertyGroup>
 </Project>

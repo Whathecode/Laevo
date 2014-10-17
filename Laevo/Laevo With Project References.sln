@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laevo", "Laevo\Laevo.csproj", "{EE753682-D3BD-45EE-9B42-9B8F1902D250}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -15,30 +15,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laevo", "Laevo\Laevo.csproj
 		{582661FF-FF3D-4CD3-8A52-3C75447E9F69} = {582661FF-FF3D-4CD3-8A52-3C75447E9F69}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.System", "..\..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj", "{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.System", "..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj", "{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.System.Aspects", "..\..\..\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj", "{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.System.Aspects", "..\..\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj", "{EDE62A57-C6BA-4604-A727-7BC0476A5EE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.PresentationFramework", "..\..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj", "{9C755F97-8302-4415-AC95-FABFCDCE14B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.PresentationFramework", "..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj", "{9C755F97-8302-4415-AC95-FABFCDCE14B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Windows", "..\..\..\ABC\ABC\ABC.Windows\ABC.Windows.csproj", "{DB8DBDF2-70BF-4712-86DA-06674986BC12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Windows", "..\..\ABC\ABC\ABC.Windows\ABC.Windows.csproj", "{DB8DBDF2-70BF-4712-86DA-06674986BC12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.PInvoke", "..\..\..\ABC\ABC\ABC.PInvoke\ABC.PInvoke.csproj", "{072142C4-284E-4F1A-A1FE-F886E8ECF728}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.PInvoke", "..\..\ABC\ABC\ABC.PInvoke\ABC.PInvoke.csproj", "{072142C4-284E-4F1A-A1FE-F886E8ECF728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Interruptions", "..\..\..\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj", "{582661FF-FF3D-4CD3-8A52-3C75447E9F69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Interruptions", "..\..\ABC\ABC\ABC.Interruptions\ABC.Interruptions.csproj", "{582661FF-FF3D-4CD3-8A52-3C75447E9F69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Applications", "..\..\..\ABC\ABC\ABC.Applications\ABC.Applications.csproj", "{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Applications", "..\..\ABC\ABC\ABC.Applications\ABC.Applications.csproj", "{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{181414DA-0FC1-44A7-8E56-4FD6EAE37C33}"
 	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Common", "..\..\..\ABC\ABC\ABC.Common\ABC.Common.csproj", "{D53F1095-6DC0-4950-982F-3322AAE74A50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Common", "..\..\ABC\ABC\ABC.Common\ABC.Common.csproj", "{D53F1095-6DC0-4950-982F-3322AAE74A50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.Interop", "..\..\..\Framework-Class-Library-Extension\Whathecode.Interop\Whathecode.Interop.csproj", "{93706064-EF4A-4F46-ABB8-D93E4C0D2732}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.Interop", "..\..\Framework-Class-Library-Extension\Whathecode.Interop\Whathecode.Interop.csproj", "{93706064-EF4A-4F46-ABB8-D93E4C0D2732}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.PresentationFramework.Aspects", "..\..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj", "{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.PresentationFramework.Aspects", "..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj", "{B51BF379-1EF4-4F1C-A5E8-3123E34298DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
