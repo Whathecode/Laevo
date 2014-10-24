@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Threading;
 using ABC.Interruptions;
+using ABC.PInvoke.Process;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System;
 using Whathecode.System.Extensions;

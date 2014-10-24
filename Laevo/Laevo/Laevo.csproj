@@ -32,6 +32,8 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -233,7 +235,6 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Reactive.Core">
       <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
     </Reference>
@@ -334,7 +335,6 @@
     <Compile Include="Model\AttentionShifts\DataContractSurrogate.cs" />
     <Compile Include="Model\Laevo.cs" />
     <Compile Include="Model\ProcessInfo.cs" />
-    <Compile Include="Model\ProcessTracker.cs" />
     <Compile Include="Model\LaevoServiceProvider.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
