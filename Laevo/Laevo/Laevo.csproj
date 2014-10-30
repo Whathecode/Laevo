@@ -232,15 +232,13 @@
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.2.1.0\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=3.1.44.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+    <Reference Include="PostSharp, Version=4.0.34.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PostSharp.3.1.44\lib\net20\PostSharp.dll</HintPath>
+      <HintPath>..\packages\PostSharp.4.0.34\lib\net35-client\PostSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp.Patterns.Diagnostics, Version=3.1.44.9, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.3.1.44\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="PostSharp.Patterns.Diagnostics">
+      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.4.0.34\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -716,10 +714,10 @@
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\PostSharp.3.1.44\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.3.1.44\tools\PostSharp.targets')" />
+  <Import Project="..\packages\PostSharp.4.0.34\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.4.0.34\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('..\packages\PostSharp.3.1.44\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('..\packages\PostSharp.3.1.44\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="!Exists('..\packages\PostSharp.4.0.34\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('..\packages\PostSharp.4.0.34\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
