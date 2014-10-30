@@ -14,7 +14,7 @@ Laevo relies heavily on two libraries:
 
 Two solution files are provided:
 
-- __Laevo.sln__ can be used to only load Laevo and reference precompiled libraries from the "Libraries" folder.
+- __Laevo.sln__ can be used to only load Laevo and reference precompiled libraries from the _"Libraries"_ folder.
 - __Laevo With Project References.sln__ includes references to project sources from the _"Framework Class Library Extension"_ and _"Activity-Based Computing Toolkit"_ libraries.
 
 When using __Laevo With Project References.sln__ there are two run configurations available, _Debug_ and _Release_. Using _Debug_, project references are used simplifying development and debugging. Using _Release_, just like _Laevo.sln_, precompiled libaries from the "Libraries" folder are referenced. However, in _Release_, after the build completes the "UpdateLibraryDlls.rb" script is ran (using Ruby), which copies the newly compiled DLLs from FCLE and ABC to the "Libraries" folder, thus updating the precompiled libraries.
