@@ -7,7 +7,7 @@ In order to have Laevo up and running and ready for development the following st
 - Laevo uses [PostSharp](http://www.postsharp.net/) which NuGet should normally install for you
 
 ## Important Libraries
-Laevo realies heavily on two libraries:
+Laevo relies heavily on two libraries:
 
 - [__Framework Class Library Extension__ (FCLE)](https://github.com/Whathecode/Framework-Class-Library-Extension): used for general purposes, and to abstract away from Win32 code.
 - [__Activity-Based Computing Toolkit__ (ABC)](https://github.com/StevenHouben/ABC): architecture to create activity-centric systems, including functionality like virtual desktops.
