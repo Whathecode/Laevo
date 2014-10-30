@@ -272,7 +272,7 @@
     </Reference>
   </ItemGroup>
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
-  <Import Project="..\ProjectReferences.txt" />
+  <Import Project="..\..\ProjectReferences.txt" />
   <Choose>
     <When Condition="Exists($(ABC-Toolkit))">
       <ItemGroup>
@@ -630,7 +630,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(SolutionDir)'</PostBuildEvent>
+    <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(ProjectDir)'</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
