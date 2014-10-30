@@ -22,14 +22,14 @@ When using __Laevo With Project References.sln__ there are two run configuration
 In order to use __Laevo With Project References.sln__ some additional setup is required:
 
 - Download the dependent libraries. You can choose where to place them, but placing them side-by-side with the Laevo project simplifies setup:
-  - [Laevo](https://bitbucket.org/Whathecode/laevo)
-  - [Framework-Class-Library-Extension](https://github.com/Whathecode/Framework-Class-Library-Extension)
-  - [ABC](https://github.com/StevenHouben/ABC)
+    - [Laevo](https://bitbucket.org/Whathecode/laevo)
+    - [Framework-Class-Library-Extension](https://github.com/Whathecode/Framework-Class-Library-Extension)
+    - [ABC](https://github.com/StevenHouben/ABC)
 - When choosing a custom location for the libraries, specifying the paths to the libraries in:
-  - Laevo With Project References.sln
-  - ProjectReferences.txt
+    - Laevo With Project References.sln
+    - ProjectReferences.txt
 - Install [Ruby](https://www.ruby-lang.org/)
-  - Install [nokogiri library](http://nokogiri.org/) for Ruby
+    - Install [nokogiri library](http://nokogiri.org/) for Ruby
 
 # Copyright
 Copyright (c) 2012 Steven Jeuris: http://whathecode.wordpress.com/
