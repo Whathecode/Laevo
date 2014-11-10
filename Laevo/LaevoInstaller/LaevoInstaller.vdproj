@@ -554,6 +554,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
         "Release"
@@ -578,6 +586,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
     }
@@ -1681,38 +1697,17 @@
                 {
                 }
             }
-            "{1525181F-901A-416C-8A58-119130FE478E}:_6517B8F2136A4BB185195D24CB72309F"
+            "{994432C3-9487-495D-8656-3E829A8DBDDE}:_513335A41C3241F8B7FA9EB1CBA85644"
             {
-            "Name" = "8:#1919"
+            "DefaultLocation" = "8:[LocalAppDataFolder]"
+            "Name" = "8:Local Application Data Folder"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
-            "Property" = "8:ProgramMenuFolder"
+            "Property" = "8:NEWPROPERTY1"
                 "Folders"
                 {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3CA25C19183A4C2A8B5906D0248A8C28"
-                    {
-                    "Name" = "8:Laevo"
-                    "AlwaysCreate" = "11:FALSE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_968308B7082F4F479842A2665E96541F"
-                        "Folders"
-                        {
-                        }
-                    }
-                }
-            }
-            "{1525181F-901A-416C-8A58-119130FE478E}:_97D358644623469EA5153E9E72C42196"
-            {
-            "Name" = "8:#1918"
-            "AlwaysCreate" = "11:FALSE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Property" = "8:PersonalFolder"
-                "Folders"
-                {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_C03619919795495AB13093A07EDA3729"
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_DB3415AA7A4148878A9BCEB2A825A92E"
                     {
                     "Name" = "8:Laevo"
                     "AlwaysCreate" = "11:FALSE"
@@ -1758,6 +1753,28 @@
                     }
                 }
             }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_6517B8F2136A4BB185195D24CB72309F"
+            {
+            "Name" = "8:#1919"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:ProgramMenuFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3CA25C19183A4C2A8B5906D0248A8C28"
+                    {
+                    "Name" = "8:Laevo"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_968308B7082F4F479842A2665E96541F"
+                        "Folders"
+                        {
+                        }
+                    }
+                }
+            }
         }
         "LaunchCondition"
         {
@@ -1774,15 +1791,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Laevo"
-        "ProductCode" = "8:{A424A59F-EC2F-4420-B4D6-19896B2C94C0}"
-        "PackageCode" = "8:{D3671B23-AF8A-44B4-A3E0-56E551810BAC}"
+        "ProductCode" = "8:{D3E40E31-EE8D-4FBC-AEFB-C92224619513}"
+        "PackageCode" = "8:{4027D2FA-45EB-4362-ABE7-6B806FA10D4A}"
         "UpgradeCode" = "8:{85383638-857F-4C39-9B41-17E21FEC7B75}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.1.6"
+        "ProductVersion" = "8:0.2"
         "Manufacturer" = "8:IT University of Copenhagen"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
