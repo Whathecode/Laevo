@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- Asus function key visualizations. -->
+  <Process Name="ATKOSD2" CompanyName="ASUSTek Computer Inc.">
+    <IgnoreWindows>
+      <Window ClassName="CNewOsd" />
+    </IgnoreWindows>
+  </Process>
+
+  <!-- Asus Splendid Video Enhancement Technology. Window is never shown. -->
+  <Process Name="ACMON" CompanyName="ASUS" Author="Steven Jeuris" Version="3.0, 2.0">
+    <IgnoreWindows>
+      <Window ClassName="ACMON" />
+    </IgnoreWindows>
+  </Process>
+
+</ProcessBehaviors>
