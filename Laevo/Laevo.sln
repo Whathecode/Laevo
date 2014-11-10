@@ -1,7 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laevo", "Laevo\Laevo.csproj", "{EE753682-D3BD-45EE-9B42-9B8F1902D250}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LaevoInstaller", "LaevoInstaller\LaevoInstaller.vdproj", "{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +28,12 @@ Global
 		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Release|x64.ActiveCfg = Release|x86
 		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Release|x86.ActiveCfg = Release|x86
 		{EE753682-D3BD-45EE-9B42-9B8F1902D250}.Release|x86.Build.0 = Release|x86
+		{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}.Debug|Any CPU.ActiveCfg = Debug
+		{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}.Debug|x64.ActiveCfg = Debug
+		{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}.Debug|x86.ActiveCfg = Debug
+		{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}.Release|Any CPU.ActiveCfg = Release
+		{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}.Release|x64.ActiveCfg = Release
+		{7B0102C6-7079-4DAF-8EBD-BFBCE328503E}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

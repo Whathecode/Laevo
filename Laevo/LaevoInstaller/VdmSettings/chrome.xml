@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+	xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+	<!-- Chrome. -->
+	<Process Name="chrome" CompanyName="Google Inc.">
+		<IgnoreWindows>
+			<!-- TODO: What is this? -->
+			<Window ClassName="Messaging" />
+			<Window ClassName="Base_PowerMessageWindow" />
+			<Window ClassName="SWFlash_PlaceholderX" />
+			<Window ClassName="CSpNotify Notify Window" />
+		</IgnoreWindows>
+		<HideBehavior>
+			<Default Hide="SelectedWindow" />
+			<!-- Also take into account the currently visible status bar. -->
+			<Include ConsiderWindows="AllWindows">
+				<!-- Apparently both classes are used for the main windows, as well as status bars. However, status bars don't have a title set. -->
+				<Window ClassName="Chrome_WidgetWin_0" Visible="True" Title="" />
+				<Window ClassName="Chrome_WidgetWin_1" Visible="True" Title="" />
+			</Include>
+		</HideBehavior>
+	</Process>
+
+</ProcessBehaviors>
