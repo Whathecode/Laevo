@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- MS Word 2010 -->
+  <Process Name="WINWORD" CompanyName="Microsoft Corporation">
+    <HideBehavior>
+      <Default Hide="SelectedWindow" />
+    </HideBehavior>
+  </Process>
+
+  <!-- MS OneNote 2010 -->
+  <Process Name="ONENOTE" CompanyName="Microsoft Corporation">
+    <HideBehavior>
+      <Default Hide="SelectedWindow" />
+    </HideBehavior>
+  </Process>
+
+  <!-- MS PowerPoint 2010 -->
+  <Process Name="POWERPNT" CompanyName="Microsoft Corporation">
+    <HideBehavior>
+      <Default Hide="SelectedWindow" />
+    </HideBehavior>
+  </Process>
+
+  <!-- MS InfoPath 2010 -->
+  <Process Name="INFOPATH" CompanyName="Microsoft Corporation">
+    <HideBehavior>
+      <Default Hide="SelectedWindow" />
+    </HideBehavior>
+  </Process>
+
+</ProcessBehaviors>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- Card detector is a background application that helps to detect USB modems, mobile Internet SIM cards. -->
+  <Process Name="CardDetector" CompanyName="France Telecom">
+    <IgnoreWindows>
+      <!-- Card detector background windows. -->
+      <Window ClassName="Afx:10000000:0:00010005:00000000:00000000" />
+      <Window ClassName="Afx:10000000:0" />
+    </IgnoreWindows>
+  </Process>
+
+</ProcessBehaviors>
