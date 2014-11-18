@@ -120,6 +120,15 @@ namespace Laevo.Model
 				}
 			}
 			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
+			DesktopManager.UnresponsiveWindowDetectedEvent += (windows, desktop) =>
+			{
+				var unresponsive = windows.GroupBy( u => u.Window.GetProcess().ProcessName ).ToList();
+
+				string error = unresponsive.Aggregate(
+					"The following applications stopped responding and are locking up the window manager:\n\n",
+					( info, processWindows ) => info + "- " + processWindows.Key + "\n" );
+				MessageBox.Show( error, "Unresponsive Applications", MessageBoxButton.OK, MessageBoxImage.Information );
+			};
 			Log.Debug( "Desktop manager initialized." );
 
 			// Handle activities and tasks from previous sessions.
