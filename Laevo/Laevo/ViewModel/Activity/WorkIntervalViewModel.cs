@@ -54,7 +54,7 @@ namespace Laevo.ViewModel.Activity
 		void UpdateLastPlannedInterval( DateTime atTime, TimeSpan duration )
 		{
 			var plannedIntervals = BaseActivity.Activity.PlannedIntervals;
-			plannedIntervals.Last().Interval = new Interval<DateTime>( atTime, atTime + duration );
+			plannedIntervals.Last().Interval = new TimeInterval( atTime, atTime + duration );
 		}
 
 		/// <summary>
@@ -95,7 +95,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		[DataMember]
 		[NotifyProperty( WorkIntervalProperties.ActiveTimeSpans )]
-		public ObservableCollection<Interval<DateTime>> ActiveTimeSpans { get; set; }
+		public ObservableCollection<TimeInterval> ActiveTimeSpans { get; set; }
 
 		/// <summary>
 		///   Determines whether or not the active timespans should be shown.
@@ -106,7 +106,7 @@ namespace Laevo.ViewModel.Activity
 
 		public WorkIntervalViewModel( ActivityViewModel baseActivity )
 		{
-			ActiveTimeSpans = new ObservableCollection<Interval<DateTime>>();
+			ActiveTimeSpans = new ObservableCollection<TimeInterval>();
 			BaseActivity = baseActivity;
 			HeightPercentage = 0.2;
 			OffsetPercentage = 1;

@@ -35,7 +35,7 @@ namespace Laevo.View.ActivityOverview
 		/// <summary>
 		///   Returns all the visible positions within a certain interval.
 		/// </summary>
-		public IEnumerable<DateTime> GetPositions( Interval<DateTime> range )
+		public IEnumerable<DateTime> GetPositions( TimeInterval range )
 		{
 			DateTime current = RoundToStart( range.Start );
 			while ( current <= range.End && current.Ticks + MinimumInterval.Ticks < DateTime.MaxValue.Ticks )

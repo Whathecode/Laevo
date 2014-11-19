@@ -15,7 +15,7 @@ namespace Laevo.Model
 		///   The interval when the activity is planned.
 		/// </summary>
 		[DataMember]
-		public Interval<DateTime> Interval { get; set; }
+		public TimeInterval Interval { get; set; }
 
 		/// <summary>
 		///   Indicates the moment in time the planned interval was created.
@@ -26,7 +26,7 @@ namespace Laevo.Model
 
 		public PlannedInterval( DateTime start, DateTime end )
 		{
-			Interval = new Interval<DateTime>( start, end );
+			Interval = new TimeInterval( start, end );
 			PlannedAt = DateTime.Now;
 		}
 

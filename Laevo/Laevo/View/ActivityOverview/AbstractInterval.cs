@@ -15,6 +15,6 @@ namespace Laevo.View.ActivityOverview
 		/// <summary>
 		///   Returns all the visible positions within a certain interval.
 		/// </summary>
-		IEnumerable<DateTime> GetPositions( Interval<DateTime> range );
+		IEnumerable<DateTime> GetPositions( TimeInterval range );
 	}
 }

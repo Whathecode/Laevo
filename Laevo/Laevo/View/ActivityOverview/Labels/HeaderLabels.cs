@@ -30,7 +30,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			};
 		}
 
-		protected override DateTime[] GetTopLabelPositions( Interval<DateTime> interval )
+		protected override DateTime[] GetTopLabelPositions( TimeInterval interval )
 		{
 			return CurrentDepth.GetPositions( interval ).ToArray();
 		}

@@ -34,7 +34,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 
-		public delegate void VisibleIntervalChangedEventHandler( Interval<DateTime> interval );
+		public delegate void VisibleIntervalChangedEventHandler( TimeInterval interval );
 		/// <summary>
 		///   Event which is triggered when the visible interval is changed.
 		/// </summary>
@@ -45,10 +45,10 @@ namespace Laevo.View.ActivityOverview
 		/// </summary>
 		[DependencyProperty( Properties.VisibleInterval )]
 		[CoercionHandler( typeof( VisibleIntervalCoercion ) )]
-		public Interval<DateTime> VisibleInterval { get; set; }
+		public TimeInterval VisibleInterval { get; set; }
 
 		[DependencyProperty( Properties.InternalVisibleInterval )]
-		public Interval<long> InternalVisibleInterval { get; private set; }
+		public TimeInterval InternalVisibleInterval { get; private set; }
 
 		[DependencyProperty( Properties.Minimum )]
 		public DateTime? Minimum { get; set; }
@@ -121,7 +121,7 @@ namespace Laevo.View.ActivityOverview
 			InitializeComponent();
 
 			RenderTransform = new TranslateTransform();
-			VisibleInterval = new Interval<DateTime>( DateTime.Today, DateTime.Today.SafeAdd( TimeSpan.FromDays( 1 ) ) );
+			VisibleInterval = new TimeInterval( DateTime.Today, DateTime.Today.SafeAdd( TimeSpan.FromDays( 1 ) ) );
 
 			Children = new ObservableCollection<FrameworkElement>();
 			Children.CollectionChanged += OnChildrenChanged;
@@ -150,7 +150,7 @@ namespace Laevo.View.ActivityOverview
 				operation = d => d.SafeSubtract( TimeSpan.FromTicks( ticks ) );
 			}
 
-			VisibleInterval = new Interval<DateTime>(
+			VisibleInterval = new TimeInterval(
 				operation( VisibleInterval.Start ),
 				operation( VisibleInterval.End ) );
 		}
@@ -210,28 +210,26 @@ namespace Laevo.View.ActivityOverview
 		static void OnVisibleIntervalChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
 		{
 			var control = (TimeLineControl)o;
-			var newInterval = (Interval<DateTime>)e.NewValue;
-			var newTicksInterval = new Interval<long>( newInterval.Start.Ticks, newInterval.End.Ticks );
+			var newInterval = (TimeInterval)e.NewValue;
 
 			bool changeInternalInterval = true;
 			if ( e.OldValue != null )
 			{
-				var oldInterval = (Interval<DateTime>)e.OldValue;
-				var oldTicksInterval = new Interval<long>( oldInterval.Start.Ticks, oldInterval.End.Ticks );
-				if ( oldTicksInterval.Size == newTicksInterval.Size )
+				var oldInterval = (TimeInterval)e.OldValue;
+				if ( oldInterval.Size == newInterval.Size )
 				{
 					changeInternalInterval = false;
 				}
 			}
 			if ( changeInternalInterval )
 			{
-				control.InternalVisibleInterval = newTicksInterval;
+				control.InternalVisibleInterval = newInterval;
 			}
 
 			// Set required transform based on difference between the internal interval and the actual interval.
 			var transform = (TranslateTransform)control.RenderTransform;
-			long ticksDifference = control.InternalVisibleInterval.Start - control.VisibleInterval.Start.Ticks;
-			transform.X = (double)ticksDifference / control.InternalVisibleInterval.Size * control.ActualWidth;
+			long difference = control.InternalVisibleInterval.Start.Ticks - control.VisibleInterval.Start.Ticks;
+			transform.X = (double)difference / control.InternalVisibleInterval.Size.Ticks * control.ActualWidth;
 
 			control.VisibleIntervalChangedEvent( control.VisibleInterval );
 		}

@@ -11,13 +11,13 @@ namespace Laevo.View.Activity.Converters
 	{
 		public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
 		{
-			var attentionSpan = (Interval<DateTime>)values[ 0 ];
-			DateTime occurance = (DateTime)values[ 1 ];
-			TimeSpan timeSpan = (TimeSpan)values[ 2 ];
+			var attentionSpan = (TimeInterval)values[ 0 ];
+			var occurance = (DateTime)values[ 1 ];
+			var timeSpan = (TimeSpan)values[ 2 ];
 			double width = values[ 3 ] == DependencyProperty.UnsetValue ? 0 : (double)values[ 3 ];
 
-			return new Interval<long>( occurance.Ticks, occurance.Ticks + timeSpan.Ticks ).Map(
-				parameter.Equals( "Start" ) ? attentionSpan.Start.Ticks : attentionSpan.End.Ticks,
+			return new TimeInterval( occurance, occurance + timeSpan ).Map(
+				parameter.Equals( "Start" ) ? attentionSpan.Start : attentionSpan.End,
 				new Interval<double>( 0, width ) );
 		}
 

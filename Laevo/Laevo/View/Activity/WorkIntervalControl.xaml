@@ -93,7 +93,9 @@
 							Visibility="{Binding
 								ElementName=Control,
 								Path=DataContext.HasMoreRecentRepresentation,
-								Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}" />
+								Converter={wtcConverters:FromBooleanConverter
+									IfTrue={x:Static Visibility.Visible},
+									IfFalse={x:Static Visibility.Collapsed}}}" />
 					</Grid>
 
 					<!-- Icon shown for planned intervals. -->
@@ -107,7 +109,9 @@
 						MouseMove="StartDrag"
 						GiveFeedback="DragFeedback"
 						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:WorkIntervalCommands.EditPlannedInterval}}"
-						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
+						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter
+							IfTrue={x:Static Visibility.Visible},
+							IfFalse={x:Static Visibility.Hidden}}}" />
 				</StackPanel>
 
 				<TextBox
@@ -208,7 +212,7 @@
 			<Border
 				BorderThickness="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource DashedBorderThicknessConverter}}">
 
-				<Border.BorderBrush >
+				<Border.BorderBrush>
 					<VisualBrush>
 						<VisualBrush.Visual>
 							<Rectangle
@@ -233,11 +237,11 @@
 
 				<!-- Attention time spans. -->
 				<ItemsControl Name="ActiveItemsControl"
-					Visibility="{Binding ElementName=Control, 
-						Path=DataContext.ShowActiveTimeSpans,
-						Converter={wtcConverters:FromBooleanConverter 
-						IfTrue={x:Static Visibility.Visible}, 
-						IfFalse={x:Static Visibility.Collapsed}}}">
+					Visibility="{Binding ElementName=Control,
+					Path=DataContext.ShowActiveTimeSpans,
+					Converter={wtcConverters:FromBooleanConverter 
+					IfTrue={x:Static Visibility.Visible}, 
+					IfFalse={x:Static Visibility.Collapsed}}}">
 
 					<ItemsControl.Resources>
 						<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />

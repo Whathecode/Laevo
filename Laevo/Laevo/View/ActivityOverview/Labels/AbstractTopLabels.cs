@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Whathecode.System.Arithmetic.Range;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows;
 
 
@@ -92,7 +93,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			return (double)interval.MinimumInterval.Ticks / TimeLine.GetVisibleTicks() * TimeLine.ActualWidth > TimeLine.ActualHeight;
 		}
 
-		protected override IEnumerable<DateTime> GetPositions( Interval<DateTime> interval )
+		protected override IEnumerable<DateTime> GetPositions( TimeInterval interval )
 		{
 			// Get the smallest interval which is currently the most relevant.
 			CurrentDepth = ((IEnumerable<IInterval>)Intervals).Reverse().FirstOrDefault( IsIntervalHigherThanScreen );
@@ -121,7 +122,7 @@ namespace Laevo.View.ActivityOverview.Labels
 				_earliestLabel.Measure( SizeHelper.MaxSize );
 				long requiredTicks = (long)((_earliestLabel.DesiredSize.Width / TimeLine.ActualWidth) * TimeLine.GetVisibleTicks());
 				long ticksOffset = ticksFromLeft < requiredTicks ? requiredTicks - ticksFromLeft : 0;
-				positionTime -= new TimeSpan( ticksOffset );
+				positionTime = positionTime.SafeSubtract( new TimeSpan( ticksOffset ) );
 			}
 			_earliestLabel.Visibility = Visibility.Visible;
 			_earliestLabel.SetValue( TimeLineControl.OccuranceProperty, positionTime );
@@ -152,7 +153,7 @@ namespace Laevo.View.ActivityOverview.Labels
 			}
 		}
 
-		protected abstract DateTime[] GetTopLabelPositions( Interval<DateTime> interval );
+		protected abstract DateTime[] GetTopLabelPositions( TimeInterval interval );
 
 		protected abstract void UpdateTopLabel( TextBlock block );
 	}
