@@ -18,17 +18,11 @@ namespace Laevo.View.ActivityOverview
 			{
 				var width = (double)values[ 0 ];
 				var elementWidth = (double)values[ 1 ];
-				var interval = (Interval<long>)values[ 2 ];
-
-				object occurance = values[ 3 ];
-				long occuranceTicks = 0;
-				if ( occurance is DateTime )
-				{
-					occuranceTicks = ((DateTime)occurance).Ticks;
-				}
+				var interval = (TimeInterval)values[ 2 ];
+				var occurance = (DateTime)values[ 3 ];
 				var alignment = (HorizontalAlignment)values[ 4 ];
 
-				double percentage = interval.GetPercentageFor( occuranceTicks );
+				double percentage = interval.GetPercentageFor( occurance );
 				double position = percentage * width;
 
 				switch ( alignment )

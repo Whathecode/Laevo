@@ -87,15 +87,15 @@ namespace Laevo.Model
 		[DataMember]
 		public DateTime DateCreated { get; private set; }
 
-		Interval<DateTime> _currentOpenInterval;
+		TimeInterval _currentOpenInterval;
 
 		[DataMember]
-		List<Interval<DateTime>> _openIntervals;
+		List<TimeInterval> _openIntervals;
 
 		/// <summary>
 		///   The intervals during which the activity was open, but not necessarily active.
 		/// </summary>
-		public IReadOnlyCollection<Interval<DateTime>> OpenIntervals
+		public IReadOnlyCollection<TimeInterval> OpenIntervals
 		{
 			get { return _openIntervals; }
 		}
@@ -164,7 +164,7 @@ namespace Laevo.Model
 		void SetDefaults()
 		{
 			_dataPaths = new HashSet<Uri>();
-			_openIntervals = new List<Interval<DateTime>>();
+			_openIntervals = new List<TimeInterval>();
 			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
 		}
@@ -242,7 +242,7 @@ namespace Laevo.Model
 			}
 
 			var now = DateTime.Now;
-			_currentOpenInterval = new Interval<DateTime>( now, now );
+			_currentOpenInterval = new TimeInterval( now, now );
 			_openIntervals.Add( _currentOpenInterval );
 
 			IsToDo = false;
@@ -262,7 +262,7 @@ namespace Laevo.Model
 				return;
 			}
 
-			_currentOpenInterval.ExpandTo( DateTime.Now );
+			_openIntervals[ _openIntervals.Count - 1 ] = _currentOpenInterval.ExpandTo( DateTime.Now );
 			_currentOpenInterval = null;
 			IsOpen = false;
 			StoppedEvent( this );
@@ -422,7 +422,8 @@ namespace Laevo.Model
 		{
 			if ( IsOpen )
 			{
-				_currentOpenInterval.ExpandTo( now );
+				_currentOpenInterval = _currentOpenInterval.ExpandTo( now );
+				_openIntervals[ _openIntervals.Count - 1 ] = _currentOpenInterval;
 			}
 		}
 

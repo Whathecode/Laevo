@@ -16,6 +16,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using ABC.Windows;
 using ABC.Windows.Desktop;
 using Laevo.View.Activity;
@@ -26,6 +27,7 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Whathecode.System.Windows.Threading;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
@@ -38,6 +40,8 @@ namespace Laevo.ViewModel.Activity
 	[KnownType( typeof( ABC.Windows.Window ) )]
 	public class ActivityViewModel : AbstractViewModel
 	{
+		Dispatcher _dispatcher;
+
 		ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
@@ -143,7 +147,7 @@ namespace Laevo.ViewModel.Activity
 
 		public bool IsUnnamed { get; set; }
 
-		Interval<DateTime> _currentActiveTimeSpan;
+		TimeInterval _currentActiveTimeSpan;
 
 		bool _showActiveTimeSpans;
 
@@ -317,7 +321,7 @@ namespace Laevo.ViewModel.Activity
 
 			// Initialize all work intervals.
 			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the timeline.
-			var dontDisplay = Activity.PlannedIntervals.Select( p => new Interval<DateTime>( p.PlannedAt, p.Interval.End ) ).ToList();
+			var dontDisplay = Activity.PlannedIntervals.Select( p => new TimeInterval( p.PlannedAt, p.Interval.End ) ).ToList();
 			var openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
@@ -345,6 +349,8 @@ namespace Laevo.ViewModel.Activity
 
 		void CommonInitialize()
 		{
+			_dispatcher = Dispatcher.CurrentDispatcher;
+
 			IsActive = Activity.IsActive;
 			IsOpen = Activity.IsOpen;
 			Label = Activity.Name;
@@ -425,7 +431,7 @@ namespace Laevo.ViewModel.Activity
 				Activity.View();
 			}
 			DateTime now = DateTime.Now;
-			_currentActiveTimeSpan = new Interval<DateTime>( now, now );
+			_currentActiveTimeSpan = new TimeInterval( now, now );
 
 			// The only activity which can be active and do not have work intervals is home- avoid adding active intervals.
 			if ( WorkIntervals.Count > 0 )
@@ -861,11 +867,11 @@ namespace Laevo.ViewModel.Activity
 		{
 			HasUnattendedInterruptions = Activity.Interruptions.Any( i => !i.AttendedTo );
 			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
+
 			// Be sure not to allow removing planning when it would result in removal without suspension first.
 			bool containsHistory = (IsToDo && WorkIntervals.Count > 0) || WorkIntervals.Count > 1;
 			CanRemovePlanning = IsPlanned && (!NeedsSuspension || containsHistory);
 			
-
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
 			{
@@ -875,10 +881,13 @@ namespace Laevo.ViewModel.Activity
 					WorkIntervals.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
 				}
 			}
+
 			// Update the intervals which indicate when the activity was active.
 			if ( _currentActiveTimeSpan != null )
 			{
-				_currentActiveTimeSpan.ExpandTo( now );
+				_currentActiveTimeSpan = _currentActiveTimeSpan.ExpandTo( now );
+				ObservableCollection<TimeInterval> activeTimeSpans = WorkIntervals.Last().ActiveTimeSpans;
+				_dispatcher.Invoke( () => { activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan; } );
 			}
 		}
 
