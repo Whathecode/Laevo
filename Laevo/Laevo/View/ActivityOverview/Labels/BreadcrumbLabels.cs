@@ -39,7 +39,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		}
 
 		readonly Dictionary<DateTime, string> _formattedDates = new Dictionary<DateTime, string>();
-		protected override DateTime[] GetTopLabelPositions( Interval<DateTime> interval )
+		protected override DateTime[] GetTopLabelPositions( TimeInterval interval )
 		{
 			if ( _currentDepthChanged )
 			{

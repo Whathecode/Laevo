@@ -28,7 +28,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		}
 
 
-		protected override IEnumerable<DateTime> GetPositions( Interval<DateTime> interval )
+		protected override IEnumerable<DateTime> GetPositions( TimeInterval interval )
 		{
 			return Interval.GetPositions( interval ).Where( d => _predicate( d ) );
 		}
