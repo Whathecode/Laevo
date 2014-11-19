@@ -5,7 +5,7 @@ using Whathecode.System.Windows.DependencyPropertyFactory.Attributes.Coercion;
 
 namespace Laevo.View.ActivityOverview
 {
-	public class VisibleIntervalCoercion : IControlCoercion<TimeLineControl.Properties, Interval<DateTime>>
+	public class VisibleIntervalCoercion : IControlCoercion<TimeLineControl.Properties, TimeInterval>
 	{
 		public TimeLineControl.Properties DependentProperties
 		{
@@ -17,7 +17,7 @@ namespace Laevo.View.ActivityOverview
 			}
 		}
 
-		public Interval<DateTime> Coerce( object context, Interval<DateTime> value )
+		public TimeInterval Coerce( object context, TimeInterval value )
 		{
 			var timeLine = (TimeLineControl)context;
 
@@ -33,10 +33,7 @@ namespace Laevo.View.ActivityOverview
 			// Limit how far the time line goes.
 			DateTime min = timeLine.Minimum ?? DateTime.MinValue;
 			DateTime max = timeLine.Maximum ?? DateTime.MaxValue;
-			var ticksInterval = new Interval<long>( value.Start.Ticks, value.End.Ticks );
-			var limitedRange = new Interval<long>( min.Ticks, max.Ticks );
-			var clamped = ticksInterval.Clamp( limitedRange );
-			return new Interval<DateTime>( new DateTime( clamped.Start ), new DateTime( clamped.End ) );
+			return value.Clamp( new TimeInterval( min, max ) );
 		}
 	}
 }

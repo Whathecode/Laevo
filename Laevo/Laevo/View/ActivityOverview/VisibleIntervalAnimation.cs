@@ -65,12 +65,12 @@ namespace Laevo.View.ActivityOverview
 
 		public override Type TargetPropertyType
 		{
-			get { return typeof( Interval<DateTime> ); }
+			get { return typeof( TimeInterval ); }
 		}
 
 		public override object GetCurrentValue( object defaultOriginValue, object defaultDestinationValue, AnimationClock animationClock )
 		{
-			var from = (Interval<DateTime>)defaultOriginValue;
+			var from = (TimeInterval)defaultOriginValue;
 			if ( animationClock.CurrentTime == null || ConstantDeceleration == null || StartVelocity == null )
 			{
 				return from;
@@ -80,9 +80,11 @@ namespace Laevo.View.ActivityOverview
 			double currentVelocity = StartVelocity.Value - (ConstantDeceleration.Value * time);
 			long displacement = (long)(((StartVelocity.Value + currentVelocity) * time) / 2.0);
 
-			if ( from.Start.Ticks - displacement > DateTime.MinValue.Ticks && from.End.Ticks - displacement < DateTime.MaxValue.Ticks )
+			var maxima = new Interval<long>( DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks );
+			if ( maxima.LiesInInterval( from.Start.Ticks + displacement ) &&
+				 maxima.LiesInInterval( from.End.Ticks + displacement ) )
 			{
-				return new Interval<DateTime>(
+				return new TimeInterval(
 					new DateTime( from.Start.Ticks + displacement ),
 					new DateTime( from.End.Ticks + displacement ) );
 			}

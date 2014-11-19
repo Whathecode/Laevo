@@ -27,7 +27,7 @@ namespace Laevo.View.ActivityOverview
 		}
 
 
-		public IEnumerable<DateTime> GetPositions( Interval<DateTime> range )
+		public IEnumerable<DateTime> GetPositions( TimeInterval range )
 		{
 			DateTime current = range.Start.Round( _part );
 			yield return current;

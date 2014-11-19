@@ -21,16 +21,16 @@ namespace Laevo.View.ActivityOverview.Labels
 		protected readonly List<T> VisibleLabels = new List<T>();
 		protected readonly Stack<T> AvailableLabels = new Stack<T>();
 
-		Interval<DateTime> _currentVisibleInterval;
-		Interval<DateTime> _extendedVisibleInterval;
-		protected Interval<DateTime> ExtendedVisibleRange
+		TimeInterval _currentVisibleInterval;
+		TimeInterval _extendedVisibleInterval;
+		protected TimeInterval ExtendedVisibleRange
 		{
 			get
 			{
-				Interval<DateTime> visibleInterval = TimeLine.VisibleInterval;
+				TimeInterval visibleInterval = TimeLine.VisibleInterval;
 				if ( visibleInterval != _currentVisibleInterval )
 				{
-					_extendedVisibleInterval = new Interval<DateTime>(
+					_extendedVisibleInterval = new TimeInterval(
 						visibleInterval.Start.SafeSubtract( _extendVisibleRange ),
 						visibleInterval.End.SafeAdd( _extendVisibleRange ) );
 					_currentVisibleInterval = visibleInterval;
@@ -53,7 +53,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		{
 			if ( ShouldShowLabels() )
 			{
-				Interval<DateTime> visibleRange = TimeLine.VisibleInterval;
+				TimeInterval visibleRange = TimeLine.VisibleInterval;
 				List<DateTime> toPosition = GetPositions( visibleRange ).ToList();
 
 				// Free up labels which aren't visible anymore, and determine which still need to be placed.
@@ -114,7 +114,7 @@ namespace Laevo.View.ActivityOverview.Labels
 		/// <summary>
 		///   Returns all the visible positions within a certain interval.
 		/// </summary>
-		protected abstract IEnumerable<DateTime> GetPositions( Interval<DateTime> interval );
+		protected abstract IEnumerable<DateTime> GetPositions( TimeInterval interval );
 
 		/// <summary>
 		///   Determines whether or not the labels should be shown.
