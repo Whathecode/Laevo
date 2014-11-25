@@ -2,10 +2,9 @@
 using System.Windows;
 using Whathecode.System.Windows.Data;
 
-
-namespace Laevo.View.Activity.Converters
+namespace Laevo.View.Common
 {
-	public class EditActivityIconMarginConverter : AbstractMultiValueConverter<double, Thickness>
+	public class PopupIconMarginConverter : AbstractMultiValueConverter<double, Thickness>
 	{
 		public Thickness AddMargin { get; set; }
 
