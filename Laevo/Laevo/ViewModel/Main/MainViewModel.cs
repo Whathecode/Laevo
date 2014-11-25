@@ -10,6 +10,7 @@ using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityBar;
 using Laevo.ViewModel.ActivityOverview;
+using Laevo.ViewModel.Main.Unresponsive;
 using Laevo.ViewModel.Settings;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -17,6 +18,7 @@ using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Application = System.Windows.Application;
 using Commands = Laevo.ViewModel.Main.Binding.Commands;
+using UnresponsiveWindowPopup = Laevo.View.Main.Unresponsive.UnresponsiveWindowPopup;
 
 
 namespace Laevo.ViewModel.Main
@@ -40,9 +42,28 @@ namespace Laevo.ViewModel.Main
 		[NotifyProperty( Binding.Properties.UnattendedInterruptions )]
 		public int UnattendedInterruptions { get; private set; }
 
+		readonly UnresponsiveWindowPopup _unresponsivePopup = new UnresponsiveWindowPopup();
+		bool _unresponsiveEventThrown;
+
 
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
+			model.DesktopManager.UnresponsiveWindowDetectedEvent += ( windows, desktop ) =>
+			{
+				var unresponsiveViewModel = new UnresponsiveViewModel( windows, desktop );
+				unresponsiveViewModel.UnresponsiveWindows.CollectionChanged += ( sender, args ) =>
+				{
+					if ( unresponsiveViewModel.UnresponsiveWindows.Count == 0 )
+					{
+						_unresponsivePopup.Hide();
+					}
+				};
+				_unresponsivePopup.DataContext = unresponsiveViewModel;
+				ShowActivityOverview();
+				_unresponsiveEventThrown = true;
+				_unresponsivePopup.ShowDialog();
+			};
+
 			_model = model;
 			_dataRepository = dataRepository;
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -275,7 +296,15 @@ namespace Laevo.ViewModel.Main
 		{
 			UpdateUnattendedInterruptions();
 
-			HideActivityOverview();
+			// When pop-up window with unresponsive windows is shown we do not want to hide the overview.
+			if ( !_unresponsiveEventThrown )
+			{
+				HideActivityOverview();
+			}
+			else
+			{
+				_unresponsiveEventThrown = false;
+			}
 
 			// TODO: Is there a better way to check whether the name has been set already? Perhaps it's also not desirable to activate the activity bar each time as long as the name isn't changed?
 			ShowActivityBar( newActivity.Label != Model.Laevo.DefaultActivityName );

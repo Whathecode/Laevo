@@ -11,6 +11,7 @@
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
 	WindowStyle="None"
 	ShowInTaskbar="False"
@@ -34,7 +35,7 @@
 		</Style>
 
 		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
-		<converters:EditActivityIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
+		<common:PopupIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
 	</Window.Resources>
 
 	<Border

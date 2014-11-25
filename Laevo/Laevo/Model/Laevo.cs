@@ -76,6 +76,7 @@ namespace Laevo.Model
 		public Activity HomeActivity { get; private set; }
 
 		Activity _currentActivity;
+
 		public Activity CurrentActivity
 		{
 			get { return _currentActivity; }
@@ -87,7 +88,8 @@ namespace Laevo.Model
 		}
 
 
-		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger, PersistenceProvider persistenceProvider )
+		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
+			PersistenceProvider persistenceProvider )
 		{
 			Log.Info( "Startup." );
 
@@ -119,6 +121,7 @@ namespace Laevo.Model
 					// Simply ignore invalid files.
 				}
 			}
+
 			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			Log.Debug( "Desktop manager initialized." );
 
@@ -140,7 +143,8 @@ namespace Laevo.Model
 				DispatcherHelper.SafeDispatch( _dispatcher, () =>
 				{
 					HandleActivity( newActivity );
-					InterruptionAdded( newActivity ); // TODO: This event should probably be removed and some other mechanism should be used.
+					InterruptionAdded( newActivity );
+					// TODO: This event should probably be removed and some other mechanism should be used.
 				} );
 			};
 
@@ -207,7 +211,9 @@ namespace Laevo.Model
 
 			activity.ActivatedEvent -= OnActivityActivated;
 
-			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => activity.Equals( s.Activity ) ).ForEach( a => a.ActivityRemoved() );
+			AttentionShifts.OfType<ActivityAttentionShift>()
+				.Where( s => activity.Equals( s.Activity ) )
+				.ForEach( a => a.ActivityRemoved() );
 
 			_dataRepository.RemoveActivity( activity );
 

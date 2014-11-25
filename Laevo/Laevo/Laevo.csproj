@@ -432,6 +432,8 @@
     <Compile Include="ViewModel\Activity\WorkIntervalViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
+    <Compile Include="ViewModel\Main\Unresponsive\Binding\Binding.cs" />
+    <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="View\ActivityBar\ActivityBackgroundConverter.cs" />
@@ -470,7 +472,12 @@
     <Compile Include="View\Activity\Converters\IntervalIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Common\Common.cs" />
+    <Compile Include="View\Common\PopupIconMarginConverter.cs" />
     <Compile Include="View\Main\IconConverter.cs" />
+    <Compile Include="View\Main\Unresponsive\EventFocusAttachment.cs" />
+    <Compile Include="View\Main\Unresponsive\UnresponsiveWindowPopup.xaml.cs">
+      <DependentUpon>UnresponsiveWindowPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>
@@ -510,7 +517,6 @@
     <Compile Include="View\Activity\Converters\IntervalHeightConverter.cs" />
     <Compile Include="View\Activity\Converters\IntervalOffsetConverter.cs" />
     <Compile Include="View\Activity\Converters\BorderBrushConverter.cs" />
-    <Compile Include="View\Activity\Converters\EditActivityIconMarginConverter.cs" />
     <Compile Include="View\Activity\Converters\AttentionTimeSpanConverter.cs" />
     <Compile Include="View\Activity\EditActivityPopup.xaml.cs">
       <DependentUpon>EditActivityPopup.xaml</DependentUpon>
@@ -532,6 +538,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\Common\Alert.png" />
     <Resource Include="View\Activity\ActionIcons\suspend.png" />
     <None Include="app.config" />
     <None Include="app.manifest">
@@ -585,6 +592,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Main\Unresponsive\UnresponsiveWindowPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\TaskList\TaskListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -614,7 +625,6 @@
     <Resource Include="View\Activity\ActionIcons\delete.png" />
     <Resource Include="View\Activity\ActionIcons\view.png" />
     <Resource Include="View\Activity\Icons\Address_Book.png" />
-    <Resource Include="View\Activity\Icons\Alert.png" />
     <Resource Include="View\Activity\Icons\Announcement.png" />
     <Resource Include="View\Activity\Icons\Box.png" />
     <Resource Include="View\Activity\Icons\Burn.png" />

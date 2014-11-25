@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Reflection;
-using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Whathecode.System.Windows.Data;
 
 
