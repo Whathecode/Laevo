@@ -868,8 +868,13 @@ namespace Laevo.ViewModel.Activity
 			if ( _currentActiveTimeSpan != null )
 			{
 				_currentActiveTimeSpan = _currentActiveTimeSpan.ExpandTo( now );
-				ObservableCollection<TimeInterval> activeTimeSpans = WorkIntervals.Last().ActiveTimeSpans;
-				_dispatcher.Invoke( () => { activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan; } );
+				var lastWorkInterval = WorkIntervals.LastOrDefault();
+				if ( lastWorkInterval != null )
+				{
+					ObservableCollection<TimeInterval> activeTimeSpans = lastWorkInterval.ActiveTimeSpans;
+					_dispatcher.Invoke( () => { activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan; } );
+				}
+
 			}
 		}
 
