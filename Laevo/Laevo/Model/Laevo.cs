@@ -76,6 +76,7 @@ namespace Laevo.Model
 		public Activity HomeActivity { get; private set; }
 
 		Activity _currentActivity;
+
 		public Activity CurrentActivity
 		{
 			get { return _currentActivity; }
@@ -87,7 +88,8 @@ namespace Laevo.Model
 		}
 
 
-		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger, PersistenceProvider persistenceProvider )
+		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
+			PersistenceProvider persistenceProvider )
 		{
 			Log.Info( "Startup." );
 
@@ -119,16 +121,8 @@ namespace Laevo.Model
 					// Simply ignore invalid files.
 				}
 			}
-			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
-			DesktopManager.UnresponsiveWindowDetectedEvent += (windows, desktop) =>
-			{
-				var unresponsive = windows.GroupBy( u => u.Window.GetProcess().ProcessName ).ToList();
 
-				string error = unresponsive.Aggregate(
-					"The following applications stopped responding and are locking up the window manager:\n\n",
-					( info, processWindows ) => info + "- " + processWindows.Key + "\n" );
-				MessageBox.Show( error, "Unresponsive Applications", MessageBoxButton.OK, MessageBoxImage.Information );
-			};
+			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			Log.Debug( "Desktop manager initialized." );
 
 			// Handle activities and tasks from previous sessions.
@@ -149,7 +143,8 @@ namespace Laevo.Model
 				DispatcherHelper.SafeDispatch( _dispatcher, () =>
 				{
 					HandleActivity( newActivity );
-					InterruptionAdded( newActivity ); // TODO: This event should probably be removed and some other mechanism should be used.
+					InterruptionAdded( newActivity );
+					// TODO: This event should probably be removed and some other mechanism should be used.
 				} );
 			};
 
@@ -216,7 +211,9 @@ namespace Laevo.Model
 
 			activity.ActivatedEvent -= OnActivityActivated;
 
-			AttentionShifts.OfType<ActivityAttentionShift>().Where( s => activity.Equals( s.Activity ) ).ForEach( a => a.ActivityRemoved() );
+			AttentionShifts.OfType<ActivityAttentionShift>()
+				.Where( s => activity.Equals( s.Activity ) )
+				.ForEach( a => a.ActivityRemoved() );
 
 			_dataRepository.RemoveActivity( activity );
 
