@@ -28,8 +28,8 @@ end
 # Copy ABC Toolkit DLLs.
 abc_toolkit = '..\\..\\Libraries\\ABC Toolkit\\'
 abc_dlls = [
+	'ABC',
 	'ABC.Applications',
-	'ABC.Common',
 	'ABC.Interruptions',
 	'ABC.PInvoke',
 	'ABC.Windows'
