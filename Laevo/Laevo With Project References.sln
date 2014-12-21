@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laevo", "Laevo\Laevo.csproj", "{EE753682-D3BD-45EE-9B42-9B8F1902D250}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.System.Aspects",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.PresentationFramework", "..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj", "{9C755F97-8302-4415-AC95-FABFCDCE14B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC", "..\..\ABC\ABC\ABC\ABC.csproj", "{D53F1095-6DC0-4950-982F-3322AAE74A50}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Windows", "..\..\ABC\ABC\ABC.Windows\ABC.Windows.csproj", "{DB8DBDF2-70BF-4712-86DA-06674986BC12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.PInvoke", "..\..\ABC\ABC\ABC.PInvoke\ABC.PInvoke.csproj", "{072142C4-284E-4F1A-A1FE-F886E8ECF728}"
@@ -36,8 +38,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{181414
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Common", "..\..\ABC\ABC\ABC.Common\ABC.Common.csproj", "{D53F1095-6DC0-4950-982F-3322AAE74A50}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whathecode.Interop", "..\..\Framework-Class-Library-Extension\Whathecode.Interop\Whathecode.Interop.csproj", "{93706064-EF4A-4F46-ABB8-D93E4C0D2732}"
 EndProject
@@ -182,6 +182,26 @@ Global
 		{9C755F97-8302-4415-AC95-FABFCDCE14B2}.SingleImage|x64.Build.0 = Release|x64
 		{9C755F97-8302-4415-AC95-FABFCDCE14B2}.SingleImage|x86.ActiveCfg = Release|x86
 		{9C755F97-8302-4415-AC95-FABFCDCE14B2}.SingleImage|x86.Build.0 = Release|x86
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|Any CPU.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|Any CPU.Build.0 = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|x64.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|x86.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|Any CPU.ActiveCfg = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|Any CPU.Build.0 = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|x64.ActiveCfg = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|x86.ActiveCfg = Debug|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|x64.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|x86.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|Any CPU.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|Any CPU.Build.0 = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|x64.ActiveCfg = Release|Any CPU
+		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|x86.ActiveCfg = Release|Any CPU
 		{DB8DBDF2-70BF-4712-86DA-06674986BC12}.CD_ROM|Any CPU.ActiveCfg = Release|Any CPU
 		{DB8DBDF2-70BF-4712-86DA-06674986BC12}.CD_ROM|Any CPU.Build.0 = Release|Any CPU
 		{DB8DBDF2-70BF-4712-86DA-06674986BC12}.CD_ROM|x64.ActiveCfg = Release|x64
@@ -282,26 +302,6 @@ Global
 		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.SingleImage|Any CPU.Build.0 = Release|Any CPU
 		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.SingleImage|x64.ActiveCfg = Debug|Any CPU
 		{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}.SingleImage|x86.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|Any CPU.ActiveCfg = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|Any CPU.Build.0 = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|x64.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.CD_ROM|x86.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|Any CPU.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|Any CPU.Build.0 = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|x64.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.DVD-5|x86.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|x64.ActiveCfg = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.Release|x86.ActiveCfg = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|Any CPU.ActiveCfg = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|Any CPU.Build.0 = Release|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|x64.ActiveCfg = Debug|Any CPU
-		{D53F1095-6DC0-4950-982F-3322AAE74A50}.SingleImage|x86.ActiveCfg = Debug|Any CPU
 		{93706064-EF4A-4F46-ABB8-D93E4C0D2732}.CD_ROM|Any CPU.ActiveCfg = Release|Any CPU
 		{93706064-EF4A-4F46-ABB8-D93E4C0D2732}.CD_ROM|Any CPU.Build.0 = Release|Any CPU
 		{93706064-EF4A-4F46-ABB8-D93E4C0D2732}.CD_ROM|x64.ActiveCfg = Debug|Any CPU
