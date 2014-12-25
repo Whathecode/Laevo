@@ -4,6 +4,7 @@ using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
 using Laevo.ViewModel.Activity;
@@ -21,6 +22,8 @@ namespace Laevo.ViewModel.ActivityOverview
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	public class ActivityOverviewViewModel : AbstractViewModel
 	{
+		Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
+
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
 
 
@@ -158,7 +161,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			};
 
 			// Hook up timer.
-			_updateTimer.Elapsed += UpdateData;
+			_updateTimer.Elapsed += (s, a) => _dispatcher.Invoke( () => UpdateData( a.SignalTime ) );
 			_updateTimer.Start();
 		}
 
@@ -406,13 +409,12 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
-
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
-		void UpdateData( object sender, ElapsedEventArgs e )
+		void UpdateData( DateTime updateTime )
 		{
-			CurrentTime = e.SignalTime;
+			CurrentTime = updateTime;
 
 			// Update model.
 			_model.Update( CurrentTime );

@@ -16,8 +16,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using ABC.Windows;
 using ABC.Windows.Desktop;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
@@ -27,7 +25,6 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
-using Whathecode.System.Windows.Threading;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
@@ -40,8 +37,6 @@ namespace Laevo.ViewModel.Activity
 	[KnownType( typeof( ABC.Windows.Window ) )]
 	public class ActivityViewModel : AbstractViewModel
 	{
-		Dispatcher _dispatcher;
-
 		ActivityOverviewViewModel _overview;
 
 		const string IconResourceLocation = "view/activity/icons";
@@ -344,13 +339,12 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
 				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
 			}
+
 			_currentActiveTimeSpan = null;
 		}
 
 		void CommonInitialize()
 		{
-			_dispatcher = Dispatcher.CurrentDispatcher;
-
 			IsActive = Activity.IsActive;
 			IsOpen = Activity.IsOpen;
 			Label = Activity.Name;
@@ -430,10 +424,11 @@ namespace Laevo.ViewModel.Activity
 			{
 				Activity.View();
 			}
+
+			// The only activity which can be active and does not have work intervals is home. Avoid adding active intervals.
+			// TODO: Why would 'ActivityViewModel' need to be aware about a 'home' activity? This dependency should be removed.
 			DateTime now = DateTime.Now;
 			_currentActiveTimeSpan = new TimeInterval( now, now );
-
-			// The only activity which can be active and do not have work intervals is home- avoid adding active intervals.
 			if ( WorkIntervals.Count > 0 )
 			{
 				WorkIntervals.Last().ActiveTimeSpans.Add( _currentActiveTimeSpan );
@@ -851,9 +846,9 @@ namespace Laevo.ViewModel.Activity
 			IsPlanned = Activity.IsToDo || GetFutureWorkIntervals().Any();
 
 			// Be sure not to allow removing planning when it would result in removal without suspension first.
-			bool containsHistory = (IsToDo && WorkIntervals.Count > 0) || WorkIntervals.Count > 1;
-			CanRemovePlanning = IsPlanned && (!NeedsSuspension || containsHistory);
-			
+			bool containsHistory = ( IsToDo && WorkIntervals.Count > 0 ) || WorkIntervals.Count > 1;
+			CanRemovePlanning = IsPlanned && ( !NeedsSuspension || containsHistory );
+
 			// Update the interval which indicates when the activity was open.
 			if ( Activity.OpenIntervals.Count > 0 )
 			{
@@ -872,9 +867,8 @@ namespace Laevo.ViewModel.Activity
 				if ( lastWorkInterval != null )
 				{
 					ObservableCollection<TimeInterval> activeTimeSpans = lastWorkInterval.ActiveTimeSpans;
-					_dispatcher.Invoke( () => { activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan; } );
+					activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan;
 				}
-
 			}
 		}
 
