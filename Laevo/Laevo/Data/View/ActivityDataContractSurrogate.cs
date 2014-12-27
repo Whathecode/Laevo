@@ -70,7 +70,7 @@ namespace Laevo.Data.View
 			}
 			else if ( targetType == typeof( VirtualDesktop ) )
 			{
-				return _desktopManager.CreateDesktopFromSession( (StoredSession)obj );
+				return _desktopManager.CreateWorkspaceFromSession( (StoredSession)obj );
 			}
 
 			return obj;
