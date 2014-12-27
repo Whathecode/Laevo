@@ -279,7 +279,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
-			: this( activity, desktopManager, desktopManager.CreateEmptyDesktop() ) {}
+			: this( activity, desktopManager, desktopManager.CreateEmptyWorkspace() ) {}
 
 		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop, bool isEditable = true )
 		{
@@ -304,7 +304,7 @@ namespace Laevo.ViewModel.Activity
 			Activity = activity;
 
 			_desktopManager = desktopManager;
-			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
+			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyWorkspace();
 			NeedsSuspension = _virtualDesktop.Windows.Count > 0;
 
 			Icon = storedViewModel.Icon;
@@ -435,7 +435,7 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			// Initialize desktop.
-			_desktopManager.SwitchToDesktop( _virtualDesktop );
+			_desktopManager.SwitchToWorkspace( _virtualDesktop );
 			
 			InitializeLibrary();
 
