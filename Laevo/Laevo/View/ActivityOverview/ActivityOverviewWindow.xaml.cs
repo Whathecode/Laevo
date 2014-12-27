@@ -70,11 +70,11 @@ namespace Laevo.View.ActivityOverview
 			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveTimeLine );
 
 #if DEBUG
-			WindowStyle = WindowStyle.None;
+			WindowStyle = WindowStyle.SingleBorderWindow;
 			WindowState = WindowState.Normal;
 			Topmost = false;
-			Width = 1280;
-			Height = 720;
+			Width = 1024;
+			Height = 576;
 #endif
 
 			// Set the time line's position around the current time when first starting the application.
