@@ -290,6 +290,7 @@ namespace Laevo.ViewModel.Main
 				DataContext = _activityOverviewViewModel
 			};
 			_activityOverview.Activated += ( sender, args ) => _activityOverviewViewModel.OnOverviewActivated();
+			_activityOverview.Closed += (s, a) => ResetGui();
 		}
 
 		void OnActivatedActivityEvent( ActivityViewModel oldActivity, ActivityViewModel newActivity )
