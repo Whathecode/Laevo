@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using ABC;
 using ABC.Applications.Persistence;
-using ABC.Windows.Desktop;
 using Laevo.Data.Common;
 using Laevo.Data.Model;
 using Laevo.ViewModel.Activity;
@@ -25,7 +25,7 @@ namespace Laevo.Data.View
 		readonly DataContractSerializer _activitySerializer;
 
 
-		public DataContractSerializedViewRepository( string programDataFolder, VirtualDesktopManager desktopManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
+		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
 		{
 			_activitiesFile = Path.Combine( programDataFolder, "ActivityRepresentations.xml" );
 			_tasksFile = Path.Combine( programDataFolder, "TaskRepresentations.xml" );
@@ -33,9 +33,9 @@ namespace Laevo.Data.View
 			// Check for stored presentation options for existing activities and tasks.
 			_activitySerializer = new DataContractSerializer(
 				typeof( Dictionary<Guid, ActivityViewModel> ),
-				persistenceProvider.GetPersistedDataTypes(),
+				workspaceManager.GetPersistedDataTypes().Concat( persistenceProvider.GetPersistedDataTypes() ),
 				Int32.MaxValue, true, false,
-				new ActivityDataContractSurrogate( desktopManager ) );
+				new ActivityDataContractSurrogate( workspaceManager ) );
 			var existingActivities = new Dictionary<Guid, ActivityViewModel>();
 			if ( File.Exists( _activitiesFile ) )
 			{
@@ -63,7 +63,7 @@ namespace Laevo.Data.View
 
 				// Create and hook up the view model.
 				var viewModel = new ActivityViewModel(
-					activity, desktopManager,
+					activity, workspaceManager,
 					existingActivities[ activity.Identifier ]);
 				Activities.Add( viewModel );
 			}
@@ -74,7 +74,7 @@ namespace Laevo.Data.View
 				from task in modelData.Tasks
 				where existingTasks.ContainsKey( task.Identifier )
 				select new ActivityViewModel(
-					task, desktopManager,
+					task, workspaceManager,
 					existingTasks[ task.Identifier ]);
 			// ReSharper restore ImplicitlyCapturedClosure
 			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.

@@ -17,6 +17,7 @@ using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Threading;
+using WorkspaceManager = ABC.WorkspaceManager;
 
 
 namespace Laevo.Model
@@ -47,7 +48,12 @@ namespace Laevo.Model
 
 		public static string ProgramLocalDataFolder { get; private set; }
 
-		public VirtualDesktopManager DesktopManager { get; private set; }
+		public IWindowOperations WindowClipboard { get; private set; }
+
+		/// <summary>
+		///   The controller which allows switching between different workspaces.
+		/// </summary>
+		public WorkspaceManager WorkspaceManager { get; private set; }
 
 		public event Action<Activity> ActivityRemoved;
 
@@ -121,9 +127,13 @@ namespace Laevo.Model
 					// Simply ignore invalid files.
 				}
 			}
-
-			DesktopManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
+			var vdmManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
+			WindowClipboard = vdmManager; // Only expose window clipboard, WorkspaceManager is used to expose workspaces.
 			Log.Debug( "Desktop manager initialized." );
+
+			// Initialize workspace manager.
+			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric } );
+			Log.Debug( "Workspace manager initialized." );
 
 			// Handle activities and tasks from previous sessions.
 			_dataRepository.Activities.ForEach( HandleActivity );

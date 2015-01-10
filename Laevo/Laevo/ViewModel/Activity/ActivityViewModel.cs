@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -12,11 +11,10 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC.Windows.Desktop;
+using ABC;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -33,7 +31,7 @@ namespace Laevo.ViewModel.Activity
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
-	[KnownType( typeof( StoredSession ) )]
+	[KnownType( typeof( WorkspaceSession ) )]
 	[KnownType( typeof( ABC.Windows.Window ) )]
 	public class ActivityViewModel : AbstractViewModel
 	{
@@ -127,10 +125,10 @@ namespace Laevo.ViewModel.Activity
 
 		internal readonly Model.Activity Activity;
 
-		readonly VirtualDesktopManager _desktopManager;
+		readonly WorkspaceManager _workspaceManager;
 
 		[DataMember]
-		VirtualDesktop _virtualDesktop;
+		Workspace _workspace;
 
 		/// <summary>
 		///   The unique identifier of the activity this view model represents.
@@ -227,9 +225,6 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.ContainsHistory )]
 		public bool CanRemovePlanning { get; private set; }
 
-		[NotifyProperty( Binding.Properties.HasOpenWindows )]
-		public bool HasOpenWindows { get; private set; }
-
 		/// <summary>
 		///   Determines whether the activity is currently suspended, meaning it no longer takes up any resources.
 		/// </summary>
@@ -278,17 +273,17 @@ namespace Laevo.ViewModel.Activity
 				.ToList();
 		}
 
-		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager )
-			: this( activity, desktopManager, desktopManager.CreateEmptyWorkspace() ) {}
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
+			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) {}
 
-		public ActivityViewModel( Model.Activity activity, VirtualDesktopManager desktopManager, VirtualDesktop desktop, bool isEditable = true )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace, bool isEditable = true )
 		{
 			Contract.Requires( activity != null );
 
 			Activity = activity;
 
-			_desktopManager = desktopManager;
-			_virtualDesktop = desktop;
+			_workspaceManager = workspaceManager;
+			_workspace = workspace;
 
 			Color = DefaultColor;
 			IsEditable = isEditable;
@@ -298,14 +293,14 @@ namespace Laevo.ViewModel.Activity
 
 		public ActivityViewModel(
 			Model.Activity activity,
-			VirtualDesktopManager desktopManager,
+			WorkspaceManager workspaceManager,
 			ActivityViewModel storedViewModel )
 		{
 			Activity = activity;
 
-			_desktopManager = desktopManager;
-			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyWorkspace();
-			NeedsSuspension = _virtualDesktop.Windows.Count > 0;
+			_workspaceManager = workspaceManager;
+			_workspace = storedViewModel._workspace ?? workspaceManager.CreateEmptyWorkspace();
+			NeedsSuspension = _workspace.HasResourcesToSuspend();
 
 			Icon = storedViewModel.Icon;
 			Color = storedViewModel.Color;
@@ -435,7 +430,7 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			// Initialize desktop.
-			_desktopManager.SwitchToWorkspace( _virtualDesktop );
+			_workspaceManager.SwitchToWorkspace( _workspace );
 			
 			InitializeLibrary();
 
@@ -557,8 +552,6 @@ namespace Laevo.ViewModel.Activity
 			// Be sure the activity is activated prior to suspending it.
 			ActivateActivity();
 
-			_desktopManager.UpdateWindowAssociations();
-
 			if ( IsSuspended )
 			{
 				return;
@@ -567,29 +560,19 @@ namespace Laevo.ViewModel.Activity
 			_isSuspending = true;
 			SuspendingActivityEvent( this );
 
-			// Await full suspension in background.
-			var awaitSuspend = new BackgroundWorker();
-			awaitSuspend.DoWork += ( sender, args ) =>
-			{
-				do
-				{
-					// When all windows are closed, assume suspension was successful.
-					_desktopManager.UpdateWindowAssociations();
-					Thread.Sleep( TimeSpan.FromSeconds( 1 ) );
-				} while ( _virtualDesktop.Windows.Count != 0 );
-			};
-			awaitSuspend.RunWorkerCompleted += ( sender, args ) =>
-			{
-				IsSuspended = true;
-				NeedsSuspension = false;
-				_isSuspending = false;
-				StopActivity();
-				SuspendedActivityEvent( this );
-			};
-			awaitSuspend.RunWorkerAsync();
+			// Start workspace suspension.
+			_workspace.SuspendedWorkspace += OnSuspendedWorkspace;
+			_workspace.Suspend();
+		}
 
-			// Initiate the actual suspension.
-			_virtualDesktop.Suspend();
+		void OnSuspendedWorkspace( AbstractWorkspace<WorkspaceSession> workspace )
+		{
+			_workspace.SuspendedWorkspace -= OnSuspendedWorkspace;
+			IsSuspended = true;
+			NeedsSuspension = false;
+			_isSuspending = false;
+			StopActivity();
+			SuspendedActivityEvent( this );
 		}
 
 		[CommandCanExecute( Commands.SuspendActivity )]
@@ -601,8 +584,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.ForceSuspend )]
 		public void ForceSuspend()
 		{
-			// By moving the remaining windows to the home activity, suspension will finish.
-			_virtualDesktop.TransferWindows( _virtualDesktop.Windows.ToList(), _overview.HomeActivity._virtualDesktop );
+			_workspace.ForceSuspend();
 		}
 
 		[CommandCanExecute( Commands.ForceSuspend )]
@@ -619,7 +601,7 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			IsSuspended = false;
-			_virtualDesktop.Resume();
+			_workspace.Resume();
 		}
 
 		[CommandExecute( Commands.Remove )]
@@ -671,11 +653,6 @@ namespace Laevo.ViewModel.Activity
 		public bool CanRemovePlanningCommand()
 		{
 			return CanRemovePlanning;
-		}
-
-		public void UpdateHasOpenWindows()
-		{
-			HasOpenWindows = _virtualDesktop.Windows.Count > 0;
 		}
 
 		[CommandExecute( Commands.ChangeColor )]
@@ -758,7 +735,7 @@ namespace Laevo.ViewModel.Activity
 				// The data paths of the merged activity need to be added to the library.
 				InitializeLibrary();
 			}
-			_desktopManager.Merge( activity._virtualDesktop, _virtualDesktop );
+			_workspaceManager.Merge( activity._workspace, _workspace );
 
 			// Only at the end, when nothing from the activity is 'active' anymore, convert it to the required state.
 			if ( activity.IsToDo || activity.GetFutureWorkIntervals().Any() )
@@ -881,8 +858,6 @@ namespace Laevo.ViewModel.Activity
 			{
 				return;
 			}
-
-			UpdateHasOpenWindows();
 
 			// Storing activity context paths can't be done in Persist(), since the same library is shared across activities.
 			UpdateLibrary();

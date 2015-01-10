@@ -48,7 +48,7 @@ namespace Laevo.ViewModel.Main
 
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
-			model.DesktopManager.UnresponsiveWindowDetectedEvent += ( windows, desktop ) =>
+			model.WindowClipboard.UnresponsiveWindowDetected += ( windows, desktop ) =>
 			{
 				var unresponsiveViewModel = new UnresponsiveViewModel( windows, desktop );
 				unresponsiveViewModel.UnresponsiveWindows.CollectionChanged += ( sender, args ) =>
@@ -113,9 +113,6 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.Exit )]
 		public void Exit()
 		{
-			// Make sure newly opened windows on the current desk are stored as well.
-			_model.DesktopManager.UpdateWindowAssociations();
-
 			_activityOverviewViewModel.Exit();
 			Persist();
 			_model.Exit();
@@ -258,8 +255,6 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.ActivateSelectedActivity )]
 		public void ActivateSelectedActivity()
 		{
-			_model.DesktopManager.UpdateWindowAssociations();
-
 			_activityBarViewModel.ActivateSelectedActivity();
 		}
 
@@ -289,7 +284,6 @@ namespace Laevo.ViewModel.Main
 			{
 				DataContext = _activityOverviewViewModel
 			};
-			_activityOverview.Activated += ( sender, args ) => _activityOverviewViewModel.OnOverviewActivated();
 			_activityOverview.Closed += (s, a) => ResetGui();
 		}
 

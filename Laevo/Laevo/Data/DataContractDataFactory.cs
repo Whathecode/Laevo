@@ -1,6 +1,6 @@
-﻿using ABC.Applications.Persistence;
+﻿using ABC;
+using ABC.Applications.Persistence;
 using ABC.Interruptions;
-using ABC.Windows.Desktop;
 using Laevo.Data.Model;
 using Laevo.Data.View;
 
@@ -30,9 +30,9 @@ namespace Laevo.Data
 			return new DataContractSerializedModelRepository( _dataFolder, _interruptionAggregator );
 		}
 
-		public IViewRepository CreateViewRepository( IModelRepository linkedModelRepository, VirtualDesktopManager desktopManager )
+		public IViewRepository CreateViewRepository( IModelRepository linkedModelRepository, WorkspaceManager workspaceManager )
 		{
-			return new DataContractSerializedViewRepository( _dataFolder, desktopManager, linkedModelRepository, _persistenceProvider );
+			return new DataContractSerializedViewRepository( _dataFolder, workspaceManager, linkedModelRepository, _persistenceProvider );
 		}
 	}
 }
