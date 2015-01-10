@@ -1,4 +1,4 @@
-﻿using ABC.Windows.Desktop;
+﻿using ABC;
 using Laevo.Data.Model;
 using Laevo.Data.View;
 
@@ -12,6 +12,6 @@ namespace Laevo.Data
 	interface IDataFactory
 	{
 		IModelRepository CreateModelRepository();
-		IViewRepository CreateViewRepository( IModelRepository linkedModelRepository, VirtualDesktopManager desktopManager );
+		IViewRepository CreateViewRepository( IModelRepository linkedModelRepository, WorkspaceManager workspaceManager );
 	}
 }

@@ -12,7 +12,6 @@
 		IsToDo,
 		IsPlanned,
 		ContainsHistory,
-		HasOpenWindows,
 		IsSuspended,
 		NeedsSuspension,
 		HasUnattendedInterruptions,

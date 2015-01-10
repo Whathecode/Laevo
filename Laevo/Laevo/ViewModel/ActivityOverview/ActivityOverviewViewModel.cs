@@ -22,7 +22,7 @@ namespace Laevo.ViewModel.ActivityOverview
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	public class ActivityOverviewViewModel : AbstractViewModel
 	{
-		Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
+		readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
 
@@ -133,25 +133,21 @@ namespace Laevo.ViewModel.ActivityOverview
 			var homeIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.DesktopManager, _model.DesktopManager.CurrentWorkspace, false )
+			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.CurrentWorkspace, false )
 			{
 				Icon = homeIcon
 			};
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity();
 
-			// Initialize the activities and tasks to work with this overview.
-			Activities.Concat( Tasks ).Distinct().ForEach( a =>
-			{
-				HookActivityToOverview( a ); // Hook up activity view models from previous sessions.
-				a.UpdateHasOpenWindows(); // Update the activity states now that the VDM has been initialized.
-			} );
+			// Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
+			Activities.Concat( Tasks ).Distinct().ForEach( HookActivityToOverview );
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
 			_model.InterruptionAdded += task =>
 			{
-				var taskViewModel = new ActivityViewModel( task, _model.DesktopManager )
+				var taskViewModel = new ActivityViewModel( task, _model.WorkspaceManager )
 				{
 					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
 					Color = ActivityViewModel.PresetColors[ 5 ],
@@ -171,7 +167,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.DesktopManager )
+			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				Icon = _defaultIcon,
@@ -190,7 +186,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.DesktopManager )
+			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager )
 			{
 				Icon = _defaultIcon
 			};
@@ -368,12 +364,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			if ( viewModel == CurrentActivityViewModel )
 			{
-				// HACK: Since this activity is deactivated, CurrentActivityViewModel will be null next time the overview is activated and its state won't be updated.
-				//       Therefore, already update the window states now. This is a temporary solution.
-				//       A proper solution involves listening to window events and making an observable window collection to which is bound.
-				_model.DesktopManager.UpdateWindowAssociations();
-				viewModel.UpdateHasOpenWindows();
-
 				CurrentActivityViewModel = null;
 				NoCurrentActiveActivityEvent();
 			}
@@ -436,25 +426,14 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 		}
 
-		public void OnOverviewActivated()
-		{
-			_model.DesktopManager.UpdateWindowAssociations();
-
-			// The currently active activity might have closed windows.
-			if ( CurrentActivityViewModel != null )
-			{
-				CurrentActivityViewModel.UpdateHasOpenWindows();
-			}
-		}
-
 		public void CutWindow()
 		{
-			_model.DesktopManager.CutWindow( Window.GetForegroundWindow() );
+			_model.WindowClipboard.CutWindow( Window.GetForegroundWindow() );
 		}
 
 		public void PasteWindows()
 		{
-			_model.DesktopManager.PasteWindows();
+			_model.WindowClipboard.PasteWindows();
 		}
 
 		public void ActivityDropped( ActivityViewModel activity )
@@ -543,7 +522,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.Stop();
 			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
 
-			_model.DesktopManager.Close();
+			_model.WorkspaceManager.Close();
 		}
 	}
 }

@@ -41,8 +41,8 @@ namespace Laevo
 			_model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
 
 			// Create ViewModel.
-			// TODO: Move DesktopManager to ViewModel?
-			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, _model.DesktopManager );
+			// TODO: Move WorkspaceManager to ViewModel?
+			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, _model.WorkspaceManager );
 			_viewModel = new MainViewModel( _model, viewDataRepository );
 
 			// Create View.
@@ -66,7 +66,7 @@ namespace Laevo
 
 		public void ExitDesktopManager()
 		{
-			_model.DesktopManager.Close();
+			_model.WorkspaceManager.Close();
 		}
 
 		protected override void FreeManagedResources()

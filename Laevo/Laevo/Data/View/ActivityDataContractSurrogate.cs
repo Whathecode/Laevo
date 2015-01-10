@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC.Windows.Desktop;
+using ABC;
 
 
 namespace Laevo.Data.View
@@ -26,12 +26,12 @@ namespace Laevo.Data.View
 		}
 
 
-		readonly VirtualDesktopManager _desktopManager;
+		readonly WorkspaceManager _workspaceManager;
 
 
-		public ActivityDataContractSurrogate( VirtualDesktopManager desktopManager )
+		public ActivityDataContractSurrogate( WorkspaceManager workspaceManager )
 		{
-			_desktopManager = desktopManager;
+			_workspaceManager = workspaceManager;
 		}
 
 
@@ -41,8 +41,8 @@ namespace Laevo.Data.View
 			{
 				{ typeof( ImageSource ), typeof( SerializedBitmap ) },
 				{ typeof( SerializedBitmap ), typeof( BitmapImage ) },
-				{ typeof( VirtualDesktop ), typeof( StoredSession ) },
-				{ typeof( StoredSession ), typeof( VirtualDesktop ) }
+				{ typeof( Workspace ), typeof( WorkspaceSession ) },
+				{ typeof( WorkspaceSession ), typeof( Workspace ) }
 			};
 
 			return convertTypes.ContainsKey( type ) ? convertTypes[ type ] : type;
@@ -54,9 +54,9 @@ namespace Laevo.Data.View
 			{
 				return new SerializedBitmap( ((BitmapImage)obj).UriSource );
 			}
-			else if ( targetType == typeof( StoredSession ) )
+			else if ( targetType == typeof( WorkspaceSession ) )
 			{
-				return ((VirtualDesktop)obj).Store();
+				return ((Workspace)obj).Store();
 			}
 
 			return obj;
@@ -68,9 +68,9 @@ namespace Laevo.Data.View
 			{
 				return new BitmapImage( ((SerializedBitmap)obj).Source );
 			}
-			else if ( targetType == typeof( VirtualDesktop ) )
+			else if ( targetType == typeof( Workspace ) )
 			{
-				return _desktopManager.CreateWorkspaceFromSession( (StoredSession)obj );
+				return _workspaceManager.CreateWorkspaceFromSession( (WorkspaceSession)obj );
 			}
 
 			return obj;
