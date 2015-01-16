@@ -513,7 +513,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 			catch ( PersistenceException pe )
 			{
-				MessageBox.Show( pe.Message, "Saving view data failed", MessageBoxButton.OK );
+				View.MessageBox.Show( pe.Message, "Saving view data failed", MessageBoxButton.OK );
 			}
 		}
 

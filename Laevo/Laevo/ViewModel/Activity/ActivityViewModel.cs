@@ -808,7 +808,7 @@ namespace Laevo.ViewModel.Activity
 				}
 				if ( pathsToAdd.Count > 0 )
 				{
-					MessageBox.Show(
+					View.MessageBox.Show(
 						"Something went wrong while initializing the Activity Context library, see whether this error still occurs when reopening this activity.",
 						"Error initializing Activity Context Library",
 						MessageBoxButton.OK,
