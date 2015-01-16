@@ -478,6 +478,7 @@
     <Compile Include="View\Main\Unresponsive\UnresponsiveWindowPopup.xaml.cs">
       <DependentUpon>UnresponsiveWindowPopup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\MessageBox.cs" />
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>

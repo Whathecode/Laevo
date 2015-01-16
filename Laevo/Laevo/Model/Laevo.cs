@@ -2,14 +2,12 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Threading;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using ABC.PInvoke.Process;
 using ABC.Windows.Desktop;
 using ABC.Windows.Desktop.Settings;
-using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
@@ -262,14 +260,7 @@ namespace Laevo.Model
 		{
 			Log.Debug( "Persisting." );
 
-			try
-			{
-				_dataRepository.SaveChanges();
-			}
-			catch ( PersistenceException pe )
-			{
-				MessageBox.Show( pe.Message, "Saving data failed", MessageBoxButton.OK );
-			}
+			_dataRepository.SaveChanges();
 		}
 	}
 }

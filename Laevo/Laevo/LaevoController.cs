@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using Laevo.Data;
@@ -53,7 +54,14 @@ namespace Laevo
 			dispatcherTimer.Tick += ( s, e ) =>
 			{
 				_viewModel.Persist();
-				_model.Persist();
+				try
+				{
+					_model.Persist();
+				}
+				catch ( PersistenceException pe )
+				{
+					View.MessageBox.Show( pe.Message, "Saving data failed", MessageBoxButton.OK );
+				}
 			};
 			dispatcherTimer.Interval = new TimeSpan( 0, 5, 0 );
 			dispatcherTimer.Start();

@@ -58,7 +58,7 @@ namespace Laevo
 			// TODO: Improved verification, rather than just name.
 			if ( Process.GetProcessesByName( "Laevo" ).Count() > 1 )
 			{
-				MessageBox.Show( "Laevo is already running.", "Laevo", MessageBoxButton.OK );
+				View.MessageBox.Show( "Laevo is already running.", "Laevo", MessageBoxButton.OK );
 
 				Current.Shutdown();
 				return;
