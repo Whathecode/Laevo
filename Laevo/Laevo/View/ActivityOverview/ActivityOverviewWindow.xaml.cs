@@ -67,7 +67,7 @@ namespace Laevo.View.ActivityOverview
 		{
 			InitializeComponent();
 
-			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveTimeLine );
+			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.MouseDragCommandArgs>( MoveTimeLine );
 
 #if DEBUG
 			WindowStyle = WindowStyle.SingleBorderWindow;
@@ -285,7 +285,7 @@ namespace Laevo.View.ActivityOverview
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
 
-		void MoveTimeLine( MouseBehavior.ClickDragInfo info )
+		void MoveTimeLine( MouseBehavior.MouseDragCommandArgs info )
 		{
 			double mouseX = Mouse.GetPosition( this ).X;
 
@@ -293,12 +293,12 @@ namespace Laevo.View.ActivityOverview
 			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
 			StopDragAnimation();
 
-			if ( info.State == MouseBehavior.ClickDragState.Start )
+			if ( info.DragInfo.State == MouseBehavior.ClickDragState.Start )
 			{
 				_startDrag = TimeLine.VisibleInterval;
 				_startDragFocus = GetFocusedTime( _startDrag, mouseX );
 			}
-			else if ( info.State == MouseBehavior.ClickDragState.Stop )
+			else if ( info.DragInfo.State == MouseBehavior.ClickDragState.Stop )
 			{
 				_startDrag = null;
 
