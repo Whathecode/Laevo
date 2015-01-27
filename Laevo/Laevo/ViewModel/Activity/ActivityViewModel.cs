@@ -32,7 +32,7 @@ namespace Laevo.ViewModel.Activity
 	[DataContract]
 	[KnownType( typeof( BitmapImage ) )]
 	[KnownType( typeof( WorkspaceSession ) )]
-	[KnownType( typeof( ABC.Windows.Desktop.Window ) )]
+	[KnownType( typeof( ABC.Common.Window ) )]
 	public class ActivityViewModel : AbstractViewModel
 	{
 		ActivityOverviewViewModel _overview;
@@ -274,7 +274,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
-			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) {}
+			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) { }
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace, bool isEditable = true )
 		{

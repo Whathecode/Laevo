@@ -6,8 +6,8 @@ using System.Windows.Threading;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using ABC.PInvoke.Process;
-using ABC.Windows.Desktop;
-using ABC.Windows.Desktop.Settings;
+using ABC.Managers.Windows;
+using ABC.Managers.Windows.Settings;
 using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
@@ -128,7 +128,7 @@ namespace Laevo.Model
 			var vdmManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			WindowClipboard = vdmManager; // Only expose window clipboard, WorkspaceManager is used to expose workspaces.
 			Log.Debug( "Desktop manager initialized." );
-
+			
 			// Initialize workspace manager.
 			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric } );
 			Log.Debug( "Workspace manager initialized." );
