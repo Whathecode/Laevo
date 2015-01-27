@@ -306,21 +306,9 @@
   <Choose>
     <When Condition="Exists($(ABC-Toolkit)) And '$(Configuration)' != 'Release'">
       <ItemGroup>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.Windows\ABC.Windows.csproj">
-          <Project>{DB8DBDF2-70BF-4712-86DA-06674986BC12}</Project>
-          <Name>ABC.Windows</Name>
-        </ProjectReference>
         <ProjectReference Include="$(ABC-Toolkit)\ABC.PInvoke\ABC.PInvoke.csproj">
           <Project>{072142C4-284E-4F1A-A1FE-F886E8ECF728}</Project>
           <Name>ABC.PInvoke</Name>
-        </ProjectReference>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.Interruptions\ABC.Interruptions.csproj">
-          <Project>{582661FF-FF3D-4CD3-8A52-3C75447E9F69}</Project>
-          <Name>ABC.Interruptions</Name>
-        </ProjectReference>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.Applications\ABC.Applications.csproj">
-          <Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
-          <Name>ABC.Applications</Name>
         </ProjectReference>
         <ProjectReference Include="$(ABC-Toolkit)\ABC\ABC.csproj">
           <Project>{d53f1095-6dc0-4950-982f-3322aae74a50}</Project>
@@ -330,17 +318,8 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="ABC.Windows">
-          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Windows.dll</HintPath>
-        </Reference>
         <Reference Include="ABC.PInvoke">
           <HintPath>..\..\Libraries\ABC Toolkit\ABC.PInvoke.dll</HintPath>
-        </Reference>
-        <Reference Include="ABC.Interruptions">
-          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Interruptions.dll</HintPath>
-        </Reference>
-        <Reference Include="ABC.Applications">
-          <HintPath>..\..\Libraries\ABC Toolkit\ABC.Applications.dll</HintPath>
         </Reference>
         <Reference Include="ABC">
           <HintPath>..\..\Libraries\ABC Toolkit\ABC.dll</HintPath>
