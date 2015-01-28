@@ -3,9 +3,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Threading;
+using ABC;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
-using ABC.PInvoke.Process;
+using ABC.Workspaces;
 using ABC.Workspaces.Windows;
 using ABC.Workspaces.Windows.Settings;
 using Laevo.Data.Model;
@@ -15,7 +16,6 @@ using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Threading;
-using WorkspaceManager = ABC.Workspaces.WorkspaceManager;
 
 
 namespace Laevo.Model
