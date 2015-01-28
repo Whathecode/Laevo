@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using ABC.Managers.Windows;
+using ABC.Workspaces.Windows;
 using Laevo.ViewModel.Main.Unresponsive.Binding;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
