@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC;
+using ABC.Workspaces;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Microsoft.WindowsAPICodePack.Shell;

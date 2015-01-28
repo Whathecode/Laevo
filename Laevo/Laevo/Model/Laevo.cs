@@ -6,8 +6,8 @@ using System.Windows.Threading;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using ABC.PInvoke.Process;
-using ABC.Managers.Windows;
-using ABC.Managers.Windows.Settings;
+using ABC.Workspaces.Windows;
+using ABC.Workspaces.Windows.Settings;
 using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
@@ -15,7 +15,7 @@ using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Threading;
-using WorkspaceManager = ABC.WorkspaceManager;
+using WorkspaceManager = ABC.Workspaces.WorkspaceManager;
 
 
 namespace Laevo.Model

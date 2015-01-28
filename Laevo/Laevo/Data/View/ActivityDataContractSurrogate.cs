@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC;
+using ABC.Workspaces;
 
 
 namespace Laevo.Data.View
