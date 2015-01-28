@@ -14,7 +14,7 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
-using Window = ABC.Common.Window;
+using Window = ABC.Window;
 
 
 namespace Laevo.ViewModel.ActivityOverview
