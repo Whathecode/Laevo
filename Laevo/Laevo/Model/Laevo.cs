@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Threading;
-using ABC;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using ABC.Workspaces;
@@ -15,6 +14,7 @@ using Laevo.Model.AttentionShifts;
 using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
+using Whathecode.System.Management;
 using Whathecode.System.Windows.Threading;
 
 
