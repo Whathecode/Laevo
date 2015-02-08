@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
+using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
@@ -81,10 +82,11 @@ namespace Laevo.View.TaskList
 
 			// Reposition tasks while dragging.
 			Point currentPosition = e.GetPosition( Tasks );
+			double clampedX = new Interval<double>( 0, Tasks.ActualWidth ).Clamp( currentPosition.X );
 			var viewModel = (ActivityOverviewViewModel)DataContext;
 			ObservableCollection<ActivityViewModel> tasks = viewModel.Tasks;
 			int draggedIndex = tasks.IndexOf( _draggedTaskViewModel );
-			int currentIndex = (int)Math.Floor( currentPosition.X / ( Tasks.ActualWidth / tasks.Count ) );
+			int currentIndex = (int)Math.Floor( clampedX / ( Tasks.ActualWidth / tasks.Count ) );
 			if ( draggedIndex != currentIndex )
 			{
 				viewModel.SwapTaskOrder( _draggedTaskViewModel, tasks[ currentIndex ] );
