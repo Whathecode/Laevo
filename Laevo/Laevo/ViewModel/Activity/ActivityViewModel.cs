@@ -720,9 +720,9 @@ namespace Laevo.ViewModel.Activity
 				activity.RemovePlanning();
 
 				// When no intervals are left, also remove the activity.
-				if ( WorkIntervals.Count == 0 )
+				if ( activity.WorkIntervals.Count == 0 )
 				{
-					Remove();
+					activity.Remove();
 				}
 			}
 			else
