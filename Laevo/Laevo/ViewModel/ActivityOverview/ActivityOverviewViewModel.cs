@@ -445,7 +445,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 
-			// Based on where the to do item is dropped, open, or plan it.
+			// Based on where the activity is dropped, open, or plan it.
 			bool openEdit = false;
 			if ( IsFocusedTimeBeforeNow )
 			{
