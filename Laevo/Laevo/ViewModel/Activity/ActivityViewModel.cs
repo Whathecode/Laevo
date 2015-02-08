@@ -130,7 +130,6 @@ namespace Laevo.ViewModel.Activity
 		TimeInterval _currentActiveTimeSpan;
 
 		bool _showActiveTimeSpans;
-
 		public bool ShowActiveTimeSpans
 		{
 			set
@@ -299,11 +298,11 @@ namespace Laevo.ViewModel.Activity
 			_workspaceManager = workspaceManager;
 			_workspace = storedViewModel._workspace ?? workspaceManager.CreateEmptyWorkspace();
 			NeedsSuspension = _workspace.HasResourcesToSuspend();
-
-			Icon = storedViewModel.Icon;
-			Color = storedViewModel.Color;
 			IsSuspended = storedViewModel.IsSuspended;
+
 			IsEditable = storedViewModel.IsEditable;
+			Color = storedViewModel.Color;
+			Icon = storedViewModel.Icon;
 
 			CommonInitialize();
 
@@ -314,11 +313,9 @@ namespace Laevo.ViewModel.Activity
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
 				.ToList();
-
 			IEnumerable<WorkIntervalViewModel> plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
-
 			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
 				WorkIntervals.Add( i );
@@ -516,14 +513,6 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals.Add( CreateWorkInterval() );
 			}
 
-			if ( IsActive )
-			{
-				var beforeLastWorkInterval = WorkIntervals[ WorkIntervals.Count - 2 ];
-				var lastActiveTimeSpan = beforeLastWorkInterval.ActiveTimeSpans.Last();
-				beforeLastWorkInterval.ActiveTimeSpans.Remove( lastActiveTimeSpan );
-				WorkIntervals.Last().ActiveTimeSpans.Add( lastActiveTimeSpan );
-			}
-
 			Activity.Open();
 		}
 
@@ -674,7 +663,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			StopActivity();
+			Activity.Stop();
 
 			DateTime at = atTime;
 			TimeSpan duration = TimeSpan.FromHours( 1 );
@@ -769,7 +758,10 @@ namespace Laevo.ViewModel.Activity
 				if ( lastWorkInterval != null )
 				{
 					ObservableCollection<TimeInterval> activeTimeSpans = lastWorkInterval.ActiveTimeSpans;
-					activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan;
+					if ( activeTimeSpans.Count > 0 )
+					{
+						activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan;
+					}
 				}
 			}
 		}
@@ -790,20 +782,25 @@ namespace Laevo.ViewModel.Activity
 
 		WorkIntervalViewModel CreateWorkInterval()
 		{
-			var newActivity = new WorkIntervalViewModel( this )
+			var newInterval = new WorkIntervalViewModel( this )
 			{
 				Occurance = DateTime.Now,
 				ShowActiveTimeSpans = _showActiveTimeSpans
 			};
 
+			if ( IsActive )
+			{
+				newInterval.ActiveTimeSpans.Add( _currentActiveTimeSpan );
+			}
+
 			var lastInterval = WorkIntervals.LastOrDefault();
 			if ( lastInterval != null )
 			{
-				newActivity.HeightPercentage = lastInterval.HeightPercentage;
-				newActivity.OffsetPercentage = lastInterval.OffsetPercentage;
+				newInterval.HeightPercentage = lastInterval.HeightPercentage;
+				newInterval.OffsetPercentage = lastInterval.OffsetPercentage;
 			}
 
-			return newActivity;
+			return newInterval;
 		}
 
 		WorkIntervalViewModel CreateWorkInterval( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
