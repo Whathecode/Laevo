@@ -61,9 +61,15 @@ namespace Laevo.Data.Model
 			}
 
 			// Set home activity.
-			HomeActivity = Activities.Count > 0
-				? Activities.MinBy( a => a.DateCreated )
-				: CreateNewActivity( "Home" );
+			if ( Activities.Count > 0 )
+			{
+				HomeActivity = Activities.MinBy( a => a.DateCreated );
+			}
+			else
+			{
+				HomeActivity = CreateNewActivity( "Home" );
+				HomeActivity.MakeToDo();
+			}
 
 			// Add tasks from previous sessions.
 			if ( File.Exists( _tasksFile ) )

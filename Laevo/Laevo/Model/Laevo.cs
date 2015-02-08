@@ -143,7 +143,7 @@ namespace Laevo.Model
 
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;
-			HomeActivity.Activate();
+			HomeActivity.View();
 
 			// Set up interruption handlers.
 			_interruptionTrigger.InterruptionReceived += interruption =>
