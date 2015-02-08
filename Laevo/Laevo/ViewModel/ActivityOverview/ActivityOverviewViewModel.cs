@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
@@ -64,8 +63,6 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
-
-		readonly BitmapImage _defaultIcon;
 
 		/// <summary>
 		///   Timer used to update data regularly.
@@ -129,13 +126,13 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 			_dataRepository = dataRepository;
 
-			_defaultIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
 			var homeIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace, false )
+			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace )
 			{
-				Icon = homeIcon
+				Icon = homeIcon,
+				IsEditable = false
 			};
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity();
@@ -170,7 +167,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
-				Icon = _defaultIcon,
 				IsUnnamed = true
 			};
 			lock ( Activities )
@@ -186,10 +182,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager )
-			{
-				Icon = _defaultIcon
-			};
+			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager );
 			AddTask( newTask );
 		}
 

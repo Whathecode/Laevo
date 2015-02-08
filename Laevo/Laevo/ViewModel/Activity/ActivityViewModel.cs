@@ -19,6 +19,7 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Color = System.Windows.Media.Color;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
@@ -50,6 +51,7 @@ namespace Laevo.ViewModel.Activity
 		};
 
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
+		public static readonly BitmapImage DefaultIcon;
 
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
@@ -243,7 +245,7 @@ namespace Laevo.ViewModel.Activity
 
 		[DataMember]
 		[NotifyProperty( Binding.Properties.IsEditable )]
-		public bool IsEditable { get; private set; }
+		public bool IsEditable { get; set; }
 
 		/// <summary>
 		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
@@ -266,22 +268,23 @@ namespace Laevo.ViewModel.Activity
 				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
 				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
 				.ToList();
+			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) ); 
 		}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
 			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) { }
 
-		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace, bool isEditable = true )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace )
 		{
 			Contract.Requires( activity != null );
 
 			Activity = activity;
-
 			_workspaceManager = workspaceManager;
 			_workspace = workspace;
 
+			IsEditable = true;
 			Color = DefaultColor;
-			IsEditable = isEditable;
+			Icon = DefaultIcon;
 
 			CommonInitialize();
 		}
@@ -306,13 +309,13 @@ namespace Laevo.ViewModel.Activity
 
 			// Initialize all work intervals.
 			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the timeline.
-			var dontDisplay = Activity.PlannedIntervals.Select( p => new TimeInterval( p.PlannedAt, p.Interval.End ) ).ToList();
-			var openIntervals = Activity.OpenIntervals
+			List<TimeInterval> dontDisplay = Activity.PlannedIntervals.Select( p => new TimeInterval( p.PlannedAt, p.Interval.End ) ).ToList();
+			List<WorkIntervalViewModel> openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
 				.ToList();
 
-			var plannedIntervals = Activity.PlannedIntervals
+			IEnumerable<WorkIntervalViewModel> plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
 
@@ -329,8 +332,6 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
 				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
 			}
-
-			_currentActiveTimeSpan = null;
 		}
 
 		void CommonInitialize()
