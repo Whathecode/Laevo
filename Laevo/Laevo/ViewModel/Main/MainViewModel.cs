@@ -114,8 +114,8 @@ namespace Laevo.ViewModel.Main
 		public void Exit()
 		{
 			_activityOverviewViewModel.Exit();
-			Persist();
 			_model.Exit();
+			Persist();
 
 			Application.Current.Shutdown();
 		}

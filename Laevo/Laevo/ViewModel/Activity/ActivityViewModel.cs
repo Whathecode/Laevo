@@ -2,22 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ABC.Workspaces;
+using ABC.Workspaces.Library;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
-using Microsoft.WindowsAPICodePack.Shell;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -54,17 +50,6 @@ namespace Laevo.ViewModel.Activity
 		};
 
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
-
-		/// <summary>
-		///   Path of the folder which contains the file libraries.
-		/// </summary>
-		const string LibraryName = "Activity Context";
-
-		/// <summary>
-		///   The extension of microsoft libraries.
-		/// </summary>
-		const string LibraryExtension = "library-ms";
-
 
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
@@ -188,9 +173,18 @@ namespace Laevo.ViewModel.Activity
 			IsUnnamed = false;
 			Activity.Name = newLabel;
 
-			if ( _overview != null && _overview.CurrentActivityViewModel == this )
+			// Attempt renaming the specific folder of the activity.
+			string oldFolder = Activity.SpecificFolder.LocalPath;
+			string newFolder = Activity.UpdateSpecificFolder().LocalPath;
+
+			// Update the Windows Shell Library paths to the new specific folder.
+			if ( oldFolder != newFolder )
 			{
-				InitializeLibrary();
+				Library library = _workspace.GetInnerWorkspace<Library>();
+				List<string> paths = library.Paths.ToList();
+				paths.Remove( oldFolder );
+				paths.Add( newFolder );
+				library.SetPaths( paths );
 			}
 		}
 
@@ -247,6 +241,7 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; private set; }
 
+		[DataMember]
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; private set; }
 
@@ -305,7 +300,7 @@ namespace Laevo.ViewModel.Activity
 			Icon = storedViewModel.Icon;
 			Color = storedViewModel.Color;
 			IsSuspended = storedViewModel.IsSuspended;
-			IsEditable = true;
+			IsEditable = storedViewModel.IsEditable;
 
 			CommonInitialize();
 
@@ -344,6 +339,15 @@ namespace Laevo.ViewModel.Activity
 			IsOpen = Activity.IsOpen;
 			Label = Activity.Name;
 			IsToDo = Activity.IsToDo;
+
+			// Set Windows Shell Library folder.
+			Library library = _workspace.GetInnerWorkspace<Library>();
+			List<string> paths = library.Paths.ToList();
+			if ( !paths.Contains( Activity.SpecificFolder.LocalPath ) )
+			{
+				paths.Add( Activity.SpecificFolder.LocalPath );
+			}
+			library.SetPaths( paths );
 
 			Activity.ActivatedEvent += a => IsActive = true;
 			Activity.DeactivatedEvent += a =>
@@ -431,8 +435,6 @@ namespace Laevo.ViewModel.Activity
 
 			// Initialize desktop.
 			_workspaceManager.SwitchToWorkspace( _workspace );
-			
-			InitializeLibrary();
 
 			OpenInterruptions();
 
@@ -455,8 +457,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivityLibrary )]
 		public void OpenActivityLibrary()
 		{
-			string folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
-			Process.Start( "explorer.exe", Path.ChangeExtension( folderName, LibraryExtension ) );
+			_workspace.GetInnerWorkspace<Library>().Open();
 		}
 
 		[CommandExecute( Commands.SelectActivity )]
@@ -719,9 +720,6 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
-			// Make sure that the current selected libraries are up to date, prior to merging the folders of the other activity.
-			UpdateLibrary();
-
 			Activity.Merge( activity.Activity );
 
 			// Ensure the correct activity is activated and its initialized properly.
@@ -729,11 +727,6 @@ namespace Laevo.ViewModel.Activity
 			{
 				// One virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
 				ActivateActivity( false );
-			}
-			else if ( _overview.CurrentActivityViewModel == this )
-			{
-				// The data paths of the merged activity need to be added to the library.
-				InitializeLibrary();
 			}
 			_workspaceManager.Merge( activity._workspace, _workspace );
 
@@ -745,75 +738,6 @@ namespace Laevo.ViewModel.Activity
 			else
 			{
 				activity.StopActivity();
-			}
-		}
-
-		/// <summary>
-		///   Store activity context paths from the shell library to this activity. This only works when this activity is active.
-		/// </summary>
-		void UpdateLibrary()
-		{
-			if ( _overview.CurrentActivityViewModel != this )
-			{
-				return;
-			}
-
-			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
-			{
-				var dataPaths = new List<Uri>();
-				foreach ( var folder in activityContext )
-				{
-					dataPaths.Add( new Uri( folder.Path ) );
-				}
-				Activity.SetNewDataPaths( dataPaths );
-			}
-		}
-
-		/// <summary>
-		///   Initialize the library which contains all the context files. This should only be called when the activity is currently active.
-		/// </summary>
-		void InitializeLibrary()
-		{
-			// Initialize the shell library.
-			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
-			var dataPaths = Activity.GetUpdatedDataPaths().ToArray();
-
-			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
-			{
-				// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the icon of the executing assembly.
-				activityContext.IconResourceId = new IconReference( Assembly.GetExecutingAssembly().Location, 0 );
-
-				int retries = 5;
-				var pathsToAdd = new List<Uri>();
-				pathsToAdd.AddRange( dataPaths );
-				while ( pathsToAdd.Count > 0 && retries > 0 )
-				{
-					foreach ( Uri path in dataPaths )
-					{
-						try
-						{
-							activityContext.Add( path.LocalPath );
-							pathsToAdd.Remove( path );
-						}
-						catch ( COMException )
-						{
-							// TODO: How to handle/prevent the COMException which is sometimes thrown?
-							// System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced.
-						}
-						finally
-						{
-							--retries;
-						}
-					}
-				}
-				if ( pathsToAdd.Count > 0 )
-				{
-					View.MessageBox.Show(
-						"Something went wrong while initializing the Activity Context library, see whether this error still occurs when reopening this activity.",
-						"Error initializing Activity Context Library",
-						MessageBoxButton.OK,
-						MessageBoxImage.Error );
-				}
 			}
 		}
 
@@ -858,9 +782,6 @@ namespace Laevo.ViewModel.Activity
 			{
 				return;
 			}
-
-			// Storing activity context paths can't be done in Persist(), since the same library is shared across activities.
-			UpdateLibrary();
 
 			Activity.Deactivate();
 			_currentActiveTimeSpan = null;

@@ -133,7 +133,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			var homeIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
 
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.CurrentWorkspace, false )
+			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace, false )
 			{
 				Icon = homeIcon
 			};
@@ -521,8 +521,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_updateTimer.Stop();
 			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
-
-			_model.WorkspaceManager.Close();
 		}
 	}
 }
