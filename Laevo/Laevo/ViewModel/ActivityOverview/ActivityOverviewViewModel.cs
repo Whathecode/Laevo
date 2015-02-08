@@ -135,7 +135,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				IsEditable = false
 			};
 			HookActivityToOverview( HomeActivity );
-			HomeActivity.ActivateActivity();
+			HomeActivity.ActivateActivity( false );
 
 			// Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
 			Activities.Concat( Tasks ).Distinct().ForEach( HookActivityToOverview );

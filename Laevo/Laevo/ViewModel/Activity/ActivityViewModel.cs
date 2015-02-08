@@ -422,11 +422,10 @@ namespace Laevo.ViewModel.Activity
 				Activity.View();
 			}
 
-			// The only activity which can be active and does not have work intervals is home. Avoid adding active intervals.
-			// TODO: Why would 'ActivityViewModel' need to be aware about a 'home' activity? This dependency should be removed.
+			// Update active time spans.
 			DateTime now = DateTime.Now;
 			_currentActiveTimeSpan = new TimeInterval( now, now );
-			if ( WorkIntervals.Count > 0 )
+			if ( !IsToDo )
 			{
 				WorkIntervals.Last().ActiveTimeSpans.Add( _currentActiveTimeSpan );
 			}
@@ -709,7 +708,7 @@ namespace Laevo.ViewModel.Activity
 			// Ensure the correct activity is activated and its initialized properly.
 			if ( _overview.CurrentActivityViewModel == activity )
 			{
-				// One virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
+				// One workspace needs to be active at all times, so in case the current workspace is being merged, activate the target workspace.
 				ActivateActivity( false );
 			}
 			_workspaceManager.Merge( activity._workspace, _workspace );
