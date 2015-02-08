@@ -182,7 +182,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager );
+			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager )
+			{
+				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
+				IsUnnamed = true
+			};
 			AddTask( newTask );
 		}
 
