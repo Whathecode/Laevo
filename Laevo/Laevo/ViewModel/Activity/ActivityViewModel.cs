@@ -632,12 +632,6 @@ namespace Laevo.ViewModel.Activity
 			{
 				WorkIntervals.Remove( i );
 			}
-
-			// When no intervals are left, also remove the activity.
-			if ( WorkIntervals.Count == 0 )
-			{
-				Remove();
-			}
 		}
 
 		[CommandCanExecute( Commands.RemovePlanning )]
@@ -724,6 +718,12 @@ namespace Laevo.ViewModel.Activity
 			if ( activity.IsToDo || activity.GetFutureWorkIntervals().Any() )
 			{
 				activity.RemovePlanning();
+
+				// When no intervals are left, also remove the activity.
+				if ( WorkIntervals.Count == 0 )
+				{
+					Remove();
+				}
 			}
 			else
 			{
