@@ -288,10 +288,7 @@ namespace Laevo.ViewModel.Activity
 			CommonInitialize();
 		}
 
-		public ActivityViewModel(
-			Model.Activity activity,
-			WorkspaceManager workspaceManager,
-			ActivityViewModel storedViewModel )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, ActivityViewModel storedViewModel )
 		{
 			Activity = activity;
 
