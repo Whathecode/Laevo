@@ -19,44 +19,45 @@ namespace Laevo.Data.View
 	/// <author>Steven Jeuris</author>
 	class DataContractSerializedViewRepository : AbstractMemoryViewRepository
 	{
-		readonly string _activitiesFile;
-		readonly string _tasksFile;
+		[DataContract]
+		class Data
+		{
+			[DataMember]
+			public ActivityViewModel Home;
+			[DataMember]
+			public Dictionary<Guid, ActivityViewModel> Activities = new Dictionary<Guid, ActivityViewModel>();
+			[DataMember]
+			public Dictionary<Guid, ActivityViewModel> Tasks = new Dictionary<Guid, ActivityViewModel>();
+		}
 
-		readonly DataContractSerializer _activitySerializer;
+
+		readonly string _file;
+		readonly DataContractSerializer _serializer;
 
 
 		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
 		{
-			_activitiesFile = Path.Combine( programDataFolder, "ActivityRepresentations.xml" );
-			_tasksFile = Path.Combine( programDataFolder, "TaskRepresentations.xml" );
+			_file = Path.Combine( programDataFolder, "ActivityRepresentations.xml" );
 
 			// Check for stored presentation options for existing activities and tasks.
-			_activitySerializer = new DataContractSerializer(
-				typeof( Dictionary<Guid, ActivityViewModel> ),
+			_serializer = new DataContractSerializer(
+				typeof( Data ),
 				workspaceManager.GetPersistedDataTypes().Concat( persistenceProvider.GetPersistedDataTypes() ),
 				Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( workspaceManager ) );
-			var existingActivities = new Dictionary<Guid, ActivityViewModel>();
-			if ( File.Exists( _activitiesFile ) )
+			Data loadedData = new Data();
+			if ( File.Exists( _file ) )
 			{
-				using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Open ) )
+				using ( var activitiesFileStream = new FileStream( _file, FileMode.Open ) )
 				{
-					existingActivities = (Dictionary<Guid, ActivityViewModel>)_activitySerializer.ReadObject( activitiesFileStream );
-				}
-			}
-			var existingTasks = new Dictionary<Guid, ActivityViewModel>();
-			if ( File.Exists( _tasksFile ) )
-			{
-				using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Open ) )
-				{
-					existingTasks = (Dictionary<Guid, ActivityViewModel>)_activitySerializer.ReadObject( tasksFileStream );
+					loadedData = (Data)_serializer.ReadObject( activitiesFileStream );
 				}
 			}
 
 			// Initialize a view model for all activities from previous sessions.
-			foreach ( var activity in modelData.Activities.Where( a => !a.Equals( modelData.HomeActivity ) ) )
+			foreach ( var activity in modelData.Activities )
 			{
-				if ( !existingActivities.ContainsKey( activity.Identifier ) )
+				if ( !loadedData.Activities.ContainsKey( activity.Identifier ) )
 				{
 					continue;
 				}
@@ -64,7 +65,7 @@ namespace Laevo.Data.View
 				// Create and hook up the view model.
 				var viewModel = new ActivityViewModel(
 					activity, workspaceManager,
-					existingActivities[ activity.Identifier ]);
+					loadedData.Activities[ activity.Identifier ]);
 				Activities.Add( viewModel );
 			}
 
@@ -72,14 +73,20 @@ namespace Laevo.Data.View
 			// ReSharper disable ImplicitlyCapturedClosure
 			var taskViewModels =
 				from task in modelData.Tasks
-				where existingTasks.ContainsKey( task.Identifier )
+				where loadedData.Tasks.ContainsKey( task.Identifier )
 				select new ActivityViewModel(
 					task, workspaceManager,
-					existingTasks[ task.Identifier ]);
+					loadedData.Tasks[ task.Identifier ]);
 			// ReSharper restore ImplicitlyCapturedClosure
 			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
 			{
 				Tasks.Add( task );
+			}
+
+			// Initialize home from previous session.
+			if ( loadedData.Home != null )
+			{
+				Home = new ActivityViewModel( modelData.HomeActivity, workspaceManager, loadedData.Home );
 			}
 
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
@@ -97,18 +104,19 @@ namespace Laevo.Data.View
 
 		public override void SaveChanges()
 		{
-			// Persist activities.
+			// Persist activities and tasks.
 			lock ( Activities )
-			{
-				Activities.ForEach( a => a.Persist() );
-				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, Activities.ToDictionary( a => a.Identifier, a => a ) );
-			}
-
-			// Persist tasks.
 			lock ( Tasks )
 			{
-				Tasks.ForEach( t => t.Persist() );
-				PersistanceHelper.Persist( _tasksFile, _activitySerializer, Tasks.ToDictionary( a => a.Identifier, a => a ) );
+				Activities.ForEach( a => a.Persist() );
+				Tasks.ForEach( a => a.Persist() );
+				var data = new Data()
+				{
+					Home = Home,
+					Activities = Activities.ToDictionary( a => a.Identifier, a => a ),
+					Tasks = Tasks.ToDictionary( t => t.Identifier, t => t )
+				};
+				PersistanceHelper.Persist( _file, _serializer, data );
 			}
 		}
 	}

@@ -10,6 +10,7 @@ namespace Laevo.Data.View
 	/// <author>Steven Jeuris</author>
 	public interface IViewRepository
 	{
+		ActivityViewModel Home { get; set; }
 		ObservableCollection<ActivityViewModel> Activities { get; }
 		ObservableCollection<ActivityViewModel> Tasks { get; }
 

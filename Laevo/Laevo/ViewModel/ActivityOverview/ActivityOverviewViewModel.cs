@@ -110,6 +110,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; private set; }
 
+		[NotifyPropertyChanged( Binding.Properties.HomeActivity )]
+		public void OnHomeActivityChanged( ActivityViewModel oldActivity, ActivityViewModel newActivity )
+		{
+			_dataRepository.Home = newActivity;
+		}
+
 		public ObservableCollection<ActivityViewModel> Activities
 		{
 			get { return _dataRepository.Activities; }
@@ -126,14 +132,19 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 			_dataRepository = dataRepository;
 
-			var homeIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
-
-			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace )
+			// Set up home activity.
+			if ( _dataRepository.Home != null )
 			{
-				Icon = homeIcon,
-				IsEditable = false
-			};
+				HomeActivity = _dataRepository.Home;
+			}
+			else
+			{
+				HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace )
+				{
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) ),
+					IsEditable = false
+				};	
+			}
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity( false );
 

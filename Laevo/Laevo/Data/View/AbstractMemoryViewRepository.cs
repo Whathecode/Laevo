@@ -10,6 +10,8 @@ namespace Laevo.Data.View
 	/// <author>Steven Jeuris</author>
 	abstract class AbstractMemoryViewRepository : IViewRepository
 	{
+		public ActivityViewModel Home { get; set; }
+
 		readonly ObservableCollection<ActivityViewModel> _activities = new ObservableCollection<ActivityViewModel>();
 		public ObservableCollection<ActivityViewModel> Activities
 		{
