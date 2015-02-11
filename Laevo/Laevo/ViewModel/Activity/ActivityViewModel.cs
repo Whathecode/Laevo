@@ -175,17 +175,20 @@ namespace Laevo.ViewModel.Activity
 			Activity.Name = newLabel;
 
 			// Attempt renaming the specific folder of the activity.
-			string oldFolder = Activity.SpecificFolder.LocalPath;
-			string newFolder = Activity.UpdateSpecificFolder().LocalPath;
-
-			// Update the Windows Shell Library paths to the new specific folder.
-			if ( oldFolder != newFolder )
+			if ( IsAccessible ) // Do not rename merged folders, as not to break any links created while merging.
 			{
-				Library library = _workspace.GetInnerWorkspace<Library>();
-				List<string> paths = library.Paths.ToList();
-				paths.Remove( oldFolder );
-				paths.Add( newFolder );
-				library.SetPaths( paths );
+				string oldFolder = Activity.SpecificFolder.LocalPath;
+				string newFolder = Activity.UpdateSpecificFolder().LocalPath;
+
+				// Update the Windows Shell Library paths to the new specific folder.
+				if ( oldFolder != newFolder )
+				{
+					Library library = _workspace.GetInnerWorkspace<Library>();
+					List<string> paths = library.Paths.ToList();
+					paths.Remove( oldFolder );
+					paths.Add( newFolder );
+					library.SetPaths( paths );
+				}
 			}
 		}
 
@@ -246,6 +249,10 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.IsEditable )]
 		public bool IsEditable { get; set; }
 
+		[DataMember]
+		[NotifyProperty( Binding.Properties.IsAccessible )]
+		public bool IsAccessible { get; private set; }
+
 		/// <summary>
 		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
 		///   TODO: The collection should only be allowed to be modified from the view model.
@@ -282,6 +289,7 @@ namespace Laevo.ViewModel.Activity
 			_workspace = workspace;
 
 			IsEditable = true;
+			IsAccessible = true;
 			Color = DefaultColor;
 			Icon = DefaultIcon;
 
@@ -298,6 +306,7 @@ namespace Laevo.ViewModel.Activity
 			IsSuspended = storedViewModel.IsSuspended;
 
 			IsEditable = storedViewModel.IsEditable;
+			IsAccessible = storedViewModel.IsAccessible;
 			Color = storedViewModel.Color;
 			Icon = storedViewModel.Icon;
 
@@ -468,6 +477,13 @@ namespace Laevo.ViewModel.Activity
 			}
 		}
 
+		[CommandCanExecute( Commands.SelectActivity )]
+		public bool CanSelectActivity()
+		{
+			// Merged activities can not be accessed later on.
+			return IsAccessible;
+		}
+
 		[CommandExecute( Commands.EditActivity )]
 		public void EditActivity()
 		{
@@ -515,7 +531,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.OpenActivity )]
 		public bool CanOpenActivity()
 		{
-			return !Activity.IsOpen;
+			return !Activity.IsOpen && IsAccessible;
 		}
 
 		[CommandExecute( Commands.StopActivity )]
@@ -725,6 +741,9 @@ namespace Laevo.ViewModel.Activity
 			{
 				activity.StopActivity();
 			}
+
+			// Merged activities are no longer accessible.
+			activity.IsAccessible = false;
 		}
 
 		public void Update( DateTime now )
