@@ -9,7 +9,6 @@
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:activity="clr-namespace:Laevo.ViewModel.Activity"
-	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	d:DataContext="{d:DesignInstance Type=activity:ActivityViewModel}"
 	mc:Ignorable="d"
 	x:Name="Control">
@@ -106,6 +105,7 @@
 				<Image
 					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenActivity}}"
 					Visibility="{Binding IsOpen, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+					Cursor="{Binding IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
 					Style="{StaticResource StartButton}" />
 				<Image
 					behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.StopActivity}}"

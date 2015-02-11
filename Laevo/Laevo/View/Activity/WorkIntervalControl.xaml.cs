@@ -120,7 +120,7 @@ namespace Laevo.View.Activity
 		{
 			var activity = (WorkIntervalViewModel)DataContext;
 
-			if ( e.LeftButton == MouseButtonState.Pressed && !activity.HasMoreRecentRepresentation )
+			if ( e.LeftButton == MouseButtonState.Pressed && !activity.HasMoreRecentRepresentation && activity.BaseActivity.IsAccessible )
 			{
 				var draggedTask = (FrameworkElement)sender;
 				var draggedActivity = activity.BaseActivity;

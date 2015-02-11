@@ -20,7 +20,8 @@
 	Panel.ZIndex="10"
 	activityOverview:TimeLineControl.Occurance="{Binding Occurance}"
 	activityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
-	ClipToBounds="False">
+	ClipToBounds="False"
+	Opacity="{Binding Path=BaseActivity.IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.6}}">
 
 	<activityOverview:TimeLineControl.Offset>
 		<MultiBinding Mode="TwoWay">
@@ -79,7 +80,7 @@
 							x:Name="Image"
 							Source="{Binding Path=Icon}"
 							Stretch="None"
-							Cursor="Hand"
+							Cursor="{Binding IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
 							AllowDrop="False"
 							MouseMove="StartDrag"
 							GiveFeedback="DragFeedback"
@@ -155,7 +156,7 @@
 			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
 			behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
 			MouseMove="OnMouseMoved"
-			Cursor="Hand"
+			Cursor="{Binding IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
 			Panel.ZIndex="15"
 			ClipToBounds="True"
 			AllowDrop="True"
