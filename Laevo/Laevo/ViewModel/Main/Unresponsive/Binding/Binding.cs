@@ -9,7 +9,7 @@
 
 	public enum Commands
 	{
-		IgnoreSingle,
-		KeepSingle
+		Ignore,
+		Keep
 	}
 }

@@ -10,7 +10,6 @@
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	xmlns:binding="clr-namespace:Laevo.ViewModel.Main.Unresponsive.Binding"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
-	xmlns:main="clr-namespace:Laevo.View.Main"
 	xmlns:unresponsive1="clr-namespace:Laevo.View.Main.Unresponsive"
 	d:DataContext="{d:DesignInstance Type=unresponsive:UnresponsiveViewModel}"
 	WindowStyle="None"
@@ -26,14 +25,6 @@
 	Topmost="True">
 
 	<Window.Resources>
-		<!-- Styles -->
-
-		<!--<Style TargetType="Label">
-			<Setter Property="Foreground" Value="White" />
-		</Style>
-		<Style TargetType="Button">
-			<Setter Property="Padding" Value="10, 0, 10, 0" />
-		</Style>-->
 		<common:PopupIconMarginConverter x:Key="PopupIconMarginConverter" AddMargin="20" />
 	</Window.Resources>
 
@@ -69,7 +60,7 @@
 			</Grid.RowDefinitions>
 
 			<Canvas>
-				<Image x:Name="Image" Source="../Common/Alert.png">
+				<Image x:Name="Image" Source="../../Common/Alert.png">
 					<Image.Margin>
 						<MultiBinding Converter="{StaticResource PopupIconMarginConverter}">
 							<Binding ElementName="Image" Path="ActualWidth" />
@@ -95,7 +86,7 @@
 				Margin="0, 20, 0, 20"
 				ItemsSource="{Binding UnresponsiveWindows}"
 				SelectedIndex="{Binding SelectedApplicationIndex}" 
-				SelectionMode="Multiple"
+				SelectionMode="Extended"
 				IsSelected="True">
 				<ListView.BorderBrush>
 					<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
@@ -153,12 +144,12 @@
 					Grid.Column="0"
 					Content="Keep"
 					unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
-					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.KeepSingle}}" />
+					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Keep}}" />
 				<Button
 					Grid.Column="1"
 					Content="Ignore"
 					unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
-					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.IgnoreSingle}}" />
+					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Ignore}}" />
 			</Grid>
 		</Grid>
 	</Border>
