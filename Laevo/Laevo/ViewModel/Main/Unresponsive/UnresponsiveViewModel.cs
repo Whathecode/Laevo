@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using ABC.Workspaces.Windows;
 using Laevo.ViewModel.Main.Unresponsive.Binding;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
-using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
@@ -16,38 +15,30 @@ namespace Laevo.ViewModel.Main.Unresponsive
 		public delegate void UnresponsiveEventHandler();
 
 		/// <summary>
-		///   Event which is triggered when all unresponsive window are handled.
+		///   Event which is triggered when all unresponsive windows are handled.
 		/// </summary>
 		public event UnresponsiveEventHandler UnresponsiveHandled;
 
 		[NotifyProperty( Binding.Properties.UnresponsiveWindows )]
-		public ObservableCollection<string> UnresponsiveWindows { get; set; }
-
-		[NotifyProperty( Binding.Properties.Desktop )]
-		public VirtualDesktop Desktop { get; private set; }
+		public ObservableCollection<UnresponsiveWindow> UnresponsiveWindows { get; private set; }
 
 		[NotifyProperty( Binding.Properties.SelectedApplication )]
 		public int SelectedApplicationIndex { get; set; }
 
-		readonly Dictionary<string, WindowSnapshot> _unresponsiveWindows;
-		public List<string> SelectedItems { get; set; }
+		public List<UnresponsiveWindow> SelectedItems { get; set; }
 
-		public UnresponsiveViewModel( List<WindowSnapshot> windows, VirtualDesktop desktop )
+		public UnresponsiveViewModel( List<WindowSnapshot> windows )
 		{
-			SelectedItems = new List<string>();
-
-			_unresponsiveWindows = new Dictionary<string, WindowSnapshot>();
-			UnresponsiveWindows = new ObservableCollection<string>();
+			SelectedItems = new List<UnresponsiveWindow>();
+			UnresponsiveWindows = new ObservableCollection<UnresponsiveWindow>();
 
 			windows.ForEach( w =>
 			{
 				var processName = w.Window.GetProcess().ProcessName;
 				var processId = w.Window.GetProcess().Id;
 
-				UnresponsiveWindows.Add( processName + " (process id: " + processId + ")" );
-				_unresponsiveWindows.Add( processName + " (process id: " + processId + ")", w );
+				UnresponsiveWindows.Add( new UnresponsiveWindow( processName, processId, w ) );
 			} );
-			Desktop = desktop;
 
 			SetSelectionOrClose();
 		}
@@ -56,20 +47,14 @@ namespace Laevo.ViewModel.Main.Unresponsive
 		{
 			// SelectedItems are updated from code behind (ListView component collection binding issue) 
 			// we have to create a local copy to safely enumerate over list.
-			var selectedItemsLocal = new List<string>( SelectedItems );
+			var selectedItemsLocal = new List<UnresponsiveWindow>( SelectedItems );
 			selectedItemsLocal.ForEach( selectedItemLocal => UnresponsiveWindows.Remove( selectedItemLocal ) );
 		}
 
 		[CommandExecute( Commands.Ignore )]
 		public void Ignore()
 		{
-			_unresponsiveWindows.ForEach( window => SelectedItems.ForEach( unresponsive =>
-			{
-				if ( window.Key == unresponsive )
-				{
-					window.Value.Ignore = true;
-				}
-			} ) );
+			SelectedItems.ForEach( unresponsiveWindow => { unresponsiveWindow.WindowSnapshot.Ignore = true; } );
 
 			RemoveSelected();
 			SetSelectionOrClose();

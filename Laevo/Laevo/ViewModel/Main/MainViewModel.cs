@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data.View;
@@ -51,13 +50,7 @@ namespace Laevo.ViewModel.Main
 		{
 			model.WindowClipboard.UnresponsiveWindowDetected += ( windows, desktop ) =>
 			{
-				// Allow only one thread at the time to open unresponsive pop-up, others are dismissed.
-				if ( !Monitor.TryEnter( _unresponsivePopup ) )
-				{
-					return;
-				}
-
-				var unresponsiveViewModel = new UnresponsiveViewModel( windows, desktop );
+				var unresponsiveViewModel = new UnresponsiveViewModel( windows );
 				unresponsiveViewModel.UnresponsiveHandled += () => _unresponsivePopup.Hide();
 				_unresponsivePopup.DataContext = unresponsiveViewModel;
 				ShowActivityOverview();

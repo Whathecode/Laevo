@@ -87,17 +87,27 @@
 				ItemsSource="{Binding UnresponsiveWindows}"
 				SelectedIndex="{Binding SelectedApplicationIndex}" 
 				SelectionMode="Extended"
-				IsSelected="True">
+				IsSelected="True"
+				Foreground="White">
 				<ListView.BorderBrush>
 					<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 						<GradientStop Offset="0" Color="White" />
 						<GradientStop Offset="1" Color="Transparent" />
 					</LinearGradientBrush>
 				</ListView.BorderBrush>
+
 				<ListView.Resources>
+					<DataTemplate x:Key="ListViewDataTemplate">
+						<WrapPanel>
+							<TextBlock Text="{Binding ProcessName}"/>
+							<TextBlock Text=" (PID: "/>
+							<TextBlock Text="{Binding ProcessId}"/>
+							<TextBlock Text=")"/>
+						</WrapPanel>
+					</DataTemplate>
 					<ControlTemplate x:Key="SelectedTemplate" TargetType="ListViewItem">
 						<Border CornerRadius="3" BorderBrush="Transparent" Background="#FF92C6F9" Margin="1" Cursor="Hand" Padding="3">
-							<TextBlock Text="{Binding}" Foreground="White" />
+							<ContentPresenter ContentTemplate="{StaticResource ListViewDataTemplate}"/>
 						</Border>
 					</ControlTemplate>
 					<Style TargetType="ListViewItem">
@@ -105,7 +115,7 @@
 							<Setter.Value>
 								<ControlTemplate TargetType="ListViewItem">
 									<Border BorderBrush="Transparent" Background="Transparent" Margin="1" Cursor="Hand" Padding="3">
-										<TextBlock Text="{Binding}" Foreground="White" />
+										<ContentPresenter ContentTemplate="{StaticResource ListViewDataTemplate}"/>
 									</Border>
 								</ControlTemplate>
 							</Setter.Value>

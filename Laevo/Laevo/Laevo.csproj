@@ -407,6 +407,7 @@
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
     <Compile Include="ViewModel\Main\Unresponsive\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveViewModel.cs" />
+    <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveWindow.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="View\ActivityBar\ActivityBackgroundConverter.cs" />
