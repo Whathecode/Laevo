@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
@@ -65,8 +64,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
 
-		readonly BitmapImage _defaultIcon;
-
 		/// <summary>
 		///   Timer used to update data regularly.
 		/// </summary>
@@ -113,6 +110,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; private set; }
 
+		[NotifyPropertyChanged( Binding.Properties.HomeActivity )]
+		public void OnHomeActivityChanged( ActivityViewModel oldActivity, ActivityViewModel newActivity )
+		{
+			_dataRepository.Home = newActivity;
+		}
+
 		public ObservableCollection<ActivityViewModel> Activities
 		{
 			get { return _dataRepository.Activities; }
@@ -129,16 +132,21 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model = model;
 			_dataRepository = dataRepository;
 
-			_defaultIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
-			var homeIcon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) );
-
-			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.CurrentWorkspace, false )
+			// Set up home activity.
+			if ( _dataRepository.Home != null )
 			{
-				Icon = homeIcon
-			};
+				HomeActivity = _dataRepository.Home;
+			}
+			else
+			{
+				HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace )
+				{
+					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) ),
+					IsEditable = false
+				};	
+			}
 			HookActivityToOverview( HomeActivity );
-			HomeActivity.ActivateActivity();
+			HomeActivity.ActivateActivity( false );
 
 			// Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
 			Activities.Concat( Tasks ).Distinct().ForEach( HookActivityToOverview );
@@ -170,7 +178,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
-				Icon = _defaultIcon,
 				IsUnnamed = true
 			};
 			lock ( Activities )
@@ -188,7 +195,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager )
 			{
-				Icon = _defaultIcon
+				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
+				IsUnnamed = true
 			};
 			AddTask( newTask );
 		}
@@ -448,7 +456,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				}
 			}
 
-			// Based on where the to do item is dropped, open, or plan it.
+			// Based on where the activity is dropped, open, or plan it.
 			bool openEdit = false;
 			if ( IsFocusedTimeBeforeNow )
 			{
@@ -521,8 +529,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_updateTimer.Stop();
 			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
-
-			_model.WorkspaceManager.Close();
 		}
 	}
 }

@@ -17,8 +17,19 @@ namespace Laevo.Data.Model
 	/// <author>Steven Jeuris</author>
 	class DataContractSerializedModelRepository : AbstractMemoryModelRepository
 	{
+		[DataContract]
+		class Data
+		{
+			[DataMember]
+			public Activity Home;
+			[DataMember]
+			public List<Activity> Activities = new List<Activity>();
+			[DataMember]
+			public List<Activity> Tasks = new List<Activity>(); 
+		}
+
+
 		readonly string _activitiesFile;
-		readonly string _tasksFile;
 		readonly string _attentionShiftsFile;
 		readonly string _settingsFile;
 
@@ -31,7 +42,6 @@ namespace Laevo.Data.Model
 		{
 			// Set up file paths.
 			_activitiesFile = Path.Combine( programDataFolder, "Activities.xml" );
-			_tasksFile = Path.Combine( programDataFolder, "Tasks.xml" );
 			_attentionShiftsFile = Path.Combine( programDataFolder, "AttentionShifts.xml" );
 			_settingsFile = Path.Combine( programDataFolder, "Settings.xml" );
 
@@ -46,34 +56,33 @@ namespace Laevo.Data.Model
 
 			// Initialize activity serializer.
 			// It needs to be aware about the interruption types loaded by the interruption aggregator.
-			_activitySerializer = new DataContractSerializer( typeof( List<Activity> ), interruptionAggregator.GetInterruptionTypes() );
+			_activitySerializer = new DataContractSerializer( typeof( Data ), interruptionAggregator.GetInterruptionTypes() );
 
-			// Add activities from previous sessions.
+			// Load previous data.
+			Data loadedData = new Data();
 			if ( File.Exists( _activitiesFile ) )
 			{
 				using ( var activitiesFileStream = new FileStream( _activitiesFile, FileMode.Open ) )
 				{
-					var activities = (List<Activity>)_activitySerializer.ReadObject( activitiesFileStream );
-					MemoryActivities.AddRange( activities );
-					// TODO: Can this design be improved so implementing repositories can't forget to hook up the ToDoChangedEvent?
-					activities.ForEach( a => a.ToDoChangedEvent += OnActivityToDoChanged );
+					loadedData = (Data)_activitySerializer.ReadObject( activitiesFileStream );
 				}
 			}
 
-			// Set home activity.
-			HomeActivity = Activities.Count > 0
-				? Activities.MinBy( a => a.DateCreated )
-				: CreateNewActivity( "Home" );
+			// Add activities and tasks from previous sessions.
+			MemoryActivities.AddRange( loadedData.Activities );
+			MemoryTasks.AddRange( loadedData.Tasks );
+			// TODO: Can this design be improved so implementing repositories can't forget to hook up the ToDoChangedEvent?
+			MemoryActivities.Concat( MemoryTasks ).ToList().ForEach( a => a.ToDoChangedEvent += OnActivityToDoChanged );
 
-			// Add tasks from previous sessions.
-			if ( File.Exists( _tasksFile ) )
+			// Set home activity.
+			if ( loadedData.Home != null )
 			{
-				using ( var tasksFileStream = new FileStream( _tasksFile, FileMode.Open ) )
-				{
-					var tasks = (List<Activity>)_activitySerializer.ReadObject( tasksFileStream );
-					MemoryTasks.AddRange( tasks );
-					tasks.ForEach( t => t.ToDoChangedEvent += OnActivityToDoChanged );
-				}
+				HomeActivity = loadedData.Home;
+			}
+			else
+			{
+				HomeActivity = CreateNewActivity( "Home" );
+				HomeActivity.MakeToDo();
 			}
 
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
@@ -91,7 +100,7 @@ namespace Laevo.Data.Model
 			_attentionShiftSerializer = new DataContractSerializer(
 				typeof( List<AbstractAttentionShift> ), new[] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
 				int.MaxValue, true, false,
-				new DataContractSurrogate( Activities.ToList() ) );
+				new DataContractSurrogate( Activities.Concat( Tasks ).Concat( new [] { HomeActivity } ).ToList() ) );
 			if ( File.Exists( _attentionShiftsFile ) )
 			{
 				using ( var attentionFileStream = new FileStream( _attentionShiftsFile, FileMode.Open ) )
@@ -110,17 +119,18 @@ namespace Laevo.Data.Model
 				PersistanceHelper.Persist( _settingsFile, SettingsSerializer, Settings );
 			}
 
-			// Persist activities.
+			// Persist activities and tasks
 			// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
 			lock ( MemoryActivities )
-			{
-				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, MemoryActivities );
-			}
-
-			// Persist tasks.
 			lock ( MemoryTasks )
 			{
-				PersistanceHelper.Persist( _tasksFile, _activitySerializer, MemoryTasks );
+				Data data = new Data()
+				{
+					Home = HomeActivity,
+					Activities = MemoryActivities,
+					Tasks = MemoryTasks
+				};
+				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, data );
 			}
 
 			// Persist attention shifts.

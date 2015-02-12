@@ -2,27 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ABC.Workspaces;
+using ABC.Workspaces.Library;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
-using Microsoft.WindowsAPICodePack.Shell;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Color = System.Windows.Media.Color;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
 
@@ -54,17 +51,7 @@ namespace Laevo.ViewModel.Activity
 		};
 
 		public static readonly Color DefaultColor = PresetColors[ 0 ];
-
-		/// <summary>
-		///   Path of the folder which contains the file libraries.
-		/// </summary>
-		const string LibraryName = "Activity Context";
-
-		/// <summary>
-		///   The extension of microsoft libraries.
-		/// </summary>
-		const string LibraryExtension = "library-ms";
-
+		public static readonly BitmapImage DefaultIcon;
 
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
@@ -143,7 +130,6 @@ namespace Laevo.ViewModel.Activity
 		TimeInterval _currentActiveTimeSpan;
 
 		bool _showActiveTimeSpans;
-
 		public bool ShowActiveTimeSpans
 		{
 			set
@@ -188,9 +174,21 @@ namespace Laevo.ViewModel.Activity
 			IsUnnamed = false;
 			Activity.Name = newLabel;
 
-			if ( _overview != null && _overview.CurrentActivityViewModel == this )
+			// Attempt renaming the specific folder of the activity.
+			if ( IsAccessible ) // Do not rename merged folders, as not to break any links created while merging.
 			{
-				InitializeLibrary();
+				string oldFolder = Activity.SpecificFolder.LocalPath;
+				string newFolder = Activity.UpdateSpecificFolder().LocalPath;
+
+				// Update the Windows Shell Library paths to the new specific folder.
+				if ( oldFolder != newFolder )
+				{
+					Library library = _workspace.GetInnerWorkspace<Library>();
+					List<string> paths = library.Paths.ToList();
+					paths.Remove( oldFolder );
+					paths.Add( newFolder );
+					library.SetPaths( paths );
+				}
 			}
 		}
 
@@ -247,8 +245,13 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.PossibleIcons )]
 		public ObservableCollection<BitmapImage> PossibleIcons { get; private set; }
 
+		[DataMember]
 		[NotifyProperty( Binding.Properties.IsEditable )]
-		public bool IsEditable { get; private set; }
+		public bool IsEditable { get; set; }
+
+		[DataMember]
+		[NotifyProperty( Binding.Properties.IsAccessible )]
+		public bool IsAccessible { get; private set; }
 
 		/// <summary>
 		///   Collection of intervals which indicate when the activity was open, or when work is planned on it.
@@ -271,56 +274,54 @@ namespace Laevo.ViewModel.Activity
 				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
 				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
 				.ToList();
+			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) ); 
 		}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
 			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) { }
 
-		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace, bool isEditable = true )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace )
 		{
 			Contract.Requires( activity != null );
 
 			Activity = activity;
-
 			_workspaceManager = workspaceManager;
 			_workspace = workspace;
 
+			IsEditable = true;
+			IsAccessible = true;
 			Color = DefaultColor;
-			IsEditable = isEditable;
+			Icon = DefaultIcon;
 
 			CommonInitialize();
 		}
 
-		public ActivityViewModel(
-			Model.Activity activity,
-			WorkspaceManager workspaceManager,
-			ActivityViewModel storedViewModel )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, ActivityViewModel storedViewModel )
 		{
 			Activity = activity;
 
 			_workspaceManager = workspaceManager;
 			_workspace = storedViewModel._workspace ?? workspaceManager.CreateEmptyWorkspace();
 			NeedsSuspension = _workspace.HasResourcesToSuspend();
-
-			Icon = storedViewModel.Icon;
-			Color = storedViewModel.Color;
 			IsSuspended = storedViewModel.IsSuspended;
-			IsEditable = true;
+
+			IsEditable = storedViewModel.IsEditable;
+			IsAccessible = storedViewModel.IsAccessible;
+			Color = storedViewModel.Color;
+			Icon = storedViewModel.Icon;
 
 			CommonInitialize();
 
 			// Initialize all work intervals.
 			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the timeline.
-			var dontDisplay = Activity.PlannedIntervals.Select( p => new TimeInterval( p.PlannedAt, p.Interval.End ) ).ToList();
-			var openIntervals = Activity.OpenIntervals
+			List<TimeInterval> dontDisplay = Activity.PlannedIntervals.Select( p => new TimeInterval( p.PlannedAt, p.Interval.End ) ).ToList();
+			List<WorkIntervalViewModel> openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ) ) )
 				.ToList();
-
-			var plannedIntervals = Activity.PlannedIntervals
+			IEnumerable<WorkIntervalViewModel> plannedIntervals = Activity.PlannedIntervals
 				.Select( planned => planned.Interval )
 				.Select( interval => CreateWorkInterval( interval.Start, interval.End.Subtract( interval.Start ), true ) );
-
 			foreach ( var i in openIntervals.Concat( plannedIntervals ).OrderBy( i => i.Occurance ) )
 			{
 				WorkIntervals.Add( i );
@@ -334,8 +335,6 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
 				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
 			}
-
-			_currentActiveTimeSpan = null;
 		}
 
 		void CommonInitialize()
@@ -344,6 +343,15 @@ namespace Laevo.ViewModel.Activity
 			IsOpen = Activity.IsOpen;
 			Label = Activity.Name;
 			IsToDo = Activity.IsToDo;
+
+			// Set Windows Shell Library folder.
+			Library library = _workspace.GetInnerWorkspace<Library>();
+			List<string> paths = library.Paths.ToList();
+			if ( !paths.Contains( Activity.SpecificFolder.LocalPath ) )
+			{
+				paths.Add( Activity.SpecificFolder.LocalPath );
+			}
+			library.SetPaths( paths );
 
 			Activity.ActivatedEvent += a => IsActive = true;
 			Activity.DeactivatedEvent += a =>
@@ -420,19 +428,16 @@ namespace Laevo.ViewModel.Activity
 				Activity.View();
 			}
 
-			// The only activity which can be active and does not have work intervals is home. Avoid adding active intervals.
-			// TODO: Why would 'ActivityViewModel' need to be aware about a 'home' activity? This dependency should be removed.
+			// Update active time spans.
 			DateTime now = DateTime.Now;
 			_currentActiveTimeSpan = new TimeInterval( now, now );
-			if ( WorkIntervals.Count > 0 )
+			if ( !IsToDo )
 			{
 				WorkIntervals.Last().ActiveTimeSpans.Add( _currentActiveTimeSpan );
 			}
 
 			// Initialize desktop.
 			_workspaceManager.SwitchToWorkspace( _workspace );
-			
-			InitializeLibrary();
 
 			OpenInterruptions();
 
@@ -455,8 +460,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.OpenActivityLibrary )]
 		public void OpenActivityLibrary()
 		{
-			string folderName = Path.Combine( ShellLibrary.LibrariesKnownFolder.Path, LibraryName );
-			Process.Start( "explorer.exe", Path.ChangeExtension( folderName, LibraryExtension ) );
+			_workspace.GetInnerWorkspace<Library>().Open();
 		}
 
 		[CommandExecute( Commands.SelectActivity )]
@@ -471,6 +475,13 @@ namespace Laevo.ViewModel.Activity
 				// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
 				ActivateActivity( Activity.IsOpen );
 			}
+		}
+
+		[CommandCanExecute( Commands.SelectActivity )]
+		public bool CanSelectActivity()
+		{
+			// Merged activities can not be accessed later on.
+			return IsAccessible;
 		}
 
 		[CommandExecute( Commands.EditActivity )]
@@ -514,21 +525,13 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals.Add( CreateWorkInterval() );
 			}
 
-			if ( IsActive )
-			{
-				var beforeLastWorkInterval = WorkIntervals[ WorkIntervals.Count - 2 ];
-				var lastActiveTimeSpan = beforeLastWorkInterval.ActiveTimeSpans.Last();
-				beforeLastWorkInterval.ActiveTimeSpans.Remove( lastActiveTimeSpan );
-				WorkIntervals.Last().ActiveTimeSpans.Add( lastActiveTimeSpan );
-			}
-
 			Activity.Open();
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]
 		public bool CanOpenActivity()
 		{
-			return !Activity.IsOpen;
+			return !Activity.IsOpen && IsAccessible;
 		}
 
 		[CommandExecute( Commands.StopActivity )]
@@ -641,12 +644,6 @@ namespace Laevo.ViewModel.Activity
 			{
 				WorkIntervals.Remove( i );
 			}
-
-			// When no intervals are left, also remove the activity.
-			if ( WorkIntervals.Count == 0 )
-			{
-				Remove();
-			}
 		}
 
 		[CommandCanExecute( Commands.RemovePlanning )]
@@ -672,7 +669,7 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		public void Plan( DateTime atTime )
 		{
-			StopActivity();
+			Activity.Stop();
 
 			DateTime at = atTime;
 			TimeSpan duration = TimeSpan.FromHours( 1 );
@@ -719,21 +716,13 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
-			// Make sure that the current selected libraries are up to date, prior to merging the folders of the other activity.
-			UpdateLibrary();
-
 			Activity.Merge( activity.Activity );
 
 			// Ensure the correct activity is activated and its initialized properly.
 			if ( _overview.CurrentActivityViewModel == activity )
 			{
-				// One virtual desktop needs to be active at all times, so in case the current desktop is being merged, activate the target desktop.
+				// One workspace needs to be active at all times, so in case the current workspace is being merged, activate the target workspace.
 				ActivateActivity( false );
-			}
-			else if ( _overview.CurrentActivityViewModel == this )
-			{
-				// The data paths of the merged activity need to be added to the library.
-				InitializeLibrary();
 			}
 			_workspaceManager.Merge( activity._workspace, _workspace );
 
@@ -741,80 +730,20 @@ namespace Laevo.ViewModel.Activity
 			if ( activity.IsToDo || activity.GetFutureWorkIntervals().Any() )
 			{
 				activity.RemovePlanning();
+
+				// When no intervals are left, also remove the activity.
+				if ( activity.WorkIntervals.Count == 0 )
+				{
+					activity.Remove();
+				}
 			}
 			else
 			{
 				activity.StopActivity();
 			}
-		}
 
-		/// <summary>
-		///   Store activity context paths from the shell library to this activity. This only works when this activity is active.
-		/// </summary>
-		void UpdateLibrary()
-		{
-			if ( _overview.CurrentActivityViewModel != this )
-			{
-				return;
-			}
-
-			using ( var activityContext = ShellLibrary.Load( LibraryName, true ) )
-			{
-				var dataPaths = new List<Uri>();
-				foreach ( var folder in activityContext )
-				{
-					dataPaths.Add( new Uri( folder.Path ) );
-				}
-				Activity.SetNewDataPaths( dataPaths );
-			}
-		}
-
-		/// <summary>
-		///   Initialize the library which contains all the context files. This should only be called when the activity is currently active.
-		/// </summary>
-		void InitializeLibrary()
-		{
-			// Initialize the shell library.
-			// Information about Shell Libraries: http://msdn.microsoft.com/en-us/library/windows/desktop/dd758094(v=vs.85).aspx
-			var dataPaths = Activity.GetUpdatedDataPaths().ToArray();
-
-			using ( var activityContext = new ShellLibrary( LibraryName, true ) )
-			{
-				// TODO: Optionally set the icon of the library to the icon of the activity? For now, just set it to the icon of the executing assembly.
-				activityContext.IconResourceId = new IconReference( Assembly.GetExecutingAssembly().Location, 0 );
-
-				int retries = 5;
-				var pathsToAdd = new List<Uri>();
-				pathsToAdd.AddRange( dataPaths );
-				while ( pathsToAdd.Count > 0 && retries > 0 )
-				{
-					foreach ( Uri path in dataPaths )
-					{
-						try
-						{
-							activityContext.Add( path.LocalPath );
-							pathsToAdd.Remove( path );
-						}
-						catch ( COMException )
-						{
-							// TODO: How to handle/prevent the COMException which is sometimes thrown?
-							// System.Runtime.InteropServices.COMException (0x80070497): Unable to remove the file to be replaced.
-						}
-						finally
-						{
-							--retries;
-						}
-					}
-				}
-				if ( pathsToAdd.Count > 0 )
-				{
-					View.MessageBox.Show(
-						"Something went wrong while initializing the Activity Context library, see whether this error still occurs when reopening this activity.",
-						"Error initializing Activity Context Library",
-						MessageBoxButton.OK,
-						MessageBoxImage.Error );
-				}
-			}
+			// Merged activities are no longer accessible.
+			activity.IsAccessible = false;
 		}
 
 		public void Update( DateTime now )
@@ -844,7 +773,10 @@ namespace Laevo.ViewModel.Activity
 				if ( lastWorkInterval != null )
 				{
 					ObservableCollection<TimeInterval> activeTimeSpans = lastWorkInterval.ActiveTimeSpans;
-					activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan;
+					if ( activeTimeSpans.Count > 0 )
+					{
+						activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan;
+					}
 				}
 			}
 		}
@@ -859,29 +791,31 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
-			// Storing activity context paths can't be done in Persist(), since the same library is shared across activities.
-			UpdateLibrary();
-
 			Activity.Deactivate();
 			_currentActiveTimeSpan = null;
 		}
 
 		WorkIntervalViewModel CreateWorkInterval()
 		{
-			var newActivity = new WorkIntervalViewModel( this )
+			var newInterval = new WorkIntervalViewModel( this )
 			{
 				Occurance = DateTime.Now,
 				ShowActiveTimeSpans = _showActiveTimeSpans
 			};
 
+			if ( IsActive )
+			{
+				newInterval.ActiveTimeSpans.Add( _currentActiveTimeSpan );
+			}
+
 			var lastInterval = WorkIntervals.LastOrDefault();
 			if ( lastInterval != null )
 			{
-				newActivity.HeightPercentage = lastInterval.HeightPercentage;
-				newActivity.OffsetPercentage = lastInterval.OffsetPercentage;
+				newInterval.HeightPercentage = lastInterval.HeightPercentage;
+				newInterval.OffsetPercentage = lastInterval.OffsetPercentage;
 			}
 
-			return newActivity;
+			return newInterval;
 		}
 
 		WorkIntervalViewModel CreateWorkInterval( DateTime occurence, TimeSpan timeSpan, bool isPlanned = false )
