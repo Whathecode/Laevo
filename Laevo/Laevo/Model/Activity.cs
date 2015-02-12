@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -129,12 +128,6 @@ namespace Laevo.Model
 		[DataMember]
 		public Uri SpecificFolder { get; private set; }
 
-		/// <summary>
-		///   All paths to relevant data sources which are part of this activity context.
-		/// </summary>
-		[DataMember]
-		HashSet<Uri> _dataPaths;
-
 
 		public Activity()
 			: this( "" ) {}
@@ -151,7 +144,6 @@ namespace Laevo.Model
 			var activityDirectory = new DirectoryInfo( CreateSafeFolderName() );
 			activityDirectory.Create();
 			SpecificFolder = new Uri( activityDirectory.FullName );
-			_dataPaths.Add( SpecificFolder );
 		}
 
 
@@ -163,7 +155,6 @@ namespace Laevo.Model
 
 		void SetDefaults()
 		{
-			_dataPaths = new HashSet<Uri>();
 			_openIntervals = new List<TimeInterval>();
 			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
@@ -325,76 +316,31 @@ namespace Laevo.Model
 		public void Merge( Activity activity )
 		{
 			_interruptions.AddRange( activity.Interruptions );
-			activity._dataPaths.ForEach( p => _dataPaths.Add( p ) );
 
 			Log.InfoWithData( "Activities merged.", new LogData( "Source", activity ), new LogData( "Target", this ) );
 		}
 
 		/// <summary>
-		///   Return all paths to relevant data sources which are part of this activity context.
+		///   Attempts to update the specific folder of this activity, renaming it to the latest activity name.
 		/// </summary>
-		public ReadOnlyCollection<Uri> GetUpdatedDataPaths()
+		public Uri UpdateSpecificFolder()
 		{
-			var existingPaths = new HashSet<Uri>( _dataPaths.Where( p => Directory.Exists( p.LocalPath ) ) );
-			_dataPaths = existingPaths;
-
+			// Verify whether activity specific folder was removed.
 			if ( SpecificFolder != null && !Directory.Exists( SpecificFolder.LocalPath ) )
 			{
 				SpecificFolder = null;
 			}
-			else
-			{
-				AttemptActivityFolderRename();
-			}
-
-			return _dataPaths.ToList().AsReadOnly();
-		}
-
-		/// <summary>
-		///   Update the data sources which are part of this activity context. The existing paths will be replaced by the new ones.
-		///   Additionally, the activity-specific folder will be attempted to be renamed to the latest activity name.
-		/// </summary>
-		/// <param name = "paths">The paths to replace the existing context paths with.</param>
-		public void SetNewDataPaths( List<Uri> paths )
-		{
-			if ( _dataPaths.SetEquals( paths ) )
-			{
-				return;
-			}
-
-			_dataPaths = new HashSet<Uri>( paths );
-
-			// Check whether the activity-specific folder was removed.
-			if ( !paths.Contains( SpecificFolder ) )
-			{
-				SpecificFolder = null;
-			}
-			else
-			{
-				AttemptActivityFolderRename();
-			}
-
-			string dataPaths = "[ " + String.Join( ", ", _dataPaths.Select( uri => "\"" + uri.ToString() + "\"" ) ) + " ]";
-			Log.InfoWithData( "New data paths.", new LogData( this ), new LogData( "Paths", dataPaths, _dataPaths.Count ) );
-		}
-
-		/// <summary>
-		///   Attempt to rename the activity-specific folder representing the activity name.
-		/// </summary>
-		public void AttemptActivityFolderRename()
-		{
-			// No activity-specific folder set?
 			if ( SpecificFolder == null )
 			{
-				return;
+				return SpecificFolder;
 			}
 
-			// No new name set?
+			// Verify whether the desired name is already set.
 			string desiredName = CreateFolderName();
 			string currentName = SpecificFolder.LocalPath.Split( Path.DirectorySeparatorChar ).Last();
 			if ( desiredName == currentName )
 			{
-				return;
+				return SpecificFolder;
 			}
 
 			// Attempt rename.
@@ -402,20 +348,22 @@ namespace Laevo.Model
 			if ( newFolder.Split( Path.DirectorySeparatorChar ).Last() == currentName )
 			{
 				// The current folder name is already a 'safe' desired name.
-				return;
+				return SpecificFolder;
 			}
 			var currentPath = new DirectoryInfo( SpecificFolder.LocalPath );
 			try
 			{
 				currentPath.MoveTo( newFolder );
-				_dataPaths.Remove( SpecificFolder );
 				SpecificFolder = new Uri( newFolder );
-				_dataPaths.Add( SpecificFolder );
 			}
 			catch ( IOException )
 			{
 				// Try again next time. The directory might be in use.
 			}
+
+			Log.InfoWithData( "New specific folder.", new LogData( this ), new LogData( "Specific folder", SpecificFolder, "" ) );
+
+			return SpecificFolder;
 		}
 
 		public void Update( DateTime now )

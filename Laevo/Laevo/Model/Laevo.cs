@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using ABC.Workspaces;
+using ABC.Workspaces.Library;
 using ABC.Workspaces.Windows;
 using ABC.Workspaces.Windows.Settings;
 using Laevo.Data.Model;
@@ -128,9 +129,13 @@ namespace Laevo.Model
 			var vdmManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			WindowClipboard = vdmManager; // Only expose window clipboard, WorkspaceManager is used to expose workspaces.
 			Log.Debug( "Desktop manager initialized." );
-			
+
+			// Initialize shell library manager.
+			var libraryManager = new LibraryManager( "Activity Context" );
+			Log.Debug( "Library manager initialized." );
+
 			// Initialize workspace manager.
-			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric } );
+			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric, libraryManager.NonGeneric } );
 			Log.Debug( "Workspace manager initialized." );
 
 			// Handle activities and tasks from previous sessions.
@@ -138,7 +143,7 @@ namespace Laevo.Model
 
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;
-			HomeActivity.Activate();
+			HomeActivity.View();
 
 			// Set up interruption handlers.
 			_interruptionTrigger.InterruptionReceived += interruption =>
@@ -247,8 +252,8 @@ namespace Laevo.Model
 
 		public void Exit()
 		{
+			WorkspaceManager.Close();
 			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Shutdown ) );
-
 			_processTracker.Stop();
 
 			Persist();
