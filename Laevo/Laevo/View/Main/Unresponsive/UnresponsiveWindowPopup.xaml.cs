@@ -22,11 +22,11 @@ namespace Laevo.View.Main.Unresponsive
 			var viewModel = (UnresponsiveViewModel)DataContext;
 			foreach ( var added in e.AddedItems )
 			{
-				viewModel.SelectedItems.Add( added.ToString() );
+				viewModel.SelectedItems.Add( (UnresponsiveWindow)added );
 			}
 			foreach ( var deleted in e.RemovedItems )
 			{
-				viewModel.SelectedItems.Remove( deleted.ToString() );
+				viewModel.SelectedItems.Remove( (UnresponsiveWindow)deleted );
 			}
 		}
 
