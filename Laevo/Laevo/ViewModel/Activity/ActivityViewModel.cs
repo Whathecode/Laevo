@@ -56,7 +56,7 @@ namespace Laevo.ViewModel.Activity
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
 
 		/// <summary>
-		///   Event which is triggered at the start when an acitvity is being activated when it wasn't activated before.
+		///   Event which is triggered at the start when an activity is being activated when it wasn't activated before.
 		/// </summary>
 		public event ActivityEventHandler ActivatingActivityEvent;
 
@@ -261,6 +261,8 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.WorkIntervals )]
 		public ObservableCollection<WorkIntervalViewModel> WorkIntervals { get; private set; }
 
+		EditActivityPopup _editActivityPopup;
+
 
 		static ActivityViewModel()
 		{
@@ -313,7 +315,7 @@ namespace Laevo.ViewModel.Activity
 			CommonInitialize();
 
 			// Initialize all work intervals.
-			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the timeline.
+			// In case of planned intervals, all open intervals laying between the time the interval was planned, and an end of the planned interval, should not be shown on the time line.
 			List<TimeInterval> dontDisplay = Activity.PlannedIntervals.Select( p => new TimeInterval( p.PlannedAt, p.Interval.End ) ).ToList();
 			List<WorkIntervalViewModel> openIntervals = Activity.OpenIntervals
 				.Where( i => !dontDisplay.Any( i.Intersects ) )
@@ -327,7 +329,7 @@ namespace Laevo.ViewModel.Activity
 				WorkIntervals.Add( i );
 			}
 
-			// Update work intervals properties. They are ordered by date of occurance.
+			// Update work intervals properties. They are ordered by date of occurrence.
 			for ( var i = 0; i < WorkIntervals.Count; i++ )
 			{
 				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
@@ -490,23 +492,29 @@ namespace Laevo.ViewModel.Activity
 			EditActivity( false );
 		}
 
+		
 		public void EditActivity( bool focusPlannedInterval )
 		{
 			ActivityEditStartedEvent( this );
 
-			var popup = new EditActivityPopup
+			_editActivityPopup= new EditActivityPopup
 			{
 				DataContext = this,
 				OccurancePicker = { IsOpen = focusPlannedInterval }
 			};
-			popup.Closed += ( s, a ) => ActivityEditFinishedEvent( this );
-			popup.Show();
+			_editActivityPopup.Closed += ( s, a ) =>
+			{
+				_editActivityPopup = null;
+				ActivityEditFinishedEvent( this );
+			};
+
+			_editActivityPopup.Show();
 		}
 
 		[CommandCanExecute( Commands.EditActivity )]
 		public bool CanEditActivity()
 		{
-			return IsEditable;
+			return IsEditable && _editActivityPopup == null;
 		}
 
 		[CommandExecute( Commands.OpenActivity )]

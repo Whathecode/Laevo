@@ -89,7 +89,7 @@ namespace Laevo.ViewModel.ActivityBar
 				}
 				else
 				{
-					// Non-open but activated activites are added to the list.
+					// Non-open but activated activities are added to the list.
 					OpenPlusCurrentActivities.Insert( 0, activatedActivity );
 				}
 			}
