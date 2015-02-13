@@ -17,7 +17,7 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
-			Time
+			Time = 1
 		}
 
 		/// <summary>

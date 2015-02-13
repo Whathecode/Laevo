@@ -19,7 +19,7 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			PlannedInterval
+			PlannedInterval = 1
 		}
 
 

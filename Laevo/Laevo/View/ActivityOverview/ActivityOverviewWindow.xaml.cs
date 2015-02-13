@@ -37,7 +37,7 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
-			MoveTimeLine,
+			MoveTimeLine = 1,
 			IsSchedulingActivity
 		}
 

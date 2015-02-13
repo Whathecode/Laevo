@@ -22,7 +22,7 @@ namespace Laevo.View.TaskList
 		[Flags]
 		public enum Properties
 		{
-			TaskHasFocus
+			TaskHasFocus = 1
 		}
 
 
