@@ -17,7 +17,7 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			WorkIntervalDataContext,
+			WorkIntervalDataContext = 1,
 			IsIntervalPast
 		}
 
