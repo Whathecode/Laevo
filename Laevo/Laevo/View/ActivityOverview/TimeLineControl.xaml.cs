@@ -24,7 +24,7 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
-			VisibleInterval,
+			VisibleInterval = 1,
 			InternalVisibleInterval,
 			Minimum,
 			Maximum,
