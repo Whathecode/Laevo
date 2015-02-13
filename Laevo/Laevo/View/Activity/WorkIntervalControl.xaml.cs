@@ -23,7 +23,7 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			MouseDragged,
+			MouseDragged = 1,
 			IsDraggingActivity
 		}
 
@@ -98,7 +98,8 @@ namespace Laevo.View.Activity
 		void OnDropOver( object sender, DragEventArgs e )
 		{
 			var activity = e.Data.GetData( typeof( ActivityViewModel ) ) as ActivityViewModel;
-			if ( activity == null )
+			var dropTarget = ((WorkIntervalViewModel)DataContext).BaseActivity;
+			if ( !CanDrop( activity, dropTarget ) )
 			{
 				e.Effects = DragDropEffects.None;
 			}
@@ -109,11 +110,19 @@ namespace Laevo.View.Activity
 		void OnDrop( object sender, DragEventArgs e )
 		{
 			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
-			var dropTarget = (WorkIntervalViewModel)DataContext;
+			var dropTarget = ((WorkIntervalViewModel)DataContext).BaseActivity;
 
-			dropTarget.BaseActivity.Merge( activity );
+			if ( CanDrop( activity, dropTarget ) )
+			{
+				dropTarget.Merge( activity );
+			}
 
 			e.Handled = true;
+		}
+
+		bool CanDrop( ActivityViewModel toMerge, ActivityViewModel dropTarget )
+		{
+			return toMerge != null && dropTarget.IsAccessible;
 		}
 
 		void StartDrag( object sender, MouseEventArgs e )

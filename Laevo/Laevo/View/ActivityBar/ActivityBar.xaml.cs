@@ -21,7 +21,7 @@ namespace Laevo.View.ActivityBar
 	{
 		public enum Properties
 		{
-			SelectedActivity,
+			SelectedActivity = 1,
 			CurrentActivity
 		}
 
