@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Media.Animation;
 using Whathecode.System.Arithmetic.Range;
-using Whathecode.System.Extensions;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 
@@ -15,7 +14,7 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
-			StartVelocity,
+			StartVelocity = 1,
 			ConstantDeceleration
 		}
 

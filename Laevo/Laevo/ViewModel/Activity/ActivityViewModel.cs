@@ -724,6 +724,12 @@ namespace Laevo.ViewModel.Activity
 				return;
 			}
 
+			// Activities which have been merged elsewhere become inaccessible, thus merging to them is not possible.
+			if ( !IsAccessible )
+			{
+				throw new InvalidOperationException( "Can not merge to an activity which has been merged elsewhere.");
+			}
+
 			Activity.Merge( activity.Activity );
 
 			// Ensure the correct activity is activated and its initialized properly.
