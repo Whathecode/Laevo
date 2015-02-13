@@ -23,7 +23,7 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			MouseDragged,
+			MouseDragged = 1,
 			IsDraggingActivity
 		}
 
