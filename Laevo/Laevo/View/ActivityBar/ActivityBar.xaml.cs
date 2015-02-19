@@ -61,10 +61,11 @@ namespace Laevo.View.ActivityBar
 			InitializeComponent();
 
 			// Set up two way binding for the necessary properties to the viewmodel.
+			Type thisType = typeof( ActivityBar );
 			var selectedBinding = new Binding( "SelectedActivity" ) { Mode = BindingMode.TwoWay };
-			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.SelectedActivity ), selectedBinding );
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( thisType, Properties.SelectedActivity ), selectedBinding );
 			var currentBinding = new Binding( "Overview.CurrentActivityViewModel" );
-			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( Properties.CurrentActivity ), currentBinding );
+			SetBinding( WpfControlAspect<Properties>.GetDependencyProperty( thisType, Properties.CurrentActivity ), currentBinding );
 
 			ResizeToScreenWidth();
 			SystemEvents.DisplaySettingsChanged += ( s, a ) => ResizeToScreenWidth();

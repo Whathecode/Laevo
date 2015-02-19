@@ -25,12 +25,12 @@ namespace Laevo.View.ActivityOverview
 		public enum Properties
 		{
 			VisibleInterval = 1,
-			InternalVisibleInterval,
-			Minimum,
-			Maximum,
-			MinimumTimeSpan,
-			MaximumTimeSpan,
-			Children
+			InternalVisibleInterval = 1 << 1,
+			Minimum = 1 << 2,
+			Maximum = 1 << 3,
+			MinimumTimeSpan = 1 << 4,
+			MaximumTimeSpan = 1 << 5,
+			Children = 1 << 6
 		}
 
 
