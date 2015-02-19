@@ -3,7 +3,6 @@
 	public enum Properties
 	{
 		UnresponsiveWindows,
-		Desktop,
 		SelectedApplication
 	}
 
