@@ -4,5 +4,6 @@
   <PropertyGroup Condition="$(Configuration) == 'Debug With Project References'">
 	<ABC-Toolkit>..\..\..\ABC\ABC</ABC-Toolkit>
 	<Framework-Class-Library-Extension>..\..\..\Framework-Class-Library-Extension</Framework-Class-Library-Extension>
+	<TimeLine>..\..\..\TimeLine</TimeLine>
   </PropertyGroup>
 </Project>

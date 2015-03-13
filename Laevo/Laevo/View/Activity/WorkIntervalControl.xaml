@@ -12,31 +12,27 @@
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
-	xmlns:activityOverview="clr-namespace:Laevo.View.ActivityOverview"
 	xmlns:activity="clr-namespace:Laevo.View.Activity"
+	xmlns:controls="clr-namespace:Whathecode.System.Windows.Controls;assembly=Whathecode.PresentationFramework"
+	xmlns:timeLine="clr-namespace:Whathecode.TimeLine;assembly=Whathecode.TimeLine"
 	mc:Ignorable="d"
 	d:DesignHeight="118" d:DesignWidth="206"
 	d:DataContext="{d:DesignInstance Type=vm:WorkIntervalViewModel}"
-	Panel.ZIndex="10"
-	activityOverview:TimeLineControl.Occurance="{Binding Occurance}"
-	activityOverview:TimeLineControl.TimeSpan="{Binding TimeSpan}"
+	controls:TimePanel.X="{Binding Occurance}"
+	controls:TimePanel.SizeX="{Binding TimeSpan}"
+	Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=timeLine:TimeControlItem}}"
 	ClipToBounds="False"
 	Opacity="{Binding Path=BaseActivity.IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.6}}">
 
-	<activityOverview:TimeLineControl.Offset>
+	<controls:TimePanel.Y>
 		<MultiBinding Mode="TwoWay">
 			<MultiBinding.Converter>
 				<converters:IntervalOffsetConverter />
 			</MultiBinding.Converter>
 			<Binding Path="OffsetPercentage" Mode="TwoWay" />
-			<Binding Path="ActualHeight">
-				<Binding.RelativeSource>
-					<RelativeSource Mode="FindAncestor" AncestorType="{x:Type FrameworkElement}" AncestorLevel="2" />
-				</Binding.RelativeSource>
-			</Binding>
 			<Binding Path="HeightPercentage" />
 		</MultiBinding>
-	</activityOverview:TimeLineControl.Offset>
+	</controls:TimePanel.Y>
 
 	<UserControl.MinWidth>
 		<MultiBinding
@@ -195,7 +191,7 @@
 					<Binding ElementName="Header" Path="ActualHeight" />
 					<Binding Path="ActualHeight">
 						<Binding.RelativeSource>
-							<RelativeSource Mode="FindAncestor" AncestorType="{x:Type FrameworkElement}" AncestorLevel="5" />
+							<RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:TimePanel}" />
 						</Binding.RelativeSource>
 					</Binding>
 				</MultiBinding>

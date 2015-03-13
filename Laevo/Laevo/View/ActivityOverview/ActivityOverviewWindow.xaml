@@ -11,10 +11,11 @@
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
 	xmlns:converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
-	xmlns:shaders="clr-namespace:Laevo.View.ActivityOverview.Shaders"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:controls="clr-namespace:Whathecode.System.Windows.Controls;assembly=Whathecode.PresentationFramework"
+	xmlns:timeline="clr-namespace:Whathecode.TimeLine;assembly=Whathecode.TimeLine"
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityOverviewViewModel}"
 	Title="Laevo Activity Time Line"
@@ -186,10 +187,8 @@
 					<DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" />
 				</Viewport2DVisual3D.Material>
 
-				<Grid>
-					<Grid.Effect>
-						<shaders:FadeEffect />
-					</Grid.Effect>
+				<Grid
+					x:Name="FadeContainer">
 
 					<Grid.CacheMode>
 						<BitmapCache />
@@ -216,9 +215,41 @@
 							</MultiBinding>
 						</Grid.Height>
 						
-						<activityOverview:TimeLineControl
+						<timeline:TimeLine
 							x:Name="TimeLine"
-							Focusable="True" />
+							Focusable="True"
+							ItemsSource="{Binding ElementName=Control, Path=WorkIntervals}"
+							CurrentTime="{Binding CurrentTime}">
+
+							<!-- TODO: Refactor so this binds to the view model, rather than a control which is initialized in code behind. -->
+							<timeline:TimeLine.ItemContainerStyle>
+								<Style TargetType="{x:Type timeline:TimeControlItem}">
+									<Setter Property="controls:TimePanel.X" Value="{Binding (controls:TimePanel.X)}" />
+									<Setter Property="controls:TimePanel.SizeX" Value="{Binding (controls:TimePanel.SizeX)}" />
+									<Setter Property="controls:TimePanel.Y" Value="{Binding (controls:TimePanel.Y)}" />
+									<Setter Property="MinWidth" Value="{Binding MinWidth}" />
+								</Style>
+							</timeline:TimeLine.ItemContainerStyle>
+							
+							<timeline:TimeLine.Resources>
+								<Style TargetType="timeline:TimeIndicator">
+									<Setter Property="Fill">
+										<Setter.Value>
+											<LinearGradientBrush StartPoint="0, 0" EndPoint="0, 1">
+												<LinearGradientBrush.GradientStops>
+													<GradientStop Offset="0" Color="Yellow" />
+													<GradientStop Offset="1" Color="Transparent" />
+												</LinearGradientBrush.GradientStops>
+											</LinearGradientBrush>
+										</Setter.Value>
+									</Setter>
+								</Style>
+								<Style TargetType="timeline:TimeLineBreadcrumb">
+									<Setter Property="Foreground" Value="WhiteSmoke" />
+								</Style>
+							</timeline:TimeLine.Resources>
+
+						</timeline:TimeLine>
 
 						<!-- Drag and drop icons. -->
 						<!-- Setting IsHitTestVisible to false prevents the icon getting in the way of the dragging operation. -->

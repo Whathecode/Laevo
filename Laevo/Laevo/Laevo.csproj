@@ -189,6 +189,7 @@
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
     <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug With Project References|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -359,6 +360,23 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
+  <Choose>
+    <When Condition="Exists($(TimeLine)) And '$(Configuration)' != 'Release'">
+      <ItemGroup>
+        <ProjectReference Include="$(TimeLine)\Whathecode.TimeLine\Whathecode.TimeLine.csproj">
+          <Project>{08c7537e-7831-42d9-97c4-0256a3f477dd}</Project>
+          <Name>Whathecode.TimeLine</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Whathecode.TimeLine">
+          <HintPath>..\..\Libraries\TimeLine\Whathecode.TimeLine.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -428,13 +446,11 @@
       <DependentUpon>ActivityOverviewWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="View\ActivityOverview\AbstractInterval.cs" />
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToFovConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToTransformOffset.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineHeightConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
     <Compile Include="View\ActivityOverview\Shaders\FadeEffect.cs" />
-    <Compile Include="View\ActivityOverview\Labels\TimeIndicator.cs" />
     <Compile Include="ViewModel\ActivityOverview\Mode.cs" />
     <Compile Include="View\ActivityOverview\Converters\VectorLine.cs" />
     <Compile Include="View\Activity\ActionButtons.xaml.cs">
@@ -457,34 +473,7 @@
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\ActivityOverview\TimeLineControl.ActivityWidthConverter.cs" />
-    <Compile Include="View\ActivityOverview\Labels\AbstractIntervalLabels.cs" />
-    <Compile Include="View\ActivityOverview\Labels\AbstractLabels.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="View\ActivityOverview\Labels\TimeSpanLabels.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="View\ActivityOverview\Labels\AbstractTopLabels.cs" />
-    <Compile Include="View\ActivityOverview\Labels\BreadcrumbLabels.cs" />
-    <Compile Include="View\ActivityOverview\Labels\HeaderLabels.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="View\ActivityOverview\Labels\ILabels.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="View\ActivityOverview\IrregularInterval.cs" />
-    <Compile Include="View\ActivityOverview\Labels\UnitLabels.cs" />
-    <Compile Include="View\ActivityOverview\RegularInterval.cs" />
-    <Compile Include="View\ActivityOverview\TimeLineControl.ActivityPositionConverter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="View\ActivityOverview\TimeLineControl.xaml.cs">
-      <DependentUpon>TimeLineControl.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="View\ActivityOverview\VisibleIntervalAnimation.cs" />
-    <Compile Include="View\ActivityOverview\VisibleIntervalCoercion.cs" />
     <Compile Include="View\Activity\WorkIntervalControl.xaml.cs">
       <DependentUpon>WorkIntervalControl.xaml</DependentUpon>
     </Compile>
@@ -572,10 +561,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\TaskList\TaskListControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\ActivityOverview\TimeLineControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
