@@ -19,9 +19,6 @@ namespace Laevo.View.ActivityOverview
 		}
 
 
-		public TimeLineControl TimeLine { get; set; }
-
-
 		[DependencyProperty( Properties.StartVelocity )]
 		public long? StartVelocity { get; set; }
 
@@ -64,12 +61,12 @@ namespace Laevo.View.ActivityOverview
 
 		public override Type TargetPropertyType
 		{
-			get { return typeof( TimeInterval ); }
+			get { return typeof( Interval<DateTime, TimeSpan> ); }
 		}
 
 		public override object GetCurrentValue( object defaultOriginValue, object defaultDestinationValue, AnimationClock animationClock )
 		{
-			var from = (TimeInterval)defaultOriginValue;
+			var from = (Interval<DateTime, TimeSpan>)defaultOriginValue;
 			if ( animationClock.CurrentTime == null || ConstantDeceleration == null || StartVelocity == null )
 			{
 				return from;
@@ -83,7 +80,7 @@ namespace Laevo.View.ActivityOverview
 			if ( maxima.LiesInInterval( from.Start.Ticks + displacement ) &&
 				 maxima.LiesInInterval( from.End.Ticks + displacement ) )
 			{
-				return new TimeInterval(
+				return new Interval<DateTime, TimeSpan>(
 					new DateTime( from.Start.Ticks + displacement ),
 					new DateTime( from.End.Ticks + displacement ) );
 			}

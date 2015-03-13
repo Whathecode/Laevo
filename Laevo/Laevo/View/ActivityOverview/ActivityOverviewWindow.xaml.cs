@@ -1,29 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Laevo.View.Activity;
 using Laevo.View.ActivityOverview.Converters;
-using Laevo.View.ActivityOverview.Labels;
+using Laevo.View.ActivityOverview.Shaders;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System;
 using Whathecode.System.Arithmetic;
 using Whathecode.System.Arithmetic.Range;
-using Whathecode.System.Collections.Generic;
 using Whathecode.System.Extensions;
-using Whathecode.System.Windows.DependencyPropertyFactory;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Input;
 using Whathecode.System.Xaml.Behaviors;
+using Whathecode.TimeLine;
 
 
 namespace Laevo.View.ActivityOverview
@@ -37,19 +34,19 @@ namespace Laevo.View.ActivityOverview
 		[Flags]
 		public enum Properties
 		{
-			MoveTimeLine = 1,
-			IsSchedulingActivity
+			MoveTimeLine,
+			IsSchedulingActivity,
+			WorkIntervals
 		}
 
 
 		public const double TopOffset = 105;
 		public const double BottomOffset = 45;
 
+		static readonly Interval<double> MaxPercentage = new Interval<double>( 0, 1 );
 		const double ZoomPercentage = 0.001;
 		const double DragMomentum = 0.0000001;
 
-		readonly List<UnitLabels> _unitLabels = new List<UnitLabels>();
-		readonly List<ILabels> _labels = new List<ILabels>();
 		readonly Dictionary<WorkIntervalViewModel, WorkIntervalControl> _activityWorkIntervals = new Dictionary<WorkIntervalViewModel, WorkIntervalControl>();
 
 		[DependencyProperty( Properties.MoveTimeLine )]
@@ -60,7 +57,8 @@ namespace Laevo.View.ActivityOverview
 		[DependencyProperty( Properties.IsSchedulingActivity )]
 		public bool IsSchedulingActivity { get; private set; }
 
-		readonly TimeIndicator _timeIndicator;
+		[DependencyProperty( Properties.WorkIntervals )]
+		public ObservableCollection<WorkIntervalControl> WorkIntervals { get; private set; }
 
 
 		public ActivityOverviewWindow()
@@ -68,6 +66,7 @@ namespace Laevo.View.ActivityOverview
 			InitializeComponent();
 
 			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.MouseDragCommandArgs>( MoveTimeLine );
+			WorkIntervals = new ObservableCollection<WorkIntervalControl>();
 
 #if DEBUG
 			WindowStyle = WindowStyle.SingleBorderWindow;
@@ -83,106 +82,26 @@ namespace Laevo.View.ActivityOverview
 			var end = now + TimeSpan.FromHours( 2 );
 			TimeLine.VisibleInterval = new TimeInterval( start, end );
 
-			// Create the line which indicates the current time.
-			_timeIndicator = new TimeIndicator { Width = 20 };
-			_timeIndicator.SetBinding( HeightProperty, new Binding( "ActualHeight" ) { Source = TimeLine } );
-			_timeIndicator.SetBinding( TimeLineControl.OccuranceProperty, "CurrentTime" );
-			TimeLine.Children.Add( _timeIndicator );
-
-			// Create desired intervals to show.
-			// TODO: This logic seems abstract enough to move to the model.
-			// TODO: Prevent showing dates outside of a certain scope to prevent exceptions.
-			var months = new IrregularInterval( TimeSpanHelper.MinimumMonthLength, DateTimePart.Month, d => d.AddMonths( 1 ) );
-			var years = new IrregularInterval( TimeSpanHelper.MinimumYearLength, DateTimePart.Year, d => d.AddYears( 1 ) );
-			var weeks = new RegularInterval(
-				d => d.Round( DateTimePart.Day ) - TimeSpan.FromDays( (int)d.DayOfWeek == 0 ? 6 : (int)d.DayOfWeek - 1 ),
-				TimeSpan.FromDays( 7 ) );
-			var days = new RegularInterval( 1, DateTimePart.Day );
-			var everySixHours = new RegularInterval( 6, DateTimePart.Hour );
-			var hours = new RegularInterval( 1, DateTimePart.Hour );
-			var quarters = new RegularInterval( 15, DateTimePart.Minute );
-
-			// Create vertical interval lines.
-			var labelList = new TupleList<IInterval, Func<DateTime, bool>>
-			{
-				{ years, d => true },
-				{ months, d => d.Month != 1 },
-				{ weeks, d => d.Day != 1 },
-				{ days, d => d.DayOfWeek != DayOfWeek.Monday && d.Day != 1 },
-				{ everySixHours, d => d.Hour.EqualsAny( 6, 12, 18 ) },
-				{ hours, d => d.Hour != 0 && !d.Hour.EqualsAny( 6, 12, 18 ) },
-				{ quarters, d => d.Minute != 0 }
-			};
-			labelList.ForEach( l => _labels.Add( new TimeSpanLabels( TimeLine, l.Item1, l.Item2 ) ) );
-
-			// Create unit labels near interval lines.
-			var quarterUnits = new UnitLabels( TimeLine, quarters, "HH:mm", () => true );
-			_unitLabels.Add( quarterUnits );
-			var hourUnits = new UnitLabels( TimeLine, hours, "HH:mm", () => !quarterUnits.LabelsFitScreen() );
-			_unitLabels.Add( hourUnits );
-			var sixHourUnits = new UnitLabels( TimeLine, everySixHours, "HH:mm", () => !hourUnits.LabelsFitScreen() );
-			_unitLabels.Add( sixHourUnits );
-			var dayUnits = new UnitLabels( TimeLine, days, @"d\t\h", () => !sixHourUnits.LabelsFitScreen() );
-			_unitLabels.Add( dayUnits );
-			var dayNameUnits = new UnitLabels( TimeLine, days, "dddd", () => !sixHourUnits.LabelsFitScreen(), 25, 18 );
-			_unitLabels.Add( dayNameUnits );
-			var dayCompleteUnits = new UnitLabels( TimeLine, days, @"dddd d\t\h", () => sixHourUnits.LabelsFitScreen() && dayUnits.LabelsFitScreen(), 25, 18 );
-			_unitLabels.Add( dayCompleteUnits );
-			var weekUnits = new UnitLabels( TimeLine, weeks, @"d\t\h", () => !dayUnits.LabelsFitScreen() );
-			_unitLabels.Add( weekUnits );
-			var monthSmallUnits = new UnitLabels( TimeLine, months, "MMMM", () => !dayUnits.LabelsFitScreen() && weekUnits.LabelsFitScreen(), 25, 30 );
-			_unitLabels.Add( monthSmallUnits );
-			var monthUnits = new UnitLabels( TimeLine, months, "MMMM", () => !weekUnits.LabelsFitScreen() );
-			_unitLabels.Add( monthUnits );
-			_labels.AddRange( _unitLabels );
-
-			// Add header labels.
-			var headerLabels = new HeaderLabels( TimeLine );
-			headerLabels.AddInterval( years, "yyyy" );
-			headerLabels.AddInterval( months, "MMMM" );
-			headerLabels.AddInterval(
-				weeks,
-				d => "Week " + CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( d, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday ) );
-			headerLabels.AddInterval( days, @"dddd d\t\h" );
-			headerLabels.AddInterval(
-				everySixHours,
-				d => d.Hour == 0 ? "Midnight" : d.Hour == 6 ? "Morning" : d.Hour == 12 ? "Noon" : "Evening" );
-			headerLabels.AddInterval( hours, "H:00" );
-			headerLabels.AddInterval( quarters, "HH:mm" );
-			_labels.Add( headerLabels );
-
-			// Add breadcrumb labels.
-			var breadcrumbs = new BreadcrumbLabels( TimeLine );
-			breadcrumbs.AddInterval( years, "yyyy" );
-			breadcrumbs.AddInterval( months, "yyyy" );
-			breadcrumbs.AddInterval( weeks, "Y" );
-			breadcrumbs.AddInterval( days, "Y" );
-			breadcrumbs.AddInterval( everySixHours, "D" );
-			breadcrumbs.AddInterval( hours, "D" );
-			breadcrumbs.AddInterval( quarters, "D" );
-			_labels.Add( breadcrumbs );
-
-			// Hook up all labels to listen to time line changes.
-			_labels.Select( l => l.Labels ).ForEach( l => l.CollectionChanged += ( s, e ) =>
-			{
-				switch ( e.Action )
-				{
-					case NotifyCollectionChangedAction.Add:
-						e.NewItems.Cast<FrameworkElement>().ForEach( i => TimeLine.Children.Add( i ) );
-						break;
-
-					case NotifyCollectionChangedAction.Remove:
-						e.OldItems.Cast<FrameworkElement>().ForEach( i => TimeLine.Children.Remove( i ) );
-						break;
-				}
-			} );
-			Action updatePositions = () => _labels.ForEach( l => l.UpdatePositions() );
-			TimeLine.VisibleIntervalChangedEvent += i => updatePositions();
-			var widthDescriptor = DependencyPropertyDescriptor.FromProperty( ActualWidthProperty, typeof( TimeLineControl ) );
-			widthDescriptor.AddValueChanged( TimeLine, ( s, e ) => updatePositions() );
-
 			DataContextChanged += NewDataContext;
 			CompositionTarget.Rendering += OnRendering;
+
+			// Make sure no memory leaks occur when this window is unloaded.
+			FadeContainer.Effect = new FadeEffect();
+			Unloaded += ( sender, args ) =>
+			{
+				// Unhook events.
+				CompositionTarget.Rendering -= OnRendering;
+				var viewModel = (ActivityOverviewViewModel)DataContext;
+				foreach ( var activityViewModel in viewModel.Activities )
+				{
+					activityViewModel.WorkIntervals.CollectionChanged -= WorkIntervalsChanged;
+				}
+				viewModel.Activities.CollectionChanged -= ActivitiesChanged;
+
+				// The fade effect is set and cleared through code-behind since it leaks otherwise:
+				// https://connect.microsoft.com/VisualStudio/feedback/details/862878/pixelshader-holds-on-to-a-hard-reference-to-shadereffect-through-the-shaderbytecodechanged-event-creating-a-memory-leak-in-commen-shader-implementations
+				FadeContainer.Effect = null;
+			};
 		}
 
 
@@ -238,7 +157,7 @@ namespace Laevo.View.ActivityOverview
 			WorkIntervalControl control = _activityWorkIntervals[ viewModel ];
 			control.DragEnter -= OnActivityDragEnter;
 			control.DragLeave -= OnActivityDragLeave;
-			TimeLine.Children.Remove( control );
+			WorkIntervals.Remove( control );
 			_activityWorkIntervals.Remove( viewModel );
 		}
 
@@ -268,7 +187,7 @@ namespace Laevo.View.ActivityOverview
 			control.DragLeave += OnActivityDragLeave;
 
 			_activityWorkIntervals.Add( viewModel, control );
-			TimeLine.Children.Add( control );
+			WorkIntervals.Add( control );
 		}
 
 		void OnActivityDragEnter( object sender, DragEventArgs e )
@@ -281,7 +200,7 @@ namespace Laevo.View.ActivityOverview
 			_isDragOverActivity = false;
 		}
 
-		TimeInterval _startDrag;
+		Interval<DateTime, TimeSpan> _startDrag;
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
 
@@ -290,7 +209,6 @@ namespace Laevo.View.ActivityOverview
 			double mouseX = Mouse.GetPosition( this ).X;
 
 			// Stop current time line animation.
-			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
 			StopDragAnimation();
 
 			if ( info.DragInfo.State == MouseBehavior.ClickDragState.Start )
@@ -307,11 +225,10 @@ namespace Laevo.View.ActivityOverview
 				_dragAnimation = new VisibleIntervalAnimation
 				{
 					StartVelocity = velocity,
-					ConstantDeceleration = velocity * DragMomentum,
-					TimeLine = TimeLine
+					ConstantDeceleration = velocity * DragMomentum
 				};
 				_dragAnimation.Completed += DragAnimationCompleted;
-				TimeLine.BeginAnimation( visibleIntervalProperty, _dragAnimation );
+				TimeLine.BeginAnimation( TimeControl.VisibleIntervalProperty, _dragAnimation );
 			}
 			else
 			{
@@ -325,7 +242,7 @@ namespace Laevo.View.ActivityOverview
 			}
 		}
 
-		DateTime GetFocusedTime( TimeInterval interval, double mouseXPosition )
+		DateTime GetFocusedTime( Interval<DateTime, TimeSpan> interval, double mouseXPosition )
 		{
 			// Find intersection of the ray along which is viewed, with the plane which shows the time line.
 			double ratio = Container2D.ActualWidth / Container2D.ActualHeight;
@@ -341,7 +258,13 @@ namespace Laevo.View.ActivityOverview
 			var rightFieldOfViewLine = new VectorLine( new Vector( 0, 1 ), new Vector( ratio, 0 ) );
 			Vector rightIntersection = planeLine.Intersection( rightFieldOfViewLine );
 			double planePercentage = leftFieldOfView.DistanceTo( viewIntersection ) / leftFieldOfView.DistanceTo( rightIntersection );
+			planePercentage = MaxPercentage.Clamp( planePercentage );
 
+			if ( planePercentage == 1.0 )
+			{
+				// Early out to prevent ArgumentOutOfRangeException due to rounding of double values.
+				return interval.End;
+			}
 			return interval.GetValueAt( planePercentage );
 		}
 
@@ -357,27 +280,32 @@ namespace Laevo.View.ActivityOverview
 				return;
 			}
 
-			DependencyProperty animatedProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
 			_dragAnimation.Completed -= DragAnimationCompleted;
 			TimeLine.VisibleInterval = TimeLine.VisibleInterval; // Required to copy latest animated value to local value.
-			TimeLine.BeginAnimation( animatedProperty, null );
+			TimeLine.BeginAnimation( TimeControl.VisibleIntervalProperty, null );
 			_dragAnimation = null;
 		}
 
+		static readonly Interval<DateTime, TimeSpan> MaxInterval = new Interval<DateTime, TimeSpan>( DateTime.MinValue, DateTime.MaxValue );
 		void OnMouseWheel( object sender, MouseWheelEventArgs e )
 		{
 			StopDragAnimation();
 
 			// Calculate which time is focused.
-			TimeInterval visibleInterval = TimeLine.VisibleInterval;
+			Interval<DateTime, TimeSpan> visibleInterval = TimeLine.GetCoercedVisibleInterval();
 			DateTime focusedTime = GetFocusedTime( visibleInterval, Mouse.GetPosition( this ).X );
 
 			// Zoom the currently visible interval in/out.
 			double zoom = 1.0 - ( e.Delta * ZoomPercentage );
 			double focusPercentage = visibleInterval.GetPercentageFor( focusedTime );
+			focusPercentage = MaxPercentage.Clamp( focusPercentage );
 			try
 			{
-				TimeLine.VisibleInterval = visibleInterval.Scale( zoom, focusPercentage );
+				TimeLine.VisibleInterval = visibleInterval.Scale( zoom, MaxInterval, focusPercentage );
+				if ( visibleInterval.Size == TimeLine.GetCoercedVisibleInterval().Size ) // Prevent 'scrolling', rather than zooming when reaching minimum or maximum zoom level.
+				{
+					TimeLine.VisibleInterval = visibleInterval;
+				}
 			}
 			catch ( ArgumentOutOfRangeException )
 			{
@@ -396,12 +324,9 @@ namespace Laevo.View.ActivityOverview
 			}
 		}
 
-		double _timeLinePosition;
-
 		void OnTimeLineDragEnter( object sender, DragEventArgs e )
 		{
 			IsSchedulingActivity = !_isDragOverActivity;
-			_timeLinePosition = _timeIndicator.TranslatePoint( new Point( 0, 0 ), TimeLineContainer ).X;
 
 			HandleTimeLineDrag( e );
 		}
@@ -423,11 +348,13 @@ namespace Laevo.View.ActivityOverview
 			UpdateFocusedTime( e.GetPosition( this ).X );
 
 			// Update cursor.
-			// TODO: The reverse calculation of GetFocusedTime might speed up things.
 			Point mouse = e.GetPosition( TimeLineContainer );
 			double x = mouse.X;
 			double y = mouse.Y;
-			if ( x <= _timeLinePosition )
+			var currentTime = ((ActivityOverviewViewModel)DataContext).CurrentTime;
+			double timePerc = TimeLine.VisibleInterval.GetPercentageFor( currentTime );
+			double timeIndiciatorPosition = TimeLineContainer.ActualWidth * timePerc;
+			if ( x <= timeIndiciatorPosition )
 			{
 				x -= DragDropCursor.ActualWidth;
 			}

@@ -3,12 +3,13 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Laevo.View.ActivityOverview;
 using Laevo.ViewModel.Activity;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows.Controls;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 using Whathecode.System.Windows.DependencyPropertyFactory.Attributes;
 using Whathecode.System.Windows.Input;
+using Whathecode.System.Windows.Media.Extensions;
 using Whathecode.System.Xaml.Behaviors;
 
 
@@ -23,7 +24,7 @@ namespace Laevo.View.Activity
 		[Flags]
 		public enum Properties
 		{
-			MouseDragged = 1,
+			MouseDragged,
 			IsDraggingActivity
 		}
 
@@ -77,8 +78,11 @@ namespace Laevo.View.Activity
 				IsDraggingActivity = false;
 			}
 
-			double offset = (double)GetValue( TimeLineControl.OffsetProperty );
-			SetValue( TimeLineControl.OffsetProperty, offset - e.DragInfo.Displacement.Y );
+			double offset = (double)GetValue( TimePanel.YProperty );
+			var parent = this.FindParent<TimePanel>();
+			double displacement = e.DragInfo.Displacement.Y / parent.ActualHeight;
+			double timePanelDisplacement = 100 * displacement; // TimePanel displays Y interval of [0, 100].
+			SetValue( TimePanel.YProperty, offset + timePanelDisplacement );
 		}
 
 		void LabelKeyDown( object sender, KeyEventArgs e )
