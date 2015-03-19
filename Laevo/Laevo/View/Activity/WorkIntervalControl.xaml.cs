@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Laevo.ViewModel.Activity;
+using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Controls;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
@@ -33,6 +34,8 @@ namespace Laevo.View.Activity
 
 		[DependencyProperty( Properties.IsDraggingActivity )]
 		public bool IsDraggingActivity { get; private set; }
+
+		static Interval<double> _percentageInterval = new Interval<double>( 0, 1 );
 
 		/// <summary>
 		///   Timer used to update active time spans.
@@ -66,7 +69,6 @@ namespace Laevo.View.Activity
 			MouseDragged = new DelegateCommand<MouseBehavior.MouseDragCommandArgs>( MoveActivity );
 		}
 
-
 		void MoveActivity( MouseBehavior.MouseDragCommandArgs e )
 		{
 			if ( e.DragInfo.State == MouseBehavior.ClickDragState.Start )
@@ -78,11 +80,11 @@ namespace Laevo.View.Activity
 				IsDraggingActivity = false;
 			}
 
-			double offset = (double)GetValue( TimePanel.YProperty );
 			var parent = this.FindParent<TimePanel>();
 			double displacement = e.DragInfo.Displacement.Y / parent.ActualHeight;
-			double timePanelDisplacement = 100 * displacement; // TimePanel displays Y interval of [0, 100].
-			SetValue( TimePanel.YProperty, offset + timePanelDisplacement );
+			var viewModel = (WorkIntervalViewModel)DataContext;
+			double offset = viewModel.OffsetPercentage;
+			viewModel.OffsetPercentage = _percentageInterval.Clamp( offset - displacement );
 		}
 
 		void LabelKeyDown( object sender, KeyEventArgs e )

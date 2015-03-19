@@ -1,5 +1,4 @@
 ﻿using System;
-using Laevo.View.ActivityOverview;
 using Whathecode.System.Windows.Data;
 
 
@@ -9,11 +8,10 @@ namespace Laevo.View.Activity.Converters
 	{
 		public override double Convert( double[] values )
 		{
-			double heightPercentage = values[ 0 ];
-			double headerHeight = values[ 1 ];
-			double availableHeight = values[ 2 ] - ActivityOverviewWindow.TopOffset - ActivityOverviewWindow.BottomOffset;
+			double headerHeight = values[ 0 ];
+			double availableHeight = values[ 1 ];
 
-			double size = (availableHeight * heightPercentage) - headerHeight;
+			double size = availableHeight - headerHeight;
 			return size < 0 ? 0 : size;
 		}
 

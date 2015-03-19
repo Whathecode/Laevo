@@ -261,6 +261,13 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.WorkIntervals )]
 		public ObservableCollection<WorkIntervalViewModel> WorkIntervals { get; private set; }
 
+		/// <summary>
+		///   The interval denoting the first time the activity was open or planned (start of first work interval) to the last time it was (end of last work interval).
+		///   When the activity does not contain any work intervals (e.g. to-do item) this value is null.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.OpenInterval )]
+		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
+			
 		EditActivityPopup _editActivityPopup;
 
 
@@ -385,6 +392,7 @@ namespace Laevo.ViewModel.Activity
 			PossibleColors = new ObservableCollection<Color>( PresetColors );
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			WorkIntervals = new ObservableCollection<WorkIntervalViewModel>();
+			WorkIntervals.CollectionChanged += ( sender, args ) => UpdateOpenInterval();
 		}
 
 
@@ -774,8 +782,11 @@ namespace Laevo.ViewModel.Activity
 			{
 				if ( IsOpen && !WorkIntervals.Last().IsPlanned )
 				{
-					WorkIntervals.Last().Occurance = Activity.OpenIntervals.Last().Start;
-					WorkIntervals.Last().TimeSpan = Activity.OpenIntervals.Last().End - Activity.OpenIntervals.Last().Start;
+					TimeInterval lastOpen = Activity.OpenIntervals.Last();
+					WorkIntervalViewModel viewModel = WorkIntervals.Last();
+					viewModel.Occurance = lastOpen.Start;
+					viewModel.TimeSpan = lastOpen.Size;
+					OpenInterval = OpenInterval.ExpandTo( lastOpen.End );
 				}
 			}
 
@@ -792,6 +803,16 @@ namespace Laevo.ViewModel.Activity
 						activeTimeSpans[ activeTimeSpans.Count - 1 ] = _currentActiveTimeSpan;
 					}
 				}
+			}
+		}
+
+		void UpdateOpenInterval()
+		{
+			WorkIntervalViewModel first = WorkIntervals.FirstOrDefault();
+			if ( first != null )
+			{
+				WorkIntervalViewModel last = WorkIntervals.Last();
+				OpenInterval = new Interval<DateTime, TimeSpan>( first.Occurance, last.Occurance + last.TimeSpan );
 			}
 		}
 

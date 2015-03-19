@@ -17,7 +17,8 @@
 		HasUnattendedInterruptions,
 		IsEditable,
 		IsAccessible,
-		WorkIntervals
+		WorkIntervals,
+		OpenInterval
 	}
 
 	public enum Commands
