@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -47,12 +44,8 @@ namespace Laevo.View.ActivityOverview
 		const double ZoomPercentage = 0.001;
 		const double DragMomentum = 0.0000001;
 
-		readonly Dictionary<WorkIntervalViewModel, WorkIntervalControl> _activityWorkIntervals = new Dictionary<WorkIntervalViewModel, WorkIntervalControl>();
-
 		[DependencyProperty( Properties.MoveTimeLine )]
 		public ICommand MoveTimeLineCommand { get; private set; }
-
-		bool _isDragOverActivity;
 
 		[DependencyProperty( Properties.IsSchedulingActivity )]
 		public bool IsSchedulingActivity { get; private set; }
@@ -82,7 +75,6 @@ namespace Laevo.View.ActivityOverview
 			var end = now + TimeSpan.FromHours( 2 );
 			TimeLine.VisibleInterval = new TimeInterval( start, end );
 
-			DataContextChanged += NewDataContext;
 			CompositionTarget.Rendering += OnRendering;
 
 			// Make sure no memory leaks occur when this window is unloaded.
@@ -91,12 +83,6 @@ namespace Laevo.View.ActivityOverview
 			{
 				// Unhook events.
 				CompositionTarget.Rendering -= OnRendering;
-				var viewModel = (ActivityOverviewViewModel)DataContext;
-				foreach ( var activityViewModel in viewModel.Activities )
-				{
-					activityViewModel.WorkIntervals.CollectionChanged -= WorkIntervalsChanged;
-				}
-				viewModel.Activities.CollectionChanged -= ActivitiesChanged;
 
 				// The fade effect is set and cleared through code-behind since it leaks otherwise:
 				// https://connect.microsoft.com/VisualStudio/feedback/details/862878/pixelshader-holds-on-to-a-hard-reference-to-shadereffect-through-the-shaderbytecodechanged-event-creating-a-memory-leak-in-commen-shader-implementations
@@ -105,105 +91,9 @@ namespace Laevo.View.ActivityOverview
 		}
 
 
-		void NewDataContext( object sender, DependencyPropertyChangedEventArgs e )
-		{
-			var oldViewModel = e.OldValue as ActivityOverviewViewModel;
-			if ( oldViewModel != null )
-			{
-				oldViewModel.Activities.CollectionChanged -= ActivitiesChanged;
-				foreach ( var activityViewModel in oldViewModel.Activities )
-				{
-					activityViewModel.WorkIntervals.CollectionChanged -= WorkIntervalsChanged;
-				}
-			}
-
-			var overviewViewModel = e.NewValue as ActivityOverviewViewModel;
-			if ( overviewViewModel == null )
-			{
-				return;
-			}
-			foreach ( var activityViewModel in overviewViewModel.Activities )
-			{
-				activityViewModel.WorkIntervals.CollectionChanged += WorkIntervalsChanged;
-				activityViewModel.WorkIntervals.ForEach( NewActivityWorkInterval );
-			}
-			overviewViewModel.Activities.CollectionChanged += ActivitiesChanged;
-		}
-
-		void ActivitiesChanged( object sender, NotifyCollectionChangedEventArgs e )
-		{
-			// Remove old items.
-			if ( e.OldItems != null )
-			{
-				foreach ( var activity in e.OldItems.Cast<ActivityViewModel>() )
-				{
-					activity.WorkIntervals.CollectionChanged -= WorkIntervalsChanged;
-					activity.WorkIntervals.ForEach( DeleteActivityWorkInterval );
-				}
-			}
-
-			// Add new items.
-			if ( e.NewItems != null )
-			{
-				foreach ( var activity in e.NewItems.Cast<ActivityViewModel>() )
-				{
-					activity.WorkIntervals.CollectionChanged += WorkIntervalsChanged;
-				}
-			}
-		}
-
-		void DeleteActivityWorkInterval( WorkIntervalViewModel viewModel )
-		{
-			WorkIntervalControl control = _activityWorkIntervals[ viewModel ];
-			control.DragEnter -= OnActivityDragEnter;
-			control.DragLeave -= OnActivityDragLeave;
-			WorkIntervals.Remove( control );
-			_activityWorkIntervals.Remove( viewModel );
-		}
-
-		void WorkIntervalsChanged( object sender, NotifyCollectionChangedEventArgs e )
-		{
-			// Remove old items.
-			if ( e.OldItems != null )
-			{
-				e.OldItems.Cast<WorkIntervalViewModel>().ForEach( DeleteActivityWorkInterval );
-			}
-
-			// Add new items.
-			if ( e.NewItems != null )
-			{
-				e.NewItems.Cast<WorkIntervalViewModel>().ForEach( NewActivityWorkInterval );
-			}
-		}
-
-		void NewActivityWorkInterval( WorkIntervalViewModel viewModel )
-		{
-			var control = new WorkIntervalControl
-			{
-				DataContext = viewModel,
-				HorizontalAlignment = HorizontalAlignment.Left,
-			};
-			control.DragEnter += OnActivityDragEnter;
-			control.DragLeave += OnActivityDragLeave;
-
-			_activityWorkIntervals.Add( viewModel, control );
-			WorkIntervals.Add( control );
-		}
-
-		void OnActivityDragEnter( object sender, DragEventArgs e )
-		{
-			_isDragOverActivity = true;
-		}
-
-		void OnActivityDragLeave( object sender, DragEventArgs e )
-		{
-			_isDragOverActivity = false;
-		}
-
 		Interval<DateTime, TimeSpan> _startDrag;
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
-
 		void MoveTimeLine( MouseBehavior.MouseDragCommandArgs info )
 		{
 			double mouseX = Mouse.GetPosition( this ).X;
@@ -326,7 +216,7 @@ namespace Laevo.View.ActivityOverview
 
 		void OnTimeLineDragEnter( object sender, DragEventArgs e )
 		{
-			IsSchedulingActivity = !_isDragOverActivity;
+			IsSchedulingActivity = true;
 
 			HandleTimeLineDrag( e );
 		}

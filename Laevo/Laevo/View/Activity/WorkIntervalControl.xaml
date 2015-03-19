@@ -5,7 +5,6 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
@@ -13,35 +12,11 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:activity="clr-namespace:Laevo.View.Activity"
-	xmlns:controls="clr-namespace:Whathecode.System.Windows.Controls;assembly=Whathecode.PresentationFramework"
-	xmlns:timeLine="clr-namespace:Whathecode.TimeLine;assembly=Whathecode.TimeLine"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	mc:Ignorable="d"
 	d:DesignHeight="118" d:DesignWidth="206"
 	d:DataContext="{d:DesignInstance Type=vm:WorkIntervalViewModel}"
-	controls:TimePanel.X="{Binding Occurance}"
-	controls:TimePanel.SizeX="{Binding TimeSpan}"
-	Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=timeLine:TimeControlItem}}"
-	ClipToBounds="False"
 	Opacity="{Binding Path=BaseActivity.IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue=1, IfFalse=0.6}}">
-
-	<controls:TimePanel.Y>
-		<MultiBinding Mode="TwoWay">
-			<MultiBinding.Converter>
-				<converters:IntervalOffsetConverter />
-			</MultiBinding.Converter>
-			<Binding Path="OffsetPercentage" Mode="TwoWay" />
-			<Binding Path="HeightPercentage" />
-		</MultiBinding>
-	</controls:TimePanel.Y>
-
-	<UserControl.MinWidth>
-		<MultiBinding
-			Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">
-			<Binding ElementName="Container" Path="IsMouseOver" />
-			<Binding ElementName="Buttons" Path="IsMouseOver" />
-			<Binding ElementName="Control" Path="ActualWidth" />
-		</MultiBinding>
-	</UserControl.MinWidth>
 
 	<UserControl.Resources>
 		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
@@ -51,255 +26,263 @@
 		<converters:IntervalHeightConverter x:Key="HeightConverter" />
 		<converters:IntervalCornerRadiusConverter x:Key="CornerRadiusConverter" />
 		<converters:IntervalDashedBorderThicknessConverter x:Key="DashedBorderThicknessConverter" />
+		<converters:DisconnectedConverter x:Key="DisconnectedConverter" />
 	</UserControl.Resources>
 
-	<StackPanel
-		Orientation="Vertical"
-		DataContext="{Binding BaseActivity}">
+	<Canvas x:Name="MainContainer">
+		<StackPanel
+			Width="{Binding ElementName=MainContainer, Path=ActualWidth}"
+			Height="{Binding ElementName=MainContainer, Path=ActualHeight}"
+			Orientation="Vertical">
+			
+			<StackPanel.MinWidth>
+				<MultiBinding
+					Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">
+					<Binding ElementName="Container" Path="IsMouseOver" />
+					<Binding ElementName="Buttons" Path="IsMouseOver" />
+					<Binding ElementName="Control" Path="ActualWidth" />
+				</MultiBinding>
+			</StackPanel.MinWidth>
 
-		<Canvas
-			x:Name="Header"
-			Panel.ZIndex="20"
-			Height="{Binding ElementName=Image, Path=ActualHeight, Converter={wtcConverters:CalculateValueConverter Operation=Division, Value=2}}">
+			<Canvas
+				x:Name="Header"
+				Panel.ZIndex="20"
+				Height="{Binding ElementName=Image, Path=ActualHeight, Converter={wtcConverters:CalculateValueConverter Operation=Division, Value=2}}">
 
-			<!-- Icon and text. -->
-			<StackPanel Orientation="Horizontal">
-				<StackPanel Orientation="Vertical">
-					<StackPanel.Margin>
-						<MultiBinding Converter="{StaticResource IconMarginConverter}">
-							<Binding ElementName="Image" Path="ActualWidth" />
-							<Binding ElementName="Image" Path="ActualHeight" />
-						</MultiBinding>
-					</StackPanel.Margin>
-					<Grid>
+				<!-- Icon and text. -->
+				<StackPanel Orientation="Horizontal">
+					<StackPanel Orientation="Vertical">
+						<StackPanel.Margin>
+							<MultiBinding Converter="{StaticResource IconMarginConverter}">
+								<Binding ElementName="Image" Path="ActualWidth" />
+								<Binding ElementName="Image" Path="ActualHeight" />
+							</MultiBinding>
+						</StackPanel.Margin>
+						<Grid>
+							<Image
+								x:Name="Image"
+								Source="{Binding BaseActivity.Icon}"
+								Stretch="None"
+								Cursor="{Binding BaseActivity.IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
+								AllowDrop="False"
+								MouseMove="StartDrag"
+								GiveFeedback="DragFeedback"
+								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}, Path=BaseActivity}" />
+							<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
+							<Image
+								Source="../Common/linked.png"
+								Stretch="None"
+								Cursor="Hand"
+								Margin="-24, 24, 0, 0"
+								Visibility="{Binding HasMoreRecentRepresentation,
+									Converter={wtcConverters:FromBooleanConverter
+										IfTrue={x:Static Visibility.Visible},
+										IfFalse={x:Static Visibility.Collapsed}}}" />
+						</Grid>
+
+						<!-- Icon shown for planned intervals. -->
 						<Image
-							x:Name="Image"
-							Source="{Binding Path=Icon}"
+							Source="../Common/calendar.png"
 							Stretch="None"
-							Cursor="{Binding IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
+							Cursor="Hand"
+							Margin="0, 6, 0, 0"
 							AllowDrop="False"
 							MouseMove="StartDrag"
 							GiveFeedback="DragFeedback"
-							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}" />
-						<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
-						<Image
-							Source="../Common/linked.png"
-							Stretch="None"
-							Cursor="Hand"
-							Margin="-24, 24, 0, 0"
-							Visibility="{Binding
-								ElementName=Control,
-								Path=DataContext.HasMoreRecentRepresentation,
-								Converter={wtcConverters:FromBooleanConverter
-									IfTrue={x:Static Visibility.Visible},
-									IfFalse={x:Static Visibility.Collapsed}}}" />
-					</Grid>
+							behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:WorkIntervalCommands.EditPlannedInterval}}"
+							Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter
+								IfTrue={x:Static Visibility.Visible},
+								IfFalse={x:Static Visibility.Hidden}}}" />
+					</StackPanel>
 
-					<!-- Icon shown for planned intervals. -->
-					<Image
-						DataContext="{Binding ElementName=Control, Path=DataContext}"
-						Source="../Common/calendar.png"
-						Stretch="None"
-						Cursor="Hand"
-						Margin="0, 6, 0, 0"
-						AllowDrop="False"
-						MouseMove="StartDrag"
-						GiveFeedback="DragFeedback"
-						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:WorkIntervalCommands.EditPlannedInterval}}"
-						Visibility="{Binding IsPlanned, Converter={wtcConverters:FromBooleanConverter
-							IfTrue={x:Static Visibility.Visible},
-							IfFalse={x:Static Visibility.Hidden}}}" />
+					<TextBox
+						x:Name="ActivityName"
+						VerticalAlignment="Top"
+						Foreground="White"
+						CaretBrush="White"
+						FontSize="20"
+						Text="{Binding Path=BaseActivity.Label}"
+						Margin="5, -13, 0, 0"
+						PreviewKeyDown="LabelKeyDown">
+						<!-- Transparent background and no border. -->
+						<TextBox.Template>
+							<ControlTemplate TargetType="{x:Type TextBox}">
+								<ScrollViewer Name="PART_ContentHost" />
+							</ControlTemplate>
+						</TextBox.Template>
+					</TextBox>
+
 				</StackPanel>
 
-				<TextBox
-					x:Name="ActivityName"
-					VerticalAlignment="Top"
-					Foreground="White"
-					CaretBrush="White"
-					FontSize="20"
-					Text="{Binding Path=Label}"
-					Margin="5, -13, 0, 0"
-					PreviewKeyDown="LabelKeyDown">
-					<!-- Transparent background and no border. -->
-					<TextBox.Template>
-						<ControlTemplate TargetType="{x:Type TextBox}">
-							<ScrollViewer Name="PART_ContentHost" />
-						</ControlTemplate>
-					</TextBox.Template>
-				</TextBox>
+				<!-- Action buttons. -->
+				<activity:ActionButtons
+					x:Name="Buttons"
+					DataContext="{Binding BaseActivity}"
+					WorkIntervalDataContext="{Binding ElementName=Control, Path=DataContext, Converter={StaticResource DisconnectedConverter}}">
+					<activity:ActionButtons.Visibility>
+						<MultiBinding
+							Converter="{wtcConverters:ConditionConverter Expression='![0] and ([1] || [2]) and ![3]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
+							<Binding
+								FallbackValue="{x:Static Visibility.Collapsed}"
+								ElementName="Control"
+								Path="DataContext.HasMoreRecentRepresentation" />
+							<Binding ElementName="Container" Path="IsMouseOver" />
+							<Binding ElementName="Buttons" Path="IsMouseOver" />
+							<Binding ElementName="Control" Path="IsDraggingActivity" />
+						</MultiBinding>
+					</activity:ActionButtons.Visibility>
+				</activity:ActionButtons>
 
-			</StackPanel>
-
-			<!-- Action buttons. -->
-			<activity:ActionButtons
-				x:Name="Buttons"
-				WorkIntervalDataContext="{Binding ElementName=Control, Path=DataContext}">
-				<activity:ActionButtons.Visibility>
-					<MultiBinding
-						Converter="{wtcConverters:ConditionConverter Expression='![0] and ([1] || [2]) and ![3]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
-						<Binding ElementName="Control" Path="DataContext.HasMoreRecentRepresentation" />
-						<Binding ElementName="Container" Path="IsMouseOver" />
-						<Binding ElementName="Buttons" Path="IsMouseOver" />
-						<Binding ElementName="Control" Path="IsDraggingActivity" />
-					</MultiBinding>
-				</activity:ActionButtons.Visibility>
-			</activity:ActionButtons>
-
-		</Canvas>
-
-		<Border
-			x:Name="Container"
-			behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}}"
-			behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
-			MouseMove="OnMouseMoved"
-			Cursor="{Binding IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
-			Panel.ZIndex="15"
-			ClipToBounds="True"
-			AllowDrop="True"
-			DragEnter="OnDropOver" DragOver="OnDropOver" DragLeave="OnDropOver"
-			Drop="OnDrop">
-
-			<Border.CornerRadius>
-				<MultiBinding
-					Converter="{StaticResource CornerRadiusConverter}">
-					<Binding Path="IsOpen" />
-					<Binding ElementName="Control" Path="DataContext.Position" />
-					<Binding ElementName="Control" Path="DataContext.IsPlanned" />
-				</MultiBinding>
-			</Border.CornerRadius>
-
-			<Border.BorderThickness>
-				<MultiBinding
-					Converter="{StaticResource BorderThicknessConverter}">
-					<Binding Path="IsOpen" />
-					<Binding ElementName="Control" Path="DataContext.Position" />
-				</MultiBinding>
-			</Border.BorderThickness>
-
-			<Border.BorderBrush>
-				<MultiBinding Converter="{StaticResource BorderBrushConverter}">
-					<Binding Path="IsActive" />
-					<Binding Path="NeedsSuspension" />
-					<Binding Path="HasUnattendedInterruptions" />
-					<Binding Path="IsOpen" />
-				</MultiBinding>
-			</Border.BorderBrush>
-
-			<Border.Height>
-				<MultiBinding Converter="{StaticResource HeightConverter}">
-					<Binding ElementName="Control" Path="DataContext.HeightPercentage" />
-					<Binding ElementName="Header" Path="ActualHeight" />
-					<Binding Path="ActualHeight">
-						<Binding.RelativeSource>
-							<RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:TimePanel}" />
-						</Binding.RelativeSource>
-					</Binding>
-				</MultiBinding>
-			</Border.Height>
-
-			<Border.Background>
-				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-					<GradientStop
-						Color="{Binding Color}" Offset="1" />
-					<GradientStop
-						Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
-				</LinearGradientBrush>
-			</Border.Background>
+			</Canvas>
 
 			<Border
-				BorderThickness="{Binding ElementName=Control, Path=DataContext.Position, Converter={StaticResource DashedBorderThicknessConverter}}">
+				x:Name="Container"
+				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}, Path=BaseActivity}"
+				behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MouseDragged}"
+				MouseMove="OnMouseMoved"
+				Cursor="{Binding BaseActivity.IsAccessible, Converter={wtcConverters:FromBooleanConverter IfTrue={x:Static Cursors.Hand}, IfFalse={x:Static Cursors.No}}}"
+				Panel.ZIndex="15"
+				ClipToBounds="True"
+				AllowDrop="True"
+				DragEnter="OnDropOver" DragOver="OnDropOver" DragLeave="OnDropOver"
+				Drop="OnDrop">
+
+				<Border.CornerRadius>
+					<MultiBinding
+						Converter="{StaticResource CornerRadiusConverter}">
+						<Binding Path="BaseActivity.IsOpen" />
+						<Binding Path="Position" />
+						<Binding Path="IsPlanned" />
+					</MultiBinding>
+				</Border.CornerRadius>
+
+				<Border.BorderThickness>
+					<MultiBinding
+						Converter="{StaticResource BorderThicknessConverter}">
+						<Binding Path="BaseActivity.IsOpen" />
+						<Binding Path="Position" />
+					</MultiBinding>
+				</Border.BorderThickness>
 
 				<Border.BorderBrush>
-					<VisualBrush>
-						<VisualBrush.Visual>
-							<Rectangle
-								StrokeThickness="4"
-								StrokeDashArray="2 2"
-								Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
-								Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}">
-
-								<Rectangle.Stroke>
-									<MultiBinding Converter="{StaticResource BorderBrushConverter}">
-										<Binding Path="IsActive" />
-										<Binding Path="NeedsSuspension" />
-										<Binding Path="HasUnattendedInterruptions" />
-										<Binding Path="IsOpen" />
-									</MultiBinding>
-								</Rectangle.Stroke>
-
-							</Rectangle>
-						</VisualBrush.Visual>
-					</VisualBrush>
+					<MultiBinding Converter="{StaticResource BorderBrushConverter}">
+						<Binding Path="BaseActivity.IsActive" />
+						<Binding Path="BaseActivity.NeedsSuspension" />
+						<Binding Path="BaseActivity.HasUnattendedInterruptions" />
+						<Binding Path="BaseActivity.IsOpen" />
+					</MultiBinding>
 				</Border.BorderBrush>
 
-				<!-- Attention time spans. -->
-				<ItemsControl Name="ActiveItemsControl"
-					Visibility="{Binding ElementName=Control,
-					Path=DataContext.ShowActiveTimeSpans,
-					Converter={wtcConverters:FromBooleanConverter 
-					IfTrue={x:Static Visibility.Visible}, 
-					IfFalse={x:Static Visibility.Collapsed}}}">
+				<Border.Height>
+					<MultiBinding Converter="{StaticResource HeightConverter}">
+						<Binding ElementName="Header" Path="ActualHeight" />
+						<Binding ElementName="Control" Path="ActualHeight" />
+					</MultiBinding>
+				</Border.Height>
 
-					<ItemsControl.Resources>
-						<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
-						<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
-					</ItemsControl.Resources>
+				<Border.Background>
+					<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+						<GradientStop
+							Color="{Binding BaseActivity.Color}" Offset="1" />
+						<GradientStop
+							Color="{Binding BaseActivity.Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
+					</LinearGradientBrush>
+				</Border.Background>
 
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Line
-								Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-								Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-								Stroke="Yellow" StrokeThickness="4">
+				<Border
+					BorderThickness="{Binding Path=Position, Converter={StaticResource DashedBorderThicknessConverter}}">
 
-								<Line.X1>
-									<MultiBinding
-										Converter="{StaticResource TimeSpanConverter}"
-										ConverterParameter="Start">
-										<Binding Path="." />
-										<Binding ElementName="Control" Path="DataContext.Occurance" />
-										<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-										<Binding ElementName="Container" Path="ActualWidth" />
-									</MultiBinding>
-								</Line.X1>
-								<Line.X2>
-									<MultiBinding
-										Converter="{StaticResource TimeSpanConverter}"
-										ConverterParameter="End">
-										<Binding Path="." />
-										<Binding ElementName="Control" Path="DataContext.Occurance" />
-										<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-										<Binding ElementName="Container" Path="ActualWidth" />
-									</MultiBinding>
-								</Line.X2>
-							</Line>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
+					<Border.BorderBrush>
+						<VisualBrush>
+							<VisualBrush.Visual>
+								<Rectangle
+									StrokeThickness="4"
+									StrokeDashArray="2 2"
+									Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+									Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}">
 
-					<ItemsControl.Style>
-						<Style TargetType="ItemsControl">
-							<Style.Triggers>
-								<Trigger Property="ItemsControl.Visibility" Value="Visible">
-									<Setter Property="ItemsSource" Value="{Binding ElementName=Control, Path=DataContext.ActiveTimeSpans}" />
-								</Trigger>
-								<Trigger Property="ItemsControl.Visibility" Value="Hidden">
-									<Setter Property="ItemsSource" Value="{x:Null}" />
-								</Trigger>
-								<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
-									<Setter Property="ItemsSource" Value="{x:Null}" />
-								</Trigger>
-							</Style.Triggers>
-						</Style>
-					</ItemsControl.Style>
+									<Rectangle.Stroke>
+										<MultiBinding Converter="{StaticResource BorderBrushConverter}">
+											<Binding Path="BaseActivity.IsActive" />
+											<Binding Path="BaseActivity.NeedsSuspension" />
+											<Binding Path="BaseActivity.HasUnattendedInterruptions" />
+											<Binding Path="BaseActivity.IsOpen" />
+										</MultiBinding>
+									</Rectangle.Stroke>
 
-					<ItemsControl.ItemsPanel>
-						<ItemsPanelTemplate>
-							<Canvas />
-						</ItemsPanelTemplate>
-					</ItemsControl.ItemsPanel>
-				</ItemsControl>
+								</Rectangle>
+							</VisualBrush.Visual>
+						</VisualBrush>
+					</Border.BorderBrush>
+
+					<!-- Attention time spans. -->
+					<ItemsControl Name="ActiveItemsControl"
+						Visibility="{Binding ShowActiveTimeSpans,
+						Converter={wtcConverters:FromBooleanConverter 
+						IfTrue={x:Static Visibility.Visible}, 
+						IfFalse={x:Static Visibility.Collapsed}}}">
+
+						<ItemsControl.Resources>
+							<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
+							<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
+						</ItemsControl.Resources>
+
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Line
+									Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+									Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+									Stroke="Yellow" StrokeThickness="4">
+
+									<Line.X1>
+										<MultiBinding
+											Converter="{StaticResource TimeSpanConverter}"
+											ConverterParameter="Start">
+											<Binding Path="." />
+											<Binding ElementName="Control" Path="DataContext.Occurance" />
+											<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+											<Binding ElementName="Container" Path="ActualWidth" />
+										</MultiBinding>
+									</Line.X1>
+									<Line.X2>
+										<MultiBinding
+											Converter="{StaticResource TimeSpanConverter}"
+											ConverterParameter="End">
+											<Binding Path="." />
+											<Binding ElementName="Control" Path="DataContext.Occurance" />
+											<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+											<Binding ElementName="Container" Path="ActualWidth" />
+										</MultiBinding>
+									</Line.X2>
+								</Line>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+
+						<ItemsControl.Style>
+							<Style TargetType="ItemsControl">
+								<Style.Triggers>
+									<Trigger Property="ItemsControl.Visibility" Value="Visible">
+										<Setter Property="ItemsSource" Value="{Binding Path=ActiveTimeSpans}" />
+									</Trigger>
+									<Trigger Property="ItemsControl.Visibility" Value="Hidden">
+										<Setter Property="ItemsSource" Value="{x:Null}" />
+									</Trigger>
+									<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
+										<Setter Property="ItemsSource" Value="{x:Null}" />
+									</Trigger>
+								</Style.Triggers>
+							</Style>
+						</ItemsControl.Style>
+
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<Canvas />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+					</ItemsControl>
+				</Border>
 			</Border>
-		</Border>
-	</StackPanel>
+		</StackPanel>
+	</Canvas>
 
 </UserControl>

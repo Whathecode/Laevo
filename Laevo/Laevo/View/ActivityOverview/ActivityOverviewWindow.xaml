@@ -13,9 +13,13 @@
 	xmlns:converters="clr-namespace:Laevo.View.ActivityOverview.Converters"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.ActivityOverview"
 	xmlns:wtcConverters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
-	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
-	xmlns:controls="clr-namespace:Whathecode.System.Windows.Controls;assembly=Whathecode.PresentationFramework"
+	xmlns:pf="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:wtcControls="clr-namespace:Whathecode.System.Windows.Controls;assembly=Whathecode.PresentationFramework"
 	xmlns:timeline="clr-namespace:Whathecode.TimeLine;assembly=Whathecode.TimeLine"
+	xmlns:activityVm="clr-namespace:Laevo.ViewModel.Activity"
+	xmlns:controls="clr-namespace:Laevo.View.Activity"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityOverviewViewModel}"
 	Title="Laevo Activity Time Line"
@@ -105,14 +109,14 @@
 				<ContextMenu>
 					<MenuItem
 						Header="_New Activity"
-						Command="{wtc:CommandBinding {x:Static binding:Commands.NewActivity}}">
+						Command="{pf:CommandBinding {x:Static binding:Commands.NewActivity}}">
 						<MenuItem.Icon>
 							<Image Source="Images\NewActivity.png" Width="20" Height="20" />
 						</MenuItem.Icon>
 					</MenuItem>
 					<MenuItem
 						Header="_Plan Activity Here"
-						Command="{wtc:CommandBinding {x:Static binding:Commands.PlanActivity}}">
+						Command="{pf:CommandBinding {x:Static binding:Commands.PlanActivity}}">
 						<MenuItem.Icon>
 							<Image Source="Images\PlanActivity.png" Width="20" Height="20" />
 						</MenuItem.Icon>
@@ -218,18 +222,54 @@
 						<timeline:TimeLine
 							x:Name="TimeLine"
 							Focusable="True"
-							ItemsSource="{Binding ElementName=Control, Path=WorkIntervals}"
+							ItemsSource="{Binding Activities}"
 							CurrentTime="{Binding CurrentTime}">
-
-							<!-- TODO: Refactor so this binds to the view model, rather than a control which is initialized in code behind. -->
+							
 							<timeline:TimeLine.ItemContainerStyle>
 								<Style TargetType="{x:Type timeline:TimeControlItem}">
-									<Setter Property="controls:TimePanel.X" Value="{Binding (controls:TimePanel.X)}" />
-									<Setter Property="controls:TimePanel.SizeX" Value="{Binding (controls:TimePanel.SizeX)}" />
-									<Setter Property="controls:TimePanel.Y" Value="{Binding (controls:TimePanel.Y)}" />
-									<Setter Property="MinWidth" Value="{Binding MinWidth}" />
+									<Setter Property="wtcControls:TimePanel.IntervalX" Value="{Binding OpenInterval}" />
+									<Setter Property="wtcControls:TimePanel.SizeY" Value="100" /> <!-- Show an 'activity time line' along the full height. -->
 								</Style>
 							</timeline:TimeLine.ItemContainerStyle>
+							
+							<timeline:TimeLine.ItemTemplate>
+								<DataTemplate DataType="activityVm:ActivityViewModel">
+									<timeline:TimeControl
+										MinimumInterval="{x:Static system:TimeSpan.MinValue}"
+										MaximumInterval="{x:Static system:TimeSpan.MaxValue}"
+										VisibleInterval="{Binding OpenInterval}"
+										ItemsSource="{Binding WorkIntervals}">
+
+										<timeline:TimeControl.ItemContainerStyle>
+											<Style TargetType="{x:Type timeline:TimeControlItem}">
+												<Setter Property="wtcControls:TimePanel.X" Value="{Binding Occurance}" />
+												<Setter Property="wtcControls:TimePanel.SizeX" Value="{Binding TimeSpan}" />
+												<Setter Property="wtcControls:TimePanel.Y">
+													<Setter.Value>
+														<MultiBinding Mode="TwoWay">
+															<MultiBinding.Converter>
+																<activityConverters:IntervalOffsetConverter />
+															</MultiBinding.Converter>
+															<Binding Path="OffsetPercentage" Mode="TwoWay" />
+															<Binding Path="HeightPercentage" />
+														</MultiBinding>
+													</Setter.Value>
+												</Setter>
+												<Setter
+													Property="wtcControls:TimePanel.SizeY"
+													Value="{Binding HeightPercentage, Converter={wtcConverters:CalculateValueConverter Operation=Multiplication, Value=100}}" />
+											</Style>
+										</timeline:TimeControl.ItemContainerStyle>
+
+										<timeline:TimeControl.ItemTemplate>
+											<DataTemplate DataType="activityVm:WorkIntervalViewModel">
+												<controls:WorkIntervalControl />
+											</DataTemplate>
+										</timeline:TimeControl.ItemTemplate>
+										
+									</timeline:TimeControl>
+								</DataTemplate>
+							</timeline:TimeLine.ItemTemplate>
 							
 							<timeline:TimeLine.Resources>
 								<Style TargetType="timeline:TimeIndicator">
@@ -321,7 +361,7 @@
 					<Button
 						Cursor="Hand"
 						Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-						Command="{wtc:CommandBinding {x:Static binding:Commands.OpenHome}}">
+						Command="{pf:CommandBinding {x:Static binding:Commands.OpenHome}}">
 						<Image Source="Images\Home.png" />
 					</Button>
 
