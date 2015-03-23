@@ -7,6 +7,7 @@
 		FocusedRoundedTime,
 		FocusedOffsetPercentage,
 		HomeActivity,
+		VisibleActivity,
 		Mode,
 		CurrentActivityViewModel,
 		TimeLineRenderScale,

@@ -7,6 +7,7 @@ using ABC.Applications.Persistence;
 using ABC.Workspaces;
 using Laevo.Data.Common;
 using Laevo.Data.Model;
+using Laevo.Model;
 using Laevo.ViewModel.Activity;
 using Whathecode.System.Extensions;
 
@@ -25,18 +26,23 @@ namespace Laevo.Data.View
 			[DataMember]
 			public ActivityViewModel Home;
 			[DataMember]
-			public Dictionary<Guid, ActivityViewModel> Activities = new Dictionary<Guid, ActivityViewModel>();
-			[DataMember]
-			public Dictionary<Guid, ActivityViewModel> Tasks = new Dictionary<Guid, ActivityViewModel>();
+			public Dictionary<Guid, Dictionary<Guid, ActivityViewModel>> Activities = new Dictionary<Guid, Dictionary<Guid, ActivityViewModel>>();
 		}
 
 
+		readonly WorkspaceManager _workspaceManager;
+		readonly IModelRepository _modelData;
+
 		readonly string _file;
 		readonly DataContractSerializer _serializer;
+		readonly Data _data;
+		readonly Activity _currentVisibleParent;
 
 
 		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
 		{
+			_workspaceManager = workspaceManager;
+			_modelData = modelData;
 			_file = Path.Combine( programDataFolder, "ActivityRepresentations.xml" );
 
 			// Check for stored presentation options for existing activities and tasks.
@@ -45,48 +51,50 @@ namespace Laevo.Data.View
 				workspaceManager.GetPersistedDataTypes().Concat( persistenceProvider.GetPersistedDataTypes() ),
 				Int32.MaxValue, true, false,
 				new ActivityDataContractSurrogate( workspaceManager ) );
-			Data loadedData = new Data();
+			_data = new Data();
 			if ( File.Exists( _file ) )
 			{
 				using ( var activitiesFileStream = new FileStream( _file, FileMode.Open ) )
 				{
-					loadedData = (Data)_serializer.ReadObject( activitiesFileStream );
+					_data = (Data)_serializer.ReadObject( activitiesFileStream );
 				}
 			}
 
-			// Initialize a view model for all activities from previous sessions.
-			foreach ( var activity in modelData.Activities )
+			// Initialize home from previous session, or initialize.
+			if ( _data.Home != null )
 			{
-				if ( !loadedData.Activities.ContainsKey( activity.Identifier ) )
-				{
-					continue;
-				}
-
-				// Create and hook up the view model.
-				var viewModel = new ActivityViewModel(
-					activity, workspaceManager,
-					loadedData.Activities[ activity.Identifier ]);
-				Activities.Add( viewModel );
+				Home = new ActivityViewModel( modelData.HomeActivity, workspaceManager, _data.Home );
 			}
 
-			// Initialize tasks from previous sessions.
-			// ReSharper disable ImplicitlyCapturedClosure
-			var taskViewModels =
-				from task in modelData.Tasks
-				where loadedData.Tasks.ContainsKey( task.Identifier )
+			// At startup, load time line for home activity.
+			_currentVisibleParent = modelData.HomeActivity;
+			LoadActivities( _currentVisibleParent );
+		}
+
+		void LoadActivities( Activity parentActivity )
+		{
+			Dictionary<Guid, ActivityViewModel> activities;
+			if ( !_data.Activities.TryGetValue( parentActivity.Identifier, out activities ) )
+			{
+				activities = new Dictionary<Guid, ActivityViewModel>();
+			}
+
+			// Initialize view model for all activities for the given parent activity.
+			var createViewModels =
+				from activity in _modelData.GetActivities( parentActivity )
+				where activities.ContainsKey( activity.Identifier )
 				select new ActivityViewModel(
-					task, workspaceManager,
-					loadedData.Tasks[ task.Identifier ]);
-			// ReSharper restore ImplicitlyCapturedClosure
-			foreach ( var task in taskViewModels.Reverse() ) // The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
+					activity, _workspaceManager,
+					activities[ activity.Identifier ] );
+			var viewModels = createViewModels.ToList();
+			viewModels.Where( v => v.WorkIntervals.Count != 0 ).ForEach( v => Activities.Add( v ) );
+
+			// Initialize tasks.
+			// The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
+			var tasks = viewModels.Where( v => v.IsToDo );
+			foreach ( var task in tasks.Reverse() )
 			{
 				Tasks.Add( task );
-			}
-
-			// Initialize home from previous session.
-			if ( loadedData.Home != null )
-			{
-				Home = new ActivityViewModel( modelData.HomeActivity, workspaceManager, loadedData.Home );
 			}
 
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
@@ -110,13 +118,12 @@ namespace Laevo.Data.View
 			{
 				Activities.ForEach( a => a.Persist() );
 				Tasks.ForEach( a => a.Persist() );
-				var data = new Data()
-				{
-					Home = Home,
-					Activities = Activities.ToDictionary( a => a.Identifier, a => a ),
-					Tasks = Tasks.ToDictionary( t => t.Identifier, t => t )
-				};
-				PersistanceHelper.Persist( _file, _serializer, data );
+
+				// Be sure to add latest activity view models to data structure.
+				_data.Home = Home;
+				_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
+
+				PersistanceHelper.Persist( _file, _serializer, _data );
 			}
 		}
 	}

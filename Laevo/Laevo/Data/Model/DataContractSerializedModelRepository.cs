@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -6,7 +7,7 @@ using ABC.Interruptions;
 using Laevo.Data.Common;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
-using Whathecode.System.Linq;
+using Whathecode.System.Extensions;
 
 
 namespace Laevo.Data.Model
@@ -23,9 +24,7 @@ namespace Laevo.Data.Model
 			[DataMember]
 			public Activity Home;
 			[DataMember]
-			public List<Activity> Activities = new List<Activity>();
-			[DataMember]
-			public List<Activity> Tasks = new List<Activity>(); 
+			public Dictionary<Guid, List<Activity>> Activities = new Dictionary<Guid, List<Activity>>();
 		}
 
 
@@ -68,11 +67,8 @@ namespace Laevo.Data.Model
 				}
 			}
 
-			// Add activities and tasks from previous sessions.
-			MemoryActivities.AddRange( loadedData.Activities );
-			MemoryTasks.AddRange( loadedData.Tasks );
-			// TODO: Can this design be improved so implementing repositories can't forget to hook up the ToDoChangedEvent?
-			MemoryActivities.Concat( MemoryTasks ).ToList().ForEach( a => a.ToDoChangedEvent += OnActivityToDoChanged );
+			// Add activities from previous sessions.
+			loadedData.Activities.ForEach( a => MemoryActivities.Add( a.Key, a.Value ) );
 
 			// Set home activity.
 			if ( loadedData.Home != null )
@@ -85,22 +81,13 @@ namespace Laevo.Data.Model
 				HomeActivity.MakeToDo();
 			}
 
-			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
-			for ( int i = 0; i < Tasks.Count; ++i )
-			{
-				Activity task = MemoryTasks[ i ];
-				Activity activity = MemoryActivities.FirstOrDefault( a => a.Equals( task ) );
-				if ( activity != null )
-				{
-					MemoryTasks[ i ] = activity;
-				}
-			}
-
 			// Add attention spans from previous sessions.
+			// TODO: Store attention spans per 'parent' activity? Deserializing this at the moment is not very scaleable.
+			var allActivities = MemoryActivities.Values.SelectMany( a => a );
 			_attentionShiftSerializer = new DataContractSerializer(
 				typeof( List<AbstractAttentionShift> ), new[] { typeof( ApplicationAttentionShift ), typeof( ActivityAttentionShift ) },
 				int.MaxValue, true, false,
-				new DataContractSurrogate( Activities.Concat( Tasks ).Concat( new [] { HomeActivity } ).ToList() ) );
+				new DataContractSurrogate( allActivities.ToList() ) );
 			if ( File.Exists( _attentionShiftsFile ) )
 			{
 				using ( var attentionFileStream = new FileStream( _attentionShiftsFile, FileMode.Open ) )
@@ -122,13 +109,11 @@ namespace Laevo.Data.Model
 			// Persist activities and tasks
 			// TODO: InvalidOperationException: Collection was modified; enumeration operation may not execute.
 			lock ( MemoryActivities )
-			lock ( MemoryTasks )
 			{
-				Data data = new Data()
+				var data = new Data
 				{
 					Home = HomeActivity,
-					Activities = MemoryActivities,
-					Tasks = MemoryTasks
+					Activities = MemoryActivities
 				};
 				PersistanceHelper.Persist( _activitiesFile, _activitySerializer, data );
 			}
