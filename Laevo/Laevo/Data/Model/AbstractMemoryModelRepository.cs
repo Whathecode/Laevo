@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
@@ -13,17 +14,7 @@ namespace Laevo.Data.Model
 	/// <author>Steven Jeuris</author>
 	abstract class AbstractMemoryModelRepository : IModelRepository
 	{
-		protected readonly List<Activity> MemoryActivities = new List<Activity>();
-		public ReadOnlyCollection<Activity> Activities
-		{
-			get { return MemoryActivities.AsReadOnly(); }
-		}
-
-		protected readonly List<Activity> MemoryTasks = new List<Activity>();
-		public ReadOnlyCollection<Activity> Tasks
-		{
-			get { return MemoryTasks.AsReadOnly(); }
-		}
+		protected readonly Dictionary<Guid, List<Activity>> MemoryActivities = new Dictionary<Guid, List<Activity>>();
 
 		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>();
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
@@ -42,47 +33,70 @@ namespace Laevo.Data.Model
 		}
 
 
-		public Activity CreateNewActivity( string name )
+		/// <summary>
+		///   Get the subactivities of a certain parent activity, or the subactivities of the home activity when null.
+		/// </summary>
+		/// <param name="parent">The parent activity to get subactivities of.</param>
+		public IEnumerable<Activity> GetActivities( Activity parent = null )
+		{
+			Guid parentId = parent == null ? HomeActivity.Identifier : parent.Identifier;
+
+			List<Activity> activities;
+			if ( MemoryActivities.TryGetValue( parentId, out activities ) )
+			{
+				return activities;
+			}
+			
+			return new List<Activity>();
+		}
+
+		/// <summary>
+		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.
+		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
+		/// </summary>
+		/// <param name="name">Name for the newly created activity.</param>
+		/// <param name="parent">The parent activity to which to add this subactivity.</param>
+		/// <returns>The newly created activity.</returns>
+		public Activity CreateNewActivity( string name, Activity parent = null )
 		{
 			var newActivity = new Activity( name );
-			newActivity.ToDoChangedEvent += OnActivityToDoChanged;
 
-			MemoryActivities.Add( newActivity );
+			Guid parentId = parent == null
+				? HomeActivity == null
+					? Guid.Empty
+					: HomeActivity.Identifier
+				: parent.Identifier;
+			List<Activity> activities;
+			if ( !MemoryActivities.TryGetValue( parentId, out activities ) )
+			{
+				activities = new List<Activity>();
+				MemoryActivities[ parentId ] = activities;
+			}
+			activities.Add( newActivity );
 
 			return newActivity;
 		}
 
 		public void RemoveActivity( Activity activity )
 		{
-			activity.ToDoChangedEvent -= OnActivityToDoChanged;
-
-			MemoryActivities.Remove( activity );
-			MemoryTasks.Remove( activity );
-		}
-
-		protected void OnActivityToDoChanged( Activity activity )
-		{
-			if ( activity.IsToDo )
+			foreach ( var activities in MemoryActivities.Values )
 			{
-				MemoryTasks.Add( activity );
-				if ( activity.OpenIntervals.Count == 0 )
-				{
-					MemoryActivities.Remove( activity );
-				}
-			}
-			else
-			{
-				MemoryTasks.Remove( activity );
-				if ( !MemoryActivities.Contains( activity ) )
-				{
-					MemoryActivities.Add( activity );
-				}
+				activities.Remove( activity );
 			}
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )
 		{
-			MemoryTasks.Swap( task1, task2 );
+			foreach ( var activities in MemoryActivities.Values )
+			{
+				if ( activities.Contains( task1 ) && activities.Contains( task2 ) )
+				{
+					activities.Swap( task1, task2 );
+					return;
+				}
+			}
+			
+			throw new InvalidOperationException( "The passed activities do not belong to the same parent, and thus can not be ordered." );
 		}
 
 		public void AddAttentionShift( AbstractAttentionShift attentionShift )

@@ -58,15 +58,10 @@ namespace Laevo.Model
 
 		public ReadOnlyCollection<Activity> Activities
 		{
-			get { return _dataRepository.Activities; }
+			get { return _dataRepository.GetActivities().ToList().AsReadOnly(); }
 		}
 
 		public event Action<Activity> InterruptionAdded;
-
-		public ReadOnlyCollection<Activity> Tasks
-		{
-			get { return _dataRepository.Tasks; }
-		}
 
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
 		{
@@ -139,7 +134,7 @@ namespace Laevo.Model
 			Log.Debug( "Workspace manager initialized." );
 
 			// Handle activities and tasks from previous sessions.
-			_dataRepository.Activities.ForEach( HandleActivity );
+			_dataRepository.GetActivities().ForEach( HandleActivity );
 
 			// Find home activity and set as current activity.
 			HomeActivity = _dataRepository.HomeActivity;

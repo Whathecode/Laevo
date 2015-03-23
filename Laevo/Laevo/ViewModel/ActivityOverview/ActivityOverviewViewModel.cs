@@ -110,6 +110,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.HomeActivity )]
 		public ActivityViewModel HomeActivity { get; private set; }
 
+		/// <summary>
+		///   The activity of which the time line is currently visible.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.VisibleActivity )]
+		public ActivityViewModel VisibleActivity { get; private set; }
+
 		[NotifyPropertyChanged( Binding.Properties.HomeActivity )]
 		public void OnHomeActivityChanged( ActivityViewModel oldActivity, ActivityViewModel newActivity )
 		{
@@ -147,9 +153,10 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity( false );
+			VisibleActivity = HomeActivity;
 
 			// Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
-			Activities.Concat( Tasks ).Distinct().ForEach( HookActivityToOverview );
+			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
