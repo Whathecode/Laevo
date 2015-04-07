@@ -32,9 +32,13 @@
 	Topmost="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Edit}, IfTrue=False, IfFalse=True}}">
 
 	<Window.Resources>
-		<LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
+		<LinearGradientBrush x:Key="PersonalActivitiesBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
 			<GradientStop Color="#606c88" Offset="0" />
-			<GradientStop Color="#282944" Offset="1" />
+			<GradientStop Color="#2D3340" Offset="1" />
+		</LinearGradientBrush>
+		<LinearGradientBrush x:Key="HierarchiesActivitiesBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
+			<GradientStop Color="#909090" Offset="0" />
+			<GradientStop Color="#404040" Offset="1" />
 		</LinearGradientBrush>
 		<SolidColorBrush x:Key="TimeLineBrush" Color="Transparent" options:Freeze="True" />
 		
@@ -47,7 +51,10 @@
 	
 	<Grid
 		x:Name="Container2D"
-		Background="{StaticResource BackgroundBrush}"
+		Background="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter
+			Flag={x:Static vm:Mode.Activate},
+			IfTrue={StaticResource PersonalActivitiesBrush},
+			IfFalse={StaticResource HierarchiesActivitiesBrush}}}"
 		behaviors:MouseBehavior.LeftClickDragCommand="{Binding ElementName=Control, Path=MoveTimeLineCommand}"
 		behaviors:MouseBehavior.DragCapturesMouse="True"
 		MouseWheel="OnMouseWheel">
@@ -94,6 +101,37 @@
 			</Style>
 		</Grid.Style>-->
 
+		<!-- Buttons at the top, including breadcrumbs and switching between views. -->
+		<StackPanel
+			Orientation="Horizontal"
+			HorizontalAlignment="Right"
+			VerticalAlignment="Top"
+			Margin="0, 10, 10, 0">
+			<activityOverview:Breadcrumbs
+				VerticalAlignment="Top"
+				Visibility="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter
+					Flag={x:Static vm:Mode.Hierarchies},
+					IfTrue={x:Static Visibility.Visible},
+					IfFalse={x:Static Visibility.Hidden}}}"
+				Height="30"
+				Margin="0, 0, 10, 0" />
+			<Border
+				BorderBrush="#AAAAAA"
+				BorderThickness="2"
+				CornerRadius="5"
+				Background="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter
+					Flag={x:Static vm:Mode.Activate},
+					IfTrue={StaticResource HierarchiesActivitiesBrush},
+					IfFalse={StaticResource PersonalActivitiesBrush}}}"
+				Width="65" Height="65">
+				<Button
+					Command="{pf:CommandBinding {x:Static binding:Commands.SwitchPersonalHierarchies}}"
+					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+					<Image Source="Images/SwitchOverview.png" />
+				</Button>
+			</Border>
+		</StackPanel>
+		
 		<!-- Time Line 3D -->
 		<Viewport3D
 			AllowDrop="True"
@@ -385,10 +423,7 @@
 			<Grid.Style>
 				<Style>
 					<Style.Triggers>
-						<DataTrigger Binding="{Binding ActivityMode}">
-							<DataTrigger.Value>
-								<vm:Mode>Edit</vm:Mode>
-							</DataTrigger.Value>
+						<DataTrigger Value="True" Binding="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Edit}}}">
 							<DataTrigger.EnterActions>
 								<BeginStoryboard>
 									<Storyboard>

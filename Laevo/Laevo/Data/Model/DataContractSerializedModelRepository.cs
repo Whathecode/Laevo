@@ -7,7 +7,6 @@ using ABC.Interruptions;
 using Laevo.Data.Common;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
-using Whathecode.System.Extensions;
 
 
 namespace Laevo.Data.Model
@@ -68,7 +67,13 @@ namespace Laevo.Data.Model
 			}
 
 			// Add activities from previous sessions.
-			loadedData.Activities.ForEach( a => MemoryActivities.Add( a.Key, a.Value ) );
+			foreach ( var activities in loadedData.Activities )
+			{
+				foreach ( var activity in activities.Value )
+				{
+					AddActivity( activity, activities.Key );
+				}
+			}
 
 			// Set home activity.
 			if ( loadedData.Home != null )

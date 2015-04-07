@@ -25,6 +25,13 @@ namespace Laevo.Data.Model
 		IEnumerable<Activity> GetActivities( Activity parent = null );
 
 		/// <summary>
+		///   Gets the full path (parent activities) of this activity.
+		/// </summary>
+		/// <param name="activity">The activity to get the path for.</param>
+		/// <returns>An ordered list of parent activities, where the last activity is the closest parent.</returns>
+		List<Activity> GetPath( Activity activity );
+
+			/// <summary>
 		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.
 		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
 		/// </summary>

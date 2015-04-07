@@ -483,7 +483,14 @@ namespace Laevo.ViewModel.Activity
 			else
 			{
 				// TODO: When the activity is in a suspended state, ask whether the user would like to open and resume it. In order to open the activity it needs to be resumed.
-				ActivateActivity( Activity.IsOpen );
+				if ( _overview.ActivityMode.HasFlag( Mode.Activate ) )
+				{
+					ActivateActivity( Activity.IsOpen );
+				}
+				else
+				{
+					OpenTimeLine();
+				}
 			}
 		}
 
@@ -542,6 +549,12 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			Activity.Open();
+		}
+
+		[CommandExecute( Commands.OpenTimeLine )]
+		public void OpenTimeLine()
+		{
+			_overview.LoadActivities( this );
 		}
 
 		[CommandCanExecute( Commands.OpenActivity )]

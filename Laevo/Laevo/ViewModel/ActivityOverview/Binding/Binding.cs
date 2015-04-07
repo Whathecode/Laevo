@@ -6,8 +6,11 @@
 		IsFocusedTimeBeforeNow,
 		FocusedRoundedTime,
 		FocusedOffsetPercentage,
-		HomeActivity,
 		VisibleActivity,
+		HomeActivity,
+		Activities,
+		Tasks,
+		Path,
 		Mode,
 		CurrentActivityViewModel,
 		TimeLineRenderScale,
@@ -19,6 +22,7 @@
 		NewTask,
 		NewActivity,
 		PlanActivity,
-		OpenHome
+		OpenHome,
+		SwitchPersonalHierarchies
 	}
 }

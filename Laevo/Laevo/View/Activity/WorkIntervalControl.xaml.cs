@@ -81,6 +81,10 @@ namespace Laevo.View.Activity
 			}
 
 			var parent = this.FindParent<TimePanel>();
+			if ( parent == null )
+			{
+				return;
+			}
 			double displacement = e.DragInfo.Displacement.Y / parent.ActualHeight;
 			var viewModel = (WorkIntervalViewModel)DataContext;
 			double offset = viewModel.OffsetPercentage;
