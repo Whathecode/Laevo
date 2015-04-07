@@ -15,6 +15,8 @@ namespace Laevo.Data.Model
 	abstract class AbstractMemoryModelRepository : IModelRepository
 	{
 		protected readonly Dictionary<Guid, List<Activity>> MemoryActivities = new Dictionary<Guid, List<Activity>>();
+		protected readonly Dictionary<Activity, Guid>  ActivityParents = new Dictionary<Activity, Guid>();
+		protected readonly Dictionary<Guid, Activity> ActivityGuids = new Dictionary<Guid, Activity>();  
 
 		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>();
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
@@ -50,6 +52,22 @@ namespace Laevo.Data.Model
 			return new List<Activity>();
 		}
 
+		public List<Activity> GetPath( Activity activity )
+		{
+			List<Activity> parents = new List<Activity>();
+
+			Guid parentId = ActivityParents[ activity ];
+			while ( parentId != Guid.Empty )
+			{
+				var parent = ActivityGuids[ parentId ];
+				parents.Add( parent );
+				parentId = ActivityParents[ parent ];
+			}
+
+			parents.Reverse();
+			return parents;
+		}
+
 		/// <summary>
 		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.
 		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
@@ -60,21 +78,33 @@ namespace Laevo.Data.Model
 		public Activity CreateNewActivity( string name, Activity parent = null )
 		{
 			var newActivity = new Activity( name );
+			AddActivity( newActivity, parent );
 
+			return newActivity;
+		}
+
+		protected void AddActivity( Activity activity, Activity parent )
+		{
 			Guid parentId = parent == null
 				? HomeActivity == null
 					? Guid.Empty
 					: HomeActivity.Identifier
 				: parent.Identifier;
+			AddActivity( activity, parentId );
+		}
+
+		protected void AddActivity( Activity activity, Guid parentId )
+		{
 			List<Activity> activities;
 			if ( !MemoryActivities.TryGetValue( parentId, out activities ) )
 			{
 				activities = new List<Activity>();
 				MemoryActivities[ parentId ] = activities;
 			}
-			activities.Add( newActivity );
+			activities.Add( activity );
 
-			return newActivity;
+			ActivityGuids.Add( activity.Identifier, activity );
+			ActivityParents.Add( activity, parentId );
 		}
 
 		public void RemoveActivity( Activity activity )
@@ -83,6 +113,9 @@ namespace Laevo.Data.Model
 			{
 				activities.Remove( activity );
 			}
+
+			ActivityGuids.Remove( activity.Identifier );
+			ActivityParents.Remove( activity );
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )

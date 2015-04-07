@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
@@ -122,21 +123,21 @@ namespace Laevo.ViewModel.ActivityOverview
 			_dataRepository.Home = newActivity;
 		}
 
-		public ObservableCollection<ActivityViewModel> Activities
-		{
-			get { return _dataRepository.Activities; }
-		}
+		[NotifyProperty( Binding.Properties.Activities )]
+		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
 
-		public ObservableCollection<ActivityViewModel> Tasks
-		{
-			get { return _dataRepository.Tasks; }
-		}
+		[NotifyProperty( Binding.Properties.Tasks )]
+		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
+
+		[NotifyProperty( Binding.Properties.Path )]
+		public List<ActivityViewModel> Path { get; private set; }
 
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
 			_dataRepository = dataRepository;
+			ActivityMode = Mode.Activate;
 
 			// Set up home activity.
 			if ( _dataRepository.Home != null )
@@ -155,8 +156,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			HomeActivity.ActivateActivity( false );
 			VisibleActivity = HomeActivity;
 
-			// Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
-			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
+			Activities = new ObservableCollection<ActivityViewModel>();
+			Tasks = new ObservableCollection<ActivityViewModel>();
+			LoadActivities( VisibleActivity );
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
@@ -176,6 +178,34 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.Start();
 		}
 
+
+		/// <summary>
+		///   Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
+		/// </summary>
+		public void LoadActivities( ActivityViewModel parentActivity )
+		{
+			// Be sure to save changes to currently loaded activities.
+			Persist();
+
+			_model.ChangeVisibleTimeLine( parentActivity.Activity );
+
+			// Clear previously loaded activities.
+			Activities.Union( Tasks ).ForEach( UnHookActivityFromOverview );
+
+			// Load new activities.
+			_dataRepository.LoadActivities( parentActivity.Activity );
+			Activities = _dataRepository.Activities;
+			Tasks = _dataRepository.Tasks;
+			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
+
+			// Set path.
+			if ( Path != null )
+			{
+				Path.ForEach( UnHookActivityFromOverview );
+			}
+			Path = _dataRepository.GetPath( parentActivity );
+			Path.ForEach( HookActivityToOverview );
+		}
 
 		/// <summary>
 		///   Create a new activity.
@@ -402,6 +432,22 @@ namespace Laevo.ViewModel.ActivityOverview
 		public void OpenHome()
 		{
 			HomeActivity.SelectActivity();
+		}
+
+		[CommandExecute( Commands.SwitchPersonalHierarchies )]
+		public void SwitchPersonalHierarchies()
+		{
+			// Swap flags.
+			if ( ActivityMode.HasFlag( Mode.Activate ) )
+			{
+				ActivityMode &= ~Mode.Activate;
+				ActivityMode |= Mode.Hierarchies;
+			}
+			else
+			{
+				ActivityMode &= ~Mode.Hierarchies;
+				ActivityMode |= Mode.Activate;				
+			}
 		}
 
 		// ReSharper disable UnusedMember.Local

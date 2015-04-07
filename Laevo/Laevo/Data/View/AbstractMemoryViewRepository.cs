@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Laevo.Model;
 using Laevo.ViewModel.Activity;
 
 
@@ -12,18 +14,21 @@ namespace Laevo.Data.View
 	{
 		public ActivityViewModel Home { get; set; }
 
-		readonly ObservableCollection<ActivityViewModel> _activities = new ObservableCollection<ActivityViewModel>();
-		public ObservableCollection<ActivityViewModel> Activities
+		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
+
+		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
+
+
+		protected AbstractMemoryViewRepository()
 		{
-			get { return _activities; }
+			Activities = new ObservableCollection<ActivityViewModel>();
+			Tasks = new ObservableCollection<ActivityViewModel>();
 		}
 
-		readonly ObservableCollection<ActivityViewModel> _tasks = new ObservableCollection<ActivityViewModel>(); 
-		public ObservableCollection<ActivityViewModel> Tasks
-		{
-			get { return _tasks; }
-		}
 
+		public abstract ActivityViewModel LoadActivity( Activity activity );
+		public abstract void LoadActivities( Activity parentActivity );
+		public abstract List<ActivityViewModel> GetPath( ActivityViewModel activity );
 
 		public abstract void SaveChanges();
 	}

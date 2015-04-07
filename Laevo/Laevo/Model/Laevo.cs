@@ -87,6 +87,18 @@ namespace Laevo.Model
 			}
 		}
 
+		Activity _openTimeLine;
+
+		public Activity OpenTimeLine
+		{
+			get { return _openTimeLine; }
+			private set
+			{
+				_openTimeLine = value;
+				Log.InfoWithData( "Open time line changed.", new LogData( _openTimeLine ) );
+			}
+		}
+
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
 			PersistenceProvider persistenceProvider )
@@ -136,8 +148,9 @@ namespace Laevo.Model
 			// Handle activities and tasks from previous sessions.
 			_dataRepository.GetActivities().ForEach( HandleActivity );
 
-			// Find home activity and set as current activity.
+			// Find home activity and set as current activity and visible time line.
 			HomeActivity = _dataRepository.HomeActivity;
+			OpenTimeLine = HomeActivity;
 			HomeActivity.View();
 
 			// Set up interruption handlers.
@@ -191,11 +204,16 @@ namespace Laevo.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name = DefaultActivityName )
 		{
-			var activity = _dataRepository.CreateNewActivity( name );
+			var activity = _dataRepository.CreateNewActivity( name, OpenTimeLine );
 			Log.InfoWithData( "New activity.", new LogData( activity ) );
 			HandleActivity( activity );
 
 			return activity;
+		}
+
+		public void ChangeVisibleTimeLine( Activity activity )
+		{
+			OpenTimeLine = activity;
 		}
 
 		void HandleActivity( Activity activity )
@@ -230,7 +248,7 @@ namespace Laevo.Model
 
 		public Activity CreateNewTask( string name = DefaultTaskName )
 		{
-			var task = _dataRepository.CreateNewActivity( name );
+			var task = _dataRepository.CreateNewActivity( name, OpenTimeLine );
 			Log.InfoWithData( "New task.", new LogData( task ) );
 			task.MakeToDo();
 			HandleActivity( task );

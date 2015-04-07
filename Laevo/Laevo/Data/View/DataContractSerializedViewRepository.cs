@@ -36,7 +36,7 @@ namespace Laevo.Data.View
 		readonly string _file;
 		readonly DataContractSerializer _serializer;
 		readonly Data _data;
-		readonly Activity _currentVisibleParent;
+		Activity _currentVisibleParent;
 
 
 		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
@@ -67,12 +67,29 @@ namespace Laevo.Data.View
 			}
 
 			// At startup, load time line for home activity.
-			_currentVisibleParent = modelData.HomeActivity;
-			LoadActivities( _currentVisibleParent );
+			LoadActivities( modelData.HomeActivity );
 		}
 
-		void LoadActivities( Activity parentActivity )
+		public override ActivityViewModel LoadActivity( Activity activity )
 		{
+			List<Activity> path = _modelData.GetPath( activity );
+			if ( path.Count == 0 )
+			{
+				return Home;
+			}
+
+			Guid parentId = path.Last().Identifier;
+			Dictionary<Guid, ActivityViewModel> activities = _data.Activities[ parentId ];
+			ActivityViewModel storedViewModel = activities[ activity.Identifier ];
+			return new ActivityViewModel( activity, _workspaceManager, storedViewModel );
+		}
+
+		public override sealed void LoadActivities( Activity parentActivity )
+		{
+			_currentVisibleParent = parentActivity;
+			Activities.Clear();
+			Tasks.Clear();
+
 			Dictionary<Guid, ActivityViewModel> activities;
 			if ( !_data.Activities.TryGetValue( parentActivity.Identifier, out activities ) )
 			{
@@ -107,6 +124,15 @@ namespace Laevo.Data.View
 					Tasks[ i ] = activity;
 				}
 			}
+		}
+
+		public override List<ActivityViewModel> GetPath( ActivityViewModel activity )
+		{
+			List<Activity> path = _modelData.GetPath( activity.Activity );
+			List<ActivityViewModel> parents = path.Select( LoadActivity ).ToList();
+			parents.Add( activity );
+
+			return parents;
 		}
 
 

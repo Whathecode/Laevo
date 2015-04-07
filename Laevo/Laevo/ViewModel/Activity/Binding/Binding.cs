@@ -28,6 +28,7 @@
 		SelectActivity,
 		EditActivity,
 		OpenActivity,
+		OpenTimeLine,
 		StopActivity,
 		SuspendActivity,
 		ForceSuspend,

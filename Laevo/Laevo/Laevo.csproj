@@ -437,6 +437,9 @@
     </Compile>
     <Compile Include="View\ActivityBar\DisableResize.cs" />
     <Compile Include="View\ActivityBar\GlassEffect.cs" />
+    <Compile Include="View\ActivityOverview\Breadcrumbs.xaml.cs">
+      <DependentUpon>Breadcrumbs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ActivityOverview\ClockControl.xaml.cs">
       <DependentUpon>ClockControl.xaml</DependentUpon>
     </Compile>
@@ -503,6 +506,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\ActivityOverview\Images\SwitchOverview.png" />
     <Resource Include="View\Common\Alert.png" />
     <Resource Include="View\Activity\ActionIcons\suspend.png" />
     <None Include="app.config" />
@@ -546,6 +550,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\ActivityOverview\ActivityOverviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ActivityOverview\Breadcrumbs.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
