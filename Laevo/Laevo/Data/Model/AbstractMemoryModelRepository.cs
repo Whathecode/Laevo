@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using ABC.Interruptions;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System.Extensions;
@@ -52,6 +54,11 @@ namespace Laevo.Data.Model
 			return new List<Activity>();
 		}
 
+		/// <summary>
+		///   Gets the full path (parent activities) of this activity.
+		/// </summary>
+		/// <param name="activity">The activity to get the path for.</param>
+		/// <returns>An ordered list of parent activities, where the last activity is the closest parent.</returns>
 		public List<Activity> GetPath( Activity activity )
 		{
 			List<Activity> parents = new List<Activity>();
@@ -66,6 +73,16 @@ namespace Laevo.Data.Model
 
 			parents.Reverse();
 			return parents;
+		}
+
+		/// <summary>
+		///   Gets a full list of all unattended interruptions per activity.
+		/// </summary>
+		public Dictionary<Activity, List<AbstractInterruption>> GetUnattendedInterruptions()
+		{
+			return ActivityGuids.Values
+				.Where( a => a.Interruptions.Count( i => !i.AttendedTo ) > 0 )
+				.ToDictionary( a => a, a => a.Interruptions.ToList() );
 		}
 
 		/// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using ABC.Interruptions;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
 
@@ -30,6 +31,11 @@ namespace Laevo.Data.Model
 		/// <param name="activity">The activity to get the path for.</param>
 		/// <returns>An ordered list of parent activities, where the last activity is the closest parent.</returns>
 		List<Activity> GetPath( Activity activity );
+
+		/// <summary>
+		///   Gets a full list of all unattended interruptions per activity.
+		/// </summary>
+		Dictionary<Activity, List<AbstractInterruption>> GetUnattendedInterruptions();
 
 			/// <summary>
 		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.

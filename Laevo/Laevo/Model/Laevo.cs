@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -55,12 +56,6 @@ namespace Laevo.Model
 		public WorkspaceManager WorkspaceManager { get; private set; }
 
 		public event Action<Activity> ActivityRemoved;
-
-		public ReadOnlyCollection<Activity> Activities
-		{
-			get { return _dataRepository.GetActivities().ToList().AsReadOnly(); }
-		}
-
 		public event Action<Activity> InterruptionAdded;
 
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
@@ -145,12 +140,9 @@ namespace Laevo.Model
 			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric, libraryManager.NonGeneric } );
 			Log.Debug( "Workspace manager initialized." );
 
-			// Handle activities and tasks from previous sessions.
-			_dataRepository.GetActivities().ForEach( HandleActivity );
-
 			// Find home activity and set as current activity and visible time line.
 			HomeActivity = _dataRepository.HomeActivity;
-			OpenTimeLine = HomeActivity;
+			ChangeVisibleTimeLine( HomeActivity );
 			HomeActivity.View();
 
 			// Set up interruption handlers.
@@ -194,7 +186,7 @@ namespace Laevo.Model
 
 		public void Update( DateTime now )
 		{
-			Activities.ForEach( a => a.Update( now ) );
+			_dataRepository.GetActivities( OpenTimeLine ).ForEach( a => a.Update( now ) );
 			_interruptionTrigger.Update( now );
 		}
 
@@ -213,12 +205,28 @@ namespace Laevo.Model
 
 		public void ChangeVisibleTimeLine( Activity activity )
 		{
+			_dataRepository.GetActivities( OpenTimeLine ).ForEach( UnHandleActivity );
 			OpenTimeLine = activity;
+			_dataRepository.GetActivities( OpenTimeLine ).ForEach( HandleActivity );
+		}
+
+		public Dictionary<Activity, List<AbstractInterruption>> GetUnattendedInterruptions()
+		{
+			return _dataRepository.GetUnattendedInterruptions();
 		}
 
 		void HandleActivity( Activity activity )
 		{
-			activity.ActivatedEvent += OnActivityActivated;
+			// TODO: Optimize when needed, 'GetActivities' is called quite a lot, just because parent/child relationship is only maintained in repository.
+			if ( _dataRepository.GetActivities( OpenTimeLine ).Contains( activity ) )
+			{
+				activity.ActivatedEvent += OnActivityActivated;
+			}
+		}
+
+		void UnHandleActivity( Activity activity )
+		{
+			activity.ActivatedEvent -= OnActivityActivated;
 		}
 
 		void OnActivityActivated( Activity activity )
