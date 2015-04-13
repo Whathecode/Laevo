@@ -10,6 +10,9 @@ namespace Laevo.Model
 		[DataMember]
 		Guid _identifier;
 
+		[DataMember]
+		public string Name { get; set; }
+
 
 		public User()
 		{

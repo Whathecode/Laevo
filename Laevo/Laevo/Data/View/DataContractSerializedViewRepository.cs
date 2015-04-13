@@ -9,6 +9,7 @@ using Laevo.Data.Common;
 using Laevo.Data.Model;
 using Laevo.Model;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.User;
 using Whathecode.System.Extensions;
 
 
@@ -59,6 +60,9 @@ namespace Laevo.Data.View
 					_data = (Data)_serializer.ReadObject( activitiesFileStream );
 				}
 			}
+
+			// Initialize user view model.
+			User = new UserViewModel( modelData.User );
 
 			// Initialize home from previous session, or initialize.
 			if ( _data.Home != null )

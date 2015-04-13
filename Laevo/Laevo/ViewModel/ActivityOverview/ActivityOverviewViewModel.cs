@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
+using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Arithmetic.Range;
@@ -448,6 +449,17 @@ namespace Laevo.ViewModel.ActivityOverview
 				ActivityMode &= ~Mode.Hierarchies;
 				ActivityMode |= Mode.Activate;				
 			}
+		}
+
+		[CommandExecute( Commands.OpenUserProfile )]
+		public void OpenUserProfile()
+		{
+			UserProfilePopup profile = new UserProfilePopup
+			{
+				DataContext = _dataRepository.User
+			};
+			profile.Closed += ( s, a ) => _dataRepository.User.Persist();
+			profile.ShowDialog();
 		}
 
 		// ReSharper disable UnusedMember.Local

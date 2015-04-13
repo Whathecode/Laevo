@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using Laevo.Model;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.User;
 
 
 namespace Laevo.Data.View
@@ -12,6 +13,7 @@ namespace Laevo.Data.View
 	/// <author>Steven Jeuris</author>
 	abstract class AbstractMemoryViewRepository : IViewRepository
 	{
+		public UserViewModel User { get; protected set; }
 		public ActivityViewModel Home { get; set; }
 
 		public ObservableCollection<ActivityViewModel> Activities { get; private set; }

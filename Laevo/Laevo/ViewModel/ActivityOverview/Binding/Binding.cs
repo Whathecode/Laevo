@@ -23,6 +23,7 @@
 		NewActivity,
 		PlanActivity,
 		OpenHome,
-		SwitchPersonalHierarchies
+		SwitchPersonalHierarchies,
+		OpenUserProfile
 	}
 }

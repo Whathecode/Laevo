@@ -429,6 +429,8 @@
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveWindow.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
+    <Compile Include="ViewModel\User\Binding\Binding.cs" />
+    <Compile Include="ViewModel\User\UserViewModel.cs" />
     <Compile Include="View\ActivityBar\ActivityBackgroundConverter.cs" />
     <Compile Include="View\ActivityBar\ActivityBar.xaml.cs">
       <DependentUpon>ActivityBar.xaml</DependentUpon>
@@ -497,6 +499,9 @@
     <Compile Include="View\Settings\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\User\UserProfilePopup.xaml.cs">
+      <DependentUpon>UserProfilePopup.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -507,6 +512,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\ActivityOverview\Images\Profile.png" />
     <Resource Include="View\ActivityOverview\Images\SwitchOverview.png" />
     <Resource Include="View\Common\Alert.png" />
     <Resource Include="View\Activity\ActionIcons\suspend.png" />
@@ -589,6 +595,10 @@
     <Page Include="View\Settings\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\User\UserProfilePopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
