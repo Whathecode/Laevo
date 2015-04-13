@@ -13,6 +13,8 @@ namespace Laevo.Data.Model
 	/// <author>Steven Jeuris</author>
 	public interface IModelRepository
 	{
+		User User { get; }
+
 		ReadOnlyCollection<AbstractAttentionShift> AttentionShifts { get; }
 
 		Activity HomeActivity { get; }

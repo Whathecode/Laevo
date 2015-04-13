@@ -411,6 +411,7 @@
     <Compile Include="Model\LaevoServiceProvider.cs" />
     <Compile Include="Model\PlannedInterval.cs" />
     <Compile Include="Model\Settings.cs" />
+    <Compile Include="Model\User.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="Data\View\ActivityDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityBar\ActivityBarViewModel.cs" />
