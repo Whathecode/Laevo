@@ -12,17 +12,9 @@
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:unresponsive1="clr-namespace:Laevo.View.Main.Unresponsive"
 	d:DataContext="{d:DesignInstance Type=unresponsive:UnresponsiveViewModel}"
-	WindowStyle="None"
-	ShowInTaskbar="False"
+	Style="{StaticResource Popup}"
 	WindowStartupLocation="CenterScreen"
-	AllowsTransparency="True"
-	Background="Transparent"
-	Width="650"
-	SizeToContent="Height"
-	FontFamily="Segoe UI Light"
-	FontSize="18"
-	Foreground="White"
-	Topmost="True">
+	Width="650">
 
 	<Window.Resources>
 		<common:PopupIconMarginConverter x:Key="PopupIconMarginConverter" AddMargin="20" />
@@ -75,7 +67,7 @@
 				TextWrapping="Wrap"
 				VerticalAlignment="Stretch"
 				TextAlignment="Center"
-				Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep them or ignore." />
+				Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep or ignore them." />
 
 
 			<ListView
