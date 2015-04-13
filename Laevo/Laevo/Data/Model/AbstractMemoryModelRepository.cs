@@ -18,7 +18,9 @@ namespace Laevo.Data.Model
 	{
 		protected readonly Dictionary<Guid, List<Activity>> MemoryActivities = new Dictionary<Guid, List<Activity>>();
 		protected readonly Dictionary<Activity, Guid>  ActivityParents = new Dictionary<Activity, Guid>();
-		protected readonly Dictionary<Guid, Activity> ActivityGuids = new Dictionary<Guid, Activity>();  
+		protected readonly Dictionary<Guid, Activity> ActivityGuids = new Dictionary<Guid, Activity>();
+
+		public User User { get; protected set; }
 
 		protected readonly List<AbstractAttentionShift> MemoryAttentionShifts = new List<AbstractAttentionShift>();
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts

@@ -21,6 +21,8 @@ namespace Laevo.Data.Model
 		class Data
 		{
 			[DataMember]
+			public User User;
+			[DataMember]
 			public Activity Home;
 			[DataMember]
 			public Dictionary<Guid, List<Activity>> Activities = new Dictionary<Guid, List<Activity>>();
@@ -65,6 +67,9 @@ namespace Laevo.Data.Model
 					loadedData = (Data)_activitySerializer.ReadObject( activitiesFileStream );
 				}
 			}
+
+			// Set user.
+			User = loadedData.User ?? new User();
 
 			// Add activities from previous sessions.
 			foreach ( var activities in loadedData.Activities )
@@ -117,6 +122,7 @@ namespace Laevo.Data.Model
 			{
 				var data = new Data
 				{
+					User = User,
 					Home = HomeActivity,
 					Activities = MemoryActivities
 				};
