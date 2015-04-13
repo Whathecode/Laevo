@@ -13,27 +13,11 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
-	WindowStyle="None"
-	ShowInTaskbar="False"
-	WindowStartupLocation="CenterScreen"
-	AllowsTransparency="True"
-	Background="Transparent"
-	Width="600"
-	Height="525"
-	FontFamily="Segoe UI Light"
-	FontSize="18"
-	Foreground="White"
-	Topmost="True">
+	Style="{StaticResource Popup}"
+	SizeToContent="Manual"
+	WindowStartupLocation="CenterScreen">
 
 	<Window.Resources>
-		<!-- Styles -->
-		<Style TargetType="Label">
-			<Setter Property="Foreground" Value="White" />
-		</Style>
-		<Style TargetType="Button">
-			<Setter Property="Padding" Value="10, 0, 10, 0" />
-		</Style>
-
 		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
 		<common:PopupIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
 	</Window.Resources>

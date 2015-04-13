@@ -8,28 +8,9 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.User"
 	d:DataContext="{d:DesignInstance Type=vm:UserViewModel}"
-	WindowStyle="None"
-	ShowInTaskbar="False"
-	WindowStartupLocation="CenterScreen"
-	AllowsTransparency="True"
-	Background="Transparent"
-	Width="600"
-	Height="525"
-	FontFamily="Segoe UI Light"
-	FontSize="18"
-	Foreground="White"
-	Topmost="True">
+	Style="{StaticResource Popup}"
+	WindowStartupLocation="CenterScreen">
 
-	<Window.Resources>
-		<!-- Styles -->
-		<Style TargetType="Label">
-			<Setter Property="Foreground" Value="White" />
-		</Style>
-		<Style TargetType="Button">
-			<Setter Property="Padding" Value="10, 0, 10, 0" />
-		</Style>
-	</Window.Resources>
-	
 	<Border
 		Margin="20"
 		CornerRadius="3"
