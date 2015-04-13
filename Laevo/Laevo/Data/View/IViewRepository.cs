@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using Laevo.Model;
 using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.User;
 
 
 namespace Laevo.Data.View
@@ -12,6 +13,7 @@ namespace Laevo.Data.View
 	/// <author>Steven Jeuris</author>
 	public interface IViewRepository
 	{
+		UserViewModel User { get; }
 		ActivityViewModel Home { get; set; }
 		ObservableCollection<ActivityViewModel> Activities { get; }
 		ObservableCollection<ActivityViewModel> Tasks { get; }
