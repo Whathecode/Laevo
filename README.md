@@ -40,4 +40,4 @@ http://www.gnu.org/licenses/gpl.html for details.
 
 This program uses several other open source libraries. Their copyright notices are added in the relevant Libraries folders.
 
-Some icons used are from http://iconza.com/
+Some icons used are from [Iconza](http://iconza.com). Others were made by or based on sources retrieved from [Freepik](http://www.freepik.com) from [Flaticon](http://www.flaticon.com) and are licensed under [Creative Commons BY 3.0](http://creativecommons.org/licenses/by/3.0/).
