@@ -476,6 +476,9 @@
       <DependentUpon>UnresponsiveWindowPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MessageBox.cs" />
+    <Compile Include="View\Share\SharePopup.xaml.cs">
+      <DependentUpon>SharePopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
       <DependentUpon>TaskListControl.xaml</DependentUpon>
@@ -512,6 +515,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\ActivityOverview\Images\Share.png" />
     <Resource Include="View\ActivityOverview\Images\Profile.png" />
     <Resource Include="View\ActivityOverview\Images\SwitchOverview.png" />
     <Resource Include="View\Common\Alert.png" />
@@ -577,6 +581,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Main\Unresponsive\UnresponsiveWindowPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Share\SharePopup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

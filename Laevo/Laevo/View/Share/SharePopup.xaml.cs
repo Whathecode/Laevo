@@ -3,13 +3,13 @@ using System.Windows;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 
 
-namespace Laevo.View.User
+namespace Laevo.View.Share
 {
 	/// <summary>
-	///   Interaction logic for UserProfilePopup.xaml
+	///   Interaction logic for SharePopup.xaml
 	/// </summary>
 	[WpfControl( typeof( Properties ) )]
-	public partial class UserProfilePopup
+	public partial class SharePopup
 	{
 		[Flags]
 		public enum Properties
@@ -17,12 +17,12 @@ namespace Laevo.View.User
 		}
 
 
-		public UserProfilePopup()
+		public SharePopup()
 		{
 			InitializeComponent();
 		}
 
-		void OnSaveButtonClicked( object sender, RoutedEventArgs e )
+		void OnCloseButtonClicked( object sender, RoutedEventArgs e )
 		{
 			Close();
 		}
