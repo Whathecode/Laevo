@@ -24,6 +24,7 @@
 		PlanActivity,
 		OpenHome,
 		SwitchPersonalHierarchies,
-		OpenUserProfile
+		OpenUserProfile,
+		OpenTimeLineSharing
 	}
 }

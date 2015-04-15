@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
+using Laevo.View.Share;
 using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -454,12 +455,23 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.OpenUserProfile )]
 		public void OpenUserProfile()
 		{
-			UserProfilePopup profile = new UserProfilePopup
+			var profile = new UserProfilePopup
 			{
 				DataContext = _dataRepository.User
 			};
 			profile.Closed += ( s, a ) => _dataRepository.User.Persist();
 			profile.ShowDialog();
+		}
+
+		[CommandExecute( Commands.OpenTimeLineSharing )]
+		public void OpenTimeLineSharing()
+		{
+			var share = new SharePopup
+			{
+				DataContext = VisibleActivity
+			};
+			share.Closed += ( s, a ) => VisibleActivity.Persist();
+			share.ShowDialog();
 		}
 
 		// ReSharper disable UnusedMember.Local
