@@ -6,7 +6,7 @@ using ABC.Interruptions;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Data.View;
-using Laevo.Peer;
+using Laevo.Peer.Mock;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
 using Whathecode.System;

@@ -415,7 +415,7 @@
     <Compile Include="Peer\IPeerFactory.cs" />
     <Compile Include="Peer\IUsersPeer.cs" />
     <Compile Include="Peer\Mock\MockUsersPeer.cs" />
-    <Compile Include="Peer\MockPeerFactory.cs" />
+    <Compile Include="Peer\Mock\MockPeerFactory.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="Data\View\ActivityDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityBar\ActivityBarViewModel.cs" />
@@ -508,6 +508,10 @@
     <Compile Include="View\Settings\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\User\UserImage.xaml.cs">
+      <DependentUpon>UserImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\User\UserInitialsConverter.cs" />
     <Compile Include="View\User\UserProfilePopup.xaml.cs">
       <DependentUpon>UserProfilePopup.xaml</DependentUpon>
     </Compile>
@@ -611,6 +615,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Settings\SettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\User\UserImage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

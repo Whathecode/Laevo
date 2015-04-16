@@ -18,7 +18,8 @@
 		IsEditable,
 		IsAccessible,
 		WorkIntervals,
-		OpenInterval
+		OpenInterval,
+		AccessUsers
 	}
 
 	public enum Commands

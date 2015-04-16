@@ -14,6 +14,7 @@ using ABC.Workspaces;
 using ABC.Workspaces.Library;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
+using Laevo.ViewModel.User;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -267,6 +268,12 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		[NotifyProperty( Binding.Properties.OpenInterval )]
 		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
+
+		/// <summary>
+		///   The users who have access to the time line of this activity and subactivities.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.AccessUsers )]
+		public ObservableCollection<UserViewModel> AccessUsers { get; private set; }
 			
 		EditActivityPopup _editActivityPopup;
 
@@ -393,6 +400,8 @@ namespace Laevo.ViewModel.Activity
 			PossibleIcons = new ObservableCollection<BitmapImage>( PresetIcons );
 			WorkIntervals = new ObservableCollection<WorkIntervalViewModel>();
 			WorkIntervals.CollectionChanged += ( sender, args ) => UpdateOpenInterval();
+
+			AccessUsers = new ObservableCollection<UserViewModel>();
 		}
 
 
