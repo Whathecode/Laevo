@@ -3,7 +3,7 @@ using System.Windows;
 using Whathecode.System.Windows.DependencyPropertyFactory.Aspects;
 
 
-namespace Laevo.View.Share
+namespace Laevo.View.Activity.Share
 {
 	/// <summary>
 	///   Interaction logic for SharePopup.xaml

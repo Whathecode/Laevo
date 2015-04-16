@@ -6,6 +6,7 @@ using ABC.Interruptions;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Data.View;
+using Laevo.Peer;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
 using Whathecode.System;
@@ -36,10 +37,16 @@ namespace Laevo
 			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
 			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider );
+			var peerFactory = new MockPeerFactory();
 
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			_model = new Model.Laevo( ProgramLocalDataFolder, dataRepository, interruptionAggregator, _persistenceProvider );
+			_model = new Model.Laevo(
+				ProgramLocalDataFolder,
+				dataRepository,
+				interruptionAggregator,
+				_persistenceProvider,
+				peerFactory.GetUsersPeer() );
 
 			// Create ViewModel.
 			// TODO: Move WorkspaceManager to ViewModel?

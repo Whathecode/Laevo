@@ -9,7 +9,8 @@
 	xmlns:vm="clr-namespace:Laevo.ViewModel.User"
 	d:DataContext="{d:DesignInstance Type=vm:UserViewModel}"
 	Style="{StaticResource Popup}"
-	WindowStartupLocation="CenterScreen">
+	WindowStartupLocation="CenterScreen"
+	MinHeight="200">
 
 	<Border
 		Margin="20"
@@ -38,7 +39,7 @@
 			
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
-				<RowDefinition Height="100" />
+				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 
 			<StackPanel

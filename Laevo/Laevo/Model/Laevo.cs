@@ -13,6 +13,7 @@ using ABC.Workspaces.Windows.Settings;
 using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
+using Laevo.Peer;
 using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
@@ -45,6 +46,8 @@ namespace Laevo.Model
 
 		readonly AbstractInterruptionTrigger _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
+
+		public IUsersPeer UsersPeer { get; private set; }
 
 		public static string ProgramLocalDataFolder { get; private set; }
 
@@ -96,7 +99,7 @@ namespace Laevo.Model
 
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
-			PersistenceProvider persistenceProvider )
+			PersistenceProvider persistenceProvider, IUsersPeer usersPeer )
 		{
 			Log.Info( "Startup." );
 
@@ -104,6 +107,7 @@ namespace Laevo.Model
 
 			_interruptionTrigger = interruptionTrigger;
 			_dataRepository = dataRepository;
+			UsersPeer = usersPeer;
 
 			ProgramLocalDataFolder = dataFolder;
 
