@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
-using Laevo.View.Share;
+using Laevo.View.Activity.Share;
 using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -468,7 +468,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			var share = new SharePopup
 			{
-				DataContext = VisibleActivity
+				DataContext = new ShareViewModel( _model, VisibleActivity )
 			};
 			share.Closed += ( s, a ) => VisibleActivity.Persist();
 			share.ShowDialog();

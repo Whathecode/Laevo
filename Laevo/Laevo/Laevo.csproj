@@ -412,6 +412,10 @@
     <Compile Include="Model\PlannedInterval.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Model\User.cs" />
+    <Compile Include="Peer\IPeerFactory.cs" />
+    <Compile Include="Peer\IUsersPeer.cs" />
+    <Compile Include="Peer\Mock\MockUsersPeer.cs" />
+    <Compile Include="Peer\MockPeerFactory.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="Data\View\ActivityDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityBar\ActivityBarViewModel.cs" />
@@ -421,6 +425,8 @@
     <Compile Include="ViewModel\Activity\Binding\Binding.cs" />
     <Compile Include="ViewModel\Activity\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Activity\ActivityPosition.cs" />
+    <Compile Include="ViewModel\Activity\Binding\ShareBinding.cs" />
+    <Compile Include="ViewModel\Activity\ShareViewModel.cs" />
     <Compile Include="ViewModel\Activity\WorkIntervalViewModel.cs" />
     <Compile Include="ViewModel\Main\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\MainViewModel.cs" />
@@ -476,7 +482,7 @@
       <DependentUpon>UnresponsiveWindowPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MessageBox.cs" />
-    <Compile Include="View\Share\SharePopup.xaml.cs">
+    <Compile Include="View\Activity\Share\SharePopup.xaml.cs">
       <DependentUpon>SharePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
@@ -584,7 +590,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Share\SharePopup.xaml">
+    <Page Include="View\Activity\Share\SharePopup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
