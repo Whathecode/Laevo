@@ -1,0 +1,30 @@
+﻿<UserControl
+	x:Class="Laevo.View.User.UserImage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:userVm="clr-namespace:Laevo.ViewModel.User"
+    xmlns:user="clr-namespace:Laevo.View.User"
+    d:DataContext="{d:DesignInstance Type=userVm:UserViewModel}"
+    mc:Ignorable="d" 
+	Width="30" Height="30">
+	
+	<UserControl.Resources>
+		<user:UserInitialsConverter x:Key="InitialConverter" />
+	</UserControl.Resources>
+
+	<Border
+		BorderBrush="{StaticResource BorderBrush}"
+		BorderThickness="1"
+		Background="#777777">
+		<Label
+			Padding="0"
+			FontSize="14"
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			ClipToBounds="False"
+			Content="{Binding Name, Converter={StaticResource InitialConverter}}" />
+    </Border>
+	
+</UserControl>

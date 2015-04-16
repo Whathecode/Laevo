@@ -4,6 +4,7 @@
 
 	<!-- Common brushes. -->
 	<SolidColorBrush x:Key="ForegroundBrush" Color="White" />
+	<SolidColorBrush x:Key="BorderBrush" Color="#AAAAAA" />
 	<!-- TODO: Is this brush still used? I can't see it being referenced anywhere. -->
 	<SolidColorBrush x:Key="AeroThemeColor" />
 	

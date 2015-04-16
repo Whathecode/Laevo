@@ -1,7 +1,4 @@
-﻿using Laevo.Peer.Mock;
-
-
-namespace Laevo.Peer
+﻿namespace Laevo.Peer.Mock
 {
 	public class MockPeerFactory : IPeerFactory
 	{
