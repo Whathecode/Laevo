@@ -463,6 +463,7 @@
     <Compile Include="View\Activity\Converters\OccuranceEndConverter.cs" />
     <Compile Include="View\Activity\Converters\DisconnectedConverter.cs" />
     <Compile Include="View\Common\Common.cs" />
+    <Compile Include="View\Common\LaevoPopup.cs" />
     <Compile Include="View\Common\PopupIconMarginConverter.cs" />
     <Compile Include="View\Main\IconConverter.cs" />
     <Compile Include="View\Main\Unresponsive\EventFocusAttachment.cs" />
