@@ -22,5 +22,10 @@ namespace Laevo.Peer.Mock
 			};
 			return result;
 		}
+
+		public void Invite( User user, Activity activity )
+		{
+			// Nothing to mock.
+		}
 	}
 }

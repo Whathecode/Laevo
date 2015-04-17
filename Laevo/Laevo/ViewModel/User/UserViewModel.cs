@@ -8,7 +8,7 @@ namespace Laevo.ViewModel.User
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	public class UserViewModel : AbstractViewModel
 	{
-		readonly Model.User _user;
+		internal readonly Model.User User;
 
 
 		[NotifyProperty( Binding.Properties.Name )]
@@ -17,7 +17,7 @@ namespace Laevo.ViewModel.User
 
 		public UserViewModel( Model.User user )
 		{
-			_user = user;
+			User = user;
 			Name = user.Name;
 		}
 
@@ -29,7 +29,7 @@ namespace Laevo.ViewModel.User
 
 		public override void Persist()
 		{
-			_user.Name = Name;
+			User.Name = Name;
 		}
 	}
 }

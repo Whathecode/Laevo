@@ -8,7 +8,7 @@ namespace Laevo.Model
 	public class User
 	{
 		[DataMember]
-		Guid _identifier;
+		readonly Guid _identifier;
 
 		[DataMember]
 		public string Name { get; set; }
@@ -17,6 +17,24 @@ namespace Laevo.Model
 		public User()
 		{
 			_identifier = Guid.NewGuid();
+		}
+
+
+		public override bool Equals( object obj )
+		{
+			var user = obj as User;
+
+			if ( user == null )
+			{
+				return false;
+			}
+
+			return _identifier.Equals( user._identifier );
+		}
+
+		public override int GetHashCode()
+		{
+			return _identifier.GetHashCode();
 		}
 	}
 }

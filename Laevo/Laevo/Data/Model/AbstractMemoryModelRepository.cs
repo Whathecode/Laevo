@@ -57,6 +57,14 @@ namespace Laevo.Data.Model
 		}
 
 		/// <summary>
+		///   Returns a list of all activities which are shared.
+		/// </summary>
+		public IEnumerable<Activity> GetSharedActivities()
+		{
+			return ActivityGuids.Values.Where( a => a.AccessUsers.Count > 0 );
+		}
+
+		/// <summary>
 		///   Gets the full path (parent activities) of this activity.
 		/// </summary>
 		/// <param name="activity">The activity to get the path for.</param>
