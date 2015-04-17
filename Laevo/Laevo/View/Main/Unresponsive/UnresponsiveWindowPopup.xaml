@@ -12,36 +12,11 @@
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:unresponsive1="clr-namespace:Laevo.View.Main.Unresponsive"
 	d:DataContext="{d:DesignInstance Type=unresponsive:UnresponsiveViewModel}"
-	Style="{StaticResource Popup}"
 	WindowStartupLocation="CenterScreen"
-	Width="650">
+	Style="{StaticResource Popup}"
+	Foreground="White">
 
-	<Window.Resources>
-		<common:PopupIconMarginConverter x:Key="PopupIconMarginConverter" AddMargin="20" />
-	</Window.Resources>
-
-	<Border
-		Margin="20"
-		CornerRadius="3"
-		BorderThickness="1">
-
-		<Border.BorderBrush>
-			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-				<GradientStop Offset="0" Color="White" />
-				<GradientStop Offset="1" Color="Transparent" />
-			</LinearGradientBrush>
-		</Border.BorderBrush>
-
-		<Border.Background>
-			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-				<GradientStop Color="#606c88" Offset="0" />
-				<GradientStop Color="#282944" Offset="1" />
-			</LinearGradientBrush>
-		</Border.Background>
-
-		<Border.Effect>
-			<DropShadowEffect />
-		</Border.Effect>
+	<common:LaevoPopup  PopupImage="../../Common/Alert.png" PopupColor="#606c88">
 
 		<Grid Margin="20" Background="Transparent">
 
@@ -51,23 +26,12 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 
-			<Canvas>
-				<Image x:Name="Image" Source="../../Common/Alert.png">
-					<Image.Margin>
-						<MultiBinding Converter="{StaticResource PopupIconMarginConverter}">
-							<Binding ElementName="Image" Path="ActualWidth" />
-							<Binding ElementName="Image" Path="ActualHeight" />
-						</MultiBinding>
-					</Image.Margin>
-				</Image>
-			</Canvas>
-
 			<TextBlock
 				Grid.Row="0"
 				TextWrapping="Wrap"
 				VerticalAlignment="Stretch"
 				TextAlignment="Center"
-				Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep or ignore them." />
+				Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep them or ignore." />
 
 
 			<ListView
@@ -79,8 +43,7 @@
 				ItemsSource="{Binding UnresponsiveWindows}"
 				SelectedIndex="{Binding SelectedApplicationIndex}" 
 				SelectionMode="Extended"
-				IsSelected="True"
-				Foreground="White">
+				IsSelected="True">
 				<ListView.BorderBrush>
 					<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 						<GradientStop Offset="0" Color="White" />
@@ -141,6 +104,7 @@
 					</Style>
 				</Grid.Resources>
 
+
 				<Button
 					Name="KeepButton"
 					Grid.Column="0"
@@ -154,6 +118,6 @@
 					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Ignore}}" />
 			</Grid>
 		</Grid>
-	</Border>
+	</common:LaevoPopup>
 
 </Window>
