@@ -1,7 +1,11 @@
-﻿namespace Laevo.Peer
+﻿using Laevo.Model;
+
+
+namespace Laevo.Peer
 {
-	interface IPeerFactory
+	public interface IPeerFactory
 	{
 		IUsersPeer GetUsersPeer();
+		IActivityPeer GetActivityPeer( Activity activity );
 	}
 }

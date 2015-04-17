@@ -46,8 +46,11 @@ namespace Laevo.Model
 
 		readonly AbstractInterruptionTrigger _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
+		readonly IPeerFactory _peerFactory;
 
 		public IUsersPeer UsersPeer { get; private set; }
+
+		readonly Dictionary<Activity, IActivityPeer> _activityPeers = new Dictionary<Activity, IActivityPeer>();
 
 		public static string ProgramLocalDataFolder { get; private set; }
 
@@ -99,7 +102,7 @@ namespace Laevo.Model
 
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
-			PersistenceProvider persistenceProvider, IUsersPeer usersPeer )
+			PersistenceProvider persistenceProvider, IPeerFactory peerFactory )
 		{
 			Log.Info( "Startup." );
 
@@ -107,7 +110,11 @@ namespace Laevo.Model
 
 			_interruptionTrigger = interruptionTrigger;
 			_dataRepository = dataRepository;
-			UsersPeer = usersPeer;
+			_peerFactory = peerFactory;
+			UsersPeer = _peerFactory.GetUsersPeer();
+
+			// Initialize activity peers for shared activities.
+			_dataRepository.GetSharedActivities().ForEach( AddActivityPeer );
 
 			ProgramLocalDataFolder = dataFolder;
 
@@ -225,18 +232,43 @@ namespace Laevo.Model
 			if ( _dataRepository.GetActivities( OpenTimeLine ).Contains( activity ) )
 			{
 				activity.ActivatedEvent += OnActivityActivated;
+				activity.AccessAddedEvent += OnActivityAccessAdded;
+				activity.AccessRemovedEvent += OnActivityAccessRemoved;
 			}
 		}
 
 		void UnHandleActivity( Activity activity )
 		{
 			activity.ActivatedEvent -= OnActivityActivated;
+			activity.AccessAddedEvent -= OnActivityAccessAdded;
+			activity.AccessRemovedEvent -= OnActivityAccessRemoved;
 		}
 
 		void OnActivityActivated( Activity activity )
 		{
 			_dataRepository.AddAttentionShift( new ActivityAttentionShift( activity ) );
 			CurrentActivity = activity;
+		}
+
+		void OnActivityAccessAdded( Activity activity, User user )
+		{
+			AddActivityPeer( activity );
+		}
+
+		void OnActivityAccessRemoved( Activity activity, User user )
+		{
+			if ( activity.AccessUsers.Count == 0 )
+			{
+				_activityPeers.Remove( activity );
+			}
+		}
+
+		void AddActivityPeer( Activity activity )
+		{
+			if ( !_activityPeers.ContainsKey( activity ) )
+			{
+				_activityPeers[ activity ] = _peerFactory.GetActivityPeer( activity );
+			}
 		}
 
 		/// <summary>

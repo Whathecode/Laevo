@@ -33,6 +33,9 @@ namespace Laevo.Model
 
 		public event Action<Activity> ToDoChangedEvent;
 
+		public event Action<Activity, User> AccessAddedEvent;
+		public event Action<Activity, User> AccessRemovedEvent;
+
 		[DataMember]
 		public Guid Identifier { get; private set; }
 
@@ -128,6 +131,17 @@ namespace Laevo.Model
 		[DataMember]
 		public Uri SpecificFolder { get; private set; }
 
+		[DataMember]
+		HashSet<User> _accessUsers;
+
+		/// <summary>
+		///   The users who have access to the time line of this activity.
+		/// </summary>
+		public IReadOnlyCollection<User> AccessUsers
+		{
+			get { return _accessUsers.ToList(); }
+		}
+
 
 		public Activity()
 			: this( "" ) {}
@@ -158,6 +172,7 @@ namespace Laevo.Model
 			_openIntervals = new List<TimeInterval>();
 			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
+			_accessUsers = new List<User>();
 		}
 
 		string CreateSafeFolderName()
@@ -378,6 +393,18 @@ namespace Laevo.Model
 		public void AddInterruption( AbstractInterruption interruption )
 		{
 			_interruptions.Add( interruption );
+		}
+
+		public void AddAccess( User user )
+		{
+			_accessUsers.Add( user );
+			AccessAddedEvent( this, user );
+		}
+
+		public void RemoveAccess( User user )
+		{
+			_accessUsers.Remove( user );
+			AccessRemovedEvent( this, user );
 		}
 
 		public override bool Equals( object obj )

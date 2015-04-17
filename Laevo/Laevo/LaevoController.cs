@@ -46,7 +46,7 @@ namespace Laevo
 				dataRepository,
 				interruptionAggregator,
 				_persistenceProvider,
-				peerFactory.GetUsersPeer() );
+				peerFactory );
 
 			// Create ViewModel.
 			// TODO: Move WorkspaceManager to ViewModel?

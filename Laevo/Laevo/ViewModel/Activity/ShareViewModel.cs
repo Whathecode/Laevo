@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Laevo.Peer;
 using Laevo.ViewModel.Activity.Binding;
 using Laevo.ViewModel.User;
@@ -39,6 +38,13 @@ namespace Laevo.ViewModel.Activity
 
 			List<Model.User> users = await _usersPeer.GetUsers( searchTerm );
 			users.Select( u => new UserViewModel( u ) ).ForEach( RetrievedUsers.Add );
+		}
+
+		[CommandExecute( ShareCommands.InviteUser )]
+		public void InviteUser( UserViewModel user )
+		{
+			_usersPeer.Invite( user.User, Activity.Activity );
+			Activity.InviteUser( user );
 		}
 	}
 }

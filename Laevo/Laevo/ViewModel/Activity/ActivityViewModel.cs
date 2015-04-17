@@ -269,11 +269,13 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.OpenInterval )]
 		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
 
+		ObservableCollection<UserViewModel> _accessUsers;
+		ReadOnlyObservableCollection<UserViewModel> _readOnlyAccessUsers;
 		/// <summary>
-		///   The users who have access to the time line of this activity and subactivities.
+		///   The users who have access to the time line of this activity.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.AccessUsers )]
-		public ObservableCollection<UserViewModel> AccessUsers { get; private set; }
+		public ReadOnlyObservableCollection<UserViewModel> AccessUsers { get { return _readOnlyAccessUsers; } }
 			
 		EditActivityPopup _editActivityPopup;
 
@@ -290,7 +292,7 @@ namespace Laevo.ViewModel.Activity
 				.Where( r => r.Key.ToString().StartsWith( IconResourceLocation ) )
 				.Select( r => new BitmapImage( new Uri( @"pack://application:,,/" + r.Key.ToString(), UriKind.Absolute ) ) )
 				.ToList();
-			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) ); 
+			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
 		}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
@@ -401,7 +403,12 @@ namespace Laevo.ViewModel.Activity
 			WorkIntervals = new ObservableCollection<WorkIntervalViewModel>();
 			WorkIntervals.CollectionChanged += ( sender, args ) => UpdateOpenInterval();
 
-			AccessUsers = new ObservableCollection<UserViewModel>();
+			// Initialize users who have access to this time line.
+			_accessUsers = new ObservableCollection<UserViewModel>();
+			_readOnlyAccessUsers = new ReadOnlyObservableCollection<UserViewModel>( _accessUsers );
+			Activity.AccessUsers.ForEach( u => _accessUsers.Add( new UserViewModel( u ) ) );
+			Activity.AccessAddedEvent += ( a, u ) => _accessUsers.Add( new UserViewModel( u ) );
+			Activity.AccessRemovedEvent += ( a, u ) => _accessUsers.Remove( new UserViewModel( u ) );
 		}
 
 
@@ -883,6 +890,11 @@ namespace Laevo.ViewModel.Activity
 			newActivity.IsPlanned = isPlanned;
 
 			return newActivity;
+		}
+
+		public void InviteUser( UserViewModel user )
+		{
+			Activity.AddAccess( user.User );
 		}
 
 		public override void Persist()
