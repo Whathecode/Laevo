@@ -17,35 +17,7 @@
 	SizeToContent="Manual"
 	WindowStartupLocation="CenterScreen">
 
-	<Window.Resources>
-		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
-		<common:PopupIconMarginConverter x:Key="ActivityIconMarginConverter" AddMargin="20" />
-	</Window.Resources>
-
-	<Border
-		Margin="20"
-		CornerRadius="3"
-		BorderThickness="1">
-
-		<Border.BorderBrush>
-			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-				<GradientStop Offset="0" Color="White" />
-				<GradientStop Offset="1" Color="{Binding Color}" />
-			</LinearGradientBrush>
-		</Border.BorderBrush>
-
-		<Border.Background>
-			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-				<GradientStop
-					Color="{Binding Color}" Offset="1" />
-				<GradientStop
-					Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
-			</LinearGradientBrush>
-		</Border.Background>
-
-		<Border.Effect>
-			<DropShadowEffect />
-		</Border.Effect>
+	<common:LaevoPopup PopupImage="{Binding Icon}" PopupColor="{Binding Color}">
 
 		<Grid Margin="20">
 
@@ -55,17 +27,6 @@
 				<RowDefinition Height="*" /> 
 				<RowDefinition Height="100" />
 			</Grid.RowDefinitions>
-
-			<Canvas>
-				<Image x:Name="Image" Source="{Binding Icon}">
-					<Image.Margin>
-						<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">
-							<Binding ElementName="Image" Path="ActualWidth" />
-							<Binding ElementName="Image" Path="ActualHeight" />
-						</MultiBinding>
-					</Image.Margin>
-				</Image>
-			</Canvas>
 
 			<DockPanel
 				Grid.Row="0" Grid.Column="0">
@@ -147,7 +108,7 @@
 					Visibility="{Binding Converter={wtcConverters:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 
 					<StackPanel Orientation="Horizontal">
-						<TextBlock Width="50">From: </TextBlock>
+						<TextBlock Width="50">From:</TextBlock>
 						<xctk:DateTimePicker
 							x:Name="OccurancePicker"
 							Value="{Binding Occurance}"
@@ -164,6 +125,7 @@
 						</StackPanel.Resources>
 
 						<TextBlock Width="50">To: </TextBlock>
+
 						<xctk:DateTimePicker
 							x:Name="DurationPicker"
 							Format="Custom"
@@ -196,6 +158,5 @@
 					Content="_Save" />
 			</StackPanel>
 		</Grid>
-	</Border>
-
+	</common:LaevoPopup>
 </Window>
