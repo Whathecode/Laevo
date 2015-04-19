@@ -1,4 +1,4 @@
-﻿<Window
+﻿<common:LaevoPopup
 	x:Class="Laevo.View.Main.Unresponsive.UnresponsiveWindowPopup"
 	x:Name="Control"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -12,111 +12,108 @@
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:unresponsive1="clr-namespace:Laevo.View.Main.Unresponsive"
 	d:DataContext="{d:DesignInstance Type=unresponsive:UnresponsiveViewModel}"
-	WindowStartupLocation="CenterScreen"
-	Style="{StaticResource Popup}"
-	Foreground="White">
+	Foreground="White"
+	PopupImage="../../Common/Alert.png">
 
-	<common:LaevoPopup PopupImage="../../Common/Alert.png">
-		<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-			</Grid.RowDefinitions>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
 
-			<TextBlock
-				Grid.Row="0"
-				TextWrapping="Wrap"
-				VerticalAlignment="Stretch"
-				TextAlignment="Center"
-				Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep them or ignore." />
+		<TextBlock
+			Grid.Row="0"
+			TextWrapping="Wrap"
+			VerticalAlignment="Stretch"
+			TextAlignment="Center"
+			Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep them or ignore." />
 
-			<ListView
-				SelectionChanged="SelectedUnresponsiveChanged"
-				Grid.Row="1"
-				Name="UnresponsiveListBox"
-				Background="Transparent"
-				Margin="0, 20, 0, 20"
-				ItemsSource="{Binding UnresponsiveWindows}"
-				SelectedIndex="{Binding SelectedApplicationIndex}" 
-				SelectionMode="Extended"
-				IsSelected="True">
-				
-				<ListView.BorderBrush>
-					<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-						<GradientStop Offset="0" Color="White" />
-						<GradientStop Offset="1" Color="Transparent" />
-					</LinearGradientBrush>
-				</ListView.BorderBrush>
+		<ListView
+			SelectionChanged="SelectedUnresponsiveChanged"
+			Grid.Row="1"
+			Name="UnresponsiveListBox"
+			Background="Transparent"
+			Margin="0, 20, 0, 20"
+			ItemsSource="{Binding UnresponsiveWindows}"
+			SelectedIndex="{Binding SelectedApplicationIndex}" 
+			SelectionMode="Extended"
+			IsSelected="True">
 
-				<ListView.Resources>
-					<DataTemplate x:Key="ListViewDataTemplate">
-						<WrapPanel>
-							<TextBlock Text="{Binding ProcessName}"/>
-							<TextBlock Text=" (PID: "/>
-							<TextBlock Text="{Binding ProcessId}"/>
-							<TextBlock Text=")"/>
-						</WrapPanel>
-					</DataTemplate>
-					<ControlTemplate x:Key="SelectedTemplate" TargetType="ListViewItem">
-						<Border CornerRadius="3" BorderBrush="Transparent" Background="#FF92C6F9" Margin="1" Cursor="Hand" Padding="3">
-							<ContentPresenter ContentTemplate="{StaticResource ListViewDataTemplate}"/>
-						</Border>
-					</ControlTemplate>
-					<Style TargetType="ListViewItem">
-						<Setter Property="Template">
-							<Setter.Value>
-								<ControlTemplate TargetType="ListViewItem">
-									<Border BorderBrush="Transparent" Background="Transparent" Margin="1" Cursor="Hand" Padding="3">
-										<ContentPresenter ContentTemplate="{StaticResource ListViewDataTemplate}"/>
-									</Border>
-								</ControlTemplate>
-							</Setter.Value>
-						</Setter>
-						<Style.Triggers>
-							<MultiTrigger>
-								<MultiTrigger.Conditions>
-									<Condition Property="IsSelected" Value="true" />
-									<Condition Property="Selector.IsSelectionActive" Value="true" />
-								</MultiTrigger.Conditions>
-								<Setter Property="Template" Value="{StaticResource SelectedTemplate}" />
-							</MultiTrigger>
-						</Style.Triggers>
-					</Style>
-				</ListView.Resources>
-				
-			</ListView>
+			<ListView.BorderBrush>
+				<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+					<GradientStop Offset="0" Color="White" />
+					<GradientStop Offset="1" Color="Transparent" />
+				</LinearGradientBrush>
+			</ListView.BorderBrush>
 
-			<Grid
-				Grid.Row="2"
-				VerticalAlignment="Bottom">
-				
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="*" />
-				</Grid.ColumnDefinitions>
-				<Grid.Resources>
-					<Style TargetType="{x:Type Button}">
-						<Setter Property="Width" Value="100" />
-						<Setter Property="HorizontalAlignment" Value="Center" />
-						<Setter Property="VerticalAlignment" Value="Center" />
-					</Style>
-				</Grid.Resources>
+			<ListView.Resources>
+				<DataTemplate x:Key="ListViewDataTemplate">
+					<WrapPanel>
+						<TextBlock Text="{Binding ProcessName}"/>
+						<TextBlock Text=" (PID: "/>
+						<TextBlock Text="{Binding ProcessId}"/>
+						<TextBlock Text=")"/>
+					</WrapPanel>
+				</DataTemplate>
+				<ControlTemplate x:Key="SelectedTemplate" TargetType="ListViewItem">
+					<Border CornerRadius="3" BorderBrush="Transparent" Background="#FF92C6F9" Margin="1" Cursor="Hand" Padding="3">
+						<ContentPresenter ContentTemplate="{StaticResource ListViewDataTemplate}"/>
+					</Border>
+				</ControlTemplate>
+				<Style TargetType="ListViewItem">
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="ListViewItem">
+								<Border BorderBrush="Transparent" Background="Transparent" Margin="1" Cursor="Hand" Padding="3">
+									<ContentPresenter ContentTemplate="{StaticResource ListViewDataTemplate}"/>
+								</Border>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+					<Style.Triggers>
+						<MultiTrigger>
+							<MultiTrigger.Conditions>
+								<Condition Property="IsSelected" Value="true" />
+								<Condition Property="Selector.IsSelectionActive" Value="true" />
+							</MultiTrigger.Conditions>
+							<Setter Property="Template" Value="{StaticResource SelectedTemplate}" />
+						</MultiTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListView.Resources>
 
-				<Button
-					Name="KeepButton"
-					Grid.Column="0"
-					Content="Keep"
-					unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
-					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Keep}}" />
-				<Button
-					Grid.Column="1"
-					Content="Ignore"
-					unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
-					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Ignore}}" />
-				
-			</Grid>
+		</ListView>
+
+		<Grid
+			Grid.Row="2"
+			VerticalAlignment="Bottom">
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.Resources>
+				<Style TargetType="{x:Type Button}">
+					<Setter Property="Width" Value="100" />
+					<Setter Property="HorizontalAlignment" Value="Center" />
+					<Setter Property="VerticalAlignment" Value="Center" />
+				</Style>
+			</Grid.Resources>
+
+			<Button
+				Name="KeepButton"
+				Grid.Column="0"
+				Content="Keep"
+				unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
+				Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Keep}}" />
+			<Button
+				Grid.Column="1"
+				Content="Ignore"
+				unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
+				Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Ignore}}" />
+
 		</Grid>
-	</common:LaevoPopup>
+	</Grid>
 
-</Window>
+</common:LaevoPopup>

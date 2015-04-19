@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
-using Laevo.View.Activity.Share;
+using Laevo.View.Activity;
 using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
