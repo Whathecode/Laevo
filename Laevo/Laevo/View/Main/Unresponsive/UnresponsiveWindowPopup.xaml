@@ -16,10 +16,8 @@
 	Style="{StaticResource Popup}"
 	Foreground="White">
 
-	<common:LaevoPopup  PopupImage="../../Common/Alert.png" PopupColor="#606c88">
-
-		<Grid Margin="20" Background="Transparent">
-
+	<common:LaevoPopup PopupImage="../../Common/Alert.png">
+		<Grid>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
 				<RowDefinition Height="*" />
@@ -33,7 +31,6 @@
 				TextAlignment="Center"
 				Text="The following applications stopped responding and are locking up the window manager. Please decide if you want to keep them or ignore." />
 
-
 			<ListView
 				SelectionChanged="SelectedUnresponsiveChanged"
 				Grid.Row="1"
@@ -44,6 +41,7 @@
 				SelectedIndex="{Binding SelectedApplicationIndex}" 
 				SelectionMode="Extended"
 				IsSelected="True">
+				
 				<ListView.BorderBrush>
 					<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 						<GradientStop Offset="0" Color="White" />
@@ -85,13 +83,14 @@
 							</MultiTrigger>
 						</Style.Triggers>
 					</Style>
-
 				</ListView.Resources>
+				
 			</ListView>
 
 			<Grid
 				Grid.Row="2"
 				VerticalAlignment="Bottom">
+				
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
@@ -104,7 +103,6 @@
 					</Style>
 				</Grid.Resources>
 
-
 				<Button
 					Name="KeepButton"
 					Grid.Column="0"
@@ -116,6 +114,7 @@
 					Content="Ignore"
 					unresponsive1:EventFocusAttachment.ElementToFocus="{Binding ElementName=UnresponsiveListBox}"
 					Command="{wtc:CommandBinding {x:StaticExtension binding:Commands.Ignore}}" />
+				
 			</Grid>
 		</Grid>
 	</common:LaevoPopup>

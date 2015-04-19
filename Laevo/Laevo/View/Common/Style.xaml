@@ -15,6 +15,7 @@
 		<Setter Property="FontFamily" Value="Segoe UI Light" />
 	</Style>
 
+	<!-- Popup style. -->
 	<Style TargetType="Window" x:Key="Popup" BasedOn="{StaticResource BaseStyle}">
 		<Setter Property="WindowStyle" Value="None" />
 		<Setter Property="ShowInTaskbar" Value="False" />
@@ -25,58 +26,39 @@
 		<Setter Property="Width" Value="600" />
 		<Setter Property="Height" Value="525" />
 		<Setter Property="SizeToContent" Value="Height" />
-
 	</Style>
-
-	<Style TargetType="Label">
-		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-	</Style>
-	<Style TargetType="Button">
-		<Setter Property="Padding" Value="10, 0, 10, 0" />
-	</Style>
-
-	
-
 	<Style TargetType="common:LaevoPopup">
+		<Setter Property="Background">
+			<Setter.Value>
+				<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+					<GradientStop Color="#606c88" Offset="0" />
+					<GradientStop Color="#282944" Offset="1" />
+				</LinearGradientBrush>
+			</Setter.Value>
+		</Setter>
+		<!-- TODO: If this is not set, icon is clipped. Why doesn't 'ClipToBounds=False' work instead? -->
+		<Setter Property="Margin" Value="20" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type common:LaevoPopup}">
-
 					<ControlTemplate.Resources>
 						<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
 						<common:PopupIconMarginConverter x:Key="ActivityIconMarginConverter" />
 					</ControlTemplate.Resources>
-
 					<Border
-						Margin="20"
 						CornerRadius="3"
-						BorderThickness="1">
-
-						<!--TODO: Investigate why TemplateBinding does not work (color stays transparent in the control). -->
+						BorderThickness="1"
+						Background="{TemplateBinding Background}">
 						<Border.BorderBrush>
 							<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
 								<GradientStop Offset="0" Color="White" />
-								<GradientStop Offset="1"
-								              Color="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=PopupColor}" />
+								<GradientStop Offset="1" Color="Transparent" />
 							</LinearGradientBrush>
 						</Border.BorderBrush>
-
-						<!--TODO: Investigate why TemplateBinding does not work (color stays transparent in the control). -->
-						<Border.Background>
-							<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-								<GradientStop
-									Color="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=PopupColor}" Offset="1" />
-								<GradientStop
-									Color="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=PopupColor}"
-									Offset="0" />
-							</LinearGradientBrush>
-						</Border.Background>
-
 						<Border.Effect>
 							<DropShadowEffect />
 						</Border.Effect>
-
-						<StackPanel>
+						<Grid>
 							<Canvas>
 								<Image x:Name="Image" Source="{TemplateBinding PopupImage}">
 									<Image.Margin>
@@ -87,15 +69,22 @@
 									</Image.Margin>
 								</Image>
 							</Canvas>
-							<ContentControl Content="{TemplateBinding Content}" />
-						</StackPanel>
-
+							<ContentControl
+								Margin="20"
+								Content="{TemplateBinding Content}" />
+						</Grid>
 					</Border>
-
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
 	</Style>
-
+	
+	<Style TargetType="Label">
+		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+	</Style>
+	
+	<Style TargetType="Button">
+		<Setter Property="Padding" Value="10, 0, 10, 0" />
+	</Style>
 
 </ResourceDictionary>
