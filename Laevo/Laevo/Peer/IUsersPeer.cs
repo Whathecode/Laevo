@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Laevo.Model;
+using Whathecode.System.Aspects;
 
 
 namespace Laevo.Peer
@@ -18,5 +20,11 @@ namespace Laevo.Peer
 		/// <param name="user">The user to invite.</param>
 		/// <param name="activity">The activity to which the user is invited.</param>
 		void Invite( User user, Activity activity );
+
+		/// <summary>
+		///   Event which is raised when the current user is invited to access an activity.
+		/// </summary>
+		[InitializeEventHandlers( AttributeExclude = true )] // TODO: Why doesn't this compile when aspect is not excluded here?
+		event Action<Activity> Invited;
 	}
 }
