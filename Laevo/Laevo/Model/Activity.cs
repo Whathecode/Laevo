@@ -172,7 +172,7 @@ namespace Laevo.Model
 			_openIntervals = new List<TimeInterval>();
 			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
-			_accessUsers = new List<User>();
+			_accessUsers = new HashSet<User>();
 		}
 
 		string CreateSafeFolderName()

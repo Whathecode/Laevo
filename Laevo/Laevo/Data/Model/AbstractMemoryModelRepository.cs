@@ -110,8 +110,13 @@ namespace Laevo.Data.Model
 			return newActivity;
 		}
 
-		protected void AddActivity( Activity activity, Activity parent )
+		public void AddActivity( Activity activity, Activity parent )
 		{
+			if ( ActivityGuids.ContainsKey( activity.Identifier ) )
+			{
+				throw new InvalidOperationException( "The passed activity is already managed by this repository." );
+			}
+
 			Guid parentId = parent == null
 				? HomeActivity == null
 					? Guid.Empty

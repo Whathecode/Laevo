@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using ABC.Interruptions;
 using Laevo.Model;
@@ -44,7 +45,7 @@ namespace Laevo.Data.Model
 		/// </summary>
 		Dictionary<Activity, List<AbstractInterruption>> GetUnattendedInterruptions();
 
-			/// <summary>
+		/// <summary>
 		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.
 		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
 		/// </summary>
@@ -52,6 +53,15 @@ namespace Laevo.Data.Model
 		/// <param name="parent">The parent activity to which to add this subactivity.</param>
 		/// <returns>The newly created activity.</returns>
 		Activity CreateNewActivity( string name, Activity parent = null );
+
+		/// <summary>
+		///   Add an existing activity, not yet managed by this repository, as a subactivity of the given activity parent.
+		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
+		/// </summary>
+		/// <param name="newActivity">The existing activity.</param>
+		/// <param name="parent">The parent activity to which to add this subactivity.</param>
+		/// <exception cref="InvalidOperationException">Thrown when an activity which already exists within the repository is added.</exception>
+		void AddActivity( Activity newActivity, Activity parent = null );
 
 		/// <summary>
 		///   Remove a specified activity.
