@@ -17,10 +17,21 @@
 	SizeToContent="Manual"
 	WindowStartupLocation="CenterScreen">
 
-	<common:LaevoPopup PopupImage="{Binding Icon}" PopupColor="{Binding Color}">
-
-		<Grid Margin="20">
-
+	<Window.Resources>
+		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
+	</Window.Resources>
+	
+	<common:LaevoPopup PopupImage="{Binding Icon}">
+		<common:LaevoPopup.Background>
+			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+				<GradientStop
+					Color="{Binding Color}" Offset="1" />
+				<GradientStop
+					Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
+			</LinearGradientBrush>
+		</common:LaevoPopup.Background>
+		
+		<Grid>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="30" />
 				<RowDefinition Height="80" />
@@ -156,7 +167,9 @@
 					VerticalAlignment="Bottom"
 					Click="OnCloseButtonClicked"
 					Content="_Save" />
+				
 			</StackPanel>
 		</Grid>
 	</common:LaevoPopup>
+	
 </Window>

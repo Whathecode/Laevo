@@ -7,35 +7,13 @@
 	mc:Ignorable="d"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.User"
+	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=vm:UserViewModel}"
 	Style="{StaticResource Popup}"
 	WindowStartupLocation="CenterScreen">
 
-	<Border
-		Margin="20"
-		CornerRadius="3"
-		BorderThickness="1">
-
-		<Border.BorderBrush>
-			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-				<GradientStop Offset="0" Color="White" />
-				<GradientStop Offset="1" Color="Transparent" />
-			</LinearGradientBrush>
-		</Border.BorderBrush>
-
-		<Border.Background>
-			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-				<GradientStop Color="#606c88" Offset="0" />
-				<GradientStop Color="#282944" Offset="1" />
-			</LinearGradientBrush>
-		</Border.Background>
-
-		<Border.Effect>
-			<DropShadowEffect />
-		</Border.Effect>
-
-		<Grid Margin="20">
-			
+	<common:LaevoPopup>
+		<Grid>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
 				<RowDefinition Height="100" />
@@ -62,6 +40,6 @@
 				Content="_Save" />
 
 		</Grid>
-	</Border>
+	</common:LaevoPopup>
 
 </Window>
