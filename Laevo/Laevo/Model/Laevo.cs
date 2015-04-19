@@ -14,6 +14,7 @@ using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
 using Laevo.Peer;
+using Laevo.Peer.Mock;
 using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
@@ -62,6 +63,7 @@ namespace Laevo.Model
 		public WorkspaceManager WorkspaceManager { get; private set; }
 
 		public event Action<Activity> ActivityRemoved;
+		public event Action<Activity> InvitedToActivity;
 		public event Action<Activity> InterruptionAdded;
 
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
@@ -112,6 +114,16 @@ namespace Laevo.Model
 			_dataRepository = dataRepository;
 			_peerFactory = peerFactory;
 			UsersPeer = _peerFactory.GetUsersPeer();
+
+			// When invited to an activity, add it to the home activity.
+			UsersPeer.Invited += a =>
+			{
+				_dataRepository.AddActivity( a, HomeActivity );
+				Log.InfoWithData( "Invited to activity.", new LogData( a ) );
+				HandleActivity( a );
+				InvitedToActivity( a );
+				// TODO: Similar to interruption events, this event should probably be removed and some other mechanism should be used.
+			};
 
 			// Initialize activity peers for shared activities.
 			_dataRepository.GetSharedActivities().ForEach( AddActivityPeer );

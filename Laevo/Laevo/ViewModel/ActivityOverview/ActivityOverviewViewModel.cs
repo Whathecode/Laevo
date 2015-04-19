@@ -175,6 +175,14 @@ namespace Laevo.ViewModel.ActivityOverview
 				AddTask( taskViewModel );
 			};
 
+			// Listen for invited activities being added.
+			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
+			_model.InvitedToActivity += activity =>
+			{
+				var activityViewModel = new ActivityViewModel( activity, _model.WorkspaceManager );
+				AddActivity( activityViewModel );
+			};
+
 			// Hook up timer.
 			_updateTimer.Elapsed += (s, a) => _dispatcher.Invoke( () => UpdateData( a.SignalTime ) );
 			_updateTimer.Start();
@@ -219,14 +227,18 @@ namespace Laevo.ViewModel.ActivityOverview
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
 			};
-			lock ( Activities )
-			{
-				Activities.Add( newActivity );
-			}
-
-			HookActivityToOverview( newActivity );
+			AddActivity( newActivity );
 
 			return newActivity;
+		}
+
+		void AddActivity( ActivityViewModel activity )
+		{
+			lock ( Activities )
+			{
+				Activities.Add( activity );
+			}
+			HookActivityToOverview( activity );
 		}
 
 		[CommandExecute( Commands.NewTask )]
