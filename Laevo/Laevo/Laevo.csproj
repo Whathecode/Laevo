@@ -485,7 +485,7 @@
       <DependentUpon>UnresponsiveWindowPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MessageBox.cs" />
-    <Compile Include="View\Activity\Share\SharePopup.xaml.cs">
+    <Compile Include="View\Activity\SharePopup.xaml.cs">
       <DependentUpon>SharePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
@@ -597,7 +597,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Activity\Share\SharePopup.xaml">
+    <Page Include="View\Activity\SharePopup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
