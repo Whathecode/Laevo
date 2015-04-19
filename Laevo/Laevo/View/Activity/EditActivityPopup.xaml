@@ -1,4 +1,4 @@
-﻿<Window
+﻿<common:LaevoPopup
 	x:Class="Laevo.View.Activity.EditActivityPopup"
 	x:Name="Control"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -13,163 +13,160 @@
 	xmlns:b="clr-namespace:Laevo.ViewModel.Activity.Binding" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
-	Style="{StaticResource Popup}"
 	SizeToContent="Manual"
-	WindowStartupLocation="CenterScreen">
+	PopupImage="{Binding Icon}">
 
 	<Window.Resources>
 		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
 	</Window.Resources>
-	
-	<common:LaevoPopup PopupImage="{Binding Icon}">
-		<common:LaevoPopup.Background>
-			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-				<GradientStop
-					Color="{Binding Color}" Offset="1" />
-				<GradientStop
-					Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
-			</LinearGradientBrush>
-		</common:LaevoPopup.Background>
-		
-		<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="30" />
-				<RowDefinition Height="80" />
-				<RowDefinition Height="*" /> 
-				<RowDefinition Height="100" />
-			</Grid.RowDefinitions>
 
-			<DockPanel
-				Grid.Row="0" Grid.Column="0">
-				<Label>Name</Label>
-				<TextBox
-					x:Name="LabelTextBox"
-					Margin="10, 0, 0, 0"
-					HorizontalAlignment="Stretch"
-					Text="{Binding Label}" />
-			</DockPanel>
+	<common:LaevoPopup.Background>
+		<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+			<GradientStop
+				Color="{Binding Color}" Offset="1" />
+			<GradientStop
+				Color="{Binding Color, Converter={StaticResource ColorGradientConverter}}" Offset="0" />
+		</LinearGradientBrush>
+	</common:LaevoPopup.Background>
 
-			<!-- Color selection. -->
-			<DockPanel Grid.Row="1" Grid.Column="0">
-				<Label DockPanel.Dock="Top">Color</Label>
-				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
-					<ItemsControl ItemsSource="{Binding PossibleColors}">
-						<ItemsControl.ItemsPanel>
-							<ItemsPanelTemplate>
-								<WrapPanel />
-							</ItemsPanelTemplate>
-						</ItemsControl.ItemsPanel>
-						<ItemsControl.ItemTemplate>
-							<DataTemplate>
-								<Button
-									Width="40" Height="40"
-									BorderBrush="White" BorderThickness="1"
-									Margin="5, 5, 0, 0"
-									Command="{wtc:CommandBinding {x:Static b:Commands.ChangeColor}, ElementName=Control}"
-									CommandParameter="{Binding}">
-									<Button.Background>
-										<SolidColorBrush Color="{Binding}" />
-									</Button.Background>
-								</Button>
-							</DataTemplate>
-						</ItemsControl.ItemTemplate>
-					</ItemsControl>
-				</ScrollViewer>
-			</DockPanel>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30" />
+			<RowDefinition Height="80" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="100" />
+		</Grid.RowDefinitions>
 
-			<!-- Icon selection. -->
-			<DockPanel Grid.Row="2" Grid.Column="0">
-				<Label DockPanel.Dock="Top">Icon</Label>
-				<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
-					<ItemsControl ItemsSource="{Binding PossibleIcons}">
-						<ItemsControl.ItemsPanel>
-							<ItemsPanelTemplate>
-								<WrapPanel />
-							</ItemsPanelTemplate>
-						</ItemsControl.ItemsPanel>
-						<ItemsControl.ItemTemplate>
-							<DataTemplate>
-								<Button
-									Width="40" Height="40"
-									BorderBrush="White" BorderThickness="1"
-									Margin="5, 5, 0, 0"
-									Padding="5"
-									Command="{wtc:CommandBinding {x:Static b:Commands.ChangeIcon}, ElementName=Control}"
-									CommandParameter="{Binding}"
-									Background="Transparent">
-									<Image
-										Source="{Binding}" />
-								</Button>
-							</DataTemplate>
-						</ItemsControl.ItemTemplate>
-					</ItemsControl>
-				</ScrollViewer>
-			</DockPanel>
+		<DockPanel
+			Grid.Row="0" Grid.Column="0">
+			<Label>Name</Label>
+			<TextBox
+				x:Name="LabelTextBox"
+				Margin="10, 0, 0, 0"
+				HorizontalAlignment="Stretch"
+				Text="{Binding Label}" />
+		</DockPanel>
 
+		<!-- Color selection. -->
+		<DockPanel Grid.Row="1" Grid.Column="0">
+			<Label DockPanel.Dock="Top">Color</Label>
+			<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
+				<ItemsControl ItemsSource="{Binding PossibleColors}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button
+								Width="40" Height="40"
+								BorderBrush="White" BorderThickness="1"
+								Margin="5, 5, 0, 0"
+								Command="{wtc:CommandBinding {x:Static b:Commands.ChangeColor}, ElementName=Control}"
+								CommandParameter="{Binding}">
+								<Button.Background>
+									<SolidColorBrush Color="{Binding}" />
+								</Button.Background>
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+		</DockPanel>
+
+		<!-- Icon selection. -->
+		<DockPanel Grid.Row="2" Grid.Column="0">
+			<Label DockPanel.Dock="Top">Icon</Label>
+			<ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
+				<ItemsControl ItemsSource="{Binding PossibleIcons}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button
+								Width="40" Height="40"
+								BorderBrush="White" BorderThickness="1"
+								Margin="5, 5, 0, 0"
+								Padding="5"
+								Command="{wtc:CommandBinding {x:Static b:Commands.ChangeIcon}, ElementName=Control}"
+								CommandParameter="{Binding}"
+								Background="Transparent">
+								<Image
+									Source="{Binding}" />
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+		</DockPanel>
+
+		<StackPanel
+			Grid.Row="3"
+			Grid.Column="0"
+			VerticalAlignment="Bottom">
+
+			<!-- Planned interval when set. -->
 			<StackPanel
-				Grid.Row="3"
-				Grid.Column="0"
-				VerticalAlignment="Bottom">
+				Margin="0, 0, 0, 15"
+				DataContext="{Binding ElementName=Control, Path=PlannedInterval}"
+				Orientation="Vertical"
+				Visibility="{Binding Converter={wtcConverters:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
 
-				<!-- Planned interval when set. -->
-				<StackPanel
-					Margin="0, 0, 0, 15"
-					DataContext="{Binding ElementName=Control, Path=PlannedInterval}"
-					Orientation="Vertical"
-					Visibility="{Binding Converter={wtcConverters:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
-
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Width="50">From:</TextBlock>
-						<xctk:DateTimePicker
-							x:Name="OccurancePicker"
-							Value="{Binding Occurance}"
-							Format="Custom"
-							FormatString="HH:mm"
-							Margin="0, 0, 10, 0"
-							ValueChanged="OnDateTimePickerChanged" />
-						<TextBlock Text="{Binding Occurance, StringFormat=D}" />
-					</StackPanel>
-
-					<StackPanel Orientation="Horizontal">
-						<StackPanel.Resources>
-							<converters:OccuranceEndConverter x:Key="OccuranceEndConverter" />
-						</StackPanel.Resources>
-
-						<TextBlock Width="50">To: </TextBlock>
-
-						<xctk:DateTimePicker
-							x:Name="DurationPicker"
-							Format="Custom"
-							FormatString="HH:mm"
-							Margin="0, 0, 10, 0"
-							ValueChanged="OnDateTimePickerChanged">
-							<xctk:DateTimePicker.Value>
-								<MultiBinding Converter="{StaticResource OccuranceEndConverter}">
-									<Binding Path="Occurance" />
-									<Binding Path="TimeSpan" />
-								</MultiBinding>
-							</xctk:DateTimePicker.Value>
-						</xctk:DateTimePicker>
-						<TextBlock>
-							<TextBlock.Text>
-								<MultiBinding Converter="{StaticResource OccuranceEndConverter}" StringFormat="D">
-									<Binding Path="Occurance" />
-									<Binding Path="TimeSpan" />
-								</MultiBinding>
-							</TextBlock.Text>
-						</TextBlock>
-					</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Width="50">From:</TextBlock>
+					<xctk:DateTimePicker
+						x:Name="OccurancePicker"
+						Value="{Binding Occurance}"
+						Format="Custom"
+						FormatString="HH:mm"
+						Margin="0, 0, 10, 0"
+						ValueChanged="OnDateTimePickerChanged" />
+					<TextBlock Text="{Binding Occurance, StringFormat=D}" />
 				</StackPanel>
 
-				<!-- Save button. -->
-				<Button
-					HorizontalAlignment="Right"
-					VerticalAlignment="Bottom"
-					Click="OnCloseButtonClicked"
-					Content="_Save" />
-				
+				<StackPanel Orientation="Horizontal">
+					<StackPanel.Resources>
+						<converters:OccuranceEndConverter x:Key="OccuranceEndConverter" />
+					</StackPanel.Resources>
+
+					<TextBlock Width="50">To:</TextBlock>
+
+					<xctk:DateTimePicker
+						x:Name="DurationPicker"
+						Format="Custom"
+						FormatString="HH:mm"
+						Margin="0, 0, 10, 0"
+						ValueChanged="OnDateTimePickerChanged">
+						<xctk:DateTimePicker.Value>
+							<MultiBinding Converter="{StaticResource OccuranceEndConverter}">
+								<Binding Path="Occurance" />
+								<Binding Path="TimeSpan" />
+							</MultiBinding>
+						</xctk:DateTimePicker.Value>
+					</xctk:DateTimePicker>
+					<TextBlock>
+						<TextBlock.Text>
+							<MultiBinding Converter="{StaticResource OccuranceEndConverter}" StringFormat="D">
+								<Binding Path="Occurance" />
+								<Binding Path="TimeSpan" />
+							</MultiBinding>
+						</TextBlock.Text>
+					</TextBlock>
+				</StackPanel>
 			</StackPanel>
-		</Grid>
-	</common:LaevoPopup>
-	
-</Window>
+
+			<!-- Save button. -->
+			<Button
+				HorizontalAlignment="Right"
+				VerticalAlignment="Bottom"
+				Click="OnCloseButtonClicked"
+				Content="_Save" />
+
+		</StackPanel>
+	</Grid>
+
+</common:LaevoPopup>

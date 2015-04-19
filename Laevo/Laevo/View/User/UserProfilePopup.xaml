@@ -1,4 +1,4 @@
-﻿<Window
+﻿<common:LaevoPopup
 	x:Class="Laevo.View.User.UserProfilePopup"
 	x:Name="Control"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -9,37 +9,33 @@
 	xmlns:vm="clr-namespace:Laevo.ViewModel.User"
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=vm:UserViewModel}"
-	Style="{StaticResource Popup}"
-	WindowStartupLocation="CenterScreen">
 
-	<common:LaevoPopup>
-		<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="100" />
-			</Grid.RowDefinitions>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
 
-			<StackPanel
-				Grid.Row="0" Grid.Column="0">
-				<DockPanel>
-					<Label>Name</Label>
-					<TextBox
-						Margin="10, 0, 0, 0"
-						HorizontalAlignment="Stretch"
-						Text="{Binding Name}" />
-				</DockPanel>
-			</StackPanel>
+		<StackPanel
+			Grid.Row="0" Grid.Column="0">
+			<DockPanel>
+				<Label>Name</Label>
+				<TextBox
+					Margin="10, 0, 0, 0"
+					HorizontalAlignment="Stretch"
+					Text="{Binding Name}" />
+			</DockPanel>
+		</StackPanel>
 
-			<!-- Save button. -->
-			<Button
-				Grid.Column="0"
-				Grid.Row="1"
-				HorizontalAlignment="Right"
-				VerticalAlignment="Bottom"
-				Click="OnSaveButtonClicked"
-				Content="_Save" />
+		<!-- Save button. -->
+		<Button
+			Grid.Column="0"
+			Grid.Row="1"
+			HorizontalAlignment="Right"
+			VerticalAlignment="Bottom"
+			Click="OnSaveButtonClicked"
+			Content="_Save" />
 
-		</Grid>
-	</common:LaevoPopup>
+	</Grid>
 
-</Window>
+</common:LaevoPopup>

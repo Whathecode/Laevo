@@ -15,18 +15,11 @@
 	</Style>
 
 	<!-- Popup style. -->
-	<Style TargetType="Window" x:Key="Popup" BasedOn="{StaticResource BaseStyle}">
+	<Style TargetType="common:LaevoPopup" BasedOn="{StaticResource BaseStyle}">
 		<Setter Property="WindowStyle" Value="None" />
 		<Setter Property="ShowInTaskbar" Value="False" />
 		<Setter Property="Topmost" Value="True" />
 		<Setter Property="AllowsTransparency" Value="True" />
-		<Setter Property="Background" Value="Transparent" />
-		<Setter Property="FontSize" Value="18" />
-		<Setter Property="Width" Value="600" />
-		<Setter Property="Height" Value="525" />
-		<Setter Property="SizeToContent" Value="Height" />
-	</Style>
-	<Style TargetType="common:LaevoPopup">
 		<Setter Property="Background">
 			<Setter.Value>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -35,8 +28,10 @@
 				</LinearGradientBrush>
 			</Setter.Value>
 		</Setter>
-		<!-- TODO: If this is not set, icon is clipped. Why doesn't 'ClipToBounds=False' work instead? -->
-		<Setter Property="Margin" Value="20" />
+		<Setter Property="FontSize" Value="18" />
+		<Setter Property="Width" Value="600" />
+		<Setter Property="Height" Value="525" />
+		<Setter Property="SizeToContent" Value="Height" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type common:LaevoPopup}">
@@ -44,7 +39,9 @@
 						<converters:ColorGradientConverter x:Key="ColorGradientConverter" />
 						<common:PopupIconMarginConverter x:Key="ActivityIconMarginConverter" />
 					</ControlTemplate.Resources>
+					<!-- TODO: If margin here is not set, icon is clipped. Why doesn't 'ClipToBounds=False' work instead? -->
 					<Border
+						Margin="20"
 						CornerRadius="3"
 						BorderThickness="1"
 						Background="{TemplateBinding Background}">
