@@ -8,6 +8,9 @@ namespace Laevo.Peer.Mock
 {
 	class MockUsersPeer : IUsersPeer
 	{
+		public event Action<Activity> Invited;
+
+
 		public async Task<List<User>> GetUsers( string searchTerm )
 		{
 			// Fake time taken.
