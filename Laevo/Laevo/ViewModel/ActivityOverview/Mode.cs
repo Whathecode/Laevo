@@ -15,9 +15,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		Select = 1,
 		/// <summary>
-		///   An activity is being edited.
+		///   Pop-up dialog window is shown, user needs to close it firstly to perform any interaction with the time line.
 		/// </summary>
-		Edit = 2,
+		Inactive = 1 << 3,
 		/// <summary>
 		///   An activity is being suspended.
 		/// </summary>

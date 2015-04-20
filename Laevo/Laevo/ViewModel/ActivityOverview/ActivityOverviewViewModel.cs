@@ -57,6 +57,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler SuspendingActivityEvent;
 
 		/// <summary>
+		///   Event which is triggered when pop-up window is opened.
+		/// </summary>
+		public event EventHandler OpenedPopupEvent;
+
+		/// <summary>
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
 		public event Action NoCurrentActiveActivityEvent;
@@ -126,6 +131,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			get { return _dataRepository.Tasks; }
 		}
 
+		public bool IsActive
+		{
+			get { return !ActivityMode.HasFlag( Mode.Inactive ); }
+		}
+
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
@@ -143,7 +153,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				{
 					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) ),
 					IsEditable = false
-				};	
+				};
 			}
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity( false );
@@ -165,7 +175,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			};
 
 			// Hook up timer.
-			_updateTimer.Elapsed += (s, a) => _dispatcher.Invoke( () => UpdateData( a.SignalTime ) );
+			_updateTimer.Elapsed += ( s, a ) => _dispatcher.Invoke( () => UpdateData( a.SignalTime ) );
 			_updateTimer.Start();
 		}
 
@@ -290,8 +300,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
-			activity.ActivityEditStartedEvent -= OnActivityEditStarted;
-			activity.ActivityEditFinishedEvent -= OnActivityEditFinished;
+			activity.ActivityEditStartedEvent -= OnPopupShowing;
+			activity.ActivityEditFinishedEvent -= OnPopupClosed;
 			activity.ActivityStoppedEvent -= OnActivityStopped;
 			activity.SuspendingActivityEvent -= OnSuspendingActivity;
 			activity.SuspendedActivityEvent -= OnSuspendedActivity;
@@ -308,8 +318,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
-			activity.ActivityEditStartedEvent += OnActivityEditStarted;
-			activity.ActivityEditFinishedEvent += OnActivityEditFinished;
+			activity.ActivityEditStartedEvent += OnPopupShowing;
+			activity.ActivityEditFinishedEvent += OnPopupClosed;
 			activity.ActivityStoppedEvent += OnActivityStopped;
 			activity.SuspendingActivityEvent += OnSuspendingActivity;
 			activity.SuspendedActivityEvent += OnSuspendedActivity;
@@ -343,14 +353,15 @@ namespace Laevo.ViewModel.ActivityOverview
 			SelectedActivityEvent( viewModel );
 		}
 
-		void OnActivityEditStarted( ActivityViewModel viewModel )
+		public void OnPopupShowing( ActivityViewModel viewModel = null )
 		{
-			ActivityMode |= Mode.Edit;
+			ActivityMode |= Mode.Inactive;
+			OpenedPopupEvent( this, new EventArgs() );
 		}
 
-		void OnActivityEditFinished( ActivityViewModel viewModel )
+		public void OnPopupClosed( ActivityViewModel viewModel = null )
 		{
-			ActivityMode &= ~Mode.Edit;
+			ActivityMode &= ~Mode.Inactive;
 		}
 
 		void OnSuspendingActivity( ActivityViewModel viewModel )
@@ -397,6 +408,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			HomeActivity.SelectActivity();
 		}
 
+
 		// ReSharper disable UnusedMember.Local
 		// ReSharper disable UnusedParameter.Local
 		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
@@ -407,6 +419,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
+
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 

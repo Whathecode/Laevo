@@ -130,6 +130,7 @@ namespace Laevo.ViewModel.Activity
 		TimeInterval _currentActiveTimeSpan;
 
 		bool _showActiveTimeSpans;
+
 		public bool ShowActiveTimeSpans
 		{
 			set
@@ -268,6 +269,10 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.OpenInterval )]
 		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
 			
+
+		{
+			get { return _readOnlyAccessUsers; }
+		}
 		EditActivityPopup _editActivityPopup;
 
 
@@ -287,7 +292,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
-			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) { }
+			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) {}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace )
 		{
@@ -500,12 +505,11 @@ namespace Laevo.ViewModel.Activity
 			EditActivity( false );
 		}
 
-		
+
 		public void EditActivity( bool focusPlannedInterval )
 		{
 			ActivityEditStartedEvent( this );
-
-			_editActivityPopup= new EditActivityPopup
+			_editActivityPopup = new EditActivityPopup
 			{
 				DataContext = this,
 				OccurancePicker = { IsOpen = focusPlannedInterval }
@@ -516,7 +520,7 @@ namespace Laevo.ViewModel.Activity
 				ActivityEditFinishedEvent( this );
 			};
 
-			_editActivityPopup.Show();
+			_editActivityPopup.ShowDialog();
 		}
 
 		[CommandCanExecute( Commands.EditActivity )]
@@ -560,7 +564,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.StopActivity )]
 		public bool CanStopActivity()
 		{
-			return IsEditable && Activity.IsOpen && !_isSuspending;
+			return IsEditable && Activity.IsOpen && !_isSuspending && IsOverviewActive();
 		}
 
 		bool _isSuspending;
@@ -582,6 +586,12 @@ namespace Laevo.ViewModel.Activity
 			// Start workspace suspension.
 			_workspace.SuspendedWorkspace += OnSuspendedWorkspace;
 			_workspace.Suspend();
+		}
+
+		[CommandCanExecute( Commands.OpenActivityLibrary )]
+		public bool IsOverviewActive()
+		{
+			return !_overview.IsActive;
 		}
 
 		void OnSuspendedWorkspace( AbstractWorkspace<WorkspaceSession> workspace )
@@ -735,7 +745,7 @@ namespace Laevo.ViewModel.Activity
 			// Activities which have been merged elsewhere become inaccessible, thus merging to them is not possible.
 			if ( !IsAccessible )
 			{
-				throw new InvalidOperationException( "Can not merge to an activity which has been merged elsewhere.");
+				throw new InvalidOperationException( "Can not merge to an activity which has been merged elsewhere." );
 			}
 
 			Activity.Merge( activity.Activity );
