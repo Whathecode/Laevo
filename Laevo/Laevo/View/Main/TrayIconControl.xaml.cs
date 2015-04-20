@@ -31,7 +31,7 @@ namespace Laevo.View.Main
 	{
 		const int UpdatesPerSecond = 25;
 
-		MainViewModel _viewModel;
+		readonly MainViewModel _viewModel;
 		readonly Timer _updateLoop = new Timer();
 		KeyboardHookListener _keyboardListener;
 
