@@ -50,12 +50,14 @@ namespace Laevo.ViewModel.Main
 		{
 			model.WindowClipboard.UnresponsiveWindowDetected += ( windows, desktop ) =>
 			{
+				_activityOverviewViewModel.OnPopupShowing();
 				var unresponsiveViewModel = new UnresponsiveViewModel( windows );
 				unresponsiveViewModel.UnresponsiveHandled += () => _unresponsivePopup.Hide();
 				_unresponsivePopup.DataContext = unresponsiveViewModel;
 				ShowActivityOverview();
 				_unresponsiveEventThrown = true;
 				_unresponsivePopup.ShowDialog();
+				_activityOverviewViewModel.OnPopupClosed();
 			};
 
 			_model = model;
@@ -72,7 +74,6 @@ namespace Laevo.ViewModel.Main
 			_activityBar.DataContext = _activityBarViewModel;
 			ShowActivityBar( true );
 		}
-
 
 		/// <summary>
 		///   HACK: This functionality is provided since this is still a prototype and sometimes the GUI seems to hang.
@@ -145,6 +146,8 @@ namespace Laevo.ViewModel.Main
 		public void ShowActivityOverview()
 		{
 			EnsureActivityOverview();
+			// TODO: Should activity bar be hidden or appear on top of the time line?
+			_activityBar.Hide();
 			_activityOverview.Show();
 			_activityOverview.Activate();
 		}
@@ -198,13 +201,14 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode.EqualsAny( Mode.Activate, Mode.Hierarchies ) && !_activityBar.IsInUse();
+			return _activityOverviewViewModel.ActivityMode.EqualsAny( Mode.Activate, Mode.Hierarchies ) && !_activityBar.IsInUse()
+			       && IsOverviewActive();
 		}
 
 		[CommandExecute( Commands.ShowActivityBar )]
 		public void ShowActivityBar( bool autoHide )
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && IsOverviewActive() )
 			{
 				_activityBar.ShowActivityBar( autoHide );
 			}
@@ -213,7 +217,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityBar )]
 		public void HideActivityBar()
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && IsOverviewActive() )
 			{
 				_activityBar.HideActivityBar();
 			}
@@ -246,6 +250,15 @@ namespace Laevo.ViewModel.Main
 			_activityBarViewModel.SelectNextActivity();
 		}
 
+		[CommandCanExecute( Commands.ShowActivityBar ), CommandCanExecute( Commands.HideActivityBar ),
+		 CommandCanExecute( Commands.NewActivity ), CommandCanExecute( Commands.CutWindow ),
+		 CommandCanExecute( Commands.PasteWindows ), CommandCanExecute( Commands.SwitchActivity ),
+		 CommandCanExecute( Commands.ActivateSelectedActivity ),]
+		public bool IsOverviewActive()
+		{
+			return _activityOverviewViewModel.IsActive;
+		}
+
 		[CommandExecute( Commands.ActivateSelectedActivity )]
 		public void ActivateSelectedActivity()
 		{
@@ -273,12 +286,13 @@ namespace Laevo.ViewModel.Main
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
+				_activityOverviewViewModel.OpenedPopupEvent += delegate { _activityBar.Hide(); };
 			}
 			_activityOverview = new ActivityOverviewWindow
 			{
 				DataContext = _activityOverviewViewModel
 			};
-			_activityOverview.Closed += (s, a) => ResetGui();
+			_activityOverview.Closed += ( s, a ) => ResetGui();
 		}
 
 		void OnActivatedActivityEvent( ActivityViewModel oldActivity, ActivityViewModel newActivity )

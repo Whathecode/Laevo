@@ -30,7 +30,7 @@
 	WindowState="Maximized"
 	ShowInTaskbar="False"
 	FontSize="20"
-	Topmost="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Edit}, IfTrue=False, IfFalse=True}}">
+	Topmost="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Inactive}, IfTrue=False, IfFalse=True}}">
 
 	<Window.Resources>
 		<LinearGradientBrush x:Key="PersonalActivitiesBrush" StartPoint="0,0" EndPoint="0,1" options:Freeze="True">
@@ -470,7 +470,7 @@
 			<Grid.Style>
 				<Style>
 					<Style.Triggers>
-						<DataTrigger Value="True" Binding="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Edit}}}">
+						<DataTrigger Value="True" Binding="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Inactive}}}">
 							<DataTrigger.EnterActions>
 								<BeginStoryboard>
 									<Storyboard>
