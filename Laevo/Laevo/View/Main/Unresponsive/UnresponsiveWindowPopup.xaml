@@ -50,6 +50,11 @@
 			<ListView.Resources>
 				<DataTemplate x:Key="ListViewDataTemplate">
 					<WrapPanel>
+						<WrapPanel.Resources>
+							<Style TargetType="TextBlock">
+								<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+							</Style>
+						</WrapPanel.Resources>
 						<TextBlock Text="{Binding ProcessName}"/>
 						<TextBlock Text=" (PID: "/>
 						<TextBlock Text="{Binding ProcessId}"/>
