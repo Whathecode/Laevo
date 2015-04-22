@@ -17,7 +17,7 @@ namespace Laevo.Model
 	///   Class containing all the data relating to one activity context.
 	/// </summary>
 	/// <author>Steven Jeuris</author>
-	[DataContract]
+	[DataContract( IsReference = true )]
 	public class Activity
 	{
 		static readonly Logger Log = LogManager.GetCurrentClassLogger();

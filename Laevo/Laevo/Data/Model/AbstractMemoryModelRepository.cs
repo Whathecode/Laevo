@@ -105,6 +105,7 @@ namespace Laevo.Data.Model
 		public Activity CreateNewActivity( string name, Activity parent = null )
 		{
 			var newActivity = new Activity( name );
+			newActivity.AddAccess( User );
 			AddActivity( newActivity, parent );
 
 			return newActivity;

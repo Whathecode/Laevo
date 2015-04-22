@@ -14,7 +14,6 @@ using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
 using Laevo.Peer;
-using Laevo.Peer.Mock;
 using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;

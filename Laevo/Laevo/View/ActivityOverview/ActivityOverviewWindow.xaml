@@ -134,7 +134,8 @@
 						Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
 						<Image Source="Images/Share.png" />
 					</Button>
-					<ItemsControl ItemsSource="{Binding VisibleActivity.AccessUsers}">
+					<ItemsControl
+						ItemsSource="{Binding VisibleActivity.AccessUsers}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<StackPanel Orientation="Horizontal" />
