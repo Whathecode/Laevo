@@ -22,6 +22,8 @@ namespace Laevo.Data.View
 		void LoadActivities( Activity parentActivity );
 		List<ActivityViewModel> GetPath( ActivityViewModel activity );
 
+		UserViewModel GetUser( User user );
+
 		void SaveChanges();
 	}
 }

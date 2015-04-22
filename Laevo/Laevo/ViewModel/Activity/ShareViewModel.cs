@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Laevo.Data.View;
 using Laevo.Peer;
 using Laevo.ViewModel.Activity.Binding;
 using Laevo.ViewModel.User;
@@ -16,6 +17,7 @@ namespace Laevo.ViewModel.Activity
 	public class ShareViewModel
 	{
 		readonly IUsersPeer _usersPeer;
+		readonly IViewRepository _repository;
 
 		[NotifyProperty( ShareProperties.Activity )]
 		public ActivityViewModel Activity { get; private set; }
@@ -23,9 +25,10 @@ namespace Laevo.ViewModel.Activity
 		public ObservableCollection<UserViewModel> RetrievedUsers { get; private set; }
 
 
-		public ShareViewModel( Model.Laevo model, ActivityViewModel activity )
+		public ShareViewModel( Model.Laevo model, ActivityViewModel activity, IViewRepository repository )
 		{
 			_usersPeer = model.UsersPeer;
+			_repository = repository;
 			Activity = activity;
 			RetrievedUsers = new ObservableCollection<UserViewModel>();
 		}
@@ -37,7 +40,7 @@ namespace Laevo.ViewModel.Activity
 			RetrievedUsers.Clear();
 
 			List<Model.User> users = await _usersPeer.GetUsers( searchTerm );
-			users.Select( u => new UserViewModel( u ) ).ForEach( RetrievedUsers.Add );
+			users.Select( u => _repository.GetUser( u ) ).ForEach( RetrievedUsers.Add );
 		}
 
 		[CommandExecute( ShareCommands.InviteUser )]
