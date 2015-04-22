@@ -20,6 +20,8 @@ namespace Laevo.Data.View
 
 		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
 
+		readonly Dictionary<User, UserViewModel> _users = new Dictionary<User, UserViewModel>();
+
 
 		protected AbstractMemoryViewRepository()
 		{
@@ -31,6 +33,17 @@ namespace Laevo.Data.View
 		public abstract ActivityViewModel LoadActivity( Activity activity );
 		public abstract void LoadActivities( Activity parentActivity );
 		public abstract List<ActivityViewModel> GetPath( ActivityViewModel activity );
+		public UserViewModel GetUser( User user )
+		{
+			UserViewModel viewModel;
+			if ( !_users.TryGetValue( user, out viewModel ) )
+			{
+				viewModel = new UserViewModel( user );
+				_users[ user ] = viewModel;
+			}
+
+			return viewModel;
+		}
 
 		public abstract void SaveChanges();
 	}

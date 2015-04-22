@@ -11,18 +11,39 @@
 	xmlns:binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:common="clr-namespace:Laevo.View.Common"
+	xmlns:user1="clr-namespace:Laevo.View.User"
 	d:DataContext="{d:DesignInstance Type=vm:ShareViewModel}">
 
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 
-		<!-- Search for users. -->
+		<!-- Already invited users. -->
 		<StackPanel
-				Grid.Row="0">
+			MinHeight="75"
+			Grid.Row="0">
+			<Label>Accessible by</Label>
+			<ItemsControl
+				ItemsSource="{Binding Activity.AccessUsers}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Horizontal" />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate DataType="user:UserViewModel">
+						<user1:UserImage Margin="3, 0, 0, 0" />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</StackPanel>
+		
+		<!-- Search for users. -->
+		<StackPanel Grid.Row="1">
 			<Grid>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto" />
@@ -43,7 +64,7 @@
 
 		<!-- Search results. -->
 		<ListView
-			Grid.Row="1"
+			Grid.Row="2"
 			Margin="0, 10, 0, 10"
 			MinHeight="200"
 			ItemsSource="{Binding RetrievedUsers}">
@@ -53,13 +74,20 @@
 				</Style>
 			</ListView.ItemContainerStyle>
 			<ListView.ItemTemplate>
-				<DataTemplate DataType="{x:Type user:UserViewModel}">
-					<DockPanel LastChildFill="False">
+				<DataTemplate
+					DataType="{x:Type user:UserViewModel}">
+					<DockPanel
+						x:Name="UserTemplate"
+						LastChildFill="False">
 						<Label
 							DockPanel.Dock="Left"
 							Foreground="Black"
 							Content="{Binding Name}" />
-						<Button DockPanel.Dock="Right">Invite</Button>
+						<Button
+							DataContext="{Binding ElementName=Control, Path=DataContext}"
+							Command="{wtc:CommandBinding {x:Static binding:ShareCommands.InviteUser}}"
+							CommandParameter="{Binding ElementName=UserTemplate, Path=DataContext}"
+							DockPanel.Dock="Right">Invite</Button>
 					</DockPanel>
 				</DataTemplate>
 			</ListView.ItemTemplate>
@@ -67,7 +95,7 @@
 
 		<!-- Close button. -->
 		<Button
-			Grid.Row="2"
+			Grid.Row="3"
 			HorizontalAlignment="Right"
 			VerticalAlignment="Bottom"
 			Click="OnCloseButtonClicked"
