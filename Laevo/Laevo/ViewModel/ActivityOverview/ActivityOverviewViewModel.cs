@@ -158,7 +158,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 			else
 			{
-				HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _model.WorkspaceManager.StartupWorkspace )
+				HomeActivity = new ActivityViewModel( _model.HomeActivity, _model.WorkspaceManager, _dataRepository, _model.WorkspaceManager.StartupWorkspace )
 				{
 					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "home.png" ) ),
 					IsEditable = false
@@ -166,17 +166,16 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity( false );
-			VisibleActivity = HomeActivity;
 
 			Activities = new ObservableCollection<ActivityViewModel>();
 			Tasks = new ObservableCollection<ActivityViewModel>();
-			LoadActivities( VisibleActivity );
+			LoadActivities( HomeActivity );
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
 			_model.InterruptionAdded += task =>
 			{
-				var taskViewModel = new ActivityViewModel( task, _model.WorkspaceManager )
+				var taskViewModel = new ActivityViewModel( task, _model.WorkspaceManager, _dataRepository )
 				{
 					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
 					Color = ActivityViewModel.PresetColors[ 5 ],
@@ -189,7 +188,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
 			_model.InvitedToActivity += activity =>
 			{
-				var activityViewModel = new ActivityViewModel( activity, _model.WorkspaceManager );
+				var activityViewModel = new ActivityViewModel( activity, _model.WorkspaceManager, _dataRepository );
+				// TODO: Allow changing name/icon/color and only maintain subactivities?
 				AddActivity( activityViewModel );
 			};
 
@@ -204,6 +204,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public void LoadActivities( ActivityViewModel parentActivity )
 		{
+			VisibleActivity = parentActivity;
+
 			// Be sure to save changes to currently loaded activities.
 			Persist();
 
@@ -232,7 +234,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager )
+			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager, _dataRepository )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
@@ -254,7 +256,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager )
+			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager, _dataRepository )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
@@ -494,7 +496,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			OnPopupShowing();
 			var share = new SharePopup
 			{
-				DataContext = new ShareViewModel( _model, VisibleActivity )
+				DataContext = new ShareViewModel( _model, VisibleActivity, _dataRepository )
 			};
 			share.Closed += ( s, a ) => VisibleActivity.Persist();
 			share.ShowDialog();

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Laevo.Model
 {
-	[DataContract]
+	[DataContract( IsReference = true )]
 	public class User
 	{
 		[DataMember]

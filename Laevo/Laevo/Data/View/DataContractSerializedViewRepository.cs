@@ -9,7 +9,6 @@ using Laevo.Data.Common;
 using Laevo.Data.Model;
 using Laevo.Model;
 using Laevo.ViewModel.Activity;
-using Laevo.ViewModel.User;
 using Whathecode.System.Extensions;
 
 
@@ -62,12 +61,12 @@ namespace Laevo.Data.View
 			}
 
 			// Initialize user view model.
-			User = new UserViewModel( modelData.User );
+			User = GetUser( modelData.User );
 
 			// Initialize home from previous session, or initialize.
 			if ( _data.Home != null )
 			{
-				Home = new ActivityViewModel( modelData.HomeActivity, workspaceManager, _data.Home );
+				Home = new ActivityViewModel( modelData.HomeActivity, workspaceManager, this, _data.Home );
 			}
 
 			// At startup, load time line for home activity.
@@ -85,7 +84,7 @@ namespace Laevo.Data.View
 			Guid parentId = path.Last().Identifier;
 			Dictionary<Guid, ActivityViewModel> activities = _data.Activities[ parentId ];
 			ActivityViewModel storedViewModel = activities[ activity.Identifier ];
-			return new ActivityViewModel( activity, _workspaceManager, storedViewModel );
+			return new ActivityViewModel( activity, _workspaceManager, this, storedViewModel );
 		}
 
 		public override sealed void LoadActivities( Activity parentActivity )
@@ -105,7 +104,7 @@ namespace Laevo.Data.View
 				from activity in _modelData.GetActivities( parentActivity )
 				where activities.ContainsKey( activity.Identifier )
 				select new ActivityViewModel(
-					activity, _workspaceManager,
+					activity, _workspaceManager, this,
 					activities[ activity.Identifier ] );
 			var viewModels = createViewModels.ToList();
 			viewModels.Where( v => v.WorkIntervals.Count != 0 ).ForEach( v => Activities.Add( v ) );

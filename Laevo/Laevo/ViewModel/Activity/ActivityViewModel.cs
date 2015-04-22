@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ABC.Workspaces;
 using ABC.Workspaces.Library;
+using Laevo.Data.View;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.User;
@@ -114,6 +115,7 @@ namespace Laevo.ViewModel.Activity
 		internal readonly Model.Activity Activity;
 
 		readonly WorkspaceManager _workspaceManager;
+		readonly IViewRepository _repository;
 
 		[DataMember]
 		Workspace _workspace;
@@ -270,18 +272,14 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.OpenInterval )]
 		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
 
-		ObservableCollection<UserViewModel> _accessUsers;
-		ReadOnlyObservableCollection<UserViewModel> _readOnlyAccessUsers;
+		readonly ObservableCollection<UserViewModel> _accessUsers = new ObservableCollection<UserViewModel>();
 
 		/// <summary>
 		///   The users who have access to the time line of this activity.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.AccessUsers )]
-		public ReadOnlyObservableCollection<UserViewModel> AccessUsers
-		{
-			get { return _readOnlyAccessUsers; }
-		}
-
+		public ReadOnlyObservableCollection<UserViewModel> AccessUsers { get; private set; }
+			
 		EditActivityPopup _editActivityPopup;
 
 
@@ -300,15 +298,16 @@ namespace Laevo.ViewModel.Activity
 			DefaultIcon = PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "laevo.png" ) );
 		}
 
-		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager )
-			: this( activity, workspaceManager, workspaceManager.CreateEmptyWorkspace() ) {}
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, IViewRepository repository )
+			: this( activity, workspaceManager, repository, workspaceManager.CreateEmptyWorkspace() ) { }
 
-		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, Workspace workspace )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, IViewRepository repository, Workspace workspace )
 		{
 			Contract.Requires( activity != null );
 
 			Activity = activity;
 			_workspaceManager = workspaceManager;
+			_repository = repository;
 			_workspace = workspace;
 
 			IsEditable = true;
@@ -319,11 +318,12 @@ namespace Laevo.ViewModel.Activity
 			CommonInitialize();
 		}
 
-		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, ActivityViewModel storedViewModel )
+		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, IViewRepository repository, ActivityViewModel storedViewModel )
 		{
 			Activity = activity;
 
 			_workspaceManager = workspaceManager;
+			_repository = repository;
 			_workspace = storedViewModel._workspace ?? workspaceManager.CreateEmptyWorkspace();
 			NeedsSuspension = _workspace.HasResourcesToSuspend();
 			IsSuspended = storedViewModel.IsSuspended;
@@ -409,11 +409,10 @@ namespace Laevo.ViewModel.Activity
 			WorkIntervals.CollectionChanged += ( sender, args ) => UpdateOpenInterval();
 
 			// Initialize users who have access to this time line.
-			_accessUsers = new ObservableCollection<UserViewModel>();
-			_readOnlyAccessUsers = new ReadOnlyObservableCollection<UserViewModel>( _accessUsers );
-			Activity.AccessUsers.ForEach( u => _accessUsers.Add( new UserViewModel( u ) ) );
-			Activity.AccessAddedEvent += ( a, u ) => _accessUsers.Add( new UserViewModel( u ) );
-			Activity.AccessRemovedEvent += ( a, u ) => _accessUsers.Remove( new UserViewModel( u ) );
+			AccessUsers = new ReadOnlyObservableCollection<UserViewModel>( _accessUsers );
+			Activity.AccessUsers.ForEach( AddAccess );
+			Activity.AccessAddedEvent += ( a, u ) => AddAccess( u );
+			Activity.AccessRemovedEvent += ( a, u ) => _accessUsers.Remove( _repository.GetUser( u ) );
 		}
 
 
@@ -905,6 +904,17 @@ namespace Laevo.ViewModel.Activity
 		public void InviteUser( UserViewModel user )
 		{
 			Activity.AddAccess( user.User );
+		}
+
+		void AddAccess( Model.User user )
+		{
+			// Do not display own user.
+			if ( user == _repository.User.User )
+			{
+				return;
+			}
+
+			_accessUsers.Add( _repository.GetUser( user ) );
 		}
 
 		public override void Persist()
