@@ -3,6 +3,7 @@ using ABC.Interruptions;
 using ABC.Workspaces;
 using Laevo.Data.Model;
 using Laevo.Data.View;
+using Laevo.Peer;
 
 
 namespace Laevo.Data
@@ -15,19 +16,21 @@ namespace Laevo.Data
 		readonly string _dataFolder;
 		readonly InterruptionAggregator _interruptionAggregator;
 		readonly PersistenceProvider _persistenceProvider;
+		readonly IPeerFactory _peerFactory;
 
 
-		public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider )
+		public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider, IPeerFactory peerFactory )
 		{
 			_dataFolder = dataFolder;
 			_interruptionAggregator = interruptionAggregator;
 			_persistenceProvider = persistenceProvider;
+			_peerFactory = peerFactory;
 		}
 
 
 		public IModelRepository CreateModelRepository()
 		{
-			return new DataContractSerializedModelRepository( _dataFolder, _interruptionAggregator );
+			return new DataContractSerializedModelRepository( _dataFolder, _interruptionAggregator, _peerFactory );
 		}
 
 		public IViewRepository CreateViewRepository( IModelRepository linkedModelRepository, WorkspaceManager workspaceManager )

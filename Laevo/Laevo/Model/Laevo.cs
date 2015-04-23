@@ -46,11 +46,8 @@ namespace Laevo.Model
 
 		readonly AbstractInterruptionTrigger _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
-		readonly IPeerFactory _peerFactory;
 
 		public IUsersPeer UsersPeer { get; private set; }
-
-		readonly Dictionary<Activity, IActivityPeer> _activityPeers = new Dictionary<Activity, IActivityPeer>();
 
 		public static string ProgramLocalDataFolder { get; private set; }
 
@@ -111,8 +108,7 @@ namespace Laevo.Model
 
 			_interruptionTrigger = interruptionTrigger;
 			_dataRepository = dataRepository;
-			_peerFactory = peerFactory;
-			UsersPeer = _peerFactory.GetUsersPeer();
+			UsersPeer = peerFactory.GetUsersPeer();
 
 			// When invited to an activity, add it to the home activity.
 			UsersPeer.Invited += a =>
@@ -123,9 +119,6 @@ namespace Laevo.Model
 				InvitedToActivity( a );
 				// TODO: Similar to interruption events, this event should probably be removed and some other mechanism should be used.
 			};
-
-			// Initialize activity peers for shared activities.
-			_dataRepository.GetSharedActivities().ForEach( AddActivityPeer );
 
 			ProgramLocalDataFolder = dataFolder;
 
@@ -243,43 +236,18 @@ namespace Laevo.Model
 			if ( _dataRepository.GetActivities( OpenTimeLine ).Contains( activity ) )
 			{
 				activity.ActivatedEvent += OnActivityActivated;
-				activity.AccessAddedEvent += OnActivityAccessAdded;
-				activity.AccessRemovedEvent += OnActivityAccessRemoved;
 			}
 		}
 
 		void UnHandleActivity( Activity activity )
 		{
 			activity.ActivatedEvent -= OnActivityActivated;
-			activity.AccessAddedEvent -= OnActivityAccessAdded;
-			activity.AccessRemovedEvent -= OnActivityAccessRemoved;
 		}
 
 		void OnActivityActivated( Activity activity )
 		{
 			_dataRepository.AddAttentionShift( new ActivityAttentionShift( activity ) );
 			CurrentActivity = activity;
-		}
-
-		void OnActivityAccessAdded( Activity activity, User user )
-		{
-			AddActivityPeer( activity );
-		}
-
-		void OnActivityAccessRemoved( Activity activity, User user )
-		{
-			if ( activity.AccessUsers.Count == 0 )
-			{
-				_activityPeers.Remove( activity );
-			}
-		}
-
-		void AddActivityPeer( Activity activity )
-		{
-			if ( !_activityPeers.ContainsKey( activity ) )
-			{
-				_activityPeers[ activity ] = _peerFactory.GetActivityPeer( activity );
-			}
 		}
 
 		/// <summary>
