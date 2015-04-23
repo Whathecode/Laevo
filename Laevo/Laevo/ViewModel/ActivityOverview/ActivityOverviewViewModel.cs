@@ -144,7 +144,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			get { return !ActivityMode.HasFlag( Mode.Inactive ); }
 		}
 
-
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
@@ -225,6 +224,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 			Path = _dataRepository.GetPath( parentActivity );
 			Path.ForEach( HookActivityToOverview );
+
+			CurrentActivityViewModel = parentActivity;
 		}
 
 		/// <summary>
@@ -240,6 +241,19 @@ namespace Laevo.ViewModel.ActivityOverview
 			AddActivity( newActivity );
 
 			return newActivity;
+		}
+
+		public void MoveActivity( ActivityViewModel parentActivity, ActivityViewModel activityToMove )
+		{
+			if ( parentActivity == activityToMove )
+			{
+				return;
+			}
+
+			_model.MoveActivity(parentActivity.Activity, activityToMove.Activity);
+			_dataRepository.RemoveActivity( activityToMove );
+			_dataRepository.AddActivity( activityToMove, parentActivity.Identifier );
+			LoadActivities( CurrentActivityViewModel );
 		}
 
 		void AddActivity( ActivityViewModel activity )

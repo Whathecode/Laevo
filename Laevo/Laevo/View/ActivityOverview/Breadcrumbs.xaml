@@ -37,6 +37,8 @@
 							</Polygon.RenderTransform>
 						</Polygon>
 						<Button
+							AllowDrop="True"
+							Drop="OnActivityDrop"
 							Foreground="White"
 							Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
 							Command="{wtc:CommandBinding {x:Static b:Commands.OpenTimeLine}}">

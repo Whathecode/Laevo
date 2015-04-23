@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Laevo.Model;
 using Laevo.ViewModel.Activity;
@@ -15,9 +16,7 @@ namespace Laevo.Data.View
 	{
 		public UserViewModel User { get; protected set; }
 		public ActivityViewModel Home { get; set; }
-
 		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
-
 		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
 
 
@@ -31,6 +30,9 @@ namespace Laevo.Data.View
 		public abstract ActivityViewModel LoadActivity( Activity activity );
 		public abstract void LoadActivities( Activity parentActivity );
 		public abstract List<ActivityViewModel> GetPath( ActivityViewModel activity );
+		
+		public abstract void AddActivity( ActivityViewModel activity, Guid parent );
+		public abstract void RemoveActivity( ActivityViewModel activity );
 
 		public abstract void SaveChanges();
 	}

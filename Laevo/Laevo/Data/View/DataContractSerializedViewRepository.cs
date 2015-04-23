@@ -26,6 +26,7 @@ namespace Laevo.Data.View
 		{
 			[DataMember]
 			public ActivityViewModel Home;
+
 			[DataMember]
 			public Dictionary<Guid, Dictionary<Guid, ActivityViewModel>> Activities = new Dictionary<Guid, Dictionary<Guid, ActivityViewModel>>();
 		}
@@ -139,22 +140,40 @@ namespace Laevo.Data.View
 			return parents;
 		}
 
+		public override void AddActivity( ActivityViewModel activity, Guid parent )
+		{
+			Dictionary<Guid, ActivityViewModel> activities;
+			if ( _data.Activities.TryGetValue( parent, out activities ) )
+			{
+				activities.Add( activity.Identifier, activity );
+				return;
+			}
+			_data.Activities.Add( parent, new Dictionary<Guid, ActivityViewModel> { { activity.Identifier, activity } } );
+		}
+
+		public override void RemoveActivity( ActivityViewModel activityToRemove )
+		{
+			foreach ( var aggregated in _data.Activities.Values )
+			{
+				aggregated.Remove( activityToRemove.Identifier );
+			}
+		}
 
 		public override void SaveChanges()
 		{
 			// Persist activities and tasks.
 			lock ( Activities )
-			lock ( Tasks )
-			{
-				Activities.ForEach( a => a.Persist() );
-				Tasks.ForEach( a => a.Persist() );
+				lock ( Tasks )
+				{
+					Activities.ForEach( a => a.Persist() );
+					Tasks.ForEach( a => a.Persist() );
 
-				// Be sure to add latest activity view models to data structure.
-				_data.Home = Home;
-				_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
+					// Be sure to add latest activity view models to data structure.
+					_data.Home = Home;
+					_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
 
-				PersistanceHelper.Persist( _file, _serializer, _data );
-			}
+					PersistanceHelper.Persist( _file, _serializer, _data );
+				}
 		}
 	}
 }

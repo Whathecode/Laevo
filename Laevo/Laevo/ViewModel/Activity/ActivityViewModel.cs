@@ -620,7 +620,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.OpenActivityLibrary )]
 		public bool IsOverviewActive()
 		{
-			return !_overview.IsActive;
+			return _overview.IsActive;
 		}
 
 		void OnSuspendedWorkspace( AbstractWorkspace<WorkspaceSession> workspace )
@@ -759,11 +759,29 @@ namespace Laevo.ViewModel.Activity
 			return WorkIntervals.Where( i => i.IsPlanned && !i.IsPast() ).ToList();
 		}
 
+		public bool IsHierachies()
+		{
+			return _overview.ActivityMode.HasFlag( Mode.Hierarchies );
+		}
+
+		public void OnActivityDrop( ActivityViewModel activity )
+		{
+			if ( IsHierachies() )
+			{
+				_overview.MoveActivity( this, activity );
+			}
+			else
+			{
+				// Activity merge is temporary disabled (look in WorkIntervalControl.xaml.cs => CanDrop).
+				Merge( activity );
+			}
+		}
+
 		/// <summary>
 		///   Merges the passed activity with this activity.
 		/// </summary>
 		/// <param name = "activity">The activity to merge with this activity.</param>
-		public void Merge( ActivityViewModel activity )
+		void Merge( ActivityViewModel activity )
 		{
 			// Merging with itself is useless.
 			if ( activity == this )
