@@ -218,6 +218,12 @@ namespace Laevo.Model
 			return activity;
 		}
 
+		public void MoveActivity( Activity parentActivity, Activity activityToMove )
+		{
+			_dataRepository.RemoveActivity( activityToMove );
+			_dataRepository.AddActivity( activityToMove, parentActivity );
+		}
+
 		public void ChangeVisibleTimeLine( Activity activity )
 		{
 			_dataRepository.GetActivities( OpenTimeLine ).ForEach( UnHandleActivity );

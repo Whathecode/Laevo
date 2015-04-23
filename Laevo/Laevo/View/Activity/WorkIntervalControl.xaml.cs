@@ -35,7 +35,7 @@ namespace Laevo.View.Activity
 		[DependencyProperty( Properties.IsDraggingActivity )]
 		public bool IsDraggingActivity { get; private set; }
 
-		static Interval<double> _percentageInterval = new Interval<double>( 0, 1 );
+		static readonly Interval<double> PercentageInterval = new Interval<double>( 0, 1 );
 
 		/// <summary>
 		///   Timer used to update active time spans.
@@ -88,7 +88,7 @@ namespace Laevo.View.Activity
 			double displacement = e.DragInfo.Displacement.Y / parent.ActualHeight;
 			var viewModel = (WorkIntervalViewModel)DataContext;
 			double offset = viewModel.OffsetPercentage;
-			viewModel.OffsetPercentage = _percentageInterval.Clamp( offset - displacement );
+			viewModel.OffsetPercentage = PercentageInterval.Clamp( offset - displacement );
 		}
 
 		void LabelKeyDown( object sender, KeyEventArgs e )
@@ -124,7 +124,7 @@ namespace Laevo.View.Activity
 
 			if ( CanDrop( activity, dropTarget ) )
 			{
-				dropTarget.Merge( activity );
+				dropTarget.OnActivityDrop( activity );
 			}
 
 			e.Handled = true;
@@ -132,7 +132,10 @@ namespace Laevo.View.Activity
 
 		bool CanDrop( ActivityViewModel toMerge, ActivityViewModel dropTarget )
 		{
-			return toMerge != null && dropTarget.IsAccessible;
+			return toMerge != null && dropTarget.IsAccessible 
+				// Activity drop operation is not allowed when time line is not in hierarchies state. 
+				// TODO: It should be re-enabled in the future.
+				&& dropTarget.IsHierachies();
 		}
 
 		void StartDrag( object sender, MouseEventArgs e )

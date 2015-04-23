@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Laevo.Model;
 using Laevo.ViewModel.Activity;
@@ -21,6 +22,9 @@ namespace Laevo.Data.View
 		ActivityViewModel LoadActivity( Activity activity );
 		void LoadActivities( Activity parentActivity );
 		List<ActivityViewModel> GetPath( ActivityViewModel activity );
+
+		void AddActivity( ActivityViewModel activity, Guid parent );
+		void RemoveActivity( ActivityViewModel activity );
 
 		UserViewModel GetUser( User user );
 
