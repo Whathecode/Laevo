@@ -40,10 +40,6 @@ namespace Laevo.Data.Model
 		{
 			PeerFactory = peerFactory;
 
-			// Initialize activity peers for shared activities, and start listening for changes.
-			GetSharedActivities().ForEach( AddActivityPeer );
-			ActivityGuids.Values.ForEach( a => a.AccessAddedEvent += OnActivityAccessAdded );
-
 			// Initialize settings by default to prevent extending classes from forgetting to initialize default settings.
 			Settings = new Settings();
 		}
@@ -114,7 +110,7 @@ namespace Laevo.Data.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name, Activity parent = null )
 		{
-			var newActivity = new Activity( name, PeerFactory.GetUsersPeer() );
+			var newActivity = new Activity( name, this, PeerFactory.GetUsersPeer() );
 			newActivity.Invite( User );
 			AddActivity( newActivity, parent );
 
@@ -146,6 +142,10 @@ namespace Laevo.Data.Model
 			}
 			activities.Add( activity );
 			// TODO: Can this (if necessary?) be optimized to only listen to events if this is held in memory by the model?
+			if ( activity.AccessUsers.Count > 1 )
+			{
+				AddActivityPeer( activity );
+			}
 			activity.AccessAddedEvent += OnActivityAccessAdded;
 			activity.AccessRemovedEvent += OnActivityAccessRemoved;
 
@@ -164,6 +164,11 @@ namespace Laevo.Data.Model
 
 			ActivityGuids.Remove( activity.Identifier );
 			ActivityParents.Remove( activity );
+		}
+
+		public bool ContainsActivity( Activity activity )
+		{
+			return ActivityGuids.ContainsKey( activity.Identifier );
 		}
 
 		public void SwapTaskOrder( Activity task1, Activity task2 )

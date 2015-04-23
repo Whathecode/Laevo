@@ -59,7 +59,7 @@ namespace Laevo.Data.Model
 
 			// Initialize activity serializer.
 			// It needs to be aware about the interruption types loaded by the interruption aggregator.
-			var modelSurrogate = new ModelDataContractSurrogate( peerFactory.GetUsersPeer() );
+			var modelSurrogate = new ModelDataContractSurrogate( this, peerFactory.GetUsersPeer() );
 			var surrogateTypes = new Collection<Type>();
 			modelSurrogate.GetKnownCustomDataTypes( surrogateTypes );
 			_activitySerializer = new DataContractSerializer(

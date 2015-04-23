@@ -113,8 +113,14 @@ namespace Laevo.Model
 			// When invited to an activity, add it to the home activity.
 			UsersPeer.Invited += a =>
 			{
-				_dataRepository.AddActivity( a, HomeActivity );
+				// Make sure this activity is not yet managed by the repository.
+				if ( _dataRepository.ContainsActivity( a ) )
+				{
+					return;
+				}
+
 				Log.InfoWithData( "Invited to activity.", new LogData( a ) );
+				_dataRepository.AddActivity( a, HomeActivity );
 				HandleActivity( a );
 				InvitedToActivity( a );
 				// TODO: Similar to interruption events, this event should probably be removed and some other mechanism should be used.

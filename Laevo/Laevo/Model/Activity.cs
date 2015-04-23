@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using ABC.Interruptions;
+using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Peer;
 using NLog;
@@ -136,6 +137,8 @@ namespace Laevo.Model
 		HashSet<User> _accessUsers;
 		[DataMember]
 		IUsersPeer _usersPeer;
+		[DataMember]
+		IModelRepository _repository;
 
 		/// <summary>
 		///   The users who have access to the time line of this activity.
@@ -146,15 +149,16 @@ namespace Laevo.Model
 		}
 
 
-		public Activity( IUsersPeer usersPeer )
-			: this( "", usersPeer ) {}
+		public Activity( IModelRepository repository, IUsersPeer usersPeer )
+			: this( "", repository, usersPeer ) {}
 
-		public Activity( string name, IUsersPeer usersPeer )
+		public Activity( string name, IModelRepository repository, IUsersPeer usersPeer )
 		{
 			SetDefaults();
 
 			_name = name; // Change field rather than property to prevent logging activity creation as a name change.
 			_usersPeer = usersPeer;
+			_repository = repository;
 			Identifier = Guid.NewGuid();
 			DateCreated = DateTime.Now;
 
@@ -401,7 +405,10 @@ namespace Laevo.Model
 
 		public void Invite( User user )
 		{
-			_usersPeer.Invite( user, this );
+			if ( !user.Equals( _repository.User ) )
+			{
+				_usersPeer.Invite( user, this );
+			}
 			_accessUsers.Add( user );
 			AccessAddedEvent( this, user );
 		}
