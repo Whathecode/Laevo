@@ -69,6 +69,13 @@ namespace Laevo.Data.Model
 		/// <param name="activity">The activity to remove.</param>
 		void RemoveActivity( Activity activity );
 
+		/// <summary>
+		///   Verifies whether the repository already manages the specified activity.
+		/// </summary>
+		/// <param name="activity">The activity to look for.</param>
+		/// <returns>True when the given activity is managed by the repository; false otherwise.</returns>
+		bool ContainsActivity( Activity activity );
+
 		void SwapTaskOrder( Activity task1, Activity task2 );
 
 		void AddAttentionShift( AbstractAttentionShift attentionShift );

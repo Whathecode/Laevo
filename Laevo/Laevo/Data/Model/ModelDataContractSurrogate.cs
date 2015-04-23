@@ -2,7 +2,6 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Laevo.Peer;
@@ -14,13 +13,17 @@ namespace Laevo.Data.Model
 	{
 		[DataContract]
 		class UsersPeerPlaceholder { }
+		[DataContract]
+		class RepositoryPlaceholder { }
 
 
+		readonly IModelRepository _repository;
 		readonly IUsersPeer _usersPeer;
 
 
-		public ModelDataContractSurrogate( IUsersPeer usersPeer )
+		public ModelDataContractSurrogate( IModelRepository repository, IUsersPeer usersPeer )
 		{
+			_repository = repository;
 			_usersPeer = usersPeer;
 		}
 
@@ -29,7 +32,8 @@ namespace Laevo.Data.Model
 		{
 			var convertTypes = new Dictionary<Type, Type>
 			{
-				{ typeof( UsersPeerPlaceholder ), typeof( IUsersPeer ) }
+				{ typeof( UsersPeerPlaceholder ), typeof( IUsersPeer ) },
+				{ typeof( RepositoryPlaceholder ), typeof( IModelRepository ) }
 			};
 
 			return convertTypes.ContainsKey( type ) ? convertTypes[ type ] : type;
@@ -41,6 +45,10 @@ namespace Laevo.Data.Model
 			{
 				return new UsersPeerPlaceholder();
 			}
+			if ( targetType == typeof( IModelRepository ) )
+			{
+				return new RepositoryPlaceholder();
+			}
 
 			return obj;
 		}
@@ -50,6 +58,10 @@ namespace Laevo.Data.Model
 			if ( targetType == typeof( IUsersPeer ) )
 			{
 				return _usersPeer;
+			}
+			if ( targetType == typeof( IModelRepository ) )
+			{
+				return _repository;
 			}
 
 			return obj;
@@ -68,6 +80,7 @@ namespace Laevo.Data.Model
 		public void GetKnownCustomDataTypes( Collection<Type> customDataTypes )
 		{
 			customDataTypes.Add( typeof( UsersPeerPlaceholder ) );
+			customDataTypes.Add( typeof( RepositoryPlaceholder) );
 		}
 
 		public Type GetReferencedTypeOnImport( string typeName, string typeNamespace, object customData )
