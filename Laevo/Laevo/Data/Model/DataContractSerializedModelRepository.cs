@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -7,6 +8,7 @@ using ABC.Interruptions;
 using Laevo.Data.Common;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
+using Laevo.Peer;
 
 
 namespace Laevo.Data.Model
@@ -38,7 +40,8 @@ namespace Laevo.Data.Model
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 
 
-		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator )
+		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator, IPeerFactory peerFactory )
+			: base( peerFactory )
 		{
 			// Set up file paths.
 			_activitiesFile = Path.Combine( programDataFolder, "Activities.xml" );
@@ -56,7 +59,14 @@ namespace Laevo.Data.Model
 
 			// Initialize activity serializer.
 			// It needs to be aware about the interruption types loaded by the interruption aggregator.
-			_activitySerializer = new DataContractSerializer( typeof( Data ), interruptionAggregator.GetInterruptionTypes() );
+			var modelSurrogate = new ModelDataContractSurrogate( peerFactory.GetUsersPeer() );
+			var surrogateTypes = new Collection<Type>();
+			modelSurrogate.GetKnownCustomDataTypes( surrogateTypes );
+			_activitySerializer = new DataContractSerializer(
+				typeof( Data ),
+				interruptionAggregator.GetInterruptionTypes().Concat( surrogateTypes ),
+				Int32.MaxValue, true, false,
+				modelSurrogate );
 
 			// Load previous data.
 			Data loadedData = new Data();

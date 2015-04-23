@@ -46,7 +46,6 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( ShareCommands.InviteUser )]
 		public void InviteUser( UserViewModel user )
 		{
-			_usersPeer.Invite( user.User, Activity.Activity );
 			Activity.InviteUser( user );
 		}
 	}

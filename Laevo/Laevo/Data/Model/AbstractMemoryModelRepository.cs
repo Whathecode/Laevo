@@ -5,6 +5,7 @@ using System.Linq;
 using ABC.Interruptions;
 using Laevo.Model;
 using Laevo.Model.AttentionShifts;
+using Laevo.Peer;
 using Whathecode.System.Extensions;
 
 
@@ -16,9 +17,12 @@ namespace Laevo.Data.Model
 	/// <author>Steven Jeuris</author>
 	abstract class AbstractMemoryModelRepository : IModelRepository
 	{
+		protected IPeerFactory PeerFactory { get; private set; }
 		protected readonly Dictionary<Guid, List<Activity>> MemoryActivities = new Dictionary<Guid, List<Activity>>();
 		protected readonly Dictionary<Activity, Guid>  ActivityParents = new Dictionary<Activity, Guid>();
 		protected readonly Dictionary<Guid, Activity> ActivityGuids = new Dictionary<Guid, Activity>();
+
+		readonly Dictionary<Activity, IActivityPeer> _activityPeers = new Dictionary<Activity, IActivityPeer>();
 
 		public User User { get; protected set; }
 
@@ -32,8 +36,14 @@ namespace Laevo.Data.Model
 		public Settings Settings { get; protected set; }
 
 
-		protected AbstractMemoryModelRepository()
+		protected AbstractMemoryModelRepository( IPeerFactory peerFactory )
 		{
+			PeerFactory = peerFactory;
+
+			// Initialize activity peers for shared activities, and start listening for changes.
+			GetSharedActivities().ForEach( AddActivityPeer );
+			ActivityGuids.Values.ForEach( a => a.AccessAddedEvent += OnActivityAccessAdded );
+
 			// Initialize settings by default to prevent extending classes from forgetting to initialize default settings.
 			Settings = new Settings();
 		}
@@ -61,7 +71,7 @@ namespace Laevo.Data.Model
 		/// </summary>
 		public IEnumerable<Activity> GetSharedActivities()
 		{
-			return ActivityGuids.Values.Where( a => a.AccessUsers.Count > 0 );
+			return ActivityGuids.Values.Where( a => a.AccessUsers.Count > 1 ); // All activities shared with more than self.
 		}
 
 		/// <summary>
@@ -104,8 +114,8 @@ namespace Laevo.Data.Model
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name, Activity parent = null )
 		{
-			var newActivity = new Activity( name );
-			newActivity.AddAccess( User );
+			var newActivity = new Activity( name, PeerFactory.GetUsersPeer() );
+			newActivity.Invite( User );
 			AddActivity( newActivity, parent );
 
 			return newActivity;
@@ -135,6 +145,9 @@ namespace Laevo.Data.Model
 				MemoryActivities[ parentId ] = activities;
 			}
 			activities.Add( activity );
+			// TODO: Can this (if necessary?) be optimized to only listen to events if this is held in memory by the model?
+			activity.AccessAddedEvent += OnActivityAccessAdded;
+			activity.AccessRemovedEvent += OnActivityAccessRemoved;
 
 			ActivityGuids.Add( activity.Identifier, activity );
 			ActivityParents.Add( activity, parentId );
@@ -146,6 +159,8 @@ namespace Laevo.Data.Model
 			{
 				activities.Remove( activity );
 			}
+			activity.AccessAddedEvent -= OnActivityAccessAdded;
+			activity.AccessRemovedEvent -= OnActivityAccessRemoved;
 
 			ActivityGuids.Remove( activity.Identifier );
 			ActivityParents.Remove( activity );
@@ -168,6 +183,27 @@ namespace Laevo.Data.Model
 		public void AddAttentionShift( AbstractAttentionShift attentionShift )
 		{
 			MemoryAttentionShifts.Add( attentionShift );
+		}
+
+		void OnActivityAccessAdded( Activity activity, User user )
+		{
+			AddActivityPeer( activity );
+		}
+
+		void OnActivityAccessRemoved( Activity activity, User user )
+		{
+			if ( activity.AccessUsers.Count <= 1 ) // Only shared with self.
+			{
+				_activityPeers.Remove( activity );
+			}
+		}
+
+		void AddActivityPeer( Activity activity )
+		{
+			if ( !_activityPeers.ContainsKey( activity ) )
+			{
+				_activityPeers[ activity ] = PeerFactory.GetActivityPeer( activity );
+			}
 		}
 
 		public abstract void SaveChanges();

@@ -11,7 +11,7 @@ using ABC.Workspaces;
 
 namespace Laevo.Data.View
 {
-	public class ActivityDataContractSurrogate : IDataContractSurrogate
+	public class ViewDataContractSurrogate : IDataContractSurrogate
 	{
 		[DataContract]
 		class SerializedBitmap
@@ -29,7 +29,7 @@ namespace Laevo.Data.View
 		readonly WorkspaceManager _workspaceManager;
 
 
-		public ActivityDataContractSurrogate( WorkspaceManager workspaceManager )
+		public ViewDataContractSurrogate( WorkspaceManager workspaceManager )
 		{
 			_workspaceManager = workspaceManager;
 		}

@@ -903,7 +903,7 @@ namespace Laevo.ViewModel.Activity
 
 		public void InviteUser( UserViewModel user )
 		{
-			Activity.AddAccess( user.User );
+			Activity.Invite( user.User );
 		}
 
 		void AddAccess( Model.User user )

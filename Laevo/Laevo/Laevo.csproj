@@ -392,6 +392,7 @@
     <Compile Include="Data\Model\AbstractMemoryModelRepository.cs" />
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
+    <Compile Include="Data\Model\ModelDataContractSurrogate.cs" />
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
@@ -419,7 +420,7 @@
     <Compile Include="Peer\Mock\MockUsersPeer.cs" />
     <Compile Include="Peer\Mock\MockPeerFactory.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
-    <Compile Include="Data\View\ActivityDataContractSurrogate.cs" />
+    <Compile Include="Data\View\ViewDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityBar\ActivityBarViewModel.cs" />
     <Compile Include="ViewModel\ActivityBar\Binding\Binding.cs" />
     <Compile Include="ViewModel\ActivityOverview\ActivityOverviewViewModel.cs" />

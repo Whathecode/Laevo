@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using ABC.Interruptions;
 using Laevo.Logging;
+using Laevo.Peer;
 using NLog;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.Extensions;
@@ -133,6 +134,8 @@ namespace Laevo.Model
 
 		[DataMember]
 		HashSet<User> _accessUsers;
+		[DataMember]
+		IUsersPeer _usersPeer;
 
 		/// <summary>
 		///   The users who have access to the time line of this activity.
@@ -143,14 +146,15 @@ namespace Laevo.Model
 		}
 
 
-		public Activity()
-			: this( "" ) {}
+		public Activity( IUsersPeer usersPeer )
+			: this( "", usersPeer ) {}
 
-		public Activity( string name )
+		public Activity( string name, IUsersPeer usersPeer )
 		{
 			SetDefaults();
 
 			_name = name; // Change field rather than property to prevent logging activity creation as a name change.
+			_usersPeer = usersPeer;
 			Identifier = Guid.NewGuid();
 			DateCreated = DateTime.Now;
 
@@ -395,8 +399,9 @@ namespace Laevo.Model
 			_interruptions.Add( interruption );
 		}
 
-		public void AddAccess( User user )
+		public void Invite( User user )
 		{
+			_usersPeer.Invite( user, this );
 			_accessUsers.Add( user );
 			AccessAddedEvent( this, user );
 		}

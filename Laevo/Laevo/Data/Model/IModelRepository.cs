@@ -33,7 +33,7 @@ namespace Laevo.Data.Model
 		/// </summary>
 		IEnumerable<Activity> GetSharedActivities();
 
-			/// <summary>
+		/// <summary>
 		///   Gets the full path (parent activities) of this activity.
 		/// </summary>
 		/// <param name="activity">The activity to get the path for.</param>

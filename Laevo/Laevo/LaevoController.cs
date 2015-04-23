@@ -36,8 +36,8 @@ namespace Laevo
 			// Create Services.
 			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
 			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
-			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider );
 			var peerFactory = new MockPeerFactory();
+			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );
 
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();

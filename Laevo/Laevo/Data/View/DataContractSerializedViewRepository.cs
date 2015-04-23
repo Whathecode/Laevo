@@ -50,7 +50,7 @@ namespace Laevo.Data.View
 				typeof( Data ),
 				workspaceManager.GetPersistedDataTypes().Concat( persistenceProvider.GetPersistedDataTypes() ),
 				Int32.MaxValue, true, false,
-				new ActivityDataContractSurrogate( workspaceManager ) );
+				new ViewDataContractSurrogate( workspaceManager ) );
 			_data = new Data();
 			if ( File.Exists( _file ) )
 			{
