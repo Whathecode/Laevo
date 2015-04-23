@@ -316,7 +316,7 @@ namespace Laevo.View.ActivityOverview
 			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
 			var overview = (ActivityOverviewViewModel)DataContext;
 
-			overview.HomeActivity.Merge( activity );
+			overview.HomeActivity.OnActivityDrop( activity );
 		}
 	}
 }
