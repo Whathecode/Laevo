@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
 using Laevo.View.Activity;
+using Laevo.View.Common;
 using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -27,7 +28,12 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
+		public delegate void PopupEventHandler( object sender, LaevoPopup popup );
 
+		/// <summary>
+		/// Event which is triggered when pop-up window will be shown, it carries window object.
+		/// </summary>
+		public event PopupEventHandler ShowingPopupEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is activated.
@@ -58,11 +64,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		///   Event which is triggered when an activity is being suspended.
 		/// </summary>
 		public event ActivityViewModel.ActivityEventHandler SuspendingActivityEvent;
-
-		/// <summary>
-		///   Event which is triggered when pop-up window is opened.
-		/// </summary>
-		public event EventHandler OpenedPopupEvent;
 
 		/// <summary>
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
@@ -139,9 +140,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.Path )]
 		public List<ActivityViewModel> Path { get; private set; }
 
-		public bool IsActive
+		public bool IsDisabled
 		{
-			get { return !ActivityMode.HasFlag( Mode.Inactive ); }
+			get { return ActivityMode.HasFlag( Mode.Inactive ); }
 		}
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
@@ -217,7 +218,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			_dataRepository.LoadActivities( parentActivity.Activity );
 			Activities = _dataRepository.Activities;
 			Tasks = _dataRepository.Tasks;
-			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
+			Activities.Union( Tasks ).ForEach( model =>
+			{
+				model.ShowingPopupEvent += ( sender, popup ) => ShowingPopupEvent( sender, popup );
+				HookActivityToOverview(model);
+			} );
 
 			// Set path.
 			if ( Path != null )
@@ -240,6 +245,8 @@ namespace Laevo.ViewModel.ActivityOverview
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
 			};
+			newActivity.ShowingPopupEvent += ( sender, popup ) => ShowingPopupEvent( sender, popup );
+
 			AddActivity( newActivity );
 
 			return newActivity;
@@ -252,7 +259,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				return;
 			}
 
-			_model.MoveActivity(parentActivity.Activity, activityToMove.Activity);
+			_model.MoveActivity( parentActivity.Activity, activityToMove.Activity );
 			_dataRepository.RemoveActivity( activityToMove );
 			_dataRepository.AddActivity( activityToMove, parentActivity.Identifier );
 			LoadActivities( CurrentActivityViewModel );
@@ -367,8 +374,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
-			activity.ActivityEditStartedEvent -= OnPopupShowing;
-			activity.ActivityEditFinishedEvent -= OnPopupClosed;
 			activity.ActivityStoppedEvent -= OnActivityStopped;
 			activity.SuspendingActivityEvent -= OnSuspendingActivity;
 			activity.SuspendedActivityEvent -= OnSuspendedActivity;
@@ -385,8 +390,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
-			activity.ActivityEditStartedEvent += OnPopupShowing;
-			activity.ActivityEditFinishedEvent += OnPopupClosed;
 			activity.ActivityStoppedEvent += OnActivityStopped;
 			activity.SuspendingActivityEvent += OnSuspendingActivity;
 			activity.SuspendedActivityEvent += OnSuspendedActivity;
@@ -418,17 +421,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivitySelected( ActivityViewModel viewModel )
 		{
 			SelectedActivityEvent( viewModel );
-		}
-
-		public void OnPopupShowing( ActivityViewModel viewModel = null )
-		{
-			ActivityMode |= Mode.Inactive;
-			OpenedPopupEvent( this, new EventArgs() );
-		}
-
-		public void OnPopupClosed( ActivityViewModel viewModel = null )
-		{
-			ActivityMode &= ~Mode.Inactive;
 		}
 
 		void OnSuspendingActivity( ActivityViewModel viewModel )
@@ -494,27 +486,25 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.OpenUserProfile )]
 		public void OpenUserProfile()
 		{
-			OnPopupShowing();
 			var profile = new UserProfilePopup
 			{
 				DataContext = _dataRepository.User
 			};
 			profile.Closed += ( s, a ) => _dataRepository.User.Persist();
-			profile.ShowDialog();
-			OnPopupClosed();
+			ShowingPopupEvent( this, profile );
 		}
 
 		[CommandExecute( Commands.OpenTimeLineSharing )]
 		public void OpenTimeLineSharing()
 		{
-			OnPopupShowing();
 			var share = new SharePopup
 			{
 				DataContext = new ShareViewModel( _model, VisibleActivity, _dataRepository )
 			};
 			share.Closed += ( s, a ) => VisibleActivity.Persist();
-			share.ShowDialog();
-			OnPopupClosed();
+			//share.ShowDialog();
+
+			ShowingPopupEvent( this, share );
 		}
 
 		// ReSharper disable UnusedMember.Local

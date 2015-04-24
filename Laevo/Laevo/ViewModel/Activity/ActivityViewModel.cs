@@ -14,6 +14,7 @@ using ABC.Workspaces;
 using ABC.Workspaces.Library;
 using Laevo.Data.View;
 using Laevo.View.Activity;
+using Laevo.View.Common;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.User;
 using Whathecode.System.Arithmetic.Range;
@@ -56,6 +57,12 @@ namespace Laevo.ViewModel.Activity
 		public static readonly BitmapImage DefaultIcon;
 
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
+		public delegate void PopupEventHandler( object sender, LaevoPopup popup );
+
+		/// <summary>
+		/// Event which is triggered when pop-up window will be shown, it carries window object.
+		/// </summary>
+		public event PopupEventHandler ShowingPopupEvent;
 
 		/// <summary>
 		///   Event which is triggered at the start when an activity is being activated when it wasn't activated before.
@@ -76,16 +83,6 @@ namespace Laevo.ViewModel.Activity
 		///   Event which is triggered when an activity is selected.
 		/// </summary>
 		public event ActivityEventHandler SelectedActivityEvent;
-
-		/// <summary>
-		///   Event which is triggered when starting to edit an activity.
-		/// </summary>
-		public event ActivityEventHandler ActivityEditStartedEvent;
-
-		/// <summary>
-		///   Event which is triggered when finished editing an activity.
-		/// </summary>
-		public event ActivityEventHandler ActivityEditFinishedEvent;
 
 		/// <summary>
 		///   Event which is triggered when activity is stopped.
@@ -493,6 +490,12 @@ namespace Laevo.ViewModel.Activity
 			_workspace.GetInnerWorkspace<Library>().Open();
 		}
 
+		[CommandCanExecute( Commands.OpenActivityLibrary )]
+		public bool CanOpenActivityLibrary()
+		{
+			return !_overview.IsDisabled;
+		}
+
 		[CommandExecute( Commands.SelectActivity )]
 		public void SelectActivity()
 		{
@@ -530,7 +533,6 @@ namespace Laevo.ViewModel.Activity
 
 		public void EditActivity( bool focusPlannedInterval )
 		{
-			ActivityEditStartedEvent( this );
 			_editActivityPopup = new EditActivityPopup
 			{
 				DataContext = this,
@@ -539,10 +541,8 @@ namespace Laevo.ViewModel.Activity
 			_editActivityPopup.Closed += ( s, a ) =>
 			{
 				_editActivityPopup = null;
-				ActivityEditFinishedEvent( this );
 			};
-
-			_editActivityPopup.ShowDialog();
+			ShowingPopupEvent( this, _editActivityPopup );
 		}
 
 		[CommandCanExecute( Commands.EditActivity )]
@@ -592,7 +592,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.StopActivity )]
 		public bool CanStopActivity()
 		{
-			return IsEditable && Activity.IsOpen && !_isSuspending && IsOverviewActive();
+			return IsEditable && Activity.IsOpen && !_isSuspending && !_overview.IsDisabled;
 		}
 
 		bool _isSuspending;
@@ -614,12 +614,6 @@ namespace Laevo.ViewModel.Activity
 			// Start workspace suspension.
 			_workspace.SuspendedWorkspace += OnSuspendedWorkspace;
 			_workspace.Suspend();
-		}
-
-		[CommandCanExecute( Commands.OpenActivityLibrary )]
-		public bool IsOverviewActive()
-		{
-			return _overview.IsActive;
 		}
 
 		void OnSuspendedWorkspace( AbstractWorkspace<WorkspaceSession> workspace )

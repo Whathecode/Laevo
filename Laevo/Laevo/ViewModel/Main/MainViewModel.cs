@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Laevo.Data.View;
 using Laevo.Model;
 using Laevo.View.ActivityOverview;
+using Laevo.View.Common;
 using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityBar;
@@ -50,15 +51,16 @@ namespace Laevo.ViewModel.Main
 		{
 			model.WindowClipboard.UnresponsiveWindowDetected += ( windows, desktop ) =>
 			{
-				_activityOverviewViewModel.OnPopupShowing();
 				var unresponsiveViewModel = new UnresponsiveViewModel( windows );
 				unresponsiveViewModel.UnresponsiveHandled += () => _unresponsivePopup.Hide();
 				_unresponsivePopup.DataContext = unresponsiveViewModel;
 				ShowActivityOverview();
 				_unresponsiveEventThrown = true;
-				_unresponsivePopup.ShowDialog();
-				_activityOverviewViewModel.OnPopupClosed();
+
+				ShowPopup( this, _unresponsivePopup );
 			};
+
+
 
 			_model = model;
 			_dataRepository = dataRepository;
@@ -202,13 +204,13 @@ namespace Laevo.ViewModel.Main
 		public bool CanSwitchActivityOverview()
 		{
 			return _activityOverviewViewModel.ActivityMode.EqualsAny( Mode.Activate, Mode.Hierarchies ) && !_activityBar.IsInUse()
-			       && IsOverviewActive();
+			       && !_activityOverviewViewModel.IsDisabled;
 		}
 
 		[CommandExecute( Commands.ShowActivityBar )]
 		public void ShowActivityBar( bool autoHide )
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && IsOverviewActive() )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && !_activityOverviewViewModel.IsDisabled )
 			{
 				_activityBar.ShowActivityBar( autoHide );
 			}
@@ -217,7 +219,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityBar )]
 		public void HideActivityBar()
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && IsOverviewActive() )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && !_activityOverviewViewModel.IsDisabled )
 			{
 				_activityBar.HideActivityBar();
 			}
@@ -254,9 +256,9 @@ namespace Laevo.ViewModel.Main
 		 CommandCanExecute( Commands.NewActivity ), CommandCanExecute( Commands.CutWindow ),
 		 CommandCanExecute( Commands.PasteWindows ), CommandCanExecute( Commands.SwitchActivity ),
 		 CommandCanExecute( Commands.ActivateSelectedActivity ),]
-		public bool IsOverviewActive()
+		public bool CanExecuteShortcut()
 		{
-			return _activityOverviewViewModel.IsActive;
+			return !_activityOverviewViewModel.IsDisabled;
 		}
 
 		[CommandExecute( Commands.ActivateSelectedActivity )]
@@ -286,7 +288,7 @@ namespace Laevo.ViewModel.Main
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
-				_activityOverviewViewModel.OpenedPopupEvent += delegate { _activityBar.Hide(); };
+				_activityOverviewViewModel.ShowingPopupEvent += ShowPopup;
 			}
 			_activityOverview = new ActivityOverviewWindow
 			{
@@ -322,6 +324,14 @@ namespace Laevo.ViewModel.Main
 		{
 			// Open time line in order to select a new activity to continue work on.
 			SelectActivity( a => a.ActivateActivity( a.IsOpen ) );
+		}
+
+		void ShowPopup( object sender, LaevoPopup popup )
+		{
+			_activityBar.Hide();
+			_activityOverviewViewModel.ActivityMode |= Mode.Inactive;
+			popup.ShowDialog();
+			_activityOverviewViewModel.ActivityMode &= ~Mode.Inactive;
 		}
 
 		public override void Persist()
