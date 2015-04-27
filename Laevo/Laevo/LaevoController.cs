@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Windows;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Data.View;
+using Laevo.Model;
+using Laevo.Peer;
 using Laevo.Peer.Mock;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
@@ -31,12 +34,12 @@ namespace Laevo
 		readonly TrayIconControl _trayIcon;
 		readonly Model.Laevo _model;
 
-		public LaevoController()
+	    public LaevoController()
 		{
 			// Create Services.
-			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
+	        var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
 			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
-			var peerFactory = new MockPeerFactory();
+            var peerFactory = new PeerFactory();
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );
 
 			// Create Model.
@@ -52,6 +55,12 @@ namespace Laevo
 			// TODO: Move WorkspaceManager to ViewModel?
 			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, _model.WorkspaceManager );
 			_viewModel = new MainViewModel( _model, viewDataRepository );
+
+
+            //Initializing peerfactory
+	        var uc = peerFactory.GetUsersPeer();
+		    uc.User = dataRepository.User;
+            uc.Start();
 
 			// Create View.
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };
@@ -76,7 +85,7 @@ namespace Laevo
 
 		public void Exit()
 		{
-			_viewModel.Exit();			
+		    _viewModel.Exit();
 		}
 
 		public void ExitDesktopManager()

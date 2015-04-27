@@ -7,7 +7,7 @@ using Whathecode.System.Aspects;
 
 namespace Laevo.Peer
 {
-	public interface IUsersPeer
+	public interface IUsersPeer : IPeer
 	{
 		/// <summary>
 		///   Requests all endpoints in the mesh for their user information.

@@ -3,25 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Laevo.Model;
-using Laevo.Peer.Clouds;
+using Laevo.Peer.Clouds.UserCloud;
+using Whathecode.System.Aspects;
+
 
 namespace Laevo.Peer
 {
-    class UsersPeer : IUsersPeer
+    public class UsersPeer : AbstractPeer<UserCloud>, IUsersPeer
     {
-        private readonly UserCloud _userCloud;
-        private readonly List<User> _users = new List<User>(); 
-
         /// <summary>
         /// Constructs a new UsersPeer object.
         /// </summary>
-        /// <param name="me">The user logged in to the system</param>
-        public UsersPeer(User me)
+        public UsersPeer()
         {
-            _userCloud = new UserCloud(me);
-            _userCloud.InviteRecieved += activity => Invited(activity);
-            _userCloud.PeerJoined += peer => _users.Add(peer.User);
-            _userCloud.PeerLeft += peer => _users.Remove(peer.User);
+            Cloudname = "usercloud";
+            Cloud.InviteRecieved += activity => Invited(activity);
         }
 
         /// <summary>
@@ -31,7 +27,7 @@ namespace Laevo.Peer
         /// <returns></returns>
         public Task<List<User>> GetUsers(string searchTerm)
         {
-            return Task.Run(() => _users.Where(t => t.Name != null && t.Name.Contains(searchTerm)).ToList());
+            return Task.Run(() => Users.Where(t => t.Name != null && t.Name.Contains(searchTerm)).ToList());
         }
 
         /// <summary>
@@ -41,9 +37,11 @@ namespace Laevo.Peer
         /// <param name="activity">The activity</param>
         public void Invite(User user, Activity activity)
         {
-            _userCloud.Channel.Invite(user, activity);
+            Cloud.Proxy.Invite(user, activity);
         }
 
+        [InitializeEventHandlers(AttributeExclude = true)] // TODO: Why doesn't this compile when aspect is not excluded here?
         public event Action<Activity> Invited;
+
     }
 }

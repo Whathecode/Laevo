@@ -1,6 +1,6 @@
 ﻿namespace Laevo.Peer
 {
-	public interface IActivityPeer
+	public interface IActivityPeer : IPeer
 	{
 	}
 }

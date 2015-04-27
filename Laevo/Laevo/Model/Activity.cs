@@ -135,9 +135,9 @@ namespace Laevo.Model
 
 		[DataMember]
 		HashSet<User> _accessUsers;
-		[DataMember]
+		[DataMember] //TODO Is this really needed?
 		IUsersPeer _usersPeer;
-		[DataMember]
+        [DataMember] //TODO Is this really needed?
 		IModelRepository _repository;
 
 		/// <summary>
