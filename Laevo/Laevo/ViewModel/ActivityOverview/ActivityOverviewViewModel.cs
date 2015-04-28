@@ -25,7 +25,6 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
 
-
 		/// <summary>
 		///   Event which is triggered when an activity is activated.
 		/// </summary>
@@ -65,6 +64,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
 		public event Action NoCurrentActiveActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when pop-up window is shown;
+		/// </summary>
+		public event Action ShowingPopupEvent;
 
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
@@ -180,7 +184,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
-		/// <summary>
+		Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 		///   Create a new activity.
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
@@ -190,7 +194,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
 			};
-			lock ( Activities )
 			{
 				Activities.Add( newActivity );
 			}
@@ -409,6 +412,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
+
 		// ReSharper disable UnusedMember.Local
 		// ReSharper disable UnusedParameter.Local
 		[NotifyPropertyChanged( Binding.Properties.EnableAttentionLines )]
@@ -419,7 +423,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
-
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -445,6 +448,14 @@ namespace Laevo.ViewModel.ActivityOverview
 					Tasks.ForEach( t => t.Update( CurrentTime ) );
 				}
 			}
+		}
+
+		public void ShowPopup( LaevoPopup popup )
+		{
+			ShowingPopupEvent();
+			ActivityMode |= Mode.Inactive;
+			popup.ShowDialog();
+			ActivityMode &= ~Mode.Inactive;
 		}
 
 		public void CutWindow()

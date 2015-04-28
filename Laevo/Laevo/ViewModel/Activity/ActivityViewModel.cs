@@ -269,7 +269,6 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.OpenInterval )]
 		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
 			
-		EditActivityPopup _editActivityPopup;
 
 
 		static ActivityViewModel()
@@ -504,25 +503,20 @@ namespace Laevo.ViewModel.Activity
 
 		public void EditActivity( bool focusPlannedInterval )
 		{
-			ActivityEditStartedEvent( this );
-			_editActivityPopup = new EditActivityPopup
+			var edit = new EditActivityPopup
 			{
 				DataContext = this,
 				OccurancePicker = { IsOpen = focusPlannedInterval }
 			};
-			_editActivityPopup.Closed += ( s, a ) =>
-			{
-				_editActivityPopup = null;
-				ActivityEditFinishedEvent( this );
-			};
 
-			_editActivityPopup.ShowDialog();
+			_overview.ShowPopup( edit );
+
 		}
 
 		[CommandCanExecute( Commands.EditActivity )]
 		public bool CanEditActivity()
 		{
-			return IsEditable && _editActivityPopup == null;
+			return IsEditable;
 		}
 
 		[CommandExecute( Commands.OpenActivity )]

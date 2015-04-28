@@ -88,7 +88,10 @@ namespace Laevo.View.ActivityBar
 			_activityMenu.Deactivated += ( sender, args ) =>
 			{
 				_activityMenu.Hide();
-				ShowBarFor( TimeSpan.Zero );
+				if ( Visibility == Visibility.Visible )
+				{
+					ShowBarFor( TimeSpan.Zero );
+				}
 			};
 		}
 
