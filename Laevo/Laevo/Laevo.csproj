@@ -393,6 +393,7 @@
     <Compile Include="Data\Model\DataContractSerializedModelRepository.cs" />
     <Compile Include="Data\Model\IModelRepository.cs" />
     <Compile Include="Data\Model\ModelDataContractSurrogate.cs" />
+    <Compile Include="Data\Model\Base64Bitmap.cs" />
     <Compile Include="Data\View\AbstractMemoryViewRepository.cs" />
     <Compile Include="Data\View\DataContractSerializedViewRepository.cs" />
     <Compile Include="Data\View\IViewRepository.cs" />
@@ -439,6 +440,7 @@
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="ViewModel\User\Binding\Binding.cs" />
+    <Compile Include="ViewModel\User\BitmapHelper.cs" />
     <Compile Include="ViewModel\User\UserViewModel.cs" />
     <Compile Include="View\ActivityBar\ActivityBackgroundConverter.cs" />
     <Compile Include="View\ActivityBar\ActivityBar.xaml.cs">
@@ -529,10 +531,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Resource Include="View\ActivityOverview\Images\Share.png" />
-    <Resource Include="View\ActivityOverview\Images\Profile.png" />
+    <Resource Include="View\Common\Images\Share.png" />
+    <Resource Include="View\Common\Images\Alert.png" />
+    <Resource Include="View\Common\Images\Linked.png" />
+    <Resource Include="View\Common\Images\Calendar.png" />
+    <Resource Include="View\Common\Images\Profile.png" />
     <Resource Include="View\ActivityOverview\Images\SwitchOverview.png" />
-    <Resource Include="View\Common\Alert.png" />
     <Resource Include="View\Activity\ActionIcons\suspend.png" />
     <None Include="app.config" />
     <None Include="app.manifest">
@@ -591,8 +595,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Common\Style.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Main\Unresponsive\UnresponsiveWindowPopup.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -623,8 +627,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\User\UserImage.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\User\UserProfilePopup.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -736,13 +740,7 @@
     <Resource Include="View\Activity\Icons\Library.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="View\Common\linked.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\planned.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Common\calendar.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
