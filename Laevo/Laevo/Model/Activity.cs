@@ -405,18 +405,51 @@ namespace Laevo.Model
 
 		public void Invite( User user )
 		{
-			if ( !user.Equals( _repository.User ) )
+			// Invite user when no access yet.
+			bool ownUser = user.Equals( _repository.User );
+			var accessUsers = GetInheritedAccessUsers();
+			if ( !ownUser && !accessUsers.Contains( user ) )
 			{
 				_usersPeer.Invite( user, this );
 			}
-			_accessUsers.Add( user );
-			AccessAddedEvent( this, user );
+
+			IEnumerable<Activity> updatedActivities = Invite( user, this );
+
+			// Trigger modified access event for all.
+			// This is only done after having updated access for all activities, so that listeners have the latest state for all activities in case they depend on it.
+			updatedActivities.ForEach( a => a.AccessAddedEvent( a, user ) );
+		}
+
+		IEnumerable<Activity> Invite( User user, Activity activity )
+		{
+			if ( !activity._accessUsers.Contains( user ) )
+			{
+				activity._accessUsers.Add( user );
+				yield return activity;
+			}
+
+			// Invite to all subactivities.
+			foreach ( var sub in _repository.GetActivities( activity ) )
+			{
+				var result = Invite( user, sub );
+				foreach ( var r in result )
+				{
+					yield return r;
+				}
+			}
 		}
 
 		public void RemoveAccess( User user )
 		{
-			_accessUsers.Remove( user );
-			AccessRemovedEvent( this, user );
+			if ( _accessUsers.Remove( user ) )
+			{
+				AccessRemovedEvent( this, user );
+			}
+		}
+
+		public HashSet<User> GetInheritedAccessUsers()
+		{
+			return new HashSet<User>( _repository.GetPath( this ).SelectMany( a => a.AccessUsers ) );
 		}
 
 		public override bool Equals( object obj )

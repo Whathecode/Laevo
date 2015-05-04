@@ -40,7 +40,7 @@ namespace Laevo.Data.Model
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 
 
-		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator, IPeerFactory peerFactory )
+		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator, AbstractPeerFactory peerFactory )
 			: base( peerFactory )
 		{
 			// Set up file paths.
@@ -59,7 +59,7 @@ namespace Laevo.Data.Model
 
 			// Initialize activity serializer.
 			// It needs to be aware about the interruption types loaded by the interruption aggregator.
-			var modelSurrogate = new ModelDataContractSurrogate( this, peerFactory.GetUsersPeer() );
+			var modelSurrogate = new ModelDataContractSurrogate( this, peerFactory.UsersPeer );
 			var surrogateTypes = new Collection<Type>();
 			modelSurrogate.GetKnownCustomDataTypes( surrogateTypes );
 			_activitySerializer = new DataContractSerializer(
@@ -82,11 +82,22 @@ namespace Laevo.Data.Model
 			User = loadedData.User ?? new User();
 
 			// Add activities from previous sessions.
-			foreach ( var activities in loadedData.Activities )
+			var processActivities = new Queue<KeyValuePair<Guid, List<Activity>>>( loadedData.Activities );
+			while ( processActivities.Count > 0 )
 			{
+				// Check whether the parent of the dequeued element has already been added. If not, readd to queue to wait until it has been added.
+				var activities = processActivities.Dequeue();
+				if ( activities.Key != Guid.Empty && !ActivityGuids.ContainsKey( activities.Key ) )
+				{
+					processActivities.Enqueue( activities );
+					continue;
+				}
+
+				// Add all subactivities of the parent.
+				Activity parent = activities.Key == Guid.Empty ? null : ActivityGuids[ activities.Key ];
 				foreach ( var activity in activities.Value )
 				{
-					AddActivity( activity, activities.Key );
+					AddActivity( activity, parent );
 				}
 			}
 
@@ -98,6 +109,7 @@ namespace Laevo.Data.Model
 			else
 			{
 				HomeActivity = CreateNewActivity( "Home" );
+				HomeActivity.Invite( User ); // The home activity is owned by current user.
 				HomeActivity.MakeToDo();
 			}
 

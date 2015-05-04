@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using ABC.Interruptions;
 using Laevo.Model;
@@ -17,12 +18,10 @@ namespace Laevo.Data.Model
 	/// <author>Steven Jeuris</author>
 	abstract class AbstractMemoryModelRepository : IModelRepository
 	{
-		protected IPeerFactory PeerFactory { get; private set; }
+		protected AbstractPeerFactory PeerFactory { get; private set; }
 		protected readonly Dictionary<Guid, List<Activity>> MemoryActivities = new Dictionary<Guid, List<Activity>>();
 		protected readonly Dictionary<Activity, Guid>  ActivityParents = new Dictionary<Activity, Guid>();
 		protected readonly Dictionary<Guid, Activity> ActivityGuids = new Dictionary<Guid, Activity>();
-
-		readonly Dictionary<Activity, IActivityPeer> _activityPeers = new Dictionary<Activity, IActivityPeer>();
 
 		public User User { get; protected set; }
 
@@ -36,7 +35,7 @@ namespace Laevo.Data.Model
 		public Settings Settings { get; protected set; }
 
 
-		protected AbstractMemoryModelRepository( IPeerFactory peerFactory )
+		protected AbstractMemoryModelRepository( AbstractPeerFactory peerFactory )
 		{
 			PeerFactory = peerFactory;
 
@@ -103,16 +102,17 @@ namespace Laevo.Data.Model
 
 		/// <summary>
 		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.
-		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
 		/// </summary>
 		/// <param name="name">Name for the newly created activity.</param>
-		/// <param name="parent">The parent activity to which to add this subactivity.</param>
+		/// <param name="parent">The parent activity to which to add this subactivity, or null when a root.</param>
 		/// <returns>The newly created activity.</returns>
 		public Activity CreateNewActivity( string name, Activity parent = null )
 		{
-			var newActivity = new Activity( name, this, PeerFactory.GetUsersPeer() );
-			newActivity.Invite( User );
+			var newActivity = new Activity( name, this, PeerFactory.UsersPeer );
 			AddActivity( newActivity, parent );
+
+			// Give access to all users that have access higher up the hierarchy.
+			newActivity.GetInheritedAccessUsers().ForEach( u => newActivity.Invite( u ) );
 
 			return newActivity;
 		}
@@ -125,14 +125,12 @@ namespace Laevo.Data.Model
 			}
 
 			Guid parentId = parent == null
-				? HomeActivity == null
-					? Guid.Empty
-					: HomeActivity.Identifier
+				? Guid.Empty
 				: parent.Identifier;
 			AddActivity( activity, parentId );
 		}
 
-		protected void AddActivity( Activity activity, Guid parentId )
+		void AddActivity( Activity activity, Guid parentId )
 		{
 			List<Activity> activities;
 			if ( !MemoryActivities.TryGetValue( parentId, out activities ) )
@@ -141,29 +139,60 @@ namespace Laevo.Data.Model
 				MemoryActivities[ parentId ] = activities;
 			}
 			activities.Add( activity );
-			// TODO: Can this (if necessary?) be optimized to only listen to events if this is held in memory by the model?
-			if ( activity.AccessUsers.Count > 1 )
-			{
-				AddActivityPeer( activity );
-			}
-			activity.AccessAddedEvent += OnActivityAccessAdded;
-			activity.AccessRemovedEvent += OnActivityAccessRemoved;
 
 			ActivityGuids.Add( activity.Identifier, activity );
 			ActivityParents.Add( activity, parentId );
+
+			// TODO: For now, this assumes all activities are held in memory. If not, peers wouldn't be started for 'unloaded' activities.
+			//       A more scalable approach could load only part of the tree, but ensure loading the shared parts of the tree using e.g. GetSharedActivities().
+			PeerFactory.ManageActivity( activity, GetPath( activity ) );
 		}
 
 		public void RemoveActivity( Activity activity )
 		{
-			foreach ( var activities in MemoryActivities.Values )
-			{
-				activities.Remove( activity );
-			}
-			activity.AccessAddedEvent -= OnActivityAccessAdded;
-			activity.AccessRemovedEvent -= OnActivityAccessRemoved;
+			Guid parent = MemoryActivities.First( m => m.Value.Contains( activity ) ).Key;
+			RemoveActivity( activity, parent, true );
 
+			// Notify peer that the activity no longer needs to be managed.
+			PeerFactory.UnmanageActivity( activity );
+		}
+
+		void RemoveActivity( Activity activity, Guid parent, bool removeChildren )
+		{
+			// Remove from parent/children collection.
+			List<Activity> children = MemoryActivities[ parent ];
+			if ( children.Remove( activity ) ) // Activity can only be attached to one parent.
+			{
+				if ( children.Count == 0 )
+				{
+					MemoryActivities.Remove( parent );
+				}
+			}
+
+			// Remove quick access collections.
 			ActivityGuids.Remove( activity.Identifier );
 			ActivityParents.Remove( activity );
+
+			// Remove children.
+			if ( removeChildren && MemoryActivities.TryGetValue( activity.Identifier, out children ) )
+			{
+				foreach ( Activity child in children.ToList() )
+				{
+					RemoveActivity( child, activity.Identifier, true );
+				}
+			}
+		}
+
+		public void MoveActivity( Activity activity, Activity destination )
+		{
+			Contract.Requires( activity != null && destination != null );
+
+			Guid parent = MemoryActivities.First( m => m.Value.Contains( activity ) ).Key;
+			RemoveActivity( activity, parent, false ); // Do not remove children, as the activity in its whole is being moved.
+			AddActivity( activity, destination );
+
+			// Notify peer that the activity has been moved.
+			PeerFactory.ManageActivity( activity, GetPath( activity ) );
 		}
 
 		public bool ContainsActivity( Activity activity )
@@ -188,27 +217,6 @@ namespace Laevo.Data.Model
 		public void AddAttentionShift( AbstractAttentionShift attentionShift )
 		{
 			MemoryAttentionShifts.Add( attentionShift );
-		}
-
-		void OnActivityAccessAdded( Activity activity, User user )
-		{
-			AddActivityPeer( activity );
-		}
-
-		void OnActivityAccessRemoved( Activity activity, User user )
-		{
-			if ( activity.AccessUsers.Count <= 1 ) // Only shared with self.
-			{
-				_activityPeers.Remove( activity );
-			}
-		}
-
-		void AddActivityPeer( Activity activity )
-		{
-			if ( !_activityPeers.ContainsKey( activity ) )
-			{
-				_activityPeers[ activity ] = PeerFactory.GetActivityPeer( activity );
-			}
 		}
 
 		public abstract void SaveChanges();
