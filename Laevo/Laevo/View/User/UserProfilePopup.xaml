@@ -8,7 +8,12 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.User"
 	xmlns:common="clr-namespace:Laevo.View.Common"
+	xmlns:commandFactory="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:binding="clr-namespace:Laevo.ViewModel.User.Binding"
+	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:user="clr-namespace:Laevo.View.User"
 	d:DataContext="{d:DesignInstance Type=vm:UserViewModel}"
+	PopupImage="../Common/Images/Profile.png"
 	MinHeight="200">
 
 	<Grid>
@@ -19,13 +24,32 @@
 
 		<StackPanel
 			Grid.Row="0" Grid.Column="0">
-			<DockPanel>
+			<DockPanel Margin="0, 5">
 				<Label>Name</Label>
 				<TextBox
 					Margin="10, 0, 0, 0"
-					HorizontalAlignment="Stretch"
-					Text="{Binding Name}" />
+					Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 			</DockPanel>
+			<DockPanel Margin="0, 5">
+				<Label>Photo</Label>
+				<user:UserImage
+					HorizontalAlignment="Left"
+					Margin="10, 0, 0, 0" />
+				<Button
+					HorizontalAlignment="Left"
+					Margin="10, 0, 0, 0"
+					Content="Change"
+					Command="{commandFactory:CommandBinding {x:Static binding:Commands.ChooseImage}}" />
+				<Button
+					HorizontalAlignment="Left"
+					Margin="10, 0, 0, 0"
+					Content="Remove"
+					Visibility="{Binding Image,
+						Converter={data:EqualsValueConverter Value={x:Null}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}"
+					Command="{commandFactory:CommandBinding {x:Static binding:Commands.RemoveImage}}" />
+
+			</DockPanel>
+
 		</StackPanel>
 
 		<!-- Save button. -->

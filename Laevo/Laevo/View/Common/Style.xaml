@@ -57,6 +57,9 @@
 						</Border.Effect>
 						<Grid>
 							<Canvas>
+								<Canvas.Effect>
+									<DropShadowEffect/>
+								</Canvas.Effect>
 								<Image x:Name="Image" Source="{TemplateBinding PopupImage}">
 									<Image.Margin>
 										<MultiBinding Converter="{StaticResource ActivityIconMarginConverter}">

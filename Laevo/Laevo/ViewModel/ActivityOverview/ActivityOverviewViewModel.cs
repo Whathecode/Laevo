@@ -502,7 +502,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				DataContext = new ShareViewModel( _model, VisibleActivity, _dataRepository )
 			};
 			share.Closed += ( s, a ) => VisibleActivity.Persist();
-			//share.ShowDialog();
 
 			ShowingPopupEvent( this, share );
 		}

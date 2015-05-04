@@ -2,10 +2,13 @@
 {
 	public enum Properties
 	{
-		Name
+		Name,
+		Image
 	}
 
 	public enum Commands
 	{
+		ChooseImage,
+		RemoveImage
 	}
 }
