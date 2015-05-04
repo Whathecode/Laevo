@@ -70,7 +70,7 @@
 								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.SelectActivity}, Path=BaseActivity}" />
 							<!-- Icon which indicates whether this representation points to a later presentation of the same activity or not. -->
 							<Image
-								Source="../Common/linked.png"
+								Source="../Common/Images/Linked.png"
 								Stretch="None"
 								Cursor="Hand"
 								Margin="-24, 24, 0, 0"
@@ -82,7 +82,7 @@
 
 						<!-- Icon shown for planned intervals. -->
 						<Image
-							Source="../Common/calendar.png"
+							Source="../Common/Images/Calendar.png"
 							Stretch="None"
 							Cursor="Hand"
 							Margin="0, 6, 0, 0"
