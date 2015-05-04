@@ -16,10 +16,10 @@ namespace Laevo.Data
 		readonly string _dataFolder;
 		readonly InterruptionAggregator _interruptionAggregator;
 		readonly PersistenceProvider _persistenceProvider;
-		readonly IPeerFactory _peerFactory;
+		readonly AbstractPeerFactory _peerFactory;
 
 
-		public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider, IPeerFactory peerFactory )
+		public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
 		{
 			_dataFolder = dataFolder;
 			_interruptionAggregator = interruptionAggregator;

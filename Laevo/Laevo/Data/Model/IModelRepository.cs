@@ -47,10 +47,9 @@ namespace Laevo.Data.Model
 
 		/// <summary>
 		///   Create a new activity with the specified name, and add it as a subactivity of the given activity.
-		///   When no parent activity is specified, the activity is added as a subactivity of <see cref="HomeActivity" />.
 		/// </summary>
 		/// <param name="name">Name for the newly created activity.</param>
-		/// <param name="parent">The parent activity to which to add this subactivity.</param>
+		/// <param name="parent">The parent activity to which to add this subactivity, or null when a root.</param>
 		/// <returns>The newly created activity.</returns>
 		Activity CreateNewActivity( string name, Activity parent = null );
 
@@ -64,10 +63,17 @@ namespace Laevo.Data.Model
 		void AddActivity( Activity newActivity, Activity parent = null );
 
 		/// <summary>
-		///   Remove a specified activity.
+		///   Remove a specified activity, and all of its sub activities.
 		/// </summary>
 		/// <param name="activity">The activity to remove.</param>
 		void RemoveActivity( Activity activity );
+
+		/// <summary>
+		///   Moves the specified activity to the specified destination activity.
+		/// </summary>
+		/// <param name="activity">The activity to move.</param>
+		/// <param name="destination">The destination activity, to which <see cref="activity" /> will be added as a subactivity.</param>
+		void MoveActivity( Activity activity, Activity destination );
 
 		/// <summary>
 		///   Verifies whether the repository already manages the specified activity.

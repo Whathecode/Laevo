@@ -100,7 +100,7 @@ namespace Laevo.Model
 
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
-			PersistenceProvider persistenceProvider, IPeerFactory peerFactory )
+			PersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
 		{
 			Log.Info( "Startup." );
 
@@ -108,7 +108,7 @@ namespace Laevo.Model
 
 			_interruptionTrigger = interruptionTrigger;
 			_dataRepository = dataRepository;
-			UsersPeer = peerFactory.GetUsersPeer();
+			UsersPeer = peerFactory.UsersPeer;
 
 			// When invited to an activity, add it to the home activity.
 			UsersPeer.Invited += a =>
@@ -171,7 +171,7 @@ namespace Laevo.Model
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
-				var newActivity = _dataRepository.CreateNewActivity( interruption.Name );
+				var newActivity = _dataRepository.CreateNewActivity( interruption.Name, HomeActivity );
 				newActivity.MakeToDo();
 				newActivity.AddInterruption( interruption );
 				DispatcherHelper.SafeDispatch( _dispatcher, () =>
@@ -226,8 +226,7 @@ namespace Laevo.Model
 
 		public void MoveActivity( Activity parentActivity, Activity activityToMove )
 		{
-			_dataRepository.RemoveActivity( activityToMove );
-			_dataRepository.AddActivity( activityToMove, parentActivity );
+			_dataRepository.MoveActivity( activityToMove, parentActivity );
 		}
 
 		public void ChangeVisibleTimeLine( Activity activity )
