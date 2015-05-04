@@ -28,12 +28,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
 
 		public delegate void ActivitySwitchEventHandler( ActivityViewModel oldActivity, ActivityViewModel newActivity );
-		public delegate void PopupEventHandler( object sender, LaevoPopup popup );
-
-		/// <summary>
-		/// Event which is triggered when pop-up window will be shown, it carries window object.
-		/// </summary>
-		public event PopupEventHandler ShowingPopupEvent;
 
 		/// <summary>
 		///   Event which is triggered when an activity is activated.
@@ -69,6 +63,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
 		public event Action NoCurrentActiveActivityEvent;
+
+		/// <summary>
+		///   Event which is triggered when pop-up window is shown;
+		/// </summary>
+		public event Action ShowingPopupEvent;
 
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
@@ -145,6 +144,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			get { return ActivityMode.HasFlag( Mode.Inactive ); }
 		}
 
+
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
@@ -218,11 +218,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_dataRepository.LoadActivities( parentActivity.Activity );
 			Activities = _dataRepository.Activities;
 			Tasks = _dataRepository.Tasks;
-			Activities.Union( Tasks ).ForEach( model =>
-			{
-				model.ShowingPopupEvent += ( sender, popup ) => ShowingPopupEvent( sender, popup );
-				HookActivityToOverview(model);
-			} );
+			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 
 			// Set path.
 			if ( Path != null )
@@ -245,7 +241,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
 			};
-			newActivity.ShowingPopupEvent += ( sender, popup ) => ShowingPopupEvent( sender, popup );
 
 			AddActivity( newActivity );
 
@@ -491,7 +486,8 @@ namespace Laevo.ViewModel.ActivityOverview
 				DataContext = _dataRepository.User
 			};
 			profile.Closed += ( s, a ) => _dataRepository.User.Persist();
-			ShowingPopupEvent( this, profile );
+
+			ShowPopup( profile );
 		}
 
 		[CommandExecute( Commands.OpenTimeLineSharing )]
@@ -503,7 +499,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			};
 			share.Closed += ( s, a ) => VisibleActivity.Persist();
 
-			ShowingPopupEvent( this, share );
+			ShowPopup( share );
 		}
 
 		// ReSharper disable UnusedMember.Local
@@ -516,7 +512,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
-
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -542,6 +537,14 @@ namespace Laevo.ViewModel.ActivityOverview
 					Tasks.ForEach( t => t.Update( CurrentTime ) );
 				}
 			}
+		}
+
+		public void ShowPopup( LaevoPopup popup )
+		{
+			ShowingPopupEvent();
+			ActivityMode |= Mode.Inactive;
+			popup.ShowDialog();
+			ActivityMode &= ~Mode.Inactive;
 		}
 
 		public void CutWindow()
