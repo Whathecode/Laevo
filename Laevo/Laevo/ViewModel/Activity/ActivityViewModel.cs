@@ -14,7 +14,6 @@ using ABC.Workspaces;
 using ABC.Workspaces.Library;
 using Laevo.Data.View;
 using Laevo.View.Activity;
-using Laevo.View.Common;
 using Laevo.ViewModel.ActivityOverview;
 using Laevo.ViewModel.User;
 using Whathecode.System.Arithmetic.Range;
@@ -57,12 +56,6 @@ namespace Laevo.ViewModel.Activity
 		public static readonly BitmapImage DefaultIcon;
 
 		public delegate void ActivityEventHandler( ActivityViewModel viewModel );
-		public delegate void PopupEventHandler( object sender, LaevoPopup popup );
-
-		/// <summary>
-		/// Event which is triggered when pop-up window will be shown, it carries window object.
-		/// </summary>
-		public event PopupEventHandler ShowingPopupEvent;
 
 		/// <summary>
 		///   Event which is triggered at the start when an activity is being activated when it wasn't activated before.
@@ -276,8 +269,6 @@ namespace Laevo.ViewModel.Activity
 		/// </summary>
 		[NotifyProperty( Binding.Properties.AccessUsers )]
 		public ReadOnlyObservableCollection<UserViewModel> AccessUsers { get; private set; }
-			
-		EditActivityPopup _editActivityPopup;
 
 
 		static ActivityViewModel()
@@ -533,22 +524,19 @@ namespace Laevo.ViewModel.Activity
 
 		public void EditActivity( bool focusPlannedInterval )
 		{
-			_editActivityPopup = new EditActivityPopup
+			var edit = new EditActivityPopup
 			{
 				DataContext = this,
 				OccurancePicker = { IsOpen = focusPlannedInterval }
 			};
-			_editActivityPopup.Closed += ( s, a ) =>
-			{
-				_editActivityPopup = null;
-			};
-			ShowingPopupEvent( this, _editActivityPopup );
+
+			_overview.ShowPopup( edit );
 		}
 
 		[CommandCanExecute( Commands.EditActivity )]
 		public bool CanEditActivity()
 		{
-			return IsEditable && _editActivityPopup == null;
+			return IsEditable;
 		}
 
 		[CommandExecute( Commands.OpenActivity )]

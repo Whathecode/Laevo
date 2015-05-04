@@ -6,7 +6,6 @@ using System.Windows.Threading;
 using Laevo.Data.View;
 using Laevo.Model;
 using Laevo.View.ActivityOverview;
-using Laevo.View.Common;
 using Laevo.View.Settings;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityBar;
@@ -57,10 +56,8 @@ namespace Laevo.ViewModel.Main
 				ShowActivityOverview();
 				_unresponsiveEventThrown = true;
 
-				ShowPopup( this, _unresponsivePopup );
+				_activityOverviewViewModel.ShowPopup( _unresponsivePopup );
 			};
-
-
 
 			_model = model;
 			_dataRepository = dataRepository;
@@ -148,7 +145,6 @@ namespace Laevo.ViewModel.Main
 		public void ShowActivityOverview()
 		{
 			EnsureActivityOverview();
-			// TODO: Should activity bar be hidden or appear on top of the time line?
 			_activityBar.Hide();
 			_activityOverview.Show();
 			_activityOverview.Activate();
@@ -252,10 +248,13 @@ namespace Laevo.ViewModel.Main
 			_activityBarViewModel.SelectNextActivity();
 		}
 
-		[CommandCanExecute( Commands.ShowActivityBar ), CommandCanExecute( Commands.HideActivityBar ),
-		 CommandCanExecute( Commands.NewActivity ), CommandCanExecute( Commands.CutWindow ),
-		 CommandCanExecute( Commands.PasteWindows ), CommandCanExecute( Commands.SwitchActivity ),
-		 CommandCanExecute( Commands.ActivateSelectedActivity ),]
+		[CommandCanExecute( Commands.ShowActivityBar ),
+		 CommandCanExecute( Commands.HideActivityBar ),
+		 CommandCanExecute( Commands.NewActivity ),
+		 CommandCanExecute( Commands.CutWindow ),
+		 CommandCanExecute( Commands.PasteWindows ),
+		 CommandCanExecute( Commands.SwitchActivity ),
+		 CommandCanExecute( Commands.ActivateSelectedActivity )]
 		public bool CanExecuteShortcut()
 		{
 			return !_activityOverviewViewModel.IsDisabled;
@@ -288,7 +287,7 @@ namespace Laevo.ViewModel.Main
 				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
 				_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
 				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
-				_activityOverviewViewModel.ShowingPopupEvent += ShowPopup;
+				_activityOverviewViewModel.ShowingPopupEvent += () => _activityBar.Hide();
 			}
 			_activityOverview = new ActivityOverviewWindow
 			{
@@ -324,14 +323,6 @@ namespace Laevo.ViewModel.Main
 		{
 			// Open time line in order to select a new activity to continue work on.
 			SelectActivity( a => a.ActivateActivity( a.IsOpen ) );
-		}
-
-		void ShowPopup( object sender, LaevoPopup popup )
-		{
-			_activityBar.Hide();
-			_activityOverviewViewModel.ActivityMode |= Mode.Inactive;
-			popup.ShowDialog();
-			_activityOverviewViewModel.ActivityMode &= ~Mode.Inactive;
 		}
 
 		public override void Persist()
