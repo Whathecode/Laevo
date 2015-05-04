@@ -132,7 +132,7 @@
 					<Button
 						Command="{pf:CommandBinding {x:Static binding:Commands.OpenTimeLineSharing}}"
 						Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-						<Image Source="Images/Share.png" />
+						<Image Source="../Common/Images/Share.png" />
 					</Button>
 					<ItemsControl
 						ItemsSource="{Binding VisibleActivity.AccessUsers}">
@@ -143,7 +143,9 @@
 						</ItemsControl.ItemsPanel>
 						<ItemsControl.ItemTemplate>
 							<DataTemplate DataType="userVm:UserViewModel">
-								<user:UserImage Margin="3, 0, 0, 0" />
+								<user:UserImage 
+									Margin="3, 0, 0, 0" 
+									ToolTip="{Binding Name}"/>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>
@@ -159,7 +161,7 @@
 					IfTrue={x:Static Visibility.Collapsed},
 					IfFalse={x:Static Visibility.Visible}}}"
 				Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-				<Image Source="Images/Profile.png" />
+				<Image Source="../Common/Images/Profile.png" />
 			</Button>
 			<!-- Switch views. -->
 			<Border
@@ -391,7 +393,7 @@
 									Orientation ="Horizontal">
 									<StackPanel.Resources>
 										<BitmapImage x:Key="OpenTaskCursor" UriSource="Images\OpenTask.png" />
-										<BitmapImage x:Key="PlanActivityCursor" UriSource="..\Common\calendar.png" />
+										<BitmapImage x:Key="PlanActivityCursor" UriSource="../Common/Images/Calendar.png" />
 									</StackPanel.Resources>
 									<Image
 										x:Name="DragDropCursor"

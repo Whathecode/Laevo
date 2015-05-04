@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Windows.Media;
 
 
 namespace Laevo.Model
@@ -13,6 +14,8 @@ namespace Laevo.Model
 		[DataMember]
 		public string Name { get; set; }
 
+		[DataMember]
+		public ImageSource Image { get; set; }
 
 		public User()
 		{

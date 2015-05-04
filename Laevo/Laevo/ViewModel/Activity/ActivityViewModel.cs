@@ -931,7 +931,7 @@ namespace Laevo.ViewModel.Activity
 
 		public override void Persist()
 		{
-			// Nothing to do.
+			_accessUsers.ForEach( user => user.Persist() );
 		}
 
 		protected override void FreeUnmanagedResources()

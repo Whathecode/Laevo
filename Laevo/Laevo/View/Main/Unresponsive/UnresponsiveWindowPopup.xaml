@@ -13,7 +13,7 @@
 	xmlns:unresponsive1="clr-namespace:Laevo.View.Main.Unresponsive"
 	d:DataContext="{d:DesignInstance Type=unresponsive:UnresponsiveViewModel}"
 	Foreground="White"
-	PopupImage="../../Common/Alert.png">
+	PopupImage="../../Common/Images/Alert.png">
 
 	<Grid>
 		<Grid.RowDefinitions>

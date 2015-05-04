@@ -11,7 +11,8 @@
 	xmlns:binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:common="clr-namespace:Laevo.View.Common"
-	xmlns:user1="clr-namespace:Laevo.View.User"
+	xmlns:userView="clr-namespace:Laevo.View.User"
+	PopupImage="../Common/Images/Share.png"
 	d:DataContext="{d:DesignInstance Type=vm:ShareViewModel}">
 
 	<Grid>
@@ -36,12 +37,14 @@
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate DataType="user:UserViewModel">
-						<user1:UserImage Margin="3, 0, 0, 0" />
+						<userView:UserImage
+							Margin="3, 0, 0, 0"
+							ToolTip="{Binding Name}" />
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 		</StackPanel>
-		
+
 		<!-- Search for users. -->
 		<StackPanel Grid.Row="1">
 			<Grid>
@@ -58,7 +61,8 @@
 				<Button
 					Command="{wtc:CommandBinding {x:Static binding:ShareCommands.SearchUsers}}"
 					CommandParameter="{Binding ElementName=SearchTerm, Path=Text}"
-					Grid.Column="2">Search</Button>
+					Grid.Column="2"
+					Content="Search"/>
 			</Grid>
 		</StackPanel>
 
@@ -78,7 +82,9 @@
 					DataType="{x:Type user:UserViewModel}">
 					<DockPanel
 						x:Name="UserTemplate"
-						LastChildFill="False">
+						LastChildFill="False"
+						Margin="0, 3">
+						<userView:UserImage/>
 						<Label
 							DockPanel.Dock="Left"
 							Foreground="Black"
@@ -87,7 +93,8 @@
 							DataContext="{Binding ElementName=Control, Path=DataContext}"
 							Command="{wtc:CommandBinding {x:Static binding:ShareCommands.InviteUser}}"
 							CommandParameter="{Binding ElementName=UserTemplate, Path=DataContext}"
-							DockPanel.Dock="Right">Invite</Button>
+							DockPanel.Dock="Right"
+							Content="Invite"/>
 					</DockPanel>
 				</DataTemplate>
 			</ListView.ItemTemplate>

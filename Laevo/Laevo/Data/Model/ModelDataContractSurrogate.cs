@@ -2,8 +2,11 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Laevo.Peer;
 
 
@@ -12,9 +15,10 @@ namespace Laevo.Data.Model
 	public class ModelDataContractSurrogate : IDataContractSurrogate
 	{
 		[DataContract]
-		class UsersPeerPlaceholder { }
+		class UsersPeerPlaceholder {}
+
 		[DataContract]
-		class RepositoryPlaceholder { }
+		class RepositoryPlaceholder {}
 
 
 		readonly IModelRepository _repository;
@@ -33,7 +37,9 @@ namespace Laevo.Data.Model
 			var convertTypes = new Dictionary<Type, Type>
 			{
 				{ typeof( UsersPeerPlaceholder ), typeof( IUsersPeer ) },
-				{ typeof( RepositoryPlaceholder ), typeof( IModelRepository ) }
+				{ typeof( RepositoryPlaceholder ), typeof( IModelRepository ) },
+				{ typeof( ImageSource ), typeof( Base64Bitmap ) },
+				{ typeof( Base64Bitmap ), typeof( BitmapImage ) }
 			};
 
 			return convertTypes.ContainsKey( type ) ? convertTypes[ type ] : type;
@@ -49,6 +55,21 @@ namespace Laevo.Data.Model
 			{
 				return new RepositoryPlaceholder();
 			}
+			if ( targetType == typeof( Base64Bitmap ) )
+			{
+				byte[] data;
+				var encoder = new PngBitmapEncoder();
+
+					var bitmapImage = (BitmapSource)obj;
+					encoder.Frames.Add( BitmapFrame.Create( bitmapImage ) );
+
+				using ( var ms = new MemoryStream() )
+				{
+					encoder.Save( ms );
+					data = ms.ToArray();
+				}
+				return new Base64Bitmap( Convert.ToBase64String( data ) );
+			}
 
 			return obj;
 		}
@@ -63,6 +84,20 @@ namespace Laevo.Data.Model
 			{
 				return _repository;
 			}
+			if ( targetType == typeof( ImageSource ) )
+			{
+				var byteBuffer = Convert.FromBase64String( ( (Base64Bitmap)obj ).Base64Image );
+				var bitmapImage = new BitmapImage();
+				using ( var memoryStream = new MemoryStream( byteBuffer ) )
+				{
+					bitmapImage.BeginInit();
+					bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+					bitmapImage.StreamSource = memoryStream;
+					bitmapImage.EndInit();
+				}
+
+				return bitmapImage;
+			}
 
 			return obj;
 		}
@@ -74,13 +109,13 @@ namespace Laevo.Data.Model
 
 		public object GetCustomDataToExport( Type clrType, Type dataContractType )
 		{
-			return null;;
+			return null;
 		}
 
 		public void GetKnownCustomDataTypes( Collection<Type> customDataTypes )
 		{
 			customDataTypes.Add( typeof( UsersPeerPlaceholder ) );
-			customDataTypes.Add( typeof( RepositoryPlaceholder) );
+			customDataTypes.Add( typeof( RepositoryPlaceholder ) );
 		}
 
 		public Type GetReferencedTypeOnImport( string typeName, string typeNamespace, object customData )
