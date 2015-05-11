@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Windows.Threading;
@@ -203,7 +204,8 @@ namespace Laevo.Model
 			return activity;
 		}
 
-			// ReSharper disable once PossibleUnintendedReferenceComparison
+		/// <summary>
+
 		void HandleActivity( Activity activity )
 		{
 			activity.ActivatedEvent += OnActivityActivated;
