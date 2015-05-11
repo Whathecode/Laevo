@@ -16,6 +16,7 @@ namespace Laevo.View.ActivityOverview
 			InitializeComponent();
 		}
 
+
 		void OnActivityDrop( object sender, DragEventArgs e )
 		{
 			var activity = (ActivityViewModel)e.Data.GetData( typeof( ActivityViewModel ) );
@@ -23,7 +24,7 @@ namespace Laevo.View.ActivityOverview
 			var parentActivity = (ActivityViewModel)button.DataContext;
 			var overview = (ActivityOverviewViewModel)DataContext;
 
-			overview.MoveActivity( parentActivity, activity );
+			overview.MoveActivity( activity, parentActivity );
 		}
 	}
 }

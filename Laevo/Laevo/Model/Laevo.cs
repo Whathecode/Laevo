@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Windows.Threading;
@@ -224,9 +225,16 @@ namespace Laevo.Model
 			return activity;
 		}
 
-		public void MoveActivity( Activity parentActivity, Activity activityToMove )
+		/// <summary>
+		///   Moves an activity to a new parent.
+		/// </summary>
+		/// <param name="activity">The activity to move.</param>
+		/// <param name="toParent">The parent activity to move the activity to.</param>
+		public void MoveActivity( Activity activity, Activity toParent )
 		{
-			_dataRepository.MoveActivity( activityToMove, parentActivity );
+			Contract.Requires( activity != toParent );
+
+			_dataRepository.MoveActivity( activity, toParent );
 		}
 
 		public void ChangeVisibleTimeLine( Activity activity )
