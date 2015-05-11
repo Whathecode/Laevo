@@ -749,7 +749,7 @@ namespace Laevo.ViewModel.Activity
 		{
 			if ( IsHierachies() )
 			{
-				_overview.MoveActivity( this, activity );
+				_overview.MoveActivity( activity, this );
 			}
 			else
 			{

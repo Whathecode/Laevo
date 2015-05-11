@@ -90,11 +90,16 @@ namespace Laevo.ViewModel.ActivityOverview
 		public Mode ActivityMode { get; set; }
 
 		/// <summary>
-		///   The ViewModel of the activity which is currently open.
+		///   The ViewModel of the activity which is currently active.
 		///   TODO: Think if property should be moved to MainViewModel.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.CurrentActivityViewModel )]
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
+
+		/// <summary>
+		///   The ViewModel of the activity whose time line is currently open.
+		/// </summary>
+		public ActivityViewModel OpenTimeLineViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
@@ -228,7 +233,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			Path = _dataRepository.GetPath( parentActivity );
 			Path.ForEach( HookActivityToOverview );
 
-			CurrentActivityViewModel = parentActivity;
+			OpenTimeLineViewModel = parentActivity;
 		}
 
 		/// <summary>
@@ -247,17 +252,26 @@ namespace Laevo.ViewModel.ActivityOverview
 			return newActivity;
 		}
 
-		public void MoveActivity( ActivityViewModel parentActivity, ActivityViewModel activityToMove )
+		public void MoveActivity( ActivityViewModel activity, ActivityViewModel toParent )
 		{
-			if ( parentActivity == activityToMove )
+			if ( toParent == activity )
 			{
 				return;
 			}
 
-			_model.MoveActivity( parentActivity.Activity, activityToMove.Activity );
-			_dataRepository.RemoveActivity( activityToMove );
-			_dataRepository.AddActivity( activityToMove, parentActivity.Identifier );
-			LoadActivities( CurrentActivityViewModel );
+			_model.MoveActivity( activity.Activity, toParent.Activity );
+			_dataRepository.RemoveActivity( activity );
+			_dataRepository.AddActivity( activity, toParent.Identifier );
+
+			// Since it is moved from this time line, remove.
+			lock ( Activities )
+			{
+				Activities.Remove( activity );
+			}
+			lock ( Tasks )
+			{
+				Tasks.Remove( activity );
+			}
 		}
 
 		void AddActivity( ActivityViewModel activity )
