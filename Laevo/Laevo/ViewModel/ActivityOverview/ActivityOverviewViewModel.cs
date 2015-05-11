@@ -92,11 +92,16 @@ namespace Laevo.ViewModel.ActivityOverview
 		public Mode ActivityMode { get; set; }
 
 		/// <summary>
-		///   The ViewModel of the activity which is currently open.
+		///   The ViewModel of the activity which is currently active.
 		///   TODO: Think if property should be moved to MainViewModel.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.CurrentActivityViewModel )]
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
+
+		/// <summary>
+		///   The ViewModel of the activity whose time line is currently open.
+		/// </summary>
+		public ActivityViewModel OpenTimeLineViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
@@ -190,7 +195,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager )
+		var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
@@ -202,6 +207,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			HookActivityToOverview( newActivity );
 
 			return newActivity;
+
+
 		}
 
 		[CommandExecute( Commands.NewTask )]
