@@ -20,7 +20,7 @@ namespace Laevo.Data.Model
 	{
 		protected AbstractPeerFactory PeerFactory { get; private set; }
 		protected readonly Dictionary<Guid, List<Activity>> MemoryActivities = new Dictionary<Guid, List<Activity>>();
-		protected readonly Dictionary<Activity, Guid>  ActivityParents = new Dictionary<Activity, Guid>();
+		protected readonly Dictionary<Activity, Guid> ActivityParents = new Dictionary<Activity, Guid>();
 		protected readonly Dictionary<Guid, Activity> ActivityGuids = new Dictionary<Guid, Activity>();
 
 		public User User { get; protected set; }
@@ -74,11 +74,17 @@ namespace Laevo.Data.Model
 		/// </summary>
 		/// <param name="activity">The activity to get the path for.</param>
 		/// <returns>An ordered list of parent activities, where the last activity is the closest parent.</returns>
+		/// <exception cref="InvalidOperationException">Thrown when activity is not within the repository.</exception>
 		public List<Activity> GetPath( Activity activity )
 		{
 			List<Activity> parents = new List<Activity>();
 
-			Guid parentId = ActivityParents[ activity ];
+			Guid parentId;
+			if ( !ActivityParents.TryGetValue( activity, out parentId ) )
+			{
+				string error = string.Format( "The passed activity ({0}) is not managed by this repository.", activity.Name );
+				throw new InvalidOperationException( error );
+			}
 			while ( parentId != Guid.Empty )
 			{
 				var parent = ActivityGuids[ parentId ];

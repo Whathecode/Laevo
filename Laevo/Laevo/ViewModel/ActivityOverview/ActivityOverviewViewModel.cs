@@ -77,6 +77,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		readonly Timer _updateTimer = new Timer( 100 );
 
+
 		[NotifyProperty( Binding.Properties.TimeLineRenderScale )]
 		public float TimeLineRenderScale { get; set; }
 
@@ -96,11 +97,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.CurrentActivityViewModel )]
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
 
-		/// <summary>
-		///   The ViewModel of the activity whose time line is currently open.
-		/// </summary>
-		public ActivityViewModel OpenTimeLineViewModel { get; private set; }
-
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
 
@@ -109,7 +105,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		[NotifyProperty( Binding.Properties.IsFocusedTimeBeforeNow )]
 		public bool IsFocusedTimeBeforeNow { get; private set; }
-
 
 		/// <summary>
 		///   The time which currently has input focus and can be acted upon. This is rounded to nearest values.
@@ -136,10 +131,10 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 		[NotifyProperty( Binding.Properties.Activities )]
-		public ObservableCollection<ActivityViewModel> Activities { get; private set; }
+		public ReadOnlyObservableCollection<ActivityViewModel> Activities { get; private set; }
 
 		[NotifyProperty( Binding.Properties.Tasks )]
-		public ObservableCollection<ActivityViewModel> Tasks { get; private set; }
+		public ReadOnlyObservableCollection<ActivityViewModel> Tasks { get; private set; }
 
 		[NotifyProperty( Binding.Properties.Path )]
 		public List<ActivityViewModel> Path { get; private set; }
@@ -154,7 +149,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_model = model;
 			_dataRepository = dataRepository;
-			ActivityMode = Mode.Activate;
 
 			// Set up home activity.
 			if ( _dataRepository.Home != null )
@@ -172,9 +166,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity( false );
 
-			Activities = new ObservableCollection<ActivityViewModel>();
-			Tasks = new ObservableCollection<ActivityViewModel>();
-			LoadActivities( HomeActivity );
+			// The first time this is called, it will open the personal view, since activity mode is not set yet.
+			SwitchPersonalHierarchies();
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
@@ -186,7 +179,7 @@ namespace Laevo.ViewModel.ActivityOverview
 					Color = ActivityViewModel.PresetColors[ 5 ],
 					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "mail_read.png" ) )
 				};
-				AddTask( taskViewModel );
+				AddActivity( taskViewModel, HomeActivity );
 			};
 
 			// Listen for invited activities being added.
@@ -195,7 +188,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				var activityViewModel = new ActivityViewModel( activity, _model.WorkspaceManager, _dataRepository );
 				// TODO: Allow changing name/icon/color and only maintain subactivities?
-				AddActivity( activityViewModel );
+				AddActivity( activityViewModel, HomeActivity );
 			};
 
 			// Hook up timer.
@@ -204,36 +197,45 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
+		void UnloadActivities()
+		{
+			// Clear previously loaded activities.
+			if ( Activities != null )
+			{
+				Activities.ForEach( UnHookActivityFromOverview );
+			}
+			if ( Tasks != null )
+			{
+				Tasks.ForEach( UnHookActivityFromOverview );
+			}
+
+			// Unload path.
+			if ( Path != null )
+			{
+				Path.Skip( 1 ).ForEach( UnHookActivityFromOverview ); // Skip home activity.
+				Path = null;
+			}
+		}
+
 		/// <summary>
 		///   Initialize the activities and tasks to work with this overview by hooking up activity view models from previous sessions.
 		/// </summary>
 		public void LoadActivities( ActivityViewModel parentActivity )
 		{
-			VisibleActivity = parentActivity;
+			UnloadActivities();
 
-			// Be sure to save changes to currently loaded activities.
-			Persist();
-
-			_model.ChangeVisibleTimeLine( parentActivity.Activity );
-
-			// Clear previously loaded activities.
-			Activities.Union( Tasks ).ForEach( UnHookActivityFromOverview );
+			VisibleActivity = parentActivity ?? HomeActivity; // Load home activity first time.
+			_model.ChangeVisibleTimeLine( VisibleActivity.Activity );
 
 			// Load new activities.
-			_dataRepository.LoadActivities( parentActivity.Activity );
+			_dataRepository.LoadActivities( VisibleActivity.Activity );
 			Activities = _dataRepository.Activities;
 			Tasks = _dataRepository.Tasks;
 			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 
 			// Set path.
-			if ( Path != null )
-			{
-				Path.ForEach( UnHookActivityFromOverview );
-			}
-			Path = _dataRepository.GetPath( parentActivity );
+			Path = _dataRepository.GetPath( VisibleActivity );
 			Path.ForEach( HookActivityToOverview );
-
-			OpenTimeLineViewModel = parentActivity;
 		}
 
 		/// <summary>
@@ -241,7 +243,9 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			var newActivity = new ActivityViewModel( _model.CreateNewActivity(), _model.WorkspaceManager, _dataRepository )
+			ActivityViewModel parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
+			Model.Activity activity = _model.CreateNewActivity( parent.Activity );
+			var newActivity = new ActivityViewModel( activity, _model.WorkspaceManager, _dataRepository )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
@@ -260,52 +264,35 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			_model.MoveActivity( activity.Activity, toParent.Activity );
-			_dataRepository.RemoveActivity( activity );
-			_dataRepository.AddActivity( activity, toParent.Identifier );
-
-			// Since it is moved from this time line, remove.
-			lock ( Activities )
-			{
-				Activities.Remove( activity );
-			}
-			lock ( Tasks )
-			{
-				Tasks.Remove( activity );
-			}
+			_dataRepository.MoveActivity( activity, toParent );
 		}
 
-		void AddActivity( ActivityViewModel activity )
+		/// <summary>
+		///   Adds an activity to the specified parent.
+		///   When the parent is not specified, the activity is added to the current open time line in hierarchy view, or home in personal view.
+		/// </summary>
+		void AddActivity( ActivityViewModel activity, ActivityViewModel parent = null )
 		{
-			lock ( Activities )
+			if ( parent == null )
 			{
-				Activities.Add( activity );
+				parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
 			}
+
+			_dataRepository.AddActivity( activity, parent );
 			HookActivityToOverview( activity );
 		}
 
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			var newTask = new ActivityViewModel( _model.CreateNewTask(), _model.WorkspaceManager, _dataRepository )
+			ActivityViewModel parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
+			Model.Activity task = _model.CreateNewTask( parent.Activity );
+			var newTask = new ActivityViewModel( task, _model.WorkspaceManager, _dataRepository )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 				IsUnnamed = true
 			};
-			AddTask( newTask );
-		}
-
-		void AddTask( ActivityViewModel task )
-		{
-			if ( !task.Activity.IsToDo )
-			{
-				throw new ArgumentException( "The passed activity is not a to-do item.", "task" );
-			}
-
-			lock ( Tasks )
-			{
-				Tasks.Insert( 0, task );
-			}
-			HookActivityToOverview( task );
+			AddActivity( newTask );
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -347,15 +334,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			_model.Remove( activity.Activity );
-
-			lock ( Activities )
-			{
-				Activities.Remove( activity );
-			}
-			lock ( Tasks )
-			{
-				Tasks.Remove( activity );
-			}
+			_dataRepository.RemoveActivity( activity );
 
 			UnHookActivityFromOverview( activity );
 
@@ -364,17 +343,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public void SwapTaskOrder( ActivityViewModel task1, ActivityViewModel task2 )
 		{
-			// Update viewmodel.
-			int draggedIndex = Tasks.IndexOf( task1 );
-			int currentIndex = Tasks.IndexOf( task2 );
-			var reordered = Tasks
-				.Select( ( t, i ) => i == draggedIndex ? currentIndex : i == currentIndex ? draggedIndex : i )
-				.Select( toAdd => Tasks[ toAdd ] )
-				.ToArray();
-			Tasks.Clear();
-			reordered.ForEach( Tasks.Add );
-
-			// Update order in model as well.
+			_dataRepository.SwapTaskOrder( task1, task2 );
 			_model.SwapTaskOrder( task1.Activity, task2.Activity );
 		}
 
@@ -458,16 +427,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		void OnToDoChanged( ActivityViewModel viewModel )
 		{
-			bool isTurnedIntoToDo = viewModel.Activity.IsToDo;
-
-			if ( isTurnedIntoToDo )
-			{
-				AddTask( viewModel );
-			}
-			else
-			{
-				Tasks.Remove( viewModel );
-			}
+			_dataRepository.UpdateActivity( viewModel );
 		}
 
 		[CommandExecute( Commands.OpenHome )]
@@ -484,11 +444,19 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				ActivityMode &= ~Mode.Activate;
 				ActivityMode |= Mode.Hierarchies;
+				LoadActivities( VisibleActivity );
 			}
 			else
 			{
 				ActivityMode &= ~Mode.Hierarchies;
 				ActivityMode |= Mode.Activate;
+				
+				// Load personal activities.
+				UnloadActivities();
+				_dataRepository.LoadPersonalActivities();
+				Activities = _dataRepository.Activities;
+				Tasks = _dataRepository.Tasks;
+				Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 			}
 		}
 
@@ -573,16 +541,6 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public void ActivityDropped( ActivityViewModel activity )
 		{
-			if ( activity.IsToDo )
-			{
-				// Convert to activity.
-				Tasks.Remove( activity );
-				if ( !Activities.Contains( activity ) ) // Activity can already have a presentation on the time line when it was converted to a to do item before.
-				{
-					Activities.Add( activity );
-				}
-			}
-
 			// Based on where the activity is dropped, open, or plan it.
 			bool openEdit = false;
 			if ( IsFocusedTimeBeforeNow )

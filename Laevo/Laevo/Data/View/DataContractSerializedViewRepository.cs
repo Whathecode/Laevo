@@ -37,6 +37,11 @@ namespace Laevo.Data.View
 		readonly string _file;
 		readonly DataContractSerializer _serializer;
 		readonly Data _data;
+
+		/// <summary>
+		///   True when hierarchy activities have been loaded (LoadActivities), and false when personal activities have been loaded (LoadPersonalActivities).
+		/// </summary>
+		bool _loadedHierarchy;
 		Activity _currentVisibleParent;
 
 
@@ -90,9 +95,10 @@ namespace Laevo.Data.View
 
 		public override sealed void LoadActivities( Activity parentActivity )
 		{
+			_loadedHierarchy = true;
 			_currentVisibleParent = parentActivity;
-			Activities.Clear();
-			Tasks.Clear();
+			InnerActivities.Clear();
+			InnerTasks.Clear();
 
 			Dictionary<Guid, ActivityViewModel> activities;
 			if ( !_data.Activities.TryGetValue( parentActivity.Identifier, out activities ) )
@@ -108,14 +114,14 @@ namespace Laevo.Data.View
 					activity, _workspaceManager, this,
 					activities[ activity.Identifier ] );
 			var viewModels = createViewModels.ToList();
-			viewModels.Where( v => v.WorkIntervals.Count != 0 ).ForEach( v => Activities.Add( v ) );
+			viewModels.Where( v => v.WorkIntervals.Count != 0 ).ForEach( v => InnerActivities.Add( v ) );
 
 			// Initialize tasks.
 			// The list needs to be reversed since the tasks are stored in the correct order, but each time inserted at the start.
 			var tasks = viewModels.Where( v => v.IsToDo );
 			foreach ( var task in tasks.Reverse() )
 			{
-				Tasks.Add( task );
+				InnerTasks.Add( task );
 			}
 
 			// HACK: Replace duplicate activity instances in tasks with the instances found in activities.
@@ -125,9 +131,21 @@ namespace Laevo.Data.View
 				ActivityViewModel activity = Activities.FirstOrDefault( a => a.Equals( task ) );
 				if ( activity != null )
 				{
-					Tasks[ i ] = activity;
+					InnerTasks[ i ] = activity;
 				}
 			}
+
+			// Update activities in data storage.
+			_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
+		}
+
+		public override void LoadPersonalActivities()
+		{
+			_loadedHierarchy = false;
+			InnerActivities.Clear();
+			InnerTasks.Clear();
+
+			// TODO: Load all personal activities.
 		}
 
 		public override List<ActivityViewModel> GetPath( ActivityViewModel activity )
@@ -139,40 +157,97 @@ namespace Laevo.Data.View
 			return parents;
 		}
 
-		public override void AddActivity( ActivityViewModel activity, Guid parent )
+		public override void AddActivity( ActivityViewModel activity, ActivityViewModel toParent = null )
 		{
-			Dictionary<Guid, ActivityViewModel> activities;
-			if ( _data.Activities.TryGetValue( parent, out activities ) )
+			// TODO: Throw exception when activity is already managed by repository.
+
+			if ( toParent == null )
 			{
-				activities.Add( activity.Identifier, activity );
-				return;
+				toParent = Home;
 			}
-			_data.Activities.Add( parent, new Dictionary<Guid, ActivityViewModel> { { activity.Identifier, activity } } );
+
+			// Add activity to data collection.
+			Guid parent = toParent.Identifier;
+			Dictionary<Guid, ActivityViewModel> activities;
+			if ( !_data.Activities.TryGetValue( parent, out activities ) )
+			{
+				activities = new Dictionary<Guid, ActivityViewModel>();
+				_data.Activities.Add( parent, activities );
+			}
+			activities.Add( activity.Identifier, activity );
+
+			// Add activity to observable collection when its parent is currently visible.
+			if ( _loadedHierarchy && _currentVisibleParent.Equals( toParent.Activity ) )
+			{
+				if ( activity.IsToDo )
+				{
+					InnerTasks.Insert( 0, activity );
+				}
+				else
+				{
+					InnerActivities.Add( activity );
+				}
+			}
 		}
 
-		public override void RemoveActivity( ActivityViewModel activityToRemove )
+		public override void RemoveActivity( ActivityViewModel activity )
 		{
+			// TODO: Remove subactivities? As is now, removed subactivities which aren't added again are still stored in the repository.
 			foreach ( var aggregated in _data.Activities.Values )
 			{
-				aggregated.Remove( activityToRemove.Identifier );
+				aggregated.Remove( activity.Identifier );
 			}
+
+			// Since it might be removed from the currently visible time line, remove from observable collections.
+			InnerActivities.Remove( activity );
+			InnerTasks.Remove( activity );
+		}
+
+		public override void MoveActivity( ActivityViewModel activity, ActivityViewModel toParent )
+		{
+			RemoveActivity( activity );
+			AddActivity( activity, toParent );
+		}
+
+		public override void UpdateActivity( ActivityViewModel activity )
+		{
+			bool isTurnedIntoToDo = activity.Activity.IsToDo;
+			if ( isTurnedIntoToDo )
+			{
+				InnerTasks.Insert( 0, activity );
+			}
+			else
+			{
+				InnerTasks.Remove( activity );
+				if ( !InnerActivities.Contains( activity ) ) // Activity can already have a presentation on the time line when it was converted to a to do item before.
+				{
+					InnerActivities.Add( activity );
+				}
+			}
+		}
+
+		public override void SwapTaskOrder( ActivityViewModel task1, ActivityViewModel task2 )
+		{
+			int draggedIndex = Tasks.IndexOf( task1 );
+			int currentIndex = Tasks.IndexOf( task2 );
+			var reordered = Tasks
+				.Select( ( t, i ) => i == draggedIndex ? currentIndex : i == currentIndex ? draggedIndex : i )
+				.Select( toAdd => Tasks[ toAdd ] )
+				.ToArray();
+			InnerTasks.Clear();
+			reordered.ForEach( InnerTasks.Add );
 		}
 
 		public override void SaveChanges()
 		{
 			// Persist activities and tasks.
-			lock ( Activities )
-				lock ( Tasks )
-				{
-					Activities.ForEach( a => a.Persist() );
-					Tasks.ForEach( a => a.Persist() );
+			Activities.ForEach( a => a.Persist() );
+			Tasks.ForEach( a => a.Persist() );
 
-					// Be sure to add latest activity view models to data structure.
-					_data.Home = Home;
-					_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
+			// Be sure to add latest activity view models to data structure.
+			_data.Home = Home;
 
-					PersistanceHelper.Persist( _file, _serializer, _data );
-				}
+			PersistanceHelper.Persist( _file, _serializer, _data );
 		}
 	}
 }

@@ -674,11 +674,15 @@ namespace Laevo.ViewModel.Activity
 		[CommandExecute( Commands.RemovePlanning )]
 		public void RemovePlanning()
 		{
-			Activity.RemovePlanning();
-
-			foreach ( var i in GetFutureWorkIntervals() )
+			List<WorkIntervalViewModel> futureIntervals = GetFutureWorkIntervals();
+			if ( futureIntervals.Count == WorkIntervals.Count )
 			{
-				WorkIntervals.Remove( i );
+				Remove(); // No past intervals left, just remove entire activity.
+			}
+			else
+			{
+				futureIntervals.ForEach( i => WorkIntervals.Remove( i ) );
+				Activity.RemovePlanning();
 			}
 		}
 

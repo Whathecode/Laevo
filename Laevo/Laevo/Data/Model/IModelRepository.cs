@@ -38,6 +38,7 @@ namespace Laevo.Data.Model
 		/// </summary>
 		/// <param name="activity">The activity to get the path for.</param>
 		/// <returns>An ordered list of parent activities, where the last activity is the closest parent.</returns>
+		/// <exception cref="InvalidOperationException">Thrown when activity is not within the repository.</exception>
 		List<Activity> GetPath( Activity activity );
 
 		/// <summary>

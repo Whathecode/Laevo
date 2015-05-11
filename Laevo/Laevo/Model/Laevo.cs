@@ -216,9 +216,9 @@ namespace Laevo.Model
 		///   Create and add a new activity.
 		/// </summary>
 		/// <returns>The newly created activity.</returns>
-		public Activity CreateNewActivity( string name = DefaultActivityName )
+		public Activity CreateNewActivity( Activity parent, string name = DefaultActivityName )
 		{
-			var activity = _dataRepository.CreateNewActivity( name, OpenTimeLine );
+			var activity = _dataRepository.CreateNewActivity( name, parent );
 			Log.InfoWithData( "New activity.", new LogData( activity ) );
 			HandleActivity( activity );
 
@@ -288,9 +288,9 @@ namespace Laevo.Model
 			ActivityRemoved( activity );
 		}
 
-		public Activity CreateNewTask( string name = DefaultTaskName )
+		public Activity CreateNewTask( Activity parent, string name = DefaultTaskName )
 		{
-			var task = _dataRepository.CreateNewActivity( name, OpenTimeLine );
+			var task = _dataRepository.CreateNewActivity( name, parent );
 			Log.InfoWithData( "New task.", new LogData( task ) );
 			task.MakeToDo();
 			HandleActivity( task );

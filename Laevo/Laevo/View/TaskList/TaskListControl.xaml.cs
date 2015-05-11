@@ -84,7 +84,7 @@ namespace Laevo.View.TaskList
 			Point currentPosition = e.GetPosition( Tasks );
 			double clampedX = new Interval<double>( 0, Tasks.ActualWidth ).Clamp( currentPosition.X );
 			var viewModel = (ActivityOverviewViewModel)DataContext;
-			ObservableCollection<ActivityViewModel> tasks = viewModel.Tasks;
+			ReadOnlyObservableCollection<ActivityViewModel> tasks = viewModel.Tasks;
 			int draggedIndex = tasks.IndexOf( _draggedTaskViewModel );
 			int currentIndex = (int)Math.Floor( clampedX / ( Tasks.ActualWidth / tasks.Count ) );
 			if ( draggedIndex != currentIndex )
