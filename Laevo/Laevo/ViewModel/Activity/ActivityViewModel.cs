@@ -98,6 +98,16 @@ namespace Laevo.ViewModel.Activity
 		public event ActivityEventHandler ToDoChangedEvent;
 
 		/// <summary>
+		///   Event which is triggered when the user claimed ownership over the activity.
+		/// </summary>
+		public event ActivityEventHandler ClaimedOwnershipEvent;
+
+		/// <summary>
+		///   Event which is triggered when the user dropped ownership of the activity.
+		/// </summary>
+		public event ActivityEventHandler DroppedOwnershipEvent;
+
+		/// <summary>
 		///   Event which is triggered when the activity is being removed.
 		/// </summary>
 		public event ActivityEventHandler RemovingActivityEvent;
@@ -265,7 +275,7 @@ namespace Laevo.ViewModel.Activity
 		readonly ObservableCollection<UserViewModel> _accessUsers = new ObservableCollection<UserViewModel>();
 
 		/// <summary>
-		///   The users who have access to the time line of this activity.
+		///   The other users who have access to the time line of this activity.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.AccessUsers )]
 		public ReadOnlyObservableCollection<UserViewModel> AccessUsers { get; private set; }
@@ -273,7 +283,13 @@ namespace Laevo.ViewModel.Activity
 		readonly ObservableCollection<UserViewModel> _ownedUsers = new ObservableCollection<UserViewModel>();
 
 		/// <summary>
-		///   The users who have claimed ownership over this activity.
+		///   Whether or not the current user claimed ownership over the activity.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.ClaimedOwnership )]
+		public bool ClaimedOwnership { get; private set; }
+
+		/// <summary>
+		///   The other users who have claimed ownership over this activity.
 		/// </summary>
 		[NotifyProperty( Binding.Properties.OwnedUsers )]
 		public ReadOnlyObservableCollection<UserViewModel> OwnedUsers { get; private set; }
@@ -413,8 +429,25 @@ namespace Laevo.ViewModel.Activity
 			// Initialize users who have claimed owernship over this activity.
 			OwnedUsers = new ReadOnlyObservableCollection<UserViewModel>( _ownedUsers );
 			Activity.OwnedUsers.ForEach( AddOwnership );
-			Activity.OwnershipAddedEvent += ( a, u ) => AddOwnership( u );
-			Activity.OwnershipRemovedEvent += ( a, u ) => _ownedUsers.Remove( _repository.GetUser( u ) );
+			Activity.OwnershipAddedEvent += ( a, u ) =>
+			{
+				AddOwnership( u );
+
+				if ( u.Equals( _repository.User.User ) )
+				{
+					ClaimedOwnershipEvent( this );
+				}
+			};
+			Activity.OwnershipRemovedEvent += ( a, u ) =>
+			{
+				_ownedUsers.Remove( _repository.GetUser( u ) );
+
+				if ( u.Equals( _repository.User.User ) )
+				{
+					ClaimedOwnership = false;
+					DroppedOwnershipEvent( this );
+				}
+			};
 		}
 
 
@@ -718,6 +751,18 @@ namespace Laevo.ViewModel.Activity
 			Icon = newIcon;
 		}
 
+		[CommandExecute( Commands.ClaimOwnership )]
+		public void ClaimOwnership()
+		{
+			Activity.AddOwnership( _repository.User.User );
+		}
+
+		[CommandExecute( Commands.DropOwnership )]
+		public void DropOwnership()
+		{
+			Activity.RemoveOwnership( _repository.User.User );
+		}
+
 		/// <summary>
 		///   Creates default 1 hour long planned activity.
 		/// </summary>
@@ -937,6 +982,13 @@ namespace Laevo.ViewModel.Activity
 
 		void AddOwnership( Model.User user )
 		{
+			// Do not display own user.
+			if ( user == _repository.User.User )
+			{
+				ClaimedOwnership = true;
+				return;
+			}
+
 			_ownedUsers.Add( _repository.GetUser( user ) );
 		}
 

@@ -20,6 +20,7 @@
 		WorkIntervals,
 		OpenInterval,
 		AccessUsers,
+		ClaimedOwnership,
 		OwnedUsers
 	}
 
@@ -38,7 +39,9 @@
 		MakeToDo,
 		RemovePlanning,
 		ChangeColor,
-		ChangeIcon
+		ChangeIcon,
+		ClaimOwnership,
+		DropOwnership
 	}
 
 	public enum WorkIntervalProperties

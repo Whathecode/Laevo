@@ -177,7 +177,7 @@ namespace Laevo.Model
 			Identifier = Guid.NewGuid();
 			DateCreated = DateTime.Now;
 
-			ClaimOwnership( repository.User );
+			AddOwnership( repository.User );
 
 			// Create initial data path.
 			var activityDirectory = new DirectoryInfo( CreateSafeFolderName() );
@@ -470,7 +470,7 @@ namespace Laevo.Model
 			return new HashSet<User>( _repository.GetPath( this ).SelectMany( a => a.AccessUsers ) );
 		}
 
-		public void ClaimOwnership( User user )
+		public void AddOwnership( User user )
 		{
 			if ( _ownedUsers.Add( user ) )
 			{

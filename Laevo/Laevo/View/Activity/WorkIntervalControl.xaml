@@ -13,6 +13,8 @@
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:activity="clr-namespace:Laevo.View.Activity"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:userVm="clr-namespace:Laevo.ViewModel.User"
+	xmlns:user="clr-namespace:Laevo.View.User"
 	mc:Ignorable="d"
 	d:DesignHeight="118" d:DesignWidth="206"
 	d:DataContext="{d:DesignInstance Type=vm:WorkIntervalViewModel}"
@@ -214,72 +216,118 @@
 							</VisualBrush.Visual>
 						</VisualBrush>
 					</Border.BorderBrush>
+					
+					<Grid>
+						<!-- Users who claimed ownership. -->
+						<StackPanel
+							VerticalAlignment="Bottom"
+							HorizontalAlignment="Right"
+							Orientation="Horizontal"
+							Margin="0, 0, 4, 4">
+							<ItemsControl
+								ItemsSource="{Binding BaseActivity.OwnedUsers}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate DataType="userVm:UserViewModel">
+										<user:UserImage Margin="3, 0, 0, 0" />
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+							<!-- Claim ownership. -->
+							<Image
+								Visibility="{Binding BaseActivity.ClaimedOwnership,
+									Converter={wtcConverters:FromBooleanConverter 
+									IfTrue={x:Static Visibility.Collapsed}, 
+									IfFalse={x:Static Visibility.Visible}}}"
+								Source="../Common/Images/Share.png"
+								Stretch="None"
+								Cursor="Hand"
+								Margin="10, 0, 0, 0"
+								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.ClaimOwnership}, Path=BaseActivity}" />
+							<!-- Drop ownership. -->
+							<Image
+								Visibility="{Binding BaseActivity.ClaimedOwnership,
+									Converter={wtcConverters:FromBooleanConverter 
+									IfTrue={x:Static Visibility.Visible}, 
+									IfFalse={x:Static Visibility.Collapsed}}}"
+								Source="../Common/Images/Unshare.png"
+								Stretch="None"
+								Cursor="Hand"
+								Margin="10, 0, 0, 0"
+								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.DropOwnership}, Path=BaseActivity}" />
+						</StackPanel>
 
-					<!-- Attention time spans. -->
-					<ItemsControl Name="ActiveItemsControl"
-						Visibility="{Binding ShowActiveTimeSpans,
-						Converter={wtcConverters:FromBooleanConverter 
-						IfTrue={x:Static Visibility.Visible}, 
-						IfFalse={x:Static Visibility.Collapsed}}}">
+						<!-- Attention time spans. -->
+						<ItemsControl Name="ActiveItemsControl"
+							Visibility="{Binding ShowActiveTimeSpans,
+							Converter={wtcConverters:FromBooleanConverter 
+							IfTrue={x:Static Visibility.Visible}, 
+							IfFalse={x:Static Visibility.Collapsed}}}">
 
-						<ItemsControl.Resources>
-							<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
-							<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
-						</ItemsControl.Resources>
+							<ItemsControl.Resources>
+								<converters:AttentionTimeSpanConverter x:Key="TimeSpanConverter" />
+								<wtcConverters:CalculateValueConverter x:Key="Subtractor" Value="8" Operation="Subtraction" />
+							</ItemsControl.Resources>
 
-						<ItemsControl.ItemTemplate>
-							<DataTemplate>
-								<Line
-									Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-									Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
-									Stroke="Yellow" StrokeThickness="4">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Line
+										Y1="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+										Y2="{Binding ElementName=Container, Path=ActualHeight, Converter={StaticResource Subtractor}}"
+										Stroke="Yellow" StrokeThickness="4">
 
-									<Line.X1>
-										<MultiBinding
-											Converter="{StaticResource TimeSpanConverter}"
-											ConverterParameter="Start">
-											<Binding Path="." />
-											<Binding ElementName="Control" Path="DataContext.Occurance" />
-											<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-											<Binding ElementName="Container" Path="ActualWidth" />
-										</MultiBinding>
-									</Line.X1>
-									<Line.X2>
-										<MultiBinding
-											Converter="{StaticResource TimeSpanConverter}"
-											ConverterParameter="End">
-											<Binding Path="." />
-											<Binding ElementName="Control" Path="DataContext.Occurance" />
-											<Binding ElementName="Control" Path="DataContext.TimeSpan" />
-											<Binding ElementName="Container" Path="ActualWidth" />
-										</MultiBinding>
-									</Line.X2>
-								</Line>
-							</DataTemplate>
-						</ItemsControl.ItemTemplate>
+										<Line.X1>
+											<MultiBinding
+												Converter="{StaticResource TimeSpanConverter}"
+												ConverterParameter="Start">
+												<Binding Path="." />
+												<Binding ElementName="Control" Path="DataContext.Occurance" />
+												<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+												<Binding ElementName="Container" Path="ActualWidth" />
+											</MultiBinding>
+										</Line.X1>
+										<Line.X2>
+											<MultiBinding
+												Converter="{StaticResource TimeSpanConverter}"
+												ConverterParameter="End">
+												<Binding Path="." />
+												<Binding ElementName="Control" Path="DataContext.Occurance" />
+												<Binding ElementName="Control" Path="DataContext.TimeSpan" />
+												<Binding ElementName="Container" Path="ActualWidth" />
+											</MultiBinding>
+										</Line.X2>
+									</Line>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
 
-						<ItemsControl.Style>
-							<Style TargetType="ItemsControl">
-								<Style.Triggers>
-									<Trigger Property="ItemsControl.Visibility" Value="Visible">
-										<Setter Property="ItemsSource" Value="{Binding Path=ActiveTimeSpans}" />
-									</Trigger>
-									<Trigger Property="ItemsControl.Visibility" Value="Hidden">
-										<Setter Property="ItemsSource" Value="{x:Null}" />
-									</Trigger>
-									<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
-										<Setter Property="ItemsSource" Value="{x:Null}" />
-									</Trigger>
-								</Style.Triggers>
-							</Style>
-						</ItemsControl.Style>
+							<ItemsControl.Style>
+								<Style TargetType="ItemsControl">
+									<Style.Triggers>
+										<Trigger Property="ItemsControl.Visibility" Value="Visible">
+											<Setter Property="ItemsSource" Value="{Binding Path=ActiveTimeSpans}" />
+										</Trigger>
+										<Trigger Property="ItemsControl.Visibility" Value="Hidden">
+											<Setter Property="ItemsSource" Value="{x:Null}" />
+										</Trigger>
+										<Trigger Property="ItemsControl.Visibility" Value="Collapsed">
+											<Setter Property="ItemsSource" Value="{x:Null}" />
+										</Trigger>
+									</Style.Triggers>
+								</Style>
+							</ItemsControl.Style>
 
-						<ItemsControl.ItemsPanel>
-							<ItemsPanelTemplate>
-								<Canvas />
-							</ItemsPanelTemplate>
-						</ItemsControl.ItemsPanel>
-					</ItemsControl>
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<Canvas />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+						</ItemsControl>
+					</Grid>
+					
 				</Border>
 			</Border>
 		</StackPanel>
