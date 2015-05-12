@@ -68,18 +68,18 @@ namespace Laevo
 			var english = new CultureInfo( "en-US" );
 			Thread.CurrentThread.CurrentCulture = english;
 
+			// Initiate the controller which sets up the MVVM classes.
+			_controller = new LaevoController();
+
 			AppDomain.CurrentDomain.UnhandledException += ( s, a ) =>
 			{
-				Log.FatalException( "Unhandled exception.", a.ExceptionObject as Exception );
+				Log.Fatal( "Unhandled exception.", a.ExceptionObject as Exception );
 
 				// Try to bring back all open windows on unhandled exceptions.
 				_controller.ExitDesktopManager();
 
 				OnExit( null );
 			};
-
-			// Initiate the controller which sets up the MVVM classes.
-			_controller = new LaevoController();
 
 			// HACK: Create empty window to catch aero theme color changes.
 			var hiddenWindow = new Window { ShowActivated = false, Focusable = false, Visibility = Visibility.Hidden, Width = 0, Height = 0, Left = -100, Top = -100 };
