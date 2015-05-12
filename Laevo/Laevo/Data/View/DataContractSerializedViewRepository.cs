@@ -202,7 +202,7 @@ namespace Laevo.Data.View
 
 			// Add activity to observable collection when its parent is currently visible in hierarchy view, or ownership is claimed in personal view.
 			bool hierarchyAndVisible = _loadedHierarchy && _currentVisibleParent.Equals( toParent.Activity );
-			bool personalAndOwned = !_loadedHierarchy && activity.OwnedUsers.Contains( User );
+			bool personalAndOwned = !_loadedHierarchy && activity.Activity.OwnedUsers.Contains( User.User );
 			if ( hierarchyAndVisible || personalAndOwned )
 			{
 				if ( activity.IsToDo )
@@ -237,18 +237,27 @@ namespace Laevo.Data.View
 
 		public override void UpdateActivity( ActivityViewModel activity )
 		{
-			bool isTurnedIntoToDo = activity.Activity.IsToDo;
-			if ( isTurnedIntoToDo )
+			// Change to-do state.
+			bool oldTodo = InnerTasks.Contains( activity );
+			bool nowTodo = activity.Activity.IsToDo;
+			if ( nowTodo && !oldTodo )
 			{
 				InnerTasks.Insert( 0, activity );
 			}
-			else
+			else if ( !nowTodo && oldTodo )
 			{
 				InnerTasks.Remove( activity );
 				if ( !InnerActivities.Contains( activity ) ) // Activity can already have a presentation on the time line when it was converted to a to do item before.
 				{
 					InnerActivities.Add( activity );
 				}
+			}
+
+			// Change ownership visibility/invisibility.
+			if ( !activity.ClaimedOwnership )
+			{
+				InnerActivities.Remove( activity );
+				InnerTasks.Remove( activity );
 			}
 		}
 

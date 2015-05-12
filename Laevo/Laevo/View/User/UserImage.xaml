@@ -8,6 +8,7 @@
 	xmlns:user="clr-namespace:Laevo.View.User"
 	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	d:DataContext="{d:DesignInstance Type=userVm:UserViewModel}"
+	ToolTip="{Binding Name}"
 	mc:Ignorable="d"
 	Width="30" Height="30">
 

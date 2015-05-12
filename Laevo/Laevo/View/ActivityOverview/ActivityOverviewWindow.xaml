@@ -143,9 +143,7 @@
 						</ItemsControl.ItemsPanel>
 						<ItemsControl.ItemTemplate>
 							<DataTemplate DataType="userVm:UserViewModel">
-								<user:UserImage 
-									Margin="3, 0, 0, 0" 
-									ToolTip="{Binding Name}"/>
+								<user:UserImage Margin="3, 0, 0, 0" />
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>

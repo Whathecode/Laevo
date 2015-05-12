@@ -356,6 +356,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.SuspendingActivityEvent -= OnSuspendingActivity;
 			activity.SuspendedActivityEvent -= OnSuspendedActivity;
 			activity.ToDoChangedEvent -= OnToDoChanged;
+			activity.ClaimedOwnershipEvent -= OnClaimedOwnership;
+			activity.DroppedOwnershipEvent -= OnDroppedOwnership;
 		}
 
 		void HookActivityToOverview( ActivityViewModel activity )
@@ -372,6 +374,8 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.SuspendingActivityEvent += OnSuspendingActivity;
 			activity.SuspendedActivityEvent += OnSuspendedActivity;
 			activity.ToDoChangedEvent += OnToDoChanged;
+			activity.ClaimedOwnershipEvent += OnClaimedOwnership;
+			activity.DroppedOwnershipEvent += OnDroppedOwnership;
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -426,6 +430,16 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 		void OnToDoChanged( ActivityViewModel viewModel )
+		{
+			_dataRepository.UpdateActivity( viewModel );
+		}
+
+		void OnClaimedOwnership( ActivityViewModel viewModel )
+		{
+			_dataRepository.UpdateActivity( viewModel );
+		}
+
+		void OnDroppedOwnership( ActivityViewModel viewModel )
 		{
 			_dataRepository.UpdateActivity( viewModel );
 		}
