@@ -453,6 +453,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				
 				// Load personal activities.
 				UnloadActivities();
+				_model.ChangeToPersonalTimeLine();
 				_dataRepository.LoadPersonalActivities();
 				Activities = _dataRepository.Activities;
 				Tasks = _dataRepository.Tasks;
@@ -505,19 +506,13 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.Update( CurrentTime );
 
 			// Update required view models.
-			lock ( Activities )
+			if ( Activities != null )
 			{
-				if ( Activities != null )
-				{
-					Activities.ForEach( a => a.Update( CurrentTime ) );
-				}
+				Activities.ForEach( a => a.Update( CurrentTime ) );
 			}
-			lock ( Tasks )
+			if ( Tasks != null )
 			{
-				if ( Tasks != null )
-				{
-					Tasks.ForEach( t => t.Update( CurrentTime ) );
-				}
+				Tasks.ForEach( t => t.Update( CurrentTime ) );
 			}
 		}
 

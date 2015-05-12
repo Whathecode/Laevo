@@ -62,6 +62,14 @@ namespace Laevo.Data.Model
 		}
 
 		/// <summary>
+		///   Gets all activities over which the current user has claimed ownership.
+		/// </summary>
+		public IEnumerable<Activity> GetPersonalActivities()
+		{
+			return ActivityGuids.Values.Where( a => a.OwnedUsers.Contains( User ) && !a.Equals( HomeActivity ) );
+		}
+
+		/// <summary>
 		///   Returns a list of all activities which are shared.
 		/// </summary>
 		public IEnumerable<Activity> GetSharedActivities()

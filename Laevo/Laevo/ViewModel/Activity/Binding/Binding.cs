@@ -19,7 +19,8 @@
 		IsAccessible,
 		WorkIntervals,
 		OpenInterval,
-		AccessUsers
+		AccessUsers,
+		OwnedUsers
 	}
 
 	public enum Commands

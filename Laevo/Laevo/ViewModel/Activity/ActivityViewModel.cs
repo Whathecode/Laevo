@@ -270,6 +270,14 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.AccessUsers )]
 		public ReadOnlyObservableCollection<UserViewModel> AccessUsers { get; private set; }
 
+		readonly ObservableCollection<UserViewModel> _ownedUsers = new ObservableCollection<UserViewModel>();
+
+		/// <summary>
+		///   The users who have claimed ownership over this activity.
+		/// </summary>
+		[NotifyProperty( Binding.Properties.OwnedUsers )]
+		public ReadOnlyObservableCollection<UserViewModel> OwnedUsers { get; private set; }
+
 
 		static ActivityViewModel()
 		{
@@ -401,6 +409,12 @@ namespace Laevo.ViewModel.Activity
 			Activity.AccessUsers.ForEach( AddAccess );
 			Activity.AccessAddedEvent += ( a, u ) => AddAccess( u );
 			Activity.AccessRemovedEvent += ( a, u ) => _accessUsers.Remove( _repository.GetUser( u ) );
+
+			// Initialize users who have claimed owernship over this activity.
+			OwnedUsers = new ReadOnlyObservableCollection<UserViewModel>( _ownedUsers );
+			Activity.OwnedUsers.ForEach( AddOwnership );
+			Activity.OwnershipAddedEvent += ( a, u ) => AddOwnership( u );
+			Activity.OwnershipRemovedEvent += ( a, u ) => _ownedUsers.Remove( _repository.GetUser( u ) );
 		}
 
 
@@ -919,6 +933,11 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			_accessUsers.Add( _repository.GetUser( user ) );
+		}
+
+		void AddOwnership( Model.User user )
+		{
+			_ownedUsers.Add( _repository.GetUser( user ) );
 		}
 
 		public override void Persist()

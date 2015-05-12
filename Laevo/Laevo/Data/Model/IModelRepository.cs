@@ -29,6 +29,11 @@ namespace Laevo.Data.Model
 		IEnumerable<Activity> GetActivities( Activity parent = null );
 
 		/// <summary>
+		///   Gets all activities over which the current user has claimed ownership.
+		/// </summary>
+		IEnumerable<Activity> GetPersonalActivities();
+
+			/// <summary>
 		///   Returns a list of all activities which are shared.
 		/// </summary>
 		IEnumerable<Activity> GetSharedActivities();
