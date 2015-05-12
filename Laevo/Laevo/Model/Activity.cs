@@ -38,6 +38,9 @@ namespace Laevo.Model
 		public event Action<Activity, User> AccessAddedEvent;
 		public event Action<Activity, User> AccessRemovedEvent;
 
+		public event Action<Activity, User> OwnershipAddedEvent;
+		public event Action<Activity, User> OwnershipRemovedEvent;
+
 		[DataMember]
 		public Guid Identifier { get; private set; }
 
@@ -135,10 +138,6 @@ namespace Laevo.Model
 
 		[DataMember]
 		HashSet<User> _accessUsers;
-		[DataMember]
-		IUsersPeer _usersPeer;
-		[DataMember]
-		IModelRepository _repository;
 
 		/// <summary>
 		///   The users who have access to the time line of this activity.
@@ -147,6 +146,22 @@ namespace Laevo.Model
 		{
 			get { return _accessUsers.ToList(); }
 		}
+
+		[DataMember]
+		HashSet<User> _ownedUsers;
+
+		/// <summary>
+		///   The users who have claimed ownership of this activity.
+		/// </summary>
+		public IReadOnlyCollection<User> OwnedUsers
+		{
+			get { return _ownedUsers.ToList(); }
+		}
+
+		[DataMember]
+		IUsersPeer _usersPeer;
+		[DataMember]
+		IModelRepository _repository;
 
 
 		public Activity( IModelRepository repository, IUsersPeer usersPeer )
@@ -161,6 +176,8 @@ namespace Laevo.Model
 			_repository = repository;
 			Identifier = Guid.NewGuid();
 			DateCreated = DateTime.Now;
+
+			ClaimOwnership( repository.User );
 
 			// Create initial data path.
 			var activityDirectory = new DirectoryInfo( CreateSafeFolderName() );
@@ -181,6 +198,7 @@ namespace Laevo.Model
 			_plannedIntervals = new List<PlannedInterval>();
 			_interruptions = new List<AbstractInterruption>();
 			_accessUsers = new HashSet<User>();
+			_ownedUsers = new HashSet<User>();
 		}
 
 		string CreateSafeFolderName()
@@ -450,6 +468,22 @@ namespace Laevo.Model
 		public HashSet<User> GetInheritedAccessUsers()
 		{
 			return new HashSet<User>( _repository.GetPath( this ).SelectMany( a => a.AccessUsers ) );
+		}
+
+		public void ClaimOwnership( User user )
+		{
+			if ( _ownedUsers.Add( user ) )
+			{
+				OwnershipAddedEvent( this, user );
+			}
+		}
+
+		public void RemoveOwnership( User user )
+		{
+			if ( _ownedUsers.Remove( user ) )
+			{
+				OwnershipRemovedEvent( this, user );
+			}
 		}
 
 		public override bool Equals( object obj )

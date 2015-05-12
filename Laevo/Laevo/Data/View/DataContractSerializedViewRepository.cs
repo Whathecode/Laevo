@@ -95,10 +95,25 @@ namespace Laevo.Data.View
 
 		public override sealed void LoadActivities( Activity parentActivity )
 		{
+			// Store changes when switching from personal activities.
+			// TODO: Cleanup, this is most likely temporary code once personal activities have alternate viewmodels.
+			if ( !_loadedHierarchy )
+			{
+				foreach ( var activity in InnerActivities.Union( InnerTasks ) )
+				{
+					List<Activity> path = _modelData.GetPath( activity.Activity );
+					if ( path.Count == 0 )
+					{
+						break; // Home, no changes need to be stored.
+					}
+					Guid parentId = path.Last().Identifier;
+					Dictionary<Guid, ActivityViewModel> container = _data.Activities[ parentId ];
+					container[ activity.Identifier ] = activity;
+				}
+			}
+
 			_loadedHierarchy = true;
 			_currentVisibleParent = parentActivity;
-			InnerActivities.Clear();
-			InnerTasks.Clear();
 
 			Dictionary<Guid, ActivityViewModel> activities;
 			if ( !_data.Activities.TryGetValue( parentActivity.Identifier, out activities ) )
@@ -106,7 +121,7 @@ namespace Laevo.Data.View
 				activities = new Dictionary<Guid, ActivityViewModel>();
 			}
 
-			// Initialize view model for all activities for the given parent activity.
+			// Initialize view model for all activities and tasks for the given parent activity.
 			var createViewModels =
 				from activity in _modelData.GetActivities( parentActivity )
 				where activities.ContainsKey( activity.Identifier )
@@ -114,6 +129,27 @@ namespace Laevo.Data.View
 					activity, _workspaceManager, this,
 					activities[ activity.Identifier ] );
 			var viewModels = createViewModels.ToList();
+			LoadViewModels( viewModels );
+
+			// Update activities in data storage.
+			_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
+		}
+
+		public override void LoadPersonalActivities()
+		{
+			_loadedHierarchy = false;
+
+			// Load all personal activities.
+			// TODO: Store separate presentation for personal activities which allow for different y-position.
+			var createViewModels = _modelData.GetPersonalActivities().Select( LoadActivity ).ToList();
+			LoadViewModels( createViewModels );
+		}
+
+		void LoadViewModels( List<ActivityViewModel> viewModels )
+		{
+			InnerActivities.Clear();
+			InnerTasks.Clear();
+
 			viewModels.Where( v => v.WorkIntervals.Count != 0 ).ForEach( v => InnerActivities.Add( v ) );
 
 			// Initialize tasks.
@@ -134,18 +170,6 @@ namespace Laevo.Data.View
 					InnerTasks[ i ] = activity;
 				}
 			}
-
-			// Update activities in data storage.
-			_data.Activities[ _currentVisibleParent.Identifier ] = Activities.Union( Tasks ).ToDictionary( a => a.Identifier, a => a );
-		}
-
-		public override void LoadPersonalActivities()
-		{
-			_loadedHierarchy = false;
-			InnerActivities.Clear();
-			InnerTasks.Clear();
-
-			// TODO: Load all personal activities.
 		}
 
 		public override List<ActivityViewModel> GetPath( ActivityViewModel activity )
@@ -176,8 +200,10 @@ namespace Laevo.Data.View
 			}
 			activities.Add( activity.Identifier, activity );
 
-			// Add activity to observable collection when its parent is currently visible.
-			if ( _loadedHierarchy && _currentVisibleParent.Equals( toParent.Activity ) )
+			// Add activity to observable collection when its parent is currently visible in hierarchy view, or ownership is claimed in personal view.
+			bool hierarchyAndVisible = _loadedHierarchy && _currentVisibleParent.Equals( toParent.Activity );
+			bool personalAndOwned = !_loadedHierarchy && activity.OwnedUsers.Contains( User );
+			if ( hierarchyAndVisible || personalAndOwned )
 			{
 				if ( activity.IsToDo )
 				{

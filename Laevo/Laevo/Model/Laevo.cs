@@ -88,16 +88,8 @@ namespace Laevo.Model
 		}
 
 		Activity _openTimeLine;
-
-		public Activity OpenTimeLine
-		{
-			get { return _openTimeLine; }
-			private set
-			{
-				_openTimeLine = value;
-				Log.InfoWithData( "Open time line changed.", new LogData( _openTimeLine ) );
-			}
-		}
+		bool _isHierarchyView; // TODO: Should this be managed here? This is currently also duplicated elsewhere.
+		readonly List<Activity> _visibleActivities = new List<Activity>();
 
 
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
@@ -208,7 +200,7 @@ namespace Laevo.Model
 
 		public void Update( DateTime now )
 		{
-			_dataRepository.GetActivities( OpenTimeLine ).ForEach( a => a.Update( now ) );
+			_visibleActivities.ForEach( a => a.Update( now ) );
 			_interruptionTrigger.Update( now );
 		}
 
@@ -239,9 +231,23 @@ namespace Laevo.Model
 
 		public void ChangeVisibleTimeLine( Activity activity )
 		{
-			_dataRepository.GetActivities( OpenTimeLine ).ForEach( UnHandleActivity );
-			OpenTimeLine = activity;
-			_dataRepository.GetActivities( OpenTimeLine ).ForEach( HandleActivity );
+			_visibleActivities.ForEach( UnHandleActivity );
+			_visibleActivities.Clear();
+
+			_isHierarchyView = true;
+			_openTimeLine = activity;
+			Log.InfoWithData( "Switched to hierarchy view.", new LogData( activity ) );
+			_dataRepository.GetActivities( activity ).ForEach( HandleActivity );
+		}
+
+		public void ChangeToPersonalTimeLine()
+		{
+			_visibleActivities.ForEach( UnHandleActivity );
+			_visibleActivities.Clear();
+
+			_isHierarchyView = false;
+			Log.InfoWithData( "Switched to personal view." );
+			_dataRepository.GetPersonalActivities().ForEach( HandleActivity );
 		}
 
 		public Dictionary<Activity, List<AbstractInterruption>> GetUnattendedInterruptions()
@@ -252,8 +258,11 @@ namespace Laevo.Model
 		void HandleActivity( Activity activity )
 		{
 			// TODO: Optimize when needed, 'GetActivities' is called quite a lot, just because parent/child relationship is only maintained in repository.
-			if ( _dataRepository.GetActivities( OpenTimeLine ).Contains( activity ) )
+			bool hierarchyAndVisible = _isHierarchyView && _dataRepository.GetActivities( _openTimeLine ).Contains( activity );
+			bool personalAndOwned = !_isHierarchyView && activity.OwnedUsers.Contains( _dataRepository.User );
+			if ( hierarchyAndVisible || personalAndOwned )
 			{
+				_visibleActivities.Add( activity );
 				activity.ActivatedEvent += OnActivityActivated;
 			}
 		}
