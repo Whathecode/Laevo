@@ -192,7 +192,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			};
 
 			// Hook up timer.
+			// TODO: Sometimes throws exception during exit: "Task was canceled." Needs more testing, maybe try, catch should be added to suppress exception.
 			_updateTimer.Elapsed += ( s, a ) => _dispatcher.Invoke( () => UpdateData( a.SignalTime ) );
+
 			_updateTimer.Start();
 		}
 
@@ -464,7 +466,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				ActivityMode &= ~Mode.Hierarchies;
 				ActivityMode |= Mode.Activate;
-				
+
 				// Load personal activities.
 				UnloadActivities();
 				_model.ChangeToPersonalTimeLine();
@@ -509,6 +511,7 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
+
 		// ReSharper restore UnusedMember.Local
 		// ReSharper restore UnusedParameter.Local
 
@@ -621,6 +624,8 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		protected override void FreeUnmanagedResources()
 		{
+			// Make sure timer does not dispatch another task.
+			_updateTimer.AutoReset = false;
 			_updateTimer.Stop();
 			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
 		}
