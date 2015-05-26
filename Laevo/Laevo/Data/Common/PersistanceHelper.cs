@@ -13,7 +13,7 @@ namespace Laevo.Data.Common
 			string backupFile = file + ".backup";
 			if ( File.Exists( file ) )
 			{
-				File.Copy( file, backupFile );
+				File.Copy( file, backupFile, true );
 			}
 
 			// Serialize the data.
