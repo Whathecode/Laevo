@@ -417,8 +417,10 @@
     <Compile Include="Model\User.cs" />
     <Compile Include="Peer\AbstractPeer.cs" />
     <Compile Include="Peer\ActivityPeer.cs" />
+    <Compile Include="Peer\Clouds\ActivityCloud\ActivityChannelProxy.cs" />
     <Compile Include="Peer\Clouds\ActivityCloud\ActivityCloud.cs" />
     <Compile Include="Peer\Clouds\Cloud.cs" />
+    <Compile Include="Peer\Clouds\AbstractProxy.cs" />
     <Compile Include="Peer\Clouds\IProxy.cs" />
     <Compile Include="Peer\Clouds\UserCloud\UserChannelProxy.cs" />
     <Compile Include="Peer\Clouds\UserCloud\UserCloud.cs" />

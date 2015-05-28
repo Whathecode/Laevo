@@ -6,15 +6,8 @@ using Laevo.Model;
 
 namespace Laevo.Peer.Clouds.UserCloud
 {
-    class UserChannelProxy : IProxy<IUserCloud>, IUserCloud
+    class UserChannelProxy : AbstractProxy<IUserCloud>, IUserCloud
     {
-        public Dictionary<Guid, IUserCloud> Channels { get; set; }
-
-        public UserChannelProxy()
-        {
-            Channels = new Dictionary<Guid, IUserCloud>();
-        }
-
         public void Invite( User user, Activity activity )
         {
             var remove = new List<Guid>();

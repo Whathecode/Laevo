@@ -45,7 +45,7 @@ namespace Laevo.Peer.Clouds.PNRP
         /// <returns></returns>
         public int Register(string comment)
         {
-            var peerName = new PeerName(_identifier, PeerNameType.Secured);
+            var peerName = new PeerName(_identifier, PeerNameType.Unsecured);
             _pnReg = new PeerNameRegistration(peerName, _port) { Comment = comment, UseAutoEndPointSelection = true };
             _pnReg.Start();
             return _port;
@@ -59,7 +59,7 @@ namespace Laevo.Peer.Clouds.PNRP
         /// <returns></returns>
         public int Register( string comment, byte[] data )
         {
-            var peerName = new PeerName( _identifier, PeerNameType.Secured );
+            var peerName = new PeerName(_identifier, PeerNameType.Unsecured);
             _pnReg = new PeerNameRegistration( peerName, _port ) { Comment = comment, UseAutoEndPointSelection = true, Data = data };
             _pnReg.Start();
             return _port;
@@ -72,7 +72,7 @@ namespace Laevo.Peer.Clouds.PNRP
         public PeerNameRecordCollection Resolve()
         {
             var resolver = new PeerNameResolver();
-            var peerName = new PeerName(_identifier, PeerNameType.Secured);
+            var peerName = new PeerName(_identifier, PeerNameType.Unsecured);
             return resolver.Resolve(peerName);
         }
 
@@ -87,7 +87,8 @@ namespace Laevo.Peer.Clouds.PNRP
         #endregion
 
         #region Private static methods
-        public static int FindFreePort()
+
+        static int FindFreePort()
         {
             var l = new TcpListener(IPAddress.Loopback, 0);
             l.Start();
