@@ -511,8 +511,8 @@
     <Compile Include="View\Main\TrayIconControl.xaml.cs">
       <DependentUpon>TrayIconControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Settings\SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    <Compile Include="View\Settings\SettingsPopup.xaml.cs">
+      <DependentUpon>SettingsPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\User\UserImage.xaml.cs">
       <DependentUpon>UserImage.xaml</DependentUpon>
@@ -623,7 +623,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Settings\SettingsWindow.xaml">
+    <Page Include="View\Settings\SettingsPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
