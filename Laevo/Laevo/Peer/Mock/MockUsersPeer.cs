@@ -30,5 +30,12 @@ namespace Laevo.Peer.Mock
 		{
 			// Nothing to mock.
 		}
+
+	    public User User { get; set; }
+	    public string Cloudname { get; set; }
+	    public void Start()
+	    {
+	        throw new NotImplementedException();
+	    }
 	}
 }

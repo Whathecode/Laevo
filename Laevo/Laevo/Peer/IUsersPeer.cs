@@ -26,5 +26,8 @@ namespace Laevo.Peer
 		/// </summary>
 		[InitializeEventHandlers( AttributeExclude = true )] // TODO: Why doesn't this compile when aspect is not excluded here?
 		event Action<Activity> Invited;
+
+        User User { get; set; }
+
 	}
 }
