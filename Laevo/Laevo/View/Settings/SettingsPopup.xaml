@@ -1,0 +1,64 @@
+﻿<common:LaevoPopup
+	x:Class="Laevo.View.Settings.SettingsPopup"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:common="clr-namespace:Laevo.View.Common"
+	Title="Settings"
+	SizeToContent="Height"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.Settings"
+	d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
+	PopupImage="../Activity/ActionIcons/edit.png">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+
+		<Grid.Resources>
+			<Style TargetType="Label">
+				<Setter Property="Margin" Value="0, 0, 10, 0" />
+				<Setter Property="Foreground" Value="White" />
+			</Style>
+		</Grid.Resources>
+
+		<Label Grid.Row="0" Grid.Column="0">Time line quality</Label>
+		<Label Grid.Row="1" Grid.Column="0">Attention span lines</Label>
+
+		<Slider
+			Grid.Row="0"
+			Grid.Column="1"
+			Value="{Binding TimeLineRenderScale}"
+			Minimum="0.5"
+			Maximum="1.0"
+			TickPlacement="TopLeft"
+			VerticalAlignment="Center" />
+		<CheckBox
+			Grid.Row="1"
+			Grid.Column="1"
+			VerticalAlignment="Center"
+			IsChecked="{Binding EnableAttentionLines}" />
+
+		<Button
+			Grid.Column="1"
+			Grid.Row="2"
+			Margin="0, 10, 0, 0"
+			DockPanel.Dock="Bottom"
+			HorizontalAlignment="Right"
+			Padding="15, 2, 15, 2"
+			Click="OnCloseButtonClicked"
+			VerticalAlignment="Bottom">
+			Save
+		</Button>
+	</Grid>
+
+</common:LaevoPopup>

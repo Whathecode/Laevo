@@ -19,6 +19,6 @@
 		SwitchActivity,
 		ShowActivityBar,
 		HideActivityBar,
-		ActivateSelectedActivity
+		ActivateSelectedActivity,
 	}
 }
