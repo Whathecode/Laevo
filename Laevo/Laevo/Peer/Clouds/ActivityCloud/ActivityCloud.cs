@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ServiceModel;
-
+﻿using System.ServiceModel;
 
 namespace Laevo.Peer.Clouds.ActivityCloud
 {
@@ -19,10 +16,4 @@ namespace Laevo.Peer.Clouds.ActivityCloud
             _proxy = new ActivityChannelProxy();
         }
     }
-
-    class ActivityChannelProxy : IProxy<IActivityCloud>
-    {
-        public Dictionary<Guid, IActivityCloud> Channels { get; set; }
-    }
-
 }
