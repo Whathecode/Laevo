@@ -45,6 +45,7 @@ namespace Laevo.ViewModel.Main
 		readonly UnresponsiveWindowPopup _unresponsivePopup = new UnresponsiveWindowPopup();
 		bool _unresponsiveEventThrown;
 
+		SettingsPopup _settingsPopup;
 
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
@@ -115,23 +116,27 @@ namespace Laevo.ViewModel.Main
 			Application.Current.Shutdown();
 		}
 
+		[CommandCanExecute( Commands.OpenSettings )]
+		public bool CanOpenSettings()
+		{
+			return null == _settingsPopup || !_settingsPopup.IsVisible;
+		}
+
 		[CommandExecute( Commands.OpenSettings )]
 		public void OpenSettings()
 		{
 			var viewModel = new SettingsViewModel( _model.Settings );
-			var settingsWindow = new SettingsWindow
+			_settingsPopup = new SettingsPopup
 			{
 				DataContext = viewModel
 			};
-
-			settingsWindow.Closed += ( s, a ) =>
+			_settingsPopup.Closed += ( s, a ) =>
 			{
 				viewModel.Persist();
 				_activityOverviewViewModel.TimeLineRenderScale = viewModel.TimeLineRenderScale;
 				_activityOverviewViewModel.EnableAttentionLines = viewModel.EnableAttentionLines;
 			};
-
-			settingsWindow.Show();
+			_activityOverviewViewModel.ShowPopup( _settingsPopup );
 		}
 
 		readonly LaevoServiceProvider _serviceProvider = new LaevoServiceProvider();
@@ -208,8 +213,9 @@ namespace Laevo.ViewModel.Main
 		{
 			if ( _activityOverviewViewModel.CurrentActivityViewModel != null  )
 			{
-				_activityBar.ShowActivityBar( autoHide );
+				return;
 			}
+			_activityBar.ShowActivityBar( autoHide );
 		}
 
 		[CommandExecute( Commands.HideActivityBar )]
