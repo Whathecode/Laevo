@@ -59,9 +59,12 @@ namespace Laevo.Data.Model
 			{
 				byte[] data;
 				var encoder = new PngBitmapEncoder();
-
-					var bitmapImage = (BitmapSource)obj;
-					encoder.Frames.Add( BitmapFrame.Create( bitmapImage ) );
+				var bitmapImage = (BitmapSource)obj;
+				
+				// Is some cases BitmapFrame.Create throws "NotSupportedException" which seems to be a WPF problem.
+				// To avoid it I call this function with 3 null parameters. More details on: http://stackoverflow.com/a/20990179
+				// TODO: More tests are needed to verify if this issue is solved.
+				encoder.Frames.Add( BitmapFrame.Create( bitmapImage, null, null, null ) );
 
 				using ( var ms = new MemoryStream() )
 				{
