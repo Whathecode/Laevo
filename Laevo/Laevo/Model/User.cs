@@ -9,7 +9,7 @@ namespace Laevo.Model
 	public class User
 	{
 		[DataMember]
-		readonly Guid _identifier;
+		internal readonly Guid Identifier;
 
 		[DataMember]
 		public string Name { get; set; }
@@ -19,7 +19,7 @@ namespace Laevo.Model
 
 		public User()
 		{
-			_identifier = Guid.NewGuid();
+			Identifier = Guid.NewGuid();
 		}
 
 
@@ -32,12 +32,12 @@ namespace Laevo.Model
 				return false;
 			}
 
-			return _identifier.Equals( user._identifier );
+			return Identifier.Equals( user.Identifier );
 		}
 
 		public override int GetHashCode()
 		{
-			return _identifier.GetHashCode();
+			return Identifier.GetHashCode();
 		}
 	}
 }

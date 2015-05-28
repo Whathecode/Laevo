@@ -423,9 +423,14 @@
     <Compile Include="Peer\Clouds\UserCloud\UserChannelProxy.cs" />
     <Compile Include="Peer\Clouds\UserCloud\UserCloud.cs" />
     <Compile Include="Peer\IActivityPeer.cs" />
+<<<<<<< local
     <Compile Include="Peer\Clouds\ICloud.cs" />
+    <Compile Include="Peer\IPeerFactory.cs" />
+=======
     <Compile Include="Peer\AbstractPeerFactory.cs" />
+>>>>>>> other
     <Compile Include="Peer\IUsersPeer.cs" />
+    <Compile Include="Peer\IPeer.cs" />
     <Compile Include="Peer\PeerFactory.cs" />
     <Compile Include="Peer\Mock\MockActivityPeer.cs" />
     <Compile Include="Peer\Mock\MockUsersPeer.cs" />
@@ -755,9 +760,15 @@
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\planned.png" />
   </ItemGroup>
+<<<<<<< local
+  <ItemGroup>
+    <Resource Include="View\Common\calendar.png" />
+  </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+=======
+>>>>>>> other
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(ProjectDir)'</PostBuildEvent>
