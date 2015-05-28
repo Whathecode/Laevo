@@ -1,4 +1,4 @@
-﻿<UserControl 
+﻿<UserControl
 	x:Class="Laevo.View.Main.TrayIconControl"
 	x:ClassModifier="internal"
 	x:Name="Control"
@@ -6,19 +6,28 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:tb="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.Wpf.TaskbarNotification"
 	xmlns:view="clr-namespace:Laevo.View.Main"
-	xmlns:b="clr-namespace:Laevo.ViewModel.Main.Binding">
+	xmlns:b="clr-namespace:Laevo.ViewModel.Main.Binding"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:vm="clr-namespace:Laevo.ViewModel.Main"
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
 
 	<UserControl.Resources>
 		<view:IconConverter x:Key="IconConverter" />
+		<system:Boolean x:Key="True">True</system:Boolean>
 	</UserControl.Resources>
-	
+
 	<tb:TaskbarIcon
 		x:Name="Icon"
 		IconSource="{Binding UnattendedInterruptions, Converter={StaticResource IconConverter}}"
 		ToolTipText="Laevo"
 		DataContext="{Binding ElementName=Control, Path=DataContext, Mode=OneWay}"
-		DoubleClickCommand="{view:TrayCommandBinding {x:Static b:Commands.ShowActivityOverview}}">
-		
+		DoubleClickCommand="{view:TrayCommandBinding {x:Static b:Commands.ShowActivityOverview}}"
+		LeftClickCommand="{view:TrayCommandBinding {x:Static b:Commands.ShowActivityBar}}"
+		LeftClickCommandParameter="{StaticResource True}">
+
 		<tb:TaskbarIcon.ContextMenu>
 			<ContextMenu>
 				<MenuItem
@@ -41,7 +50,7 @@
 					Command="{view:TrayCommandBinding {x:Static b:Commands.NewActivity}}" />
 			</ContextMenu>
 		</tb:TaskbarIcon.ContextMenu>
-		
+
 	</tb:TaskbarIcon>
-	
+
 </UserControl>
