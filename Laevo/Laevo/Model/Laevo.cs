@@ -12,9 +12,12 @@ using ABC.Workspaces.Library;
 using ABC.Workspaces.Windows;
 using ABC.Workspaces.Windows.Settings;
 using Laevo.Data.Model;
+using Laevo.Data.View;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
 using Laevo.Peer;
+using Laevo.ViewModel.Activity;
+using Laevo.ViewModel.ActivityOverview;
 using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
@@ -95,6 +98,9 @@ namespace Laevo.Model
 		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
 			PersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
 		{
+
+            ServiceLocator.GetInstance().RegisterService( this );
+
 			Log.Info( "Startup." );
 
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -104,20 +110,7 @@ namespace Laevo.Model
 			UsersPeer = peerFactory.UsersPeer;
 
 			// When invited to an activity, add it to the home activity.
-			UsersPeer.Invited += a =>
-			{
-				// Make sure this activity is not yet managed by the repository.
-				if ( _dataRepository.ContainsActivity( a ) )
-				{
-					return;
-				}
-
-				Log.InfoWithData( "Invited to activity.", new LogData( a ) );
-				_dataRepository.AddActivity( a, HomeActivity );
-				HandleActivity( a );
-				InvitedToActivity( a );
-				// TODO: Similar to interruption events, this event should probably be removed and some other mechanism should be used.
-			};
+		    UsersPeer.Invited += activity => AddActivity( activity );
 
 			ProgramLocalDataFolder = dataFolder;
 
@@ -203,6 +196,19 @@ namespace Laevo.Model
 			_visibleActivities.ForEach( a => a.Update( now ) );
 			_interruptionTrigger.Update( now );
 		}
+
+	    public void AddActivity( Activity activity, Activity parent = null)
+	    {
+            // Make sure this activity is not yet managed by the repository.
+            if (_dataRepository.ContainsActivity(activity)) return;
+
+            Log.InfoWithData("Invited to activity.", new LogData(activity));
+
+            _dataRepository.AddActivity(activity, parent ?? HomeActivity);
+            HandleActivity(activity);
+            InvitedToActivity(activity);
+            // TODO: Similar to interruption events, this event should probably be removed and some other mechanism should be used.
+	    }
 
 		/// <summary>
 		///   Create and add a new activity.

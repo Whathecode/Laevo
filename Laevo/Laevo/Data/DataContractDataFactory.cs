@@ -11,26 +11,24 @@ namespace Laevo.Data
 	/// <summary>
 	///   Creates data repositories persisted to flat files through DataContracts.
 	/// </summary>
-	class DataContractDataFactory : IDataFactory
+	public class DataContractDataFactory : IDataFactory
 	{
 		readonly string _dataFolder;
 		readonly InterruptionAggregator _interruptionAggregator;
 		readonly PersistenceProvider _persistenceProvider;
-		readonly AbstractPeerFactory _peerFactory;
 
 
-		public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
+	    public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider )
 		{
 			_dataFolder = dataFolder;
 			_interruptionAggregator = interruptionAggregator;
 			_persistenceProvider = persistenceProvider;
-			_peerFactory = peerFactory;
 		}
 
 
 		public IModelRepository CreateModelRepository()
 		{
-			return new DataContractSerializedModelRepository( _dataFolder, _interruptionAggregator, _peerFactory );
+            return new DataContractSerializedModelRepository(_dataFolder, _interruptionAggregator);
 		}
 
 		public IViewRepository CreateViewRepository( IModelRepository linkedModelRepository, WorkspaceManager workspaceManager )

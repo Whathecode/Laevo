@@ -35,7 +35,7 @@ namespace Laevo.Peer
         /// </summary>
         /// <param name="user">The user</param>
         /// <param name="activity">The activity</param>
-        public void Invite(User user, Activity activity)
+        public void Invite( User user, Activity activity )
         {
             Cloud.Proxy.Invite(user, activity);
         }

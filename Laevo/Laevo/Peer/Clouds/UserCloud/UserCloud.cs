@@ -24,8 +24,8 @@ namespace Laevo.Peer.Clouds.UserCloud
 
         public void Invite( User user, Activity activity )
         {
-            if ( user.Name == User.Name && InviteRecieved != null )
-                InviteRecieved( activity );
+            if ( user.Name == User.Name && activity != null && InviteRecieved != null )
+                InviteRecieved(activity);    
         }
     }
 }

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace Laevo.Peer.Clouds
 {
-    public interface IProxy<T>
-    {
-        Dictionary<Guid, T> Channels { get; set; }
+    public interface IProxy<in T> {
+        void AddChannel( Guid guid, T t );
+        bool Contains( Guid guid );
     }
-}
+} 

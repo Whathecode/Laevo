@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.PeerToPeer;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Threading;
 using System.Threading.Tasks;
 using Laevo.Model;
@@ -37,25 +38,28 @@ namespace Laevo.Peer.Clouds
             get { return (T)_proxy; }
         }
 
-        public User User { get; set; }
+        protected User User;
 
         #endregion
 
         #region Public Methods
 
-        public void Start(string cloudname)
+        public void Start(string cloudname, User user)
         {
+            User = user;
             _pnrp = new Pnrp(cloudname + "-laevo");
-            var data = UserToByteArray(User);
-            var port = _pnrp.Register(User.Identifier.ToString(), data);
+            var data = UserToByteArray(user);
+            var port = _pnrp.Register(user.Identifier.ToString(), data);
 
             //Setting up host and channel factory
             var binding = new NetTcpBinding(SecurityMode.None);
             _host = new ServiceHost(this,
                 new Uri(String.Format("net.tcp://[{0}]:{1}/ActivityCloud", IPAddress.IPv6Any, port)));
             _host.AddServiceEndpoint(typeof(T), binding, "");
+
             _host.Open();
-            _factory = new ChannelFactory<T>(binding);
+            _factory = new ChannelFactory<T>( binding );
+
             _heartbeat = new Timer(SearchForPeers, null, new TimeSpan(0), new TimeSpan(0, 0, 10));
         }
 
@@ -63,7 +67,7 @@ namespace Laevo.Peer.Clouds
         /// Returns a task that stops the cloud
         /// </summary>
         /// <returns>A task</returns>
-        public Task Stop()
+        private Task Stop()
         {
             return new Task(() =>
             {
@@ -124,18 +128,19 @@ namespace Laevo.Peer.Clouds
         void AddChannel( PeerNameRecord pnr )
         {
             var id = Guid.Parse( pnr.Comment );
-            if ( !_proxy.Channels.ContainsKey( id ) )
+            if ( !_proxy.Contains( id ) )
             {
-                foreach ( var endPoint in pnr.EndPointCollection.Select( endpoint => new EndpointAddress("net.tcp://" + endpoint + "/ActivityCloud") ) ) {
+                foreach (var ep in pnr.EndPointCollection.Select(endpoint => new EndpointAddress("net.tcp://" + endpoint + "/ActivityCloud")))
+                {
                     try
                     {
-                        var channel = _factory.CreateChannel(endPoint);
-                        _proxy.Channels[id] = channel;
+                        var channel = _factory.CreateChannel(ep);
+                        _proxy.AddChannel(id, channel);
                         break;
                     }
                     catch
                     {
-                        
+                        Debug.WriteLine( "A channel to {0} was not established", ep);
                     }
                 }
             }

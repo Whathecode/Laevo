@@ -94,6 +94,9 @@ namespace Laevo.Model
 		[DataMember]
 		public DateTime DateCreated { get; private set; }
 
+        [DataMember] //TODO Update when ever the activity is updated.
+        public DateTime LastUpdated { get; private set; }
+
 		TimeInterval _currentOpenInterval;
 
 		[DataMember]
@@ -158,9 +161,9 @@ namespace Laevo.Model
 			get { return _ownedUsers.ToList(); }
 		}
 
-		[DataMember]
+		//[DataMember]
 		IUsersPeer _usersPeer;
-		[DataMember]
+		//[DataMember]
 		IModelRepository _repository;
 
 
@@ -175,7 +178,7 @@ namespace Laevo.Model
 			_usersPeer = usersPeer;
 			_repository = repository;
 			Identifier = Guid.NewGuid();
-			DateCreated = DateTime.Now;
+			DateCreated = LastUpdated = DateTime.Now;
 
 			AddOwnership( repository.User );
 
@@ -190,6 +193,9 @@ namespace Laevo.Model
 		void OnDeserializing( StreamingContext context )
 		{
 			SetDefaults();
+		    var sl = ServiceLocator.GetInstance();
+		    _usersPeer = sl.GetService<AbstractPeerFactory>().UsersPeer;
+		    _repository = sl.GetService<IModelRepository>();
 		}
 
 		void SetDefaults()
@@ -354,10 +360,9 @@ namespace Laevo.Model
 		///   Merges the passed activity into this activity.
 		/// </summary>
 		/// <param name = "activity">The activity to merge into this activity.</param>
-		public void Merge( Activity activity )
+		public void Merge( Activity activity ) //TODO Needs to be implemented properly
 		{
 			_interruptions.AddRange( activity.Interruptions );
-
 			Log.InfoWithData( "Activities merged.", new LogData( "Source", activity ), new LogData( "Target", this ) );
 		}
 
