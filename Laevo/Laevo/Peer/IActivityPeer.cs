@@ -1,6 +1,11 @@
-﻿namespace Laevo.Peer
+﻿using System;
+using System.Security.Cryptography;
+using Laevo.Model;
+
+
+namespace Laevo.Peer
 {
-	public interface IActivityPeer
+	public interface IActivityPeer : IDisposable
 	{
 	}
 }

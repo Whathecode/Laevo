@@ -24,12 +24,7 @@ namespace Laevo.Peer
 			public override bool Equals( object obj )
 			{
 				var node = obj as CloudNode;
-				if ( node == null )
-				{
-					return false;
-				}
-
-				return Activity.Equals( node.Activity );
+				return node != null && Activity.Equals( node.Activity );
 			}
 
 			public override int GetHashCode()
@@ -38,13 +33,16 @@ namespace Laevo.Peer
 			}
 		}
 
-
 		public abstract IUsersPeer UsersPeer { get; }
 
 
 		readonly Dictionary<Activity, Tree<CloudNode>> _activityNodes = new Dictionary<Activity, Tree<CloudNode>>();
 		readonly List<Tree<CloudNode>> _activityPeers = new List<Tree<CloudNode>>();
 
+        protected AbstractPeerFactory()
+        {
+            ServiceLocator.GetInstance().RegisterService( this );
+        }
 
 		/// <summary>
 		///   Called whenever a new activity needs to be managed, or an existing activity has been moved.
@@ -128,6 +126,7 @@ namespace Laevo.Peer
 			activity.AccessRemovedEvent -= ActivityAccessChangedEvent;
 
 			// TODO: Dispose 'node.Peers' when this becomes disposable? Should be garbage collected already.
+            node.Value.Peers.Dispose();
 
 			foreach ( var child in node.Children )
 			{
@@ -146,10 +145,14 @@ namespace Laevo.Peer
 			int accessUsers = curActivity.AccessUsers.Count;
 
 			// Update peer for current node.
-			if ( accessUsers <= 1 )
+			if ( accessUsers <= 1)
 			{
 				// Peer only needs to be added when more than the current user can access it.
-				node.Value.Peers = null; // TODO: Dispose when this becomes disposable? Should be garbage collected already.
+			    if ( node.Value.Peers != null )
+			    {
+			        node.Value.Peers.Dispose();
+			        node.Value.Peers = null;
+			    }
 			}
 			else
 			{
@@ -158,7 +161,7 @@ namespace Laevo.Peer
 				{
 					if ( node.Value.Peers == null )
 					{
-						node.Value.Peers = CreateActivityPeer( curActivity );
+                        node.Value.Peers = GetOrCreateActivityPeer(curActivity);
 					}
 				}
 				else
@@ -177,6 +180,6 @@ namespace Laevo.Peer
 			}
 		}
 
-		protected abstract IActivityPeer CreateActivityPeer( Activity activity );
+        protected abstract IActivityPeer GetOrCreateActivityPeer(Activity activity);
 	}
 }

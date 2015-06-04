@@ -12,6 +12,7 @@ using Laevo.View.Common;
 using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
+using PostSharp.Serialization;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -147,6 +148,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
+            ServiceLocator.GetInstance().RegisterService(this);
 			_model = model;
 			_dataRepository = dataRepository;
 
@@ -186,7 +188,12 @@ namespace Laevo.ViewModel.ActivityOverview
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
 			_model.InvitedToActivity += activity =>
 			{
-				var activityViewModel = new ActivityViewModel( activity, _model.WorkspaceManager, _dataRepository );
+                var activityViewModel = new ActivityViewModel(activity, _model.WorkspaceManager, _dataRepository)
+                {
+                    ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
+                    IsUnnamed = true
+                };
+
 				// TODO: Allow changing name/icon/color and only maintain subactivities?
 				AddActivity( activityViewModel, HomeActivity );
 			};
@@ -247,6 +254,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			ActivityViewModel parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
 			Model.Activity activity = _model.CreateNewActivity( parent.Activity );
+            
+
 			var newActivity = new ActivityViewModel( activity, _model.WorkspaceManager, _dataRepository )
 			{
 				ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
@@ -283,6 +292,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_dataRepository.AddActivity( activity, parent );
 			HookActivityToOverview( activity );
 		}
+
 
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
@@ -362,7 +372,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.DroppedOwnershipEvent -= OnDroppedOwnership;
 		}
 
-		void HookActivityToOverview( ActivityViewModel activity )
+		public void HookActivityToOverview( ActivityViewModel activity )
 		{
 			activity.SetOverviewManager( this );
 

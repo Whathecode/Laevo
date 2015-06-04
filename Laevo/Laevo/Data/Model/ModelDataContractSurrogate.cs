@@ -14,30 +14,10 @@ namespace Laevo.Data.Model
 {
 	public class ModelDataContractSurrogate : IDataContractSurrogate
 	{
-		[DataContract]
-		class UsersPeerPlaceholder {}
-
-		[DataContract]
-		class RepositoryPlaceholder {}
-
-
-		readonly IModelRepository _repository;
-		readonly IUsersPeer _usersPeer;
-
-
-		public ModelDataContractSurrogate( IModelRepository repository, IUsersPeer usersPeer )
-		{
-			_repository = repository;
-			_usersPeer = usersPeer;
-		}
-
-
 		public Type GetDataContractType( Type type )
 		{
 			var convertTypes = new Dictionary<Type, Type>
 			{
-				{ typeof( UsersPeerPlaceholder ), typeof( IUsersPeer ) },
-				{ typeof( RepositoryPlaceholder ), typeof( IModelRepository ) },
 				{ typeof( ImageSource ), typeof( Base64Bitmap ) },
 				{ typeof( Base64Bitmap ), typeof( BitmapImage ) }
 			};
@@ -47,14 +27,6 @@ namespace Laevo.Data.Model
 
 		public object GetObjectToSerialize( object obj, Type targetType )
 		{
-			if ( targetType == typeof( IUsersPeer ) )
-			{
-				return new UsersPeerPlaceholder();
-			}
-			if ( targetType == typeof( IModelRepository ) )
-			{
-				return new RepositoryPlaceholder();
-			}
 			if ( targetType == typeof( Base64Bitmap ) )
 			{
 				byte[] data;
@@ -76,14 +48,6 @@ namespace Laevo.Data.Model
 
 		public object GetDeserializedObject( object obj, Type targetType )
 		{
-			if ( targetType == typeof( IUsersPeer ) )
-			{
-				return _usersPeer;
-			}
-			if ( targetType == typeof( IModelRepository ) )
-			{
-				return _repository;
-			}
 			if ( targetType == typeof( ImageSource ) )
 			{
 				var byteBuffer = Convert.FromBase64String( ( (Base64Bitmap)obj ).Base64Image );
@@ -114,8 +78,7 @@ namespace Laevo.Data.Model
 
 		public void GetKnownCustomDataTypes( Collection<Type> customDataTypes )
 		{
-			customDataTypes.Add( typeof( UsersPeerPlaceholder ) );
-			customDataTypes.Add( typeof( RepositoryPlaceholder ) );
+
 		}
 
 		public Type GetReferencedTypeOnImport( string typeName, string typeNamespace, object customData )

@@ -25,6 +25,7 @@ namespace Laevo.Data.View
 
 		protected AbstractMemoryViewRepository()
 		{
+            ServiceLocator.GetInstance().RegisterService<IViewRepository>(this);
 			Activities = new ReadOnlyObservableCollection<ActivityViewModel>( InnerActivities );
 			Tasks = new ReadOnlyObservableCollection<ActivityViewModel>( InnerTasks );
 		}

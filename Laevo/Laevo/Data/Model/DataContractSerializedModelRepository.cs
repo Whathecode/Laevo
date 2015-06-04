@@ -40,8 +40,7 @@ namespace Laevo.Data.Model
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 
 
-		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator, AbstractPeerFactory peerFactory )
-			: base( peerFactory )
+		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator )
 		{
 			// Set up file paths.
 			_activitiesFile = Path.Combine( programDataFolder, "Activities.xml" );
@@ -59,14 +58,14 @@ namespace Laevo.Data.Model
 
 			// Initialize activity serializer.
 			// It needs to be aware about the interruption types loaded by the interruption aggregator.
-			var modelSurrogate = new ModelDataContractSurrogate( this, peerFactory.UsersPeer );
+            var surrogate = new ModelDataContractSurrogate();
 			var surrogateTypes = new Collection<Type>();
-			modelSurrogate.GetKnownCustomDataTypes( surrogateTypes );
+            surrogate.GetKnownCustomDataTypes(surrogateTypes);
 			_activitySerializer = new DataContractSerializer(
 				typeof( Data ),
 				interruptionAggregator.GetInterruptionTypes().Concat( surrogateTypes ),
 				Int32.MaxValue, true, false,
-				modelSurrogate );
+                surrogate);
 
 			// Load previous data.
 			Data loadedData = new Data();

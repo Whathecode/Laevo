@@ -35,9 +35,10 @@ namespace Laevo.Data.Model
 		public Settings Settings { get; protected set; }
 
 
-		protected AbstractMemoryModelRepository( AbstractPeerFactory peerFactory )
+		protected AbstractMemoryModelRepository()
 		{
-			PeerFactory = peerFactory;
+            ServiceLocator.GetInstance().RegisterService<IModelRepository>(this);
+		    PeerFactory = ServiceLocator.GetInstance().GetService<AbstractPeerFactory>();
 
 			// Initialize settings by default to prevent extending classes from forgetting to initialize default settings.
 			Settings = new Settings();

@@ -9,9 +9,13 @@ namespace Laevo.Peer.Mock
 	class MockUsersPeer : IUsersPeer
 	{
 		public event Action<Activity> Invited;
+	    public void Start( User user )
+	    {
+	        throw new NotImplementedException();
+	    }
 
 
-		public async Task<List<User>> GetUsers( string searchTerm )
+	    public async Task<List<User>> GetUsers( string searchTerm )
 		{
 			// Fake time taken.
 			var wait = Task.Delay( TimeSpan.FromSeconds( 2 ) );
@@ -34,6 +38,11 @@ namespace Laevo.Peer.Mock
 	    public User User { get; set; }
 	    public string Cloudname { get; set; }
 	    public void Start()
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public void Dispose()
 	    {
 	        throw new NotImplementedException();
 	    }

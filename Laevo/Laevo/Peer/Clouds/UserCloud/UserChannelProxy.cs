@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Laevo.Model;
 
@@ -10,8 +9,7 @@ namespace Laevo.Peer.Clouds.UserCloud
     {
         public void Invite( User user, Activity activity )
         {
-            var remove = new List<Guid>();
-            foreach ( var c in Channels )
+            foreach ( var c in GetChannels() )
             {
                 try
                 {
@@ -19,14 +17,9 @@ namespace Laevo.Peer.Clouds.UserCloud
                 }
                 catch ( Exception e )
                 {
-                    remove.Add( c.Key );
+                    RemoveChannel( c.Key );
                     Debug.WriteLine( e );
                 }
-            }
-
-            foreach ( var guid in remove )
-            {
-                Channels.Remove( guid );
             }
         }
     }

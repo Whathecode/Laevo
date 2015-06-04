@@ -1,15 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Net.Sockets;
 using System.Windows;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Data.View;
-using Laevo.Model;
 using Laevo.Peer;
-using Laevo.Peer.Mock;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
 using Whathecode.System;
@@ -35,15 +32,21 @@ namespace Laevo
 		readonly Model.Laevo _model;
 
 	    public LaevoController()
-		{
+	    {
 			// Create Services.
 	        var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
 			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
+
+
+            // Create surrogate used for serializating in Model Repository and Peers
             var peerFactory = new PeerFactory();
-			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );
+
+			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider );
 
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
+
+
 			_model = new Model.Laevo(
 				ProgramLocalDataFolder,
 				dataRepository,
@@ -56,10 +59,8 @@ namespace Laevo
 			IViewRepository viewDataRepository = repositoryFactory.CreateViewRepository( dataRepository, _model.WorkspaceManager );
 			_viewModel = new MainViewModel( _model, viewDataRepository );
 
-
             //Initializing peerfactory
-	        var uc = peerFactory.UsersPeer;
-		    uc.User = dataRepository.User;
+	        peerFactory.UsersPeer.Start( dataRepository.User );
 
 			// Create View.
 			_trayIcon = new TrayIconControl( _viewModel ) { DataContext = _viewModel };

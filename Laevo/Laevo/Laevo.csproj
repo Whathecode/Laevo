@@ -235,9 +235,15 @@
       <Private>True</Private>
       <HintPath>..\packages\PostSharp.4.1.11\lib\net35-client\PostSharp.dll</HintPath>
     </Reference>
+    <Reference Include="PostSharp.Patterns.Common">
+      <HintPath>..\packages\PostSharp.Patterns.Common.4.1.11\lib\net40\PostSharp.Patterns.Common.dll</HintPath>
+    </Reference>
     <Reference Include="PostSharp.Patterns.Diagnostics, Version=4.1.11.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\PostSharp.Patterns.Diagnostics.4.1.11\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
+    </Reference>
+    <Reference Include="PostSharp.Patterns.Model">
+      <HintPath>..\packages\PostSharp.Patterns.Model.4.1.11\lib\net40\PostSharp.Patterns.Model.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -434,6 +440,7 @@
     <Compile Include="Peer\Mock\MockPeerFactory.cs" />
     <Compile Include="Peer\Clouds\PNRP\Pnrp.cs" />
     <Compile Include="Peer\UsersPeer.cs" />
+    <Compile Include="ServiceLocator.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="Data\View\ViewDataContractSurrogate.cs" />
     <Compile Include="ViewModel\ActivityBar\ActivityBarViewModel.cs" />

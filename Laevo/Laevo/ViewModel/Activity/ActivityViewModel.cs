@@ -363,13 +363,17 @@ namespace Laevo.ViewModel.Activity
 			}
 
 			// Update work intervals properties. They are ordered by date of occurrence.
-			for ( var i = 0; i < WorkIntervals.Count; i++ )
-			{
-				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
-				WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals[ i ].OffsetPercentage;
-				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
-				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
-			}
+		    try
+		    {
+		        for ( var i = 0; i < WorkIntervals.Count; i++ )
+		        {
+		            WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
+		            WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals[ i ].OffsetPercentage;
+		            WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
+		            WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
+		        }
+		    }
+            catch{}
 		}
 
 		void CommonInitialize()

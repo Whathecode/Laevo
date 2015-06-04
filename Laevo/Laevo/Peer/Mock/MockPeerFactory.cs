@@ -12,7 +12,7 @@ namespace Laevo.Peer.Mock
 		}
 
 
-		protected override IActivityPeer CreateActivityPeer( Activity activity )
+		protected override IActivityPeer GetOrCreateActivityPeer( Activity activity )
 		{
 			return new MockActivityPeer();
 		}
