@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.PeerToPeer;
 using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.ServiceModel.Description;
 using System.Threading;
 using System.Threading.Tasks;
 using Laevo.Model;
