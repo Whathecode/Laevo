@@ -1,4 +1,5 @@
-﻿using Laevo.Model;
+﻿using System;
+using Laevo.Model;
 
 
 namespace Laevo.Peer.Mock
@@ -16,5 +17,12 @@ namespace Laevo.Peer.Mock
 	    {
 	        throw new System.NotImplementedException();
 	    }
+
+	    public void BroadcastActivity( Activity activity )
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public event Action<Activity> RecievedActivity;
 	}
 }
