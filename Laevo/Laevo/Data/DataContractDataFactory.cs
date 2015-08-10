@@ -13,11 +13,11 @@ namespace Laevo.Data
 	class DataContractDataFactory : IDataFactory
 	{
 		readonly string _dataFolder;
-		readonly InterruptionAggregator _interruptionAggregator;
-		readonly PersistenceProvider _persistenceProvider;
+		readonly AbstractInterruptionAggregator _interruptionAggregator;
+		readonly AbstractPersistenceProvider _persistenceProvider;
 
 
-		public DataContractDataFactory( string dataFolder, InterruptionAggregator interruptionAggregator, PersistenceProvider persistenceProvider )
+		public DataContractDataFactory( string dataFolder, AbstractInterruptionAggregator interruptionAggregator, AbstractPersistenceProvider persistenceProvider )
 		{
 			_dataFolder = dataFolder;
 			_interruptionAggregator = interruptionAggregator;

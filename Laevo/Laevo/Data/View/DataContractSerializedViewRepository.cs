@@ -35,7 +35,7 @@ namespace Laevo.Data.View
 		readonly DataContractSerializer _serializer;
 
 
-		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
+		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, AbstractPersistenceProvider persistenceProvider )
 		{
 			_file = Path.Combine( programDataFolder, "ActivityRepresentations.xml" );
 

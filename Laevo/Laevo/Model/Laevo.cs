@@ -42,7 +42,7 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly AbstractInterruptionTrigger _interruptionTrigger;
+		readonly InterruptionAggregator _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
 
 		public static string ProgramLocalDataFolder { get; private set; }
@@ -93,8 +93,8 @@ namespace Laevo.Model
 		}
 
 
-		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
-			PersistenceProvider persistenceProvider )
+		public Laevo( string dataFolder, IModelRepository dataRepository, InterruptionAggregator interruptionTrigger,
+			AbstractPersistenceProvider persistenceProvider )
 		{
 			Log.Info( "Startup." );
 
@@ -135,7 +135,7 @@ namespace Laevo.Model
 			Log.Debug( "Library manager initialized." );
 
 			// Initialize workspace manager.
-			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric, libraryManager.NonGeneric } );
+			WorkspaceManager = new WorkspaceManager( new[] { vdmManager.NonGeneric, libraryManager.NonGeneric } );
 			Log.Debug( "Workspace manager initialized." );
 
 			// Handle activities and tasks from previous sessions.
@@ -146,7 +146,7 @@ namespace Laevo.Model
 			HomeActivity.View();
 
 			// Set up interruption handlers.
-			_interruptionTrigger.InterruptionReceived += interruption =>
+			_interruptionTrigger.InterruptionReceived += ( sender, interruption ) =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
@@ -203,6 +203,7 @@ namespace Laevo.Model
 			return activity;
 		}
 
+			// ReSharper disable once PossibleUnintendedReferenceComparison
 		void HandleActivity( Activity activity )
 		{
 			activity.ActivatedEvent += OnActivityActivated;

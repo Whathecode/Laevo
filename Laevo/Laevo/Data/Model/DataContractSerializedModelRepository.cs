@@ -38,7 +38,7 @@ namespace Laevo.Data.Model
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 
 
-		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator )
+		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionAggregator interruptionAggregator )
 		{
 			// Set up file paths.
 			_activitiesFile = Path.Combine( programDataFolder, "Activities.xml" );
