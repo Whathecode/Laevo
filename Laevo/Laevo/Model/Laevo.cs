@@ -45,7 +45,7 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly AbstractInterruptionTrigger _interruptionTrigger;
+		readonly InterruptionAggregator _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
 
 		public IUsersPeer UsersPeer { get; private set; }
@@ -92,8 +92,8 @@ namespace Laevo.Model
 		readonly List<Activity> _visibleActivities = new List<Activity>();
 
 
-		public Laevo( string dataFolder, IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
-			PersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
+		public Laevo( string dataFolder, IModelRepository dataRepository, InterruptionAggregator interruptionTrigger,
+			AbstractPersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
 		{
 			Log.Info( "Startup." );
 
@@ -151,7 +151,7 @@ namespace Laevo.Model
 			Log.Debug( "Library manager initialized." );
 
 			// Initialize workspace manager.
-			WorkspaceManager = new WorkspaceManager( new [] { vdmManager.NonGeneric, libraryManager.NonGeneric } );
+			WorkspaceManager = new WorkspaceManager( new[] { vdmManager.NonGeneric, libraryManager.NonGeneric } );
 			Log.Debug( "Workspace manager initialized." );
 
 			// Find home activity and set as current activity and visible time line.
@@ -160,7 +160,7 @@ namespace Laevo.Model
 			HomeActivity.View();
 
 			// Set up interruption handlers.
-			_interruptionTrigger.InterruptionReceived += interruption =>
+			_interruptionTrigger.InterruptionReceived += ( sender, interruption ) =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
@@ -224,6 +224,7 @@ namespace Laevo.Model
 		/// <param name="toParent">The parent activity to move the activity to.</param>
 		public void MoveActivity( Activity activity, Activity toParent )
 		{
+			// ReSharper disable once PossibleUnintendedReferenceComparison
 			Contract.Requires( activity != toParent );
 
 			_dataRepository.MoveActivity( activity, toParent );

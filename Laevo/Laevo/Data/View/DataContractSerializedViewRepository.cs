@@ -45,7 +45,7 @@ namespace Laevo.Data.View
 		Activity _currentVisibleParent;
 
 
-		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, PersistenceProvider persistenceProvider )
+		public DataContractSerializedViewRepository( string programDataFolder, WorkspaceManager workspaceManager, IModelRepository modelData, AbstractPersistenceProvider persistenceProvider )
 		{
 			_workspaceManager = workspaceManager;
 			_modelData = modelData;
