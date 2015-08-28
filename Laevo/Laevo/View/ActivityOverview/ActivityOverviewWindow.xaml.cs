@@ -67,7 +67,7 @@ namespace Laevo.View.ActivityOverview
 		{
 			InitializeComponent();
 
-			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveTimeLine );
+			MoveTimeLineCommand = new DelegateCommand<MouseBehavior.MouseDragCommandArgs>( MoveTimeLine );
 
 #if DEBUG
 			WindowStyle = WindowStyle.None;
@@ -251,7 +251,7 @@ namespace Laevo.View.ActivityOverview
 		Interval<DateTime> _startDrag;
 		DateTime _startDragFocus;
 		VisibleIntervalAnimation _dragAnimation;
-		void MoveTimeLine( MouseBehavior.ClickDragInfo info )
+		void MoveTimeLine( MouseBehavior.MouseDragCommandArgs info )
 		{
 			double mouseX = Mouse.GetPosition( this ).X;
 
@@ -259,12 +259,12 @@ namespace Laevo.View.ActivityOverview
 			DependencyProperty visibleIntervalProperty = TimeLine.GetDependencyProperty( TimeLineControl.Properties.VisibleInterval );
 			StopDragAnimation();
 
-			if ( info.State == MouseBehavior.ClickDragState.Start )
+			if ( info.DragInfo.State == MouseBehavior.ClickDragState.Start )
 			{
 				_startDrag = TimeLine.VisibleInterval;
 				_startDragFocus = GetFocusedTime( _startDrag, mouseX );
 			}
-			else if ( info.State == MouseBehavior.ClickDragState.Stop )
+			else if ( info.DragInfo.State == MouseBehavior.ClickDragState.Stop )
 			{
 				_startDrag = null;
 
@@ -286,8 +286,7 @@ namespace Laevo.View.ActivityOverview
 				var interval = ToTicksInterval( _startDrag );
 				if ( interval.Start - ticksOffset > DateTime.MinValue.Ticks && interval.End - ticksOffset < DateTime.MaxValue.Ticks )
 				{
-					interval.Move( -ticksOffset );
-					TimeLine.VisibleInterval = ToTimeInterval( interval );
+					TimeLine.VisibleInterval = ToTimeInterval( interval.Move( -ticksOffset ) );
 				}
 			}
 		}
@@ -344,10 +343,9 @@ namespace Laevo.View.ActivityOverview
 			var focusedTime = GetFocusedTime( visibleInterval, Mouse.GetPosition( this ).X );
 
 			// Zoom the currently visible interval in/out.
-			double zoom = 1.0 - ( -e.Delta * ZoomPercentage );
+			double zoom = 1.0 - ( e.Delta * ZoomPercentage );
 			double focusPercentage = ticksInterval.GetPercentageFor( focusedTime.Ticks );
-			ticksInterval.Scale( zoom, focusPercentage );
-			TimeLine.VisibleInterval = ToTimeInterval( ticksInterval );
+			TimeLine.VisibleInterval = ToTimeInterval( ticksInterval.Scale( zoom, focusPercentage ) );
 		}
 
 		readonly RateOfChange<long, long> _velocity = new RateOfChange<long, long>( TimeSpan.FromMilliseconds( 200 ).Ticks );

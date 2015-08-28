@@ -307,7 +307,8 @@ namespace Laevo.Model
 		{
 			if ( IsOpen )
 			{
-				_currentOpenInterval.ExpandTo( now );
+				_currentOpenInterval = _currentOpenInterval.ExpandTo( now );
+				_openIntervals[ _openIntervals.Count - 1 ] = _currentOpenInterval;
 			}
 		}
 
