@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Timers;
-using ABC.Windows;
-using ABC.Windows.Desktop;
-using ABC.Windows.Desktop.Settings;
+using ABC;
+using ABC.Workspaces.Windows;
+using ABC.Workspaces.Windows.Settings;
 using Laevo.Model.AttentionShifts;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
@@ -155,7 +155,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			}
 
 			// Create home activity, which uses the first created desktop by the desktop manager.
-			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager, _desktopManager.CurrentDesktop );
+			HomeActivity = new ActivityViewModel( this, _model.HomeActivity, _desktopManager, _desktopManager.CurrentWorkspace );
 			HookActivityEvents( HomeActivity );
 			HomeActivity.ActivateActivity();
 

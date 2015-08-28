@@ -6,8 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC.Windows;
-using ABC.Windows.Desktop;
+using ABC.Workspaces.Windows;
 
 
 namespace Laevo.ViewModel.ActivityOverview
@@ -55,12 +54,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				return new SerializedBitmap( ((BitmapImage)obj).UriSource );
 			}
-			else if ( targetType == typeof( StoredSession ) )
-			{
-				return ((VirtualDesktop)obj).Store();
-			}
-
-			return obj;
+			return targetType == typeof( StoredSession ) ? ((VirtualDesktop)obj).Store() : obj;
 		}
 
 		public object GetDeserializedObject( object obj, Type targetType )
@@ -69,12 +63,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				return new BitmapImage( ((SerializedBitmap)obj).Source );
 			}
-			else if ( targetType == typeof( VirtualDesktop ) )
-			{
-				return _desktopManager.CreateDesktopFromSession( (StoredSession)obj );
-			}
-
-			return obj;
+			return targetType == typeof( VirtualDesktop ) ? _desktopManager.CreateWorkspaceFromSession( (StoredSession)obj ) : obj;
 		}
 
 		public object GetCustomDataToExport( MemberInfo memberInfo, Type dataContractType )

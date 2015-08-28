@@ -26,7 +26,7 @@ namespace Laevo.View.Activity
 		}
 
 		[DependencyProperty( Properties.MouseDragged )]
-		public DelegateCommand<MouseBehavior.ClickDragInfo> MouseDragged { get; private set; }
+		public DelegateCommand<MouseBehavior.MouseDragCommandArgs> MouseDragged { get; private set; }
 
 		[DependencyProperty( Properties.IsDraggingActivity )]
 		public bool IsDraggingActivity { get; private set; }
@@ -36,23 +36,23 @@ namespace Laevo.View.Activity
 		{
 			InitializeComponent();
 
-			MouseDragged = new DelegateCommand<MouseBehavior.ClickDragInfo>( MoveActivity );
+			MouseDragged = new DelegateCommand<MouseBehavior.MouseDragCommandArgs>( MoveActivity );
 		}
 
 
-		void MoveActivity( MouseBehavior.ClickDragInfo e )
+		void MoveActivity( MouseBehavior.MouseDragCommandArgs e )
 		{
-			if ( e.State == MouseBehavior.ClickDragState.Start )
+			if ( e.DragInfo.State == MouseBehavior.ClickDragState.Start )
 			{
 				IsDraggingActivity = true;
 			}
-			else if ( e.State == MouseBehavior.ClickDragState.Stop )
+			else if ( e.DragInfo.State == MouseBehavior.ClickDragState.Stop )
 			{
 				IsDraggingActivity = false;
 			}
 
-			double offset = (double)GetValue( TimeLineControl.OffsetProperty );
-			SetValue( TimeLineControl.OffsetProperty, offset - e.Displacement.Y );
+			var offset = (double)GetValue( TimeLineControl.OffsetProperty );
+			SetValue( TimeLineControl.OffsetProperty, offset - e.DragInfo.Displacement.Y );
 		}
 
 		void LabelKeyDown( object sender, KeyEventArgs e )

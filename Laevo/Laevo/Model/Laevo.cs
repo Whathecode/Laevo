@@ -7,11 +7,11 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Threading;
 using ABC.Interruptions;
-using ABC.PInvoke.Process;
 using Laevo.Model.AttentionShifts;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Linq;
+using Whathecode.System.Management;
 using Whathecode.System.Windows.Threading;
 
 
@@ -138,7 +138,7 @@ namespace Laevo.Model
 			}
 
 			// Set up interruption handlers.
-			_interruptionAggregator.InterruptionReceived += interruption =>
+			_interruptionAggregator.InterruptionReceived += (sender, interruption) =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				var newActivity = new Activity( interruption.Name );

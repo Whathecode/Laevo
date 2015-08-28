@@ -13,8 +13,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ABC.Windows;
-using ABC.Windows.Desktop;
+using ABC.Workspaces.Windows;
 using Laevo.Model.AttentionShifts;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
@@ -22,6 +21,7 @@ using Microsoft.WindowsAPICodePack.Shell;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
+using Whathecode.System.Windows;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
@@ -247,7 +247,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( ActivityOverviewViewModel overview, Model.Activity activity, VirtualDesktopManager desktopManager )
-			: this( overview, activity, desktopManager, desktopManager.CreateEmptyDesktop() )
+			: this( overview, activity, desktopManager, desktopManager.CreateEmptyWorkspace() )
 		{
 		}
 
@@ -279,7 +279,7 @@ namespace Laevo.ViewModel.Activity
 			Activity = activity;
 
 			_desktopManager = desktopManager;
-			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyDesktop();
+			_virtualDesktop = storedViewModel._virtualDesktop ?? desktopManager.CreateEmptyWorkspace();
 
 			Label = activity.Name;
 			Icon = storedViewModel.Icon;
@@ -377,11 +377,11 @@ namespace Laevo.ViewModel.Activity
 			// Initialize desktop.
 			try
 			{
-				_desktopManager.SwitchToDesktop( _virtualDesktop );
+				_desktopManager.SwitchToWorkspace( _virtualDesktop );
 			}
 			catch ( UnresponsiveWindowsException e )
 			{
-				var unresponsive = e.UnresponsiveWindows.GroupBy( u => u.Window.GetProcess().ProcessName ).ToList();
+				var unresponsive = e.UnresponsiveWindows.GroupBy( u => u.GetProcess().ProcessName ).ToList();
 
 				// Ask user whether to ignore the locking application windows from now on.
 				// TODO: The error message could be made topmost when we could access the overview window. This exception might need to be propagated to the view.
@@ -392,7 +392,8 @@ namespace Laevo.ViewModel.Activity
 				MessageBoxResult result = MessageBox.Show( error, "Unresponsive Applications", MessageBoxButton.YesNo, MessageBoxImage.Exclamation );
 				if ( result == MessageBoxResult.Yes )
 				{
-					e.IgnoreAllWindows();
+					// TODO: Not able to ignore.
+					e.UnresponsiveWindows.ForEach( unresponsiveWindow => unresponsiveWindow.Hide() );
 				}
 			}
 			InitializeLibrary();
