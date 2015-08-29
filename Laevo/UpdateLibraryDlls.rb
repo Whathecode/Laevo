@@ -8,6 +8,7 @@ Dir.chdir(ARGV[0].to_s())
 doc = Nokogiri::XML(open("..\\..\\ProjectReferences.txt"))
 abc = doc.xpath("//nameSpace:PropertyGroup/nameSpace:ABC-Toolkit", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 fcl = doc.xpath("//nameSpace:PropertyGroup/nameSpace:Framework-Class-Library-Extension", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
+timeline = doc.xpath("//nameSpace:PropertyGroup/nameSpace:TimeLine", {"nameSpace" => "http://schemas.microsoft.com/developer/msbuild/2003"}).text
 
 # Copy Framework Class Library Extension DLLs.
 fcl_library = '..\\..\\Libraries\\Framework Class Library Extension\\'
@@ -28,11 +29,8 @@ end
 # Copy ABC Toolkit DLLs.
 abc_toolkit = '..\\..\\Libraries\\ABC Toolkit\\'
 abc_dlls = [
-	'ABC.Applications',
-	'ABC.Common',
-	'ABC.Interruptions',
-	'ABC.PInvoke',
-	'ABC.Windows'
+	'ABC',
+	'ABC.PInvoke'
 	]
 abc_dlls.each do |d|
 	FileUtils.cp(
@@ -47,4 +45,15 @@ abc_fcl_dlls.each do |d|
 	FileUtils.cp(
 		fcl + '\\' + d + '\\bin\\Release\\' + d + '.dll',
 		abc_toolkit + d + '.dll')
+end
+
+# Copy TimeLine DLL.
+timeline_library = '..\\..\\Libraries\\TimeLine\\'
+timeline_dlls = [
+	'Whathecode.TimeLine'
+	]
+timeline_dlls.each do |d|
+	FileUtils.cp(
+		timeline + '\\' + d + '\\bin\\Release\\' + d + '.dll',
+		timeline_library + d + '.dll')
 end

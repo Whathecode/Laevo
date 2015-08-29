@@ -4,7 +4,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
-	<Process Name="SpotifyHelper" CompanyName="">
+	<Process 
+    Guid="{156C5B34-EAA1-4DD3-B464-7610FDA75AA9}" 
+    Version="1.0.0.0"
+    TargetProcessName="SpotifyHelper" 
+    TargetProcessCompanyName="">
 		<IgnoreWindows Mode="AllExcept" />
 	</Process>
 

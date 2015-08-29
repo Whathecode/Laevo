@@ -6,28 +6,44 @@
   xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
   <!-- MS Word 2010 -->
-  <Process Name="WINWORD" CompanyName="Microsoft Corporation">
+  <Process
+    Guid="{C56EE1F7-DED9-4522-AFF2-19A8ECCD6DF4}"
+    Version="1.0.0.0"
+    TargetProcessName="WINWORD"
+    TargetProcessCompanyName="Microsoft Corporation">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>
   </Process>
 
   <!-- MS OneNote 2010 -->
-  <Process Name="ONENOTE" CompanyName="Microsoft Corporation">
+  <Process
+    Guid="{A4BC7D6D-42A5-47BA-90F9-D0D47301FCB4}"
+    Version="1.0.0.0"
+    TargetProcessName="ONENOTE"
+    TargetProcessCompanyName="Microsoft Corporation">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>
   </Process>
 
   <!-- MS PowerPoint 2010 -->
-  <Process Name="POWERPNT" CompanyName="Microsoft Corporation">
+  <Process
+    Guid="{EB93E412-85BA-4319-90AD-F96D4B4D2461}"
+    Version="1.0.0.0"
+    TargetProcessName="POWERPNT"
+    TargetProcessCompanyName="Microsoft Corporation">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>
   </Process>
 
   <!-- MS InfoPath 2010 -->
-  <Process Name="INFOPATH" CompanyName="Microsoft Corporation">
+  <Process
+    Guid="{933726B2-8F61-4CBF-8555-A36AF0214813}"
+    Version="1.0.0.0"
+    TargetProcessName="INFOPATH"
+    TargetProcessCompanyName="Microsoft Corporation">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>
