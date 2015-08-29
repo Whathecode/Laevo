@@ -278,29 +278,6 @@
   <!-- Conditional references. Reference project when available; DLL otherwise. -->
   <Import Project="..\..\ProjectReferences.txt" />
   <Choose>
-    <When Condition="Exists($(ABC-Toolkit))">
-      <ItemGroup>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.Windows\ABC.Windows.csproj">
-          <Project>{DB8DBDF2-70BF-4712-86DA-06674986BC12}</Project>
-          <Name>ABC.Windows</Name>
-        </ProjectReference>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.PInvoke\ABC.PInvoke.csproj">
-          <Project>{072142C4-284E-4F1A-A1FE-F886E8ECF728}</Project>
-          <Name>ABC.PInvoke</Name>
-        </ProjectReference>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.Interruptions\ABC.Interruptions.csproj">
-          <Project>{582661FF-FF3D-4CD3-8A52-3C75447E9F69}</Project>
-          <Name>ABC.Interruptions</Name>
-        </ProjectReference>
-        <ProjectReference Include="$(ABC-Toolkit)\ABC.Applications\ABC.Applications.csproj">
-          <Project>{4FD0D614-3F1D-4C4B-AE41-69EF8660C94F}</Project>
-          <Name>ABC.Applications</Name>
-        </ProjectReference>
-      </ItemGroup>
-    </When>
-    <Otherwise />
-  </Choose>
-  <Choose>
     <When Condition="Exists($(Framework-Class-Library-Extension))">
       <ItemGroup>
         <ProjectReference Include="$(Framework-Class-Library-Extension)\Whathecode.System\Whathecode.System.csproj">

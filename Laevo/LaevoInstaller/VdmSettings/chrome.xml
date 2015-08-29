@@ -5,7 +5,11 @@
 	xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
 	<!-- Chrome. -->
-	<Process Name="chrome" CompanyName="Google Inc.">
+	<Process 
+    Guid="{CE4157B1-EEBC-449B-9696-D403DEBE360B}" 
+    Version="1.0.0.0" 
+    TargetProcessName="chrome" 
+    TargetProcessCompanyName="Google Inc.">
 		<IgnoreWindows>
 			<!-- TODO: What is this? -->
 			<Window ClassName="Messaging" />
