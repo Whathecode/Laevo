@@ -385,9 +385,6 @@
 				<Style>
 					<Style.Triggers>
 						<DataTrigger Binding="{Binding ActivityMode}">
-							<DataTrigger.Value>
-								<vm:Mode>Edit</vm:Mode>
-							</DataTrigger.Value>
 							<DataTrigger.EnterActions>
 								<BeginStoryboard>
 									<Storyboard>

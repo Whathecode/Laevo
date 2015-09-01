@@ -269,10 +269,6 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.OpenInterval )]
 		public Interval<DateTime, TimeSpan> OpenInterval { get; private set; }
 			
-
-		{
-			get { return _readOnlyAccessUsers; }
-		}
 		EditActivityPopup _editActivityPopup;
 
 
