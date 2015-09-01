@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
+using Laevo.View.Common;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Whathecode.System.Arithmetic.Range;
@@ -184,7 +185,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 
-		Activities.Union( Tasks ).ForEach( HookActivityToOverview );
+		/// <summary>
 		///   Create a new activity.
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
