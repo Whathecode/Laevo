@@ -200,13 +200,13 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode == Mode.Activate && !_activityBar.IsInUse() && IsOverviewActive();
+			return _activityOverviewViewModel.ActivityMode == Mode.Activate && !_activityBar.IsInUse() ;
 		}
 
 		[CommandExecute( Commands.ShowActivityBar )]
 		public void ShowActivityBar( bool autoHide )
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && IsOverviewActive() )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null  )
 			{
 				_activityBar.ShowActivityBar( autoHide );
 			}
@@ -215,7 +215,7 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityBar )]
 		public void HideActivityBar()
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && IsOverviewActive() )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null  )
 			{
 				_activityBar.HideActivityBar();
 			}
@@ -255,6 +255,7 @@ namespace Laevo.ViewModel.Main
 		 CommandCanExecute( Commands.PasteWindows ),
 		 CommandCanExecute( Commands.SwitchActivity ),
 		 CommandCanExecute( Commands.ActivateSelectedActivity )]
+		public bool CanExecuteShortcut()
 		{
 			return _activityOverviewViewModel.IsActive;
 		}
