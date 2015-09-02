@@ -384,7 +384,7 @@
 			<Grid.Style>
 				<Style>
 					<Style.Triggers>
-						<DataTrigger Binding="{Binding ActivityMode}">
+						<DataTrigger Value="True" Binding="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:Mode.Inactive}}}">
 							<DataTrigger.EnterActions>
 								<BeginStoryboard>
 									<Storyboard>

@@ -57,11 +57,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event ActivityViewModel.ActivityEventHandler SuspendingActivityEvent;
 
 		/// <summary>
-		///   Event which is triggered when pop-up window is opened.
-		/// </summary>
-		public event EventHandler OpenedPopupEvent;
-
-		/// <summary>
 		///   Event which is triggered when there currently is no activity open. This can happen when the active activity is closed or removed.
 		/// </summary>
 		public event Action NoCurrentActiveActivityEvent;
@@ -97,11 +92,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		[NotifyProperty( Binding.Properties.CurrentActivityViewModel )]
 		public ActivityViewModel CurrentActivityViewModel { get; private set; }
-
-		/// <summary>
-		///   The ViewModel of the activity whose time line is currently open.
-		/// </summary>
-		public ActivityViewModel OpenTimeLineViewModel { get; private set; }
 
 		[NotifyProperty( Binding.Properties.CurrentTime )]
 		public DateTime CurrentTime { get; private set; }
@@ -141,9 +131,9 @@ namespace Laevo.ViewModel.ActivityOverview
 			get { return _dataRepository.Tasks; }
 		}
 
-		public bool IsActive
+		public bool IsDisabled
 		{
-			get { return !ActivityMode.HasFlag( Mode.Inactive ); }
+			get { return ActivityMode.HasFlag( Mode.Inactive ); }
 		}
 
 
@@ -311,8 +301,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivatingActivityEvent -= OnActivityActivating;
 			activity.ActivatedActivityEvent -= OnActivityActivated;
 			activity.SelectedActivityEvent -= OnActivitySelected;
-			activity.ActivityEditStartedEvent -= OnPopupShowing;
-			activity.ActivityEditFinishedEvent -= OnPopupClosed;
 			activity.ActivityStoppedEvent -= OnActivityStopped;
 			activity.SuspendingActivityEvent -= OnSuspendingActivity;
 			activity.SuspendedActivityEvent -= OnSuspendedActivity;
@@ -329,8 +317,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ActivatingActivityEvent += OnActivityActivating;
 			activity.ActivatedActivityEvent += OnActivityActivated;
 			activity.SelectedActivityEvent += OnActivitySelected;
-			activity.ActivityEditStartedEvent += OnPopupShowing;
-			activity.ActivityEditFinishedEvent += OnPopupClosed;
 			activity.ActivityStoppedEvent += OnActivityStopped;
 			activity.SuspendingActivityEvent += OnSuspendingActivity;
 			activity.SuspendedActivityEvent += OnSuspendedActivity;
@@ -362,17 +348,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		void OnActivitySelected( ActivityViewModel viewModel )
 		{
 			SelectedActivityEvent( viewModel );
-		}
-
-		public void OnPopupShowing( ActivityViewModel viewModel = null )
-		{
-			ActivityMode |= Mode.Inactive;
-			OpenedPopupEvent( this, new EventArgs() );
-		}
-
-		public void OnPopupClosed( ActivityViewModel viewModel = null )
-		{
-			ActivityMode &= ~Mode.Inactive;
 		}
 
 		void OnSuspendingActivity( ActivityViewModel viewModel )
