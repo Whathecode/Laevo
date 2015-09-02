@@ -46,14 +46,3 @@ abc_fcl_dlls.each do |d|
 		fcl + '\\' + d + '\\bin\\Release\\' + d + '.dll',
 		abc_toolkit + d + '.dll')
 end
-
-# Copy TimeLine DLL.
-timeline_library = '..\\..\\Libraries\\TimeLine\\'
-timeline_dlls = [
-	'Whathecode.TimeLine'
-	]
-timeline_dlls.each do |d|
-	FileUtils.cp(
-		timeline + '\\' + d + '\\bin\\Release\\' + d + '.dll',
-		timeline_library + d + '.dll')
-end
