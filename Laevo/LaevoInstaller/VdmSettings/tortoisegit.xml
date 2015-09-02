@@ -5,7 +5,11 @@
 	xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
 	<!-- TortoiseGit. -->
-	<Process Name="TGitCache" CompanyName="http://tortoisegit.org/">
+	<Process 
+    Guid="{4AE162A2-417E-443C-ADC9-F2D0B88A3699}"
+    Version="1.0.0.0"
+    TargetProcessName="TGitCache"
+    TargetProcessCompanyName="http://tortoisegit.org/">
 		<IgnoreWindows>
 			<!-- Hidden log message window. -->
 			<Window ClassName="TGitCacheWindow" />

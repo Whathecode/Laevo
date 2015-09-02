@@ -1,11 +1,16 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ProcessBehaviors
   xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
   <!-- Firefox. -->
-  <Process Name="firefox" CompanyName="Mozilla Corporation">
+  <Process
+    Guid="{77C5DF97-897E-475E-911A-C979415D8DFC}"
+    Version="1.0.0.0"
+    TargetProcessName="firefox"
+    TargetProcessCompanyName="Mozilla Corporation">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>

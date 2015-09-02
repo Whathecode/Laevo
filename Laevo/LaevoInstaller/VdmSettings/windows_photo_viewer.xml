@@ -5,7 +5,11 @@
   xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
   <!-- Default built-in windows photo viewer. -->
-  <Process Name="dllhost" CompanyName="Microsoft Corporation">
+  <Process 
+    Guid="{E215B602-8959-4590-B74B-6AA4E52197FB}" 
+    Version="1.0.0.0" 
+    TargetProcessName="dllhost"
+    TargetProcessCompanyName="Microsoft Corporation">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>
