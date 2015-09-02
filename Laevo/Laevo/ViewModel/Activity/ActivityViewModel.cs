@@ -76,16 +76,6 @@ namespace Laevo.ViewModel.Activity
 		public event ActivityEventHandler SelectedActivityEvent;
 
 		/// <summary>
-		///   Event which is triggered when starting to edit an activity.
-		/// </summary>
-		public event ActivityEventHandler ActivityEditStartedEvent;
-
-		/// <summary>
-		///   Event which is triggered when finished editing an activity.
-		/// </summary>
-		public event ActivityEventHandler ActivityEditFinishedEvent;
-
-		/// <summary>
 		///   Event which is triggered when activity is stopped.
 		/// </summary>
 		public event ActivityEventHandler ActivityStoppedEvent;

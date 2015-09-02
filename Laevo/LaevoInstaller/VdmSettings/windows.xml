@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- Common windows which need to be ignored in all applications. -->
+  <CommonIgnoreWindows>
+    <!-- Shadow of menus and tooltips. -->
+    <Window ClassName="SysShadow" />
+    <!-- Tooltips. -->
+    <Window ClassName="tooltips_class32" />
+
+    <!-- TODO: What are these exactly? -->
+    <Window ClassName="GDI+ Hook Window Class" />
+    <Window ClassName="IME" />
+    <Window ClassName="MSCTFIME UI" />
+    <Window ClassName="WorkerW" />
+    <!-- TODO: How unique are these class names? Do we need wildcard support? -->
+    <Window ClassName=".NET-BroadcastEventWindow.4.0.0.0.5c39d4.0" />
+    <Window ClassName="WindowsForms10.Window.0.app.0.5c39d4_r20_ad1" />
+  </CommonIgnoreWindows>
+
+  <!-- Default windows 7. -->
+  <Process
+    Guid="{123677AA-42EF-4DFB-A278-BE2EB2420D39}"
+    Version="1.0.0.0"
+    TargetProcessName="explorer"
+    TargetProcessCompanyName="Microsoft Corporation">
+
+    <IgnoreWindows>
+      <!-- Start button. -->
+      <Window ClassName="Button" />
+      <!-- Start bar. -->
+      <Window ClassName="Shell_TrayWnd" />
+      <!-- Start menu. -->
+      <Window ClassName="DV2ControlHost" />
+      <!-- Start menu user picture. -->
+      <Window ClassName="Desktop User Picture" />
+      <!-- Desktop icons. -->
+      <Window ClassName="Progman" />
+      <!-- View available networks dialog and tooltip. -->
+      <Window ClassName="NativeHWNDHost" />
+      <Window ClassName="VANUITooltip" />
+
+      <!-- TODO: Get more information on these windows, what they are, and whether they should really be ignored. -->
+      <Window ClassName="_SearchEditBoxFakeWindow" />
+      <Window ClassName="AUTHUI.DLL: Shutdown Choices Message Window" />
+      <Window ClassName="Auto-Suggest Dropdown" />
+      <Window ClassName="ComboLBox" />
+      <Window ClassName="Media Center SSO" />
+      <Window ClassName="PrintCacheLocalConnectionListenerHiddenWindow" />
+      <Window ClassName="PrintCacheListenerWindow_19A79E3F-0006-4175-AACD-6F5C69CC0D23" />
+      <Window ClassName="TaskSwitcherWnd" />
+    </IgnoreWindows>
+    <HideBehavior>
+      <Default Hide="SelectedWindow" />
+    </HideBehavior>
+  </Process>
+
+  <!-- This process triggered a window once a Windows Phone was plugged in, used to indicate the phone is connected, and to open up the related software. -->
+  <!-- Noticed when plugging in a Nokia Lumia 720. -->
+  <!-- TODO: Should some of its windows be handled differently? -->
+  <Process
+    Guid="{CC9C4D33-5B15-401E-88D5-A09A01834E34}"
+    Version="1.0.0.0"
+    TargetProcessName="Dxpserver"
+    TargetProcessCompanyName="Microsoft Corporation">
+
+    <IgnoreWindows Mode="AllExcept">
+    </IgnoreWindows>
+  </Process>
+
+  <!-- Windows Ink Services Platform Tablet Input Subsystem. -->
+  <!-- TODO: Verify what these windows do exactly, and whether they can be ignored. -->
+  <Process
+    Guid="{541E20F3-C516-4795-B742-A0EDF6FB3E03}"
+    Version="1.0.0.0"
+    TargetProcessName="wisptis"
+    TargetProcessCompanyName="Microsoft Corporation">
+
+    <IgnoreWindows>
+      <Window ClassName="wisptis_feedback_window" />
+    </IgnoreWindows>
+  </Process>
+
+  <!-- Taskhost is used as the host for all DLL based services that are run. -->
+  <Process
+    Guid="{FB8F3366-BF06-49D4-81B1-EA6B259510C2}"
+    Version="1.0.0.0"
+    TargetProcessName="taskhost"
+    TargetProcessCompanyName="Microsoft Corporation">
+
+    <IgnoreWindows>
+      <!-- TODO: Showing this window doesn't make it show up, but where is this coming from? -->
+      <Window ClassName="COMTASKSWINDOWCLASS" />
+    </IgnoreWindows>
+  </Process>
+
+  <!-- Window 10 weather metro app. -->
+  <Process
+    Guid="{6ED3E0CE-313D-4A2D-AD57-6AEDE9D27660}"
+    Version="1.0.0.0"
+    TargetProcessName="Microsoft.Msn.Weather"
+    TargetProcessCompanyName="Microsoft Corporation">
+
+    <IgnoreWindows>
+      <Window ClassName="Windows.UI.Core.CoreWindow" />
+    </IgnoreWindows>
+  </Process>
+
+  <!-- Window 10 e-mail metro app. -->
+  <Process
+    Guid="{1E593B10-CF18-4FFE-8AD2-2D0089D43A46}"
+    Version="1.0.0.0"
+    TargetProcessName="HxMail"
+    TargetProcessCompanyName="Microsoft Corporation">
+
+    <IgnoreWindows>
+      <Window ClassName="Windows.UI.Core.CoreWindow" />
+    </IgnoreWindows>
+  </Process>
+
+</ProcessBehaviors>
