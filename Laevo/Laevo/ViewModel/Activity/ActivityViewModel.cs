@@ -467,12 +467,6 @@ namespace Laevo.ViewModel.Activity
 				.ForEach( i => i.Open() );
 		}
 
-		[CommandExecute( Commands.OpenActivityLibrary )]
-		public void OpenActivityLibrary()
-		{
-			_workspace.GetInnerWorkspace<Library>().Open();
-		}
-
 		[CommandExecute( Commands.SelectActivity )]
 		public void SelectActivity()
 		{
@@ -554,7 +548,7 @@ namespace Laevo.ViewModel.Activity
 		[CommandCanExecute( Commands.StopActivity )]
 		public bool CanStopActivity()
 		{
-			return IsEditable && Activity.IsOpen && !_isSuspending && IsOverviewActive();
+			return IsEditable && Activity.IsOpen && !_isSuspending && !_overview.IsDisabled;
 		}
 
 		bool _isSuspending;
@@ -579,9 +573,15 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		[CommandCanExecute( Commands.OpenActivityLibrary )]
-		public bool IsOverviewActive()
+		public bool CanOpenActivityLibrary()
 		{
-			return !_overview.IsActive;
+			return !_overview.IsDisabled;
+		}
+
+		[CommandExecute( Commands.OpenActivityLibrary )]
+		public void OpenActivityLibrary()
+		{
+			_workspace.GetInnerWorkspace<Library>().Open();
 		}
 
 		void OnSuspendedWorkspace( AbstractWorkspace<WorkspaceSession> workspace )

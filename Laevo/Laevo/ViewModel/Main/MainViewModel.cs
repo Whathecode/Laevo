@@ -51,7 +51,6 @@ namespace Laevo.ViewModel.Main
 		{
 			model.WindowClipboard.UnresponsiveWindowDetected += ( windows, desktop ) =>
 			{
-				_activityOverviewViewModel.OnPopupShowing();
 				var unresponsiveViewModel = new UnresponsiveViewModel( windows );
 				unresponsiveViewModel.UnresponsiveHandled += () => _unresponsivePopup.Hide();
 				_unresponsivePopup.DataContext = unresponsiveViewModel;
@@ -205,23 +204,22 @@ namespace Laevo.ViewModel.Main
 		[CommandCanExecute( Commands.SwitchActivityOverview )]
 		public bool CanSwitchActivityOverview()
 		{
-			return _activityOverviewViewModel.ActivityMode == Mode.Activate && !_activityBar.IsInUse() ;
+			return _activityOverviewViewModel.ActivityMode == Mode.Activate && !_activityBar.IsInUse() && !_activityOverviewViewModel.IsDisabled;
 		}
 
 		[CommandExecute( Commands.ShowActivityBar )]
 		public void ShowActivityBar( bool autoHide )
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null  )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && !_activityOverviewViewModel.IsDisabled )
 			{
-				return;
+				_activityBar.ShowActivityBar( autoHide );
 			}
-			_activityBar.ShowActivityBar( autoHide );
 		}
 
 		[CommandExecute( Commands.HideActivityBar )]
 		public void HideActivityBar()
 		{
-			if ( _activityOverviewViewModel.CurrentActivityViewModel != null  )
+			if ( _activityOverviewViewModel.CurrentActivityViewModel != null && !_activityOverviewViewModel.IsDisabled )
 			{
 				_activityBar.HideActivityBar();
 			}
@@ -263,7 +261,7 @@ namespace Laevo.ViewModel.Main
 		 CommandCanExecute( Commands.ActivateSelectedActivity )]
 		public bool CanExecuteShortcut()
 		{
-			return _activityOverviewViewModel.IsActive;
+			return !_activityOverviewViewModel.IsDisabled;
 		}
 
 		[CommandExecute( Commands.ActivateSelectedActivity )]
