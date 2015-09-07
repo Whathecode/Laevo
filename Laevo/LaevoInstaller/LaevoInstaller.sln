@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LaevoInstaller", "LaevoInstaller.vdproj", "{38343180-58ED-489E-8BAB-DB1A80A0150A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38343180-58ED-489E-8BAB-DB1A80A0150A}.Debug|Default.ActiveCfg = Debug
+		{38343180-58ED-489E-8BAB-DB1A80A0150A}.Debug|Default.Build.0 = Debug
+		{38343180-58ED-489E-8BAB-DB1A80A0150A}.Release|Default.ActiveCfg = Release
+		{38343180-58ED-489E-8BAB-DB1A80A0150A}.Release|Default.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

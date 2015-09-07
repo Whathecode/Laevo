@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProcessBehaviors
+  xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
+
+  <!-- Visual Studio 2012. -->
+  <Process 
+    Guid="{08C5ACD5-8C88-421F-97B9-5AB70B710A1D}"
+    Version="1.0.0.0"
+    TargetProcessName="devenv"
+    TargetProcessCompanyName="Microsoft Corporation">
+    <IgnoreWindows>
+      <Window ClassName="VsSolutionFileChangeTimerWindow" />
+      <!-- NotifyIcon in tray for e.g. available plugin updates. -->
+      <Window ClassName="HwndWrapper[DefaultDomain;;e31e9001-4a7b-40e5-a491-cffd589813c7]" />
+    </IgnoreWindows>
+  </Process>
+
+</ProcessBehaviors> 

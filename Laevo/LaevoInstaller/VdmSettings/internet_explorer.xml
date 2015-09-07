@@ -1,11 +1,16 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ProcessBehaviors
   xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
   <!-- Internet explorer. -->
-  <Process Name="iexplore" CompanyName="Microsoft Corporation">
+  <Process
+    Guid="{118D8090-774F-4125-A957-FA37B1D703D4}"
+    TargetProcessName="iexplore"
+    TargetProcessCompanyName="Microsoft Corporation"
+    Version="1.0.0.0">
     <HideBehavior>
       <Default Hide="SelectedWindow" />
     </HideBehavior>
