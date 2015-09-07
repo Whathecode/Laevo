@@ -5,7 +5,11 @@
   xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
   <!-- Card detector is a background application that helps to detect USB modems, mobile Internet SIM cards. -->
-  <Process Name="CardDetector" CompanyName="France Telecom">
+  <Process 
+    Guid="{31EF8FEB-01DE-423B-A599-28D12D280CCD}" 
+    Version="1.0.0.0"
+    TargetProcessName="CardDetector" 
+    TargetProcessCompanyName="France Telecom">
     <IgnoreWindows>
       <!-- Card detector background windows. -->
       <Window ClassName="Afx:10000000:0:00010005:00000000:00000000" />

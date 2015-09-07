@@ -1,20 +1,40 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ProcessBehaviors
   xmlns="http://whatodo.at/whathecode/vdm-api/ProcessBehaviors"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://whatodo.at/whathecode/vdm-api ProcessBehaviors.xsd">
 
   <!-- Asus function key visualizations. -->
-  <Process Name="ATKOSD2" CompanyName="ASUSTek Computer Inc.">
+  <Process
+    Guid="{018B536A-B78C-444F-AE21-0120075A13F7}"
+    Version="1.0.0.0"
+    TargetProcessName="ATKOSD2"
+    TargetProcessCompanyName="ASUSTek Computer Inc.">
     <IgnoreWindows>
       <Window ClassName="CNewOsd" />
     </IgnoreWindows>
   </Process>
 
   <!-- Asus Splendid Video Enhancement Technology. Window is never shown. -->
-  <Process Name="ACMON" CompanyName="ASUS" Author="Steven Jeuris" Version="3.0, 2.0">
+  <Process
+    Guid="{97AA22DB-6F8E-42ED-BE90-33303F525635}"
+    Version="1.0.0.0"
+    TargetProcessName="ACMON"
+    TargetProcessCompanyName="ASUS">
     <IgnoreWindows>
       <Window ClassName="ACMON" />
+    </IgnoreWindows>
+  </Process>
+
+  <!-- Asus tochpad driver. -->
+  <Process
+    Guid="{0C8245C4-5C29-4E1D-BDDB-D451AC839202}"
+    Version="1.0.0.0"
+    TargetProcessName="ETDCtrl"
+    TargetProcessCompanyName="ELAN Microelectronics">
+    <IgnoreWindows>
+      <Window ClassName="#32770" />
     </IgnoreWindows>
   </Process>
 
