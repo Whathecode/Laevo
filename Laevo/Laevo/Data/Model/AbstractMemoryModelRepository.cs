@@ -125,8 +125,8 @@ namespace Laevo.Data.Model
 			var newActivity = new Activity( name, this, PeerFactory.UsersPeer );
 			AddActivity( newActivity, parent );
 
-			// Give access to all users that have access higher up the hierarchy.
-			newActivity.GetInheritedAccessUsers().ForEach( u => newActivity.Invite( u ) );
+			// Give access to activity owner.
+			if ( parent != null ) newActivity.Invite( parent.OwnedUsers.First() );
 
 			return newActivity;
 		}

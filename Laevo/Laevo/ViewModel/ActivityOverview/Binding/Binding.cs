@@ -23,7 +23,6 @@
 		NewActivity,
 		PlanActivity,
 		OpenHome,
-		SwitchPersonalHierarchies,
 		OpenUserProfile,
 		OpenTimeLineSharing
 	}

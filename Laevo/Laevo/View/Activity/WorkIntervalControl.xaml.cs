@@ -130,12 +130,9 @@ namespace Laevo.View.Activity
 			e.Handled = true;
 		}
 
-		bool CanDrop( ActivityViewModel toMerge, ActivityViewModel dropTarget )
+		static bool CanDrop( ActivityViewModel toMerge, ActivityViewModel dropTarget )
 		{
-			return toMerge != null && dropTarget.IsAccessible 
-				// Activity drop operation is not allowed when time line is not in hierarchies state. 
-				// TODO: It should be re-enabled in the future.
-				&& dropTarget.IsHierachies();
+			return toMerge != null && dropTarget.IsAccessible;
 		}
 
 		void StartDrag( object sender, MouseEventArgs e )

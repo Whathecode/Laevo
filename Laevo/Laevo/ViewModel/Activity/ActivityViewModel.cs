@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Serialization;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ABC.Workspaces;
@@ -21,6 +22,7 @@ using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
+using Whathecode.System.Xaml.Behaviors;
 using Color = System.Windows.Media.Color;
 using Commands = Laevo.ViewModel.Activity.Binding.Commands;
 
@@ -311,7 +313,7 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, IViewRepository repository )
-			: this( activity, workspaceManager, repository, workspaceManager.CreateEmptyWorkspace() ) { }
+			: this( activity, workspaceManager, repository, workspaceManager.CreateEmptyWorkspace() ) {}
 
 		public ActivityViewModel( Model.Activity activity, WorkspaceManager workspaceManager, IViewRepository repository, Workspace workspace )
 		{
@@ -380,7 +382,7 @@ namespace Laevo.ViewModel.Activity
 			IsToDo = Activity.IsToDo;
 
 			// Set Windows Shell Library folder.
-			Library library = _workspace.GetInnerWorkspace<Library>();
+			var library = _workspace.GetInnerWorkspace<Library>();
 			List<string> paths = library.Paths.ToList();
 			if ( !paths.Contains( Activity.SpecificFolder.LocalPath ) )
 			{
@@ -448,6 +450,9 @@ namespace Laevo.ViewModel.Activity
 					DroppedOwnershipEvent( this );
 				}
 			};
+			
+			// Initialize command manually, wtc command binding not working.
+			RemoveOvnership = new RemoveOvnershipCommand(this);
 		}
 
 
@@ -751,16 +756,34 @@ namespace Laevo.ViewModel.Activity
 			Icon = newIcon;
 		}
 
-		[CommandExecute( Commands.ClaimOwnership )]
-		public void ClaimOwnership()
+		public RemoveOvnershipCommand RemoveOvnership { private set; get; }
+		public class RemoveOvnershipCommand : ICommand
 		{
-			Activity.AddOwnership( _repository.User.User );
+			readonly ActivityViewModel _activityViewModel;
+			public RemoveOvnershipCommand( ActivityViewModel activityViewModel )
+			{
+				_activityViewModel = activityViewModel;
+			}
+			public bool CanExecute( object parameter )
+			{
+				return true;
+			}
+
+			public void Execute( object parameter )
+			{
+				var mouseCommandArgs = (MouseBehavior.MouseCommandArgs)parameter;
+				_activityViewModel.Activity.RemoveAccess( ((UserViewModel)mouseCommandArgs.Parameter).User );
+			}
+
+			public event EventHandler CanExecuteChanged;
 		}
 
-		[CommandExecute( Commands.DropOwnership )]
-		public void DropOwnership()
+		[CommandExecute( Commands.OpenTimeLineSharing )]
+		public void OpenTimeLineSharing()
 		{
-			Activity.RemoveOwnership( _repository.User.User );
+			_overview.OpenTimeLineSharing( this );
+			Activity.RemoveOwnership( new Model.User() );
+			
 		}
 
 		/// <summary>
@@ -816,7 +839,6 @@ namespace Laevo.ViewModel.Activity
 			}
 			else
 			{
-				// Activity merge is temporary disabled (look in WorkIntervalControl.xaml.cs => CanDrop).
 				Merge( activity );
 			}
 		}
@@ -972,7 +994,7 @@ namespace Laevo.ViewModel.Activity
 		void AddAccess( Model.User user )
 		{
 			// Do not display own user.
-			if ( user == _repository.User.User )
+			if ( Equals( user, _repository.User.User ) )
 			{
 				return;
 			}
@@ -983,7 +1005,7 @@ namespace Laevo.ViewModel.Activity
 		void AddOwnership( Model.User user )
 		{
 			// Do not display own user.
-			if ( user == _repository.User.User )
+			if ( Equals( user, _repository.User.User ) )
 			{
 				ClaimedOwnership = true;
 				return;

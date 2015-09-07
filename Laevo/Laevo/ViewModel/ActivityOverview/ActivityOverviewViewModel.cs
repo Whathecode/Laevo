@@ -166,8 +166,15 @@ namespace Laevo.ViewModel.ActivityOverview
 			HookActivityToOverview( HomeActivity );
 			HomeActivity.ActivateActivity( false );
 
-			// The first time this is called, it will open the personal view, since activity mode is not set yet.
-			SwitchPersonalHierarchies();
+			ActivityMode |= Mode.Activate;
+
+			// Load personal activities.
+			UnloadActivities();
+			_model.ChangeToPersonalTimeLine();
+			_dataRepository.LoadPersonalActivities();
+			Activities = _dataRepository.Activities;
+			Tasks = _dataRepository.Tasks;
+			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 
 			// Listen for new interruption tasks being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
@@ -452,31 +459,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			HomeActivity.SelectActivity();
 		}
 
-		[CommandExecute( Commands.SwitchPersonalHierarchies )]
-		public void SwitchPersonalHierarchies()
-		{
-			// Swap flags.
-			if ( ActivityMode.HasFlag( Mode.Activate ) )
-			{
-				ActivityMode &= ~Mode.Activate;
-				ActivityMode |= Mode.Hierarchies;
-				LoadActivities( VisibleActivity );
-			}
-			else
-			{
-				ActivityMode &= ~Mode.Hierarchies;
-				ActivityMode |= Mode.Activate;
-
-				// Load personal activities.
-				UnloadActivities();
-				_model.ChangeToPersonalTimeLine();
-				_dataRepository.LoadPersonalActivities();
-				Activities = _dataRepository.Activities;
-				Tasks = _dataRepository.Tasks;
-				Activities.Union( Tasks ).ForEach( HookActivityToOverview );
-			}
-		}
-
 		[CommandExecute( Commands.OpenUserProfile )]
 		public void OpenUserProfile()
 		{
@@ -490,11 +472,11 @@ namespace Laevo.ViewModel.ActivityOverview
 		}
 
 		[CommandExecute( Commands.OpenTimeLineSharing )]
-		public void OpenTimeLineSharing()
+		public void OpenTimeLineSharing( ActivityViewModel activityViewModel = null )
 		{
 			var share = new SharePopup
 			{
-				DataContext = new ShareViewModel( _model, VisibleActivity, _dataRepository )
+				DataContext = new ShareViewModel( _model, activityViewModel ?? CurrentActivityViewModel, _dataRepository )
 			};
 			share.Closed += ( s, a ) => VisibleActivity.Persist();
 
