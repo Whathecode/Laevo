@@ -100,7 +100,7 @@ namespace Laevo.ViewModel.Activity
 		/// <summary>
 		///   Determines whether or not the active timespans should be shown.
 		/// </summary>
-		[NotifyProperty(WorkIntervalProperties.ShowActiveTimeSpans )]
+		[NotifyProperty( WorkIntervalProperties.ShowActiveTimeSpans )]
 		public bool ShowActiveTimeSpans { get; set; }
 
 

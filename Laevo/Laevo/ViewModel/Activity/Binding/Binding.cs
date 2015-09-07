@@ -40,8 +40,7 @@
 		RemovePlanning,
 		ChangeColor,
 		ChangeIcon,
-		ClaimOwnership,
-		DropOwnership
+		OpenTimeLineSharing
 	}
 
 	public enum WorkIntervalProperties

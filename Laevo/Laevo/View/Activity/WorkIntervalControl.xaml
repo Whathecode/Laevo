@@ -36,7 +36,7 @@
 			Width="{Binding ElementName=MainContainer, Path=ActualWidth}"
 			Height="{Binding ElementName=MainContainer, Path=ActualHeight}"
 			Orientation="Vertical">
-			
+
 			<StackPanel.MinWidth>
 				<MultiBinding
 					Converter="{wtcConverters:ConditionConverter Expression='([0] || [1]) and [2] &lt;= 25', IfTrue=25, IfFalse=2, Type={x:Type system:Double}}">
@@ -216,16 +216,19 @@
 							</VisualBrush.Visual>
 						</VisualBrush>
 					</Border.BorderBrush>
-					
+
 					<Grid>
 						<!-- Users who claimed ownership. -->
+
 						<StackPanel
 							VerticalAlignment="Bottom"
 							HorizontalAlignment="Right"
 							Orientation="Horizontal"
-							Margin="0, 0, 4, 4">
-							<ItemsControl
-								ItemsSource="{Binding BaseActivity.OwnedUsers}">
+							Margin="0, 0, 4, 4"
+							Visibility="{Binding Position, Converter={wtcConverters:EnumHasFlagConverter Flag={x:Static vm:ActivityPosition.End},
+								IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
+
+							<ItemsControl ItemsSource="{Binding BaseActivity.AccessUsers}">
 								<ItemsControl.ItemsPanel>
 									<ItemsPanelTemplate>
 										<StackPanel Orientation="Horizontal" />
@@ -233,37 +236,26 @@
 								</ItemsControl.ItemsPanel>
 								<ItemsControl.ItemTemplate>
 									<DataTemplate DataType="userVm:UserViewModel">
-										<user:UserImage Margin="3, 0, 0, 0" />
+										<user:UserImage
+												Margin="3, 0, 0, 0" 
+												behaviors:MouseBehavior.LeftClickCommand="{Binding ElementName=Control, Path=DataContext.BaseActivity.RemoveOvnership}"
+												behaviors:MouseBehavior.LeftClickCommandParameter="{Binding}"/>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
-							<!-- Claim ownership. -->
+
+							<!-- Add ownership. -->
 							<Image
-								Visibility="{Binding BaseActivity.ClaimedOwnership,
-									Converter={wtcConverters:FromBooleanConverter 
-									IfTrue={x:Static Visibility.Collapsed}, 
-									IfFalse={x:Static Visibility.Visible}}}"
 								Source="../Common/Images/Share.png"
 								Stretch="None"
 								Cursor="Hand"
 								Margin="10, 0, 0, 0"
-								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.ClaimOwnership}, Path=BaseActivity}" />
-							<!-- Drop ownership. -->
-							<Image
-								Visibility="{Binding BaseActivity.ClaimedOwnership,
-									Converter={wtcConverters:FromBooleanConverter 
-									IfTrue={x:Static Visibility.Visible}, 
-									IfFalse={x:Static Visibility.Collapsed}}}"
-								Source="../Common/Images/Unshare.png"
-								Stretch="None"
-								Cursor="Hand"
-								Margin="10, 0, 0, 0"
-								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.DropOwnership}, Path=BaseActivity}" />
+								behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.OpenTimeLineSharing}, Path=BaseActivity}" />
 						</StackPanel>
 
 						<!-- Attention time spans. -->
 						<ItemsControl Name="ActiveItemsControl"
-							Visibility="{Binding ShowActiveTimeSpans,
+						              Visibility="{Binding ShowActiveTimeSpans,
 							Converter={wtcConverters:FromBooleanConverter 
 							IfTrue={x:Static Visibility.Visible}, 
 							IfFalse={x:Static Visibility.Collapsed}}}">
@@ -327,7 +319,7 @@
 							</ItemsControl.ItemsPanel>
 						</ItemsControl>
 					</Grid>
-					
+
 				</Border>
 			</Border>
 		</StackPanel>

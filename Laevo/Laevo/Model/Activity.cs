@@ -438,23 +438,14 @@ namespace Laevo.Model
 			updatedActivities.ForEach( a => a.AccessAddedEvent( a, user ) );
 		}
 
-		IEnumerable<Activity> Invite( User user, Activity activity )
+		static IEnumerable<Activity> Invite( User user, Activity activity )
 		{
-			if ( !activity._accessUsers.Contains( user ) )
+			if ( activity._accessUsers.Contains( user ) )
 			{
-				activity._accessUsers.Add( user );
-				yield return activity;
+				yield break;
 			}
-
-			// Invite to all subactivities.
-			foreach ( var sub in _repository.GetActivities( activity ) )
-			{
-				var result = Invite( user, sub );
-				foreach ( var r in result )
-				{
-					yield return r;
-				}
-			}
+			activity._accessUsers.Add( user );
+			yield return activity;
 		}
 
 		public void RemoveAccess( User user )
