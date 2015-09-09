@@ -736,6 +736,12 @@
   <ItemGroup>
     <Resource Include="View\Activity\ActionIcons\planned.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Breakpoints\Breakpoints.csproj">
+      <Project>{0bdad109-6e4f-4f41-8fc6-79ceb0861fc5}</Project>
+      <Name>Breakpoints</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(ProjectDir)'</PostBuildEvent>
