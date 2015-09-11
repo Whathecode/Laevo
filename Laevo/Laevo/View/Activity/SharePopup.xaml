@@ -13,7 +13,9 @@
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	xmlns:userView="clr-namespace:Laevo.View.User"
 	PopupImage="../Common/Images/Share.png"
-	d:DataContext="{d:DesignInstance Type=vm:ShareViewModel}">
+	d:DataContext="{d:DesignInstance Type=vm:ShareViewModel}"
+	MinWidth="600"
+	MinHeight="525">
 
 	<Grid>
 		<Grid.RowDefinitions>

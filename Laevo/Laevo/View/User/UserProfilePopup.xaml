@@ -14,7 +14,8 @@
 	xmlns:user="clr-namespace:Laevo.View.User"
 	d:DataContext="{d:DesignInstance Type=vm:UserViewModel}"
 	PopupImage="../Common/Images/Profile.png"
-	MinHeight="200">
+	MinHeight="200"
+	MinWidth="600">
 
 	<Grid>
 		<Grid.RowDefinitions>

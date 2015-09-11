@@ -14,7 +14,10 @@
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
 	SizeToContent="Manual"
-	PopupImage="{Binding Icon}">
+	PopupImage="{Binding Icon}"
+	Width="600"
+	Height="525">
+	
 
 	<Window.Resources>
 		<converters:ColorGradientConverter x:Key="ColorGradientConverter" />

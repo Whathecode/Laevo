@@ -10,7 +10,8 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Settings"
 	d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
-	PopupImage="../Activity/ActionIcons/edit.png">
+	PopupImage="../Activity/ActionIcons/edit.png"
+	Width="600">
 
 	<Grid>
 		<Grid.RowDefinitions>
