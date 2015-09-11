@@ -238,7 +238,7 @@
 									<DataTemplate DataType="userVm:UserViewModel">
 										<user:UserImage
 												Margin="3, 0, 0, 0" 
-												behaviors:MouseBehavior.LeftClickCommand="{Binding ElementName=Control, Path=DataContext.BaseActivity.RemoveOvnership}"
+												behaviors:MouseBehavior.LeftClickCommand="{Binding ElementName=Control, Path=DataContext.BaseActivity.RemoveAccess}"
 												behaviors:MouseBehavior.LeftClickCommandParameter="{Binding}"/>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>

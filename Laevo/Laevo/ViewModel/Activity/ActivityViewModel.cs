@@ -452,7 +452,7 @@ namespace Laevo.ViewModel.Activity
 			};
 			
 			// Initialize command manually, wtc command binding not working.
-			RemoveOvnership = new RemoveOvnershipCommand(this);
+			RemoveAccess = new RemoveAccessCommand(this);
 		}
 
 
@@ -756,11 +756,11 @@ namespace Laevo.ViewModel.Activity
 			Icon = newIcon;
 		}
 
-		public RemoveOvnershipCommand RemoveOvnership { private set; get; }
-		public class RemoveOvnershipCommand : ICommand
+		public RemoveAccessCommand RemoveAccess { private set; get; }
+		public class RemoveAccessCommand : ICommand
 		{
 			readonly ActivityViewModel _activityViewModel;
-			public RemoveOvnershipCommand( ActivityViewModel activityViewModel )
+			public RemoveAccessCommand( ActivityViewModel activityViewModel )
 			{
 				_activityViewModel = activityViewModel;
 			}
