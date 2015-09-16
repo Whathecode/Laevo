@@ -437,6 +437,9 @@
     <Compile Include="ViewModel\Main\Unresponsive\Binding\Binding.cs" />
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveViewModel.cs" />
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveWindow.cs" />
+    <Compile Include="ViewModel\Notification\Binding\Binding.cs" />
+    <Compile Include="ViewModel\Notification\NotificationEventArgs.cs" />
+    <Compile Include="ViewModel\Notification\NotificationViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="ViewModel\User\Binding\Binding.cs" />
@@ -487,6 +490,12 @@
     <Compile Include="View\MessageBox.cs" />
     <Compile Include="View\Activity\SharePopup.xaml.cs">
       <DependentUpon>SharePopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Notification\NotificationButtons.xaml.cs">
+      <DependentUpon>NotificationButtons.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Notification\NotificationPopup.xaml.cs">
+      <DependentUpon>NotificationPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\TaskList\TaskInformationOffsetConverter.cs" />
     <Compile Include="View\TaskList\TaskListControl.xaml.cs">
@@ -599,6 +608,14 @@
     <Page Include="View\Activity\SharePopup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Notification\NotificationButtons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Notification\NotificationPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\TaskList\TaskListControl.xaml">
       <SubType>Designer</SubType>
@@ -742,6 +759,7 @@
       <Name>Breakpoints</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(ProjectDir)'</PostBuildEvent>
