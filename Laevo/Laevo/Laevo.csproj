@@ -467,6 +467,12 @@
     <Compile Include="View\ActivityOverview\Converters\AspectRatioToTransformOffset.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineHeightConverter.cs" />
     <Compile Include="View\ActivityOverview\Converters\TimeLineWidthConverter.cs" />
+    <Compile Include="View\ActivityOverview\NotificationButton.xaml.cs">
+      <DependentUpon>NotificationButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ActivityOverview\NotificationList.xaml.cs">
+      <DependentUpon>NotificationList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ActivityOverview\Shaders\FadeEffect.cs" />
     <Compile Include="ViewModel\ActivityOverview\Mode.cs" />
     <Compile Include="View\ActivityOverview\Converters\VectorLine.cs" />
@@ -537,6 +543,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\ActivityOverview\Images\Bell.png" />
     <Resource Include="View\Common\Images\Unshare.png" />
     <Resource Include="View\Common\Images\Share.png" />
     <Resource Include="View\Common\Images\Alert.png" />
@@ -590,6 +597,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ActivityOverview\ClockControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ActivityOverview\NotificationButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ActivityOverview\NotificationList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
