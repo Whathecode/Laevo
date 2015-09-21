@@ -8,10 +8,13 @@ using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
 using Laevo.View.Activity;
+using Laevo.View.ActivityOverview;
 using Laevo.View.Common;
+using Laevo.View.Notification;
 using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
+using Laevo.ViewModel.Notification;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -139,16 +142,30 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.Path )]
 		public List<ActivityViewModel> Path { get; private set; }
 
+		[NotifyProperty( Binding.Properties.Notifications )]
+		public ObservableCollection<NotificationViewModel> Notifications { get; private set; }
+
+		[NotifyProperty( Binding.Properties.UnreadNotificationsCount )]
+		public int UnreadNotificationsCount { get; private set; }
+
 		public bool IsDisabled
 		{
 			get { return ActivityMode.HasFlag( Mode.Inactive ); }
 		}
 
+		readonly List<NotificationPopup> _notificationPopups = new List<NotificationPopup>();
+		readonly NotificationList _notificationsMenu;
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
 			_dataRepository = dataRepository;
+
+			Notifications = new ObservableCollection<NotificationViewModel>();
+			Notifications.CollectionChanged += ( sender, args ) =>
+			{
+				UnreadNotificationsCount = Notifications.Count;
+			};
 
 			// Set up home activity.
 			if ( _dataRepository.Home != null )
@@ -203,6 +220,12 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.Elapsed += ( s, a ) => _dispatcher.Invoke( () => UpdateData( a.SignalTime ) );
 
 			_updateTimer.Start();
+
+			_notificationsMenu = new NotificationList
+			{
+				DataContext = this,
+				ShowActivated = true
+			};
 		}
 
 
@@ -252,7 +275,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		/// </summary>
 		public ActivityViewModel CreateNewActivity()
 		{
-			ActivityViewModel parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
+			ActivityViewModel parent = HomeActivity;
 			Model.Activity activity = _model.CreateNewActivity( parent.Activity );
 			var newActivity = new ActivityViewModel( activity, _model.WorkspaceManager, _dataRepository )
 			{
@@ -284,7 +307,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			if ( parent == null )
 			{
-				parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
+				parent = HomeActivity;
 			}
 
 			_dataRepository.AddActivity( activity, parent );
@@ -294,7 +317,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
-			ActivityViewModel parent = ActivityMode.HasFlag( Mode.Hierarchies ) ? VisibleActivity : HomeActivity;
+			ActivityViewModel parent = HomeActivity;
 			Model.Activity task = _model.CreateNewTask( parent.Activity );
 			var newTask = new ActivityViewModel( task, _model.WorkspaceManager, _dataRepository )
 			{
@@ -328,6 +351,18 @@ namespace Laevo.ViewModel.ActivityOverview
 		public bool CanPlanActivity()
 		{
 			return FocusedRoundedTime > DateTime.Now;
+		}
+
+		[CommandExecute( Commands.OpenNotifications )]
+		public void OpenNotifications()
+		{
+			_notificationsMenu.Show();
+		}
+
+		[CommandCanExecute( Commands.OpenNotifications )]
+		public bool CanOpenNotifications()
+		{
+			return Notifications.Count > 0;
 		}
 
 		/// <summary>
@@ -367,6 +402,57 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ToDoChangedEvent -= OnToDoChanged;
 			activity.ClaimedOwnershipEvent -= OnClaimedOwnership;
 			activity.DroppedOwnershipEvent -= OnDroppedOwnership;
+		}
+
+		NotificationViewModel CreateNotificationViewModel( NotificationPopup notificationPopup, int index, object sender )
+		{
+			var notificationViewModel = new NotificationViewModel( index );
+			notificationViewModel.NewActivityCreating += ( o, eventArgs ) =>
+			{
+				var senderNotification = (NotificationViewModel)o;
+
+				_notificationPopups.Remove( notificationPopup );
+				notificationPopup.Close();
+
+				var activity = CreateNewActivity();
+				activity.Label = senderNotification.Summary;
+				activity.Activity.Name = senderNotification.Summary;
+
+				activity.OpenActivity();
+				PositionActivityAtCurrentOffset( activity );
+
+				activity.EditActivity();
+				activity.ActivateActivity();
+			};
+			notificationViewModel.NewTaskCreating += ( o, eventArgs ) =>
+			{
+				var senderNotification = (NotificationViewModel)o;
+
+				_notificationPopups.Remove( notificationPopup );
+				notificationPopup.Close();
+
+				var parent = HomeActivity;
+				var task = _model.CreateNewTask( parent.Activity );
+				task.Name = senderNotification.Summary;
+
+				var newTask = new ActivityViewModel( task, _model.WorkspaceManager, _dataRepository )
+				{
+					ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
+					Label = senderNotification.Summary
+				};
+				newTask.EditActivity();
+			};
+			notificationViewModel.NotificationHiding += ( o, eventArgs ) =>
+			{
+				_notificationPopups.Remove( notificationPopup );
+				notificationPopup.Close();
+			};
+			notificationViewModel.NotificationRemoving += ( o, args ) =>
+			{
+				_notificationPopups.Remove( notificationPopup );
+				notificationPopup.Close();
+			};
+			return notificationViewModel;
 		}
 
 		void HookActivityToOverview( ActivityViewModel activity )

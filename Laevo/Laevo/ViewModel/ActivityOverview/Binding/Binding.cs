@@ -14,7 +14,9 @@
 		Mode,
 		CurrentActivityViewModel,
 		TimeLineRenderScale,
-		EnableAttentionLines
+		EnableAttentionLines,
+		Notifications,
+		UnreadNotificationsCount
 	}
 
 	public enum Commands
@@ -24,6 +26,7 @@
 		PlanActivity,
 		OpenHome,
 		OpenUserProfile,
-		OpenTimeLineSharing
+		OpenTimeLineSharing,
+		OpenNotifications
 	}
 }

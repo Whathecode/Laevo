@@ -8,7 +8,8 @@ namespace Laevo.ViewModel.Notification.Binding
 		Image,
 		Summary,
 		Interrupter,
-		Index
+		Index,
+		IsRead
 	}
 
 	public enum Commands

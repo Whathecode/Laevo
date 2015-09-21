@@ -17,7 +17,7 @@ namespace Laevo.ViewModel.Notification
 	}
 
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
-	class NotificationViewModel
+	public class NotificationViewModel
 	{
 		public event EventHandler<EventArgs> NewActivityCreating;
 
@@ -43,12 +43,16 @@ namespace Laevo.ViewModel.Notification
 		[NotifyProperty( Binding.Properties.Index )]
 		public int Index { get; private set; }
 
+		[NotifyProperty( Binding.Properties.IsRead )]
+		public bool IsRead { get; private set; }
+
 		public NotificationViewModel( int index )
 		{
 			// Initialize notification view model with the dummy data. 
 			Interrupter = "Dominik Grondziowski";
 			Animation = AnimationType.Fade;
-			Summary = "Some Interruption summary. Some Interruption summary. Some Interruption summary";
+			Summary = "Some Interruption summary. Some Interruption summary. Some Interruption summary Some Interruption summary." +
+			          " Some Interruption summary. Some Interruption summary";
 			var uriSource = new Uri( @"/Laevo;component/View/Common/Images/Alert.png", UriKind.Relative );
 			Image = new BitmapImage( uriSource );
 			Index = index;

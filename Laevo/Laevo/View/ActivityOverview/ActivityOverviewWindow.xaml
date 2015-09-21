@@ -107,17 +107,17 @@
 			VerticalAlignment="Top"
 			Margin="0, 10, 10, 0">
 			<!-- User profile. -->
+		
 			<Button
 				Command="{pf:CommandBinding {x:Static binding:Commands.OpenUserProfile}}"
 				VerticalAlignment="Top"
 				Height="40"
-				Visibility="{Binding ActivityMode, Converter={wtcConverters:EnumHasFlagConverter
-					Flag={x:Static vm:Mode.Hierarchies},
-					IfTrue={x:Static Visibility.Collapsed},
-					IfFalse={x:Static Visibility.Visible}}}"
-				Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+				Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+				Margin="0, 5, 0, 0">
 				<Image Source="../Common/Images/Profile.png" />
 			</Button>
+
+			<activityOverview:NotificationButton DataContext="{Binding}" Margin="5, 0, 5, 0"/>
 		</StackPanel>
 		
 		<!-- Time Line 3D -->
