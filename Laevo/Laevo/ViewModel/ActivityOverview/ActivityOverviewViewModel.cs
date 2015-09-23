@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Laevo.Data;
 using Laevo.Data.View;
 using Laevo.View.Activity;
-using Laevo.View.ActivityOverview;
 using Laevo.View.Common;
 using Laevo.View.Notification;
 using Laevo.View.User;
@@ -148,13 +148,14 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.UnreadNotificationsCount )]
 		public int UnreadNotificationsCount { get; private set; }
 
+
 		public bool IsDisabled
 		{
 			get { return ActivityMode.HasFlag( Mode.Inactive ); }
 		}
 
 		readonly List<NotificationPopup> _notificationPopups = new List<NotificationPopup>();
-		readonly NotificationList _notificationsMenu;
+		readonly NotificationList _notificationList;
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
@@ -162,10 +163,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_dataRepository = dataRepository;
 
 			Notifications = new ObservableCollection<NotificationViewModel>();
-			Notifications.CollectionChanged += ( sender, args ) =>
-			{
-				UnreadNotificationsCount = Notifications.Count;
-			};
+			Notifications.CollectionChanged += ( sender, args ) => { UnreadNotificationsCount = Notifications.Count; };
 
 			// Set up home activity.
 			if ( _dataRepository.Home != null )
@@ -221,10 +219,14 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			_updateTimer.Start();
 
-			_notificationsMenu = new NotificationList
+			// Set-up all notifications list.
+			var notificationListImageUri = new Uri( @"/Laevo;component/View/ActivityOverview/Images/Bell.png", UriKind.Relative );
+			_notificationList = new NotificationList
 			{
-				DataContext = this,
-				ShowActivated = true
+				Notifications = Notifications,
+				ShowActivated = true,
+				WindowStartupLocation = WindowStartupLocation.Manual,
+				PopupImage = new BitmapImage( notificationListImageUri )
 			};
 		}
 
@@ -353,14 +355,14 @@ namespace Laevo.ViewModel.ActivityOverview
 			return FocusedRoundedTime > DateTime.Now;
 		}
 
-		[CommandExecute( Commands.OpenNotifications )]
-		public void OpenNotifications()
+		[CommandExecute( Commands.ShowNotifications )]
+		public void ShowNotifications()
 		{
-			_notificationsMenu.Show();
+			_notificationList.Show();
 		}
 
-		[CommandCanExecute( Commands.OpenNotifications )]
-		public bool CanOpenNotifications()
+		[CommandCanExecute( Commands.ShowNotifications )]
+		public bool CanShowNotifications()
 		{
 			return Notifications.Count > 0;
 		}
@@ -404,7 +406,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.DroppedOwnershipEvent -= OnDroppedOwnership;
 		}
 
-		NotificationViewModel CreateNotificationViewModel( NotificationPopup notificationPopup, int index, object sender )
+		public NotificationViewModel CreateNotificationViewModel( NotificationPopup notificationPopup, int index, object sender )
 		{
 			var notificationViewModel = new NotificationViewModel( index );
 			notificationViewModel.NewActivityCreating += ( o, eventArgs ) =>

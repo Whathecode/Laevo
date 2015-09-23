@@ -1,0 +1,51 @@
+﻿<UserControl
+	x:Class="Laevo.View.Common.NotificationButton"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:common="clr-namespace:Laevo.View.Common"
+	mc:Ignorable="d">
+
+	<UserControl.Resources>
+		<Style TargetType="common:NotificationButton">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="common:NotificationButton">
+
+						<StackPanel MinWidth="47">
+							<Canvas
+								VerticalAlignment="Top"
+								Left="40"
+								ZIndex="1">
+								<Border
+									CornerRadius="999"
+									Width="20"
+									Height="20"
+									BorderThickness="1"
+									BorderBrush="White"
+									Canvas.Left="25">
+									<TextBlock
+										Foreground="White"
+										FontWeight="Bold"
+										FontSize="12"
+										Text="{TemplateBinding UnreadNotificationsCount}"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Center" />
+								</Border>
+							</Canvas>
+
+							<Button
+								Cursor="Hand"
+								Style="{TemplateBinding ButtonStyle}"
+								Command="{TemplateBinding OpenNotificationsCommand}">
+								<Image Source="{TemplateBinding ButtonImage}" />
+							</Button>
+						</StackPanel>
+						
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</UserControl.Resources>
+</UserControl>

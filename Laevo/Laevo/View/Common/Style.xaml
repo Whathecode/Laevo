@@ -2,7 +2,10 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:common="clr-namespace:Laevo.View.Common"
-	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters">
+	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	mc:Ignorable="d">
 
 	<!-- Common brushes. -->
 	<SolidColorBrush x:Key="ForegroundBrush" Color="White" />
@@ -56,7 +59,7 @@
 						<Grid>
 							<Canvas>
 								<Canvas.Effect>
-									<DropShadowEffect/>
+									<DropShadowEffect />
 								</Canvas.Effect>
 								<Image x:Name="Image" Source="{TemplateBinding PopupImage}">
 									<Image.Margin>
@@ -76,11 +79,11 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
-	
+
 	<Style TargetType="Label">
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
 	</Style>
-	
+
 	<Style TargetType="Button">
 		<Setter Property="Padding" Value="10, 0, 10, 0" />
 	</Style>

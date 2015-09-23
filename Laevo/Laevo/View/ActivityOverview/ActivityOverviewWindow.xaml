@@ -20,6 +20,7 @@
 	xmlns:controls="clr-namespace:Laevo.View.Activity"
 	xmlns:system="clr-namespace:System;assembly=mscorlib"
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
+	xmlns:common="clr-namespace:Laevo.View.Common"
 	mc:Ignorable="d"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityOverviewViewModel}"
 	Style="{StaticResource BaseStyle}"
@@ -117,7 +118,12 @@
 				<Image Source="../Common/Images/Profile.png" />
 			</Button>
 
-			<activityOverview:NotificationButton DataContext="{Binding}" Margin="5, 0, 5, 0"/>
+			<common:NotificationButton 
+				Margin="5, 0, 5, 0" 
+				ButtonImage="Images/Bell.png" 
+				UnreadNotificationsCount="{Binding ElementName=Control, Path=DataContext.UnreadNotificationsCount}"
+				OpenNotificationsCommand="{pf:CommandBinding {x:Static binding:Commands.ShowNotifications}}"
+				ButtonStyle="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
 		</StackPanel>
 		
 		<!-- Time Line 3D -->
