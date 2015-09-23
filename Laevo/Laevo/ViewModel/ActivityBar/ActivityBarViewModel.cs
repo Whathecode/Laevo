@@ -1,11 +1,16 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using Laevo.View.Common;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityBar.Binding;
 using Laevo.ViewModel.ActivityOverview;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
+using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
 
 namespace Laevo.ViewModel.ActivityBar
@@ -31,6 +36,7 @@ namespace Laevo.ViewModel.ActivityBar
 		[NotifyProperty( Binding.Properties.SelectedActivity )]
 		public ActivityViewModel SelectedActivity { get; private set; }
 
+		readonly NotificationList _notificationList;
 
 		public ActivityBarViewModel( ActivityOverviewViewModel overview )
 		{
@@ -45,7 +51,7 @@ namespace Laevo.ViewModel.ActivityBar
 				{
 					OpenPlusCurrentActivities.Add( opened );
 				}
-			}; 
+			};
 			overview.RemovedActivityEvent += removed => OpenPlusCurrentActivities.Remove( removed );
 			overview.StoppedActivityEvent += stopped =>
 			{
@@ -55,7 +61,7 @@ namespace Laevo.ViewModel.ActivityBar
 				}
 			};
 			overview.ActivatedActivityEvent += OnActivityActivated;
-			
+
 			// Activities which are activated are shown in the list until they are suspended.
 			overview.SuspendingActivityEvent += model =>
 			{
@@ -64,8 +70,30 @@ namespace Laevo.ViewModel.ActivityBar
 					OpenPlusCurrentActivities.Remove( model );
 				}
 			};
+
+			// Set-up all notifications list.
+			var notificationListImageUri = new Uri( @"/Laevo;component/View/Activity/Icons/Bell.png", UriKind.Relative );
+			_notificationList = new NotificationList
+			{
+				Notifications = OpenPlusCurrentActivities[ 0 ].Notifications,
+				ShowActivated = true,
+				WindowStartupLocation = WindowStartupLocation.Manual,
+				PopupImage = new BitmapImage( notificationListImageUri )
+			};
 		}
 
+		[CommandExecute( Commands.ShowNotifications )]
+		public void ShowNotifications()
+		{
+			_notificationList.DataContext = OpenPlusCurrentActivities[ 0 ];
+			_notificationList.Show();
+		}
+
+		[CommandCanExecute( Commands.ShowNotifications )]
+		public bool CanOpenNotifications()
+		{
+			return OpenPlusCurrentActivities[ 0 ].Notifications.Count > 0;
+		}
 
 		void OnActivityActivated( ActivityViewModel oldActivity, ActivityViewModel activatedActivity )
 		{

@@ -10,10 +10,12 @@
 	xmlns:activityConverters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:converters="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:binding="clr-namespace:Laevo.ViewModel.Activity.Binding"
+	xmlns:barBinding="clr-namespace:Laevo.ViewModel.ActivityBar.Binding"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:activityBar="clr-namespace:Laevo.View.ActivityBar"
 	xmlns:activityBarViewModel="clr-namespace:Laevo.ViewModel.ActivityBar"
 	xmlns:overview="clr-namespace:Laevo.ViewModel.ActivityOverview"
+	xmlns:common="clr-namespace:Laevo.View.Common"
 	d:DataContext="{d:DesignInstance Type=activityBarViewModel:ActivityBarViewModel}"
 	Title="ActivityInfoBox"
 	WindowStyle="None"
@@ -27,22 +29,19 @@
 	ResizeMode="NoResize"
 	activityBar:GlassEffect.IsEnabled="False"
 	activityBar:DisableResize.IsDisabled="False"
-	BorderThickness="0"
-	>
-
-
+	BorderThickness="0">
 
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="GlassButton.xaml" />
 			</ResourceDictionary.MergedDictionaries>
-			
+
 			<activityBar:ActivityBackgroundConverter x:Key="ActivityBackgroundConverter" />
 			<activityConverters:BorderBrushConverter x:Key="BorderBrushConverter" />
 
 			<Style x:Key="NoButtonHover" TargetType="Button">
-				<Setter Property="OverridesDefaultStyle" Value="True"/>
+				<Setter Property="OverridesDefaultStyle" Value="True" />
 				<Setter Property="Template">
 					<Setter.Value>
 						<ControlTemplate TargetType="Button">
@@ -55,9 +54,9 @@
 								BorderBrush="{TemplateBinding BorderBrush}"
 								Background="{TemplateBinding Background}">
 
-									<ContentPresenter
-										Margin="2"
-										HorizontalAlignment="Center" VerticalAlignment="Center" />
+								<ContentPresenter
+									Margin="2"
+									HorizontalAlignment="Center" VerticalAlignment="Center" />
 
 							</Border>
 						</ControlTemplate>
@@ -69,159 +68,168 @@
 	</Window.Resources>
 
 	<Border CornerRadius="3" BorderThickness="1">
-	
-	<Border.BorderBrush>
-		<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-			<GradientStop Offset="0" Color="White" />
-			<GradientStop Offset="1" Color="Transparent" />
-		</LinearGradientBrush>
-	</Border.BorderBrush>
 
-	<Border.Background>
-		<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-			<GradientStop Color="#606c88" Offset="0" />
-			<GradientStop Color="#282944" Offset="1" />
-		</LinearGradientBrush>
-	</Border.Background>
+		<Border.BorderBrush>
+			<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+				<GradientStop Offset="0" Color="White" />
+				<GradientStop Offset="1" Color="Transparent" />
+			</LinearGradientBrush>
+		</Border.BorderBrush>
 
-	<DockPanel Margin="10, 0, 10, 0">
+		<Border.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+				<GradientStop Color="#606c88" Offset="0" />
+				<GradientStop Color="#282944" Offset="1" />
+			</LinearGradientBrush>
+		</Border.Background>
 
-		<StackPanel
-			DataContext="{Binding Overview.CurrentActivityViewModel}"
-			Orientation="Horizontal"
-			DockPanel.Dock="Left">
-			<Button
-				x:Name="ActivityButton"
-				Style="{StaticResource GlassButton}"
-				Width="35" Height="35"
-				Click="SwitchActivityMenu">
-
-				<Button.Background>
-					<SolidColorBrush Color="{Binding Color}" />
-				</Button.Background>
-
-				<Image Source="{Binding Icon}" Width="23" Height="23" />
-			</Button>
-
-			<TextBox
-				x:Name="ActivityName"
-				Background="Transparent"
-				BorderBrush="Transparent"
-				Foreground="White"
-				CaretBrush="White"
-				IsEnabled="{Binding IsEditable}"
-				Text="{Binding Label}"
-				Margin="10, 0, 10, 0"
-				HorizontalAlignment="Center"
-				VerticalAlignment="Center"
-				PreviewKeyDown="LabelKeyDown">
-
-				<TextBox.Template>
-					<ControlTemplate TargetType="{x:Type TextBox}">
-						<ScrollViewer x:Name="PART_ContentHost" />
-					</ControlTemplate>
-				</TextBox.Template>
-			</TextBox>
-
-		</StackPanel>
-
-		<!-- Shown when the activity is being suspended. -->
-		<StackPanel
-			Orientation="Horizontal"
-			DockPanel.Dock="Right"
-			Visibility="{Binding Overview.ActivityMode,
-				Converter={converters:EnumHasFlagConverter Flag={x:Static overview:Mode.Suspending}, IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
-
-			<TextBlock
-				VerticalAlignment="Center"
-				Text="Suspending activity ... Please close all remaining open windows."
-				Margin="0, 0, 10, 0" />
-			<!-- TODO: Once CommandBinding is extended to support rebinding the command if the path changes, the DataContext binding of the Force Suspend Button can be removed. -->
-			<Button
-				DataContext="{Binding Overview.CurrentActivityViewModel}"
-				Height="26"
-				Padding="10, 0, 10, 0"
-				FontSize="15"
-				Content="Force Suspend"
-				Command="{wtc:CommandBinding {x:Static binding:Commands.ForceSuspend}}" />
-		</StackPanel>
-
-		<!-- Shows the open activites between which can be switched. -->
-		<StackPanel
-			Height="35"
-			Orientation="Horizontal"
-			DockPanel.Dock="Right"
-			HorizontalAlignment="Right"
-			Visibility="{Binding Overview.ActivityMode,
-				Converter={converters:EnumHasFlagConverter Flag={x:Static overview:Mode.Suspending}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
+		<DockPanel Margin="10, 0, 10, 0">
 
 			<StackPanel
-				Orientation="Horizontal">
+				DataContext="{Binding Overview.CurrentActivityViewModel}"
+				Orientation="Horizontal"
+				DockPanel.Dock="Left">
+				<Button
+					x:Name="ActivityButton"
+					Style="{StaticResource GlassButton}"
+					Width="35" Height="35"
+					Click="SwitchActivityMenu">
 
-				<TextBlock
-					Text="{Binding SelectedActivity.Label}"
-					Margin="0, 0, 20, 0"
-					VerticalAlignment="Center" />
+					<Button.Background>
+						<SolidColorBrush Color="{Binding Color}" />
+					</Button.Background>
 
-				<ItemsControl
-					x:Name="ItemsControlActivities"
-					ItemsSource="{Binding OpenPlusCurrentActivities}">
+					<Image Source="{Binding Icon}" Width="23" Height="23" />
+				</Button>
 
-					<ItemsControl.ItemsPanel>
-						<ItemsPanelTemplate>
-							<StackPanel
-								Orientation="Horizontal"
-								Visibility="{Binding
-									OpenPlusCurrentActivities.Count,
-									Converter={converters:SingleConditionConverter Expression='[0] > 1', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
-						</ItemsPanelTemplate>
-					</ItemsControl.ItemsPanel>
+				<TextBox
+					x:Name="ActivityName"
+					Background="Transparent"
+					BorderBrush="Transparent"
+					Foreground="White"
+					CaretBrush="White"
+					IsEnabled="{Binding IsEditable}"
+					Text="{Binding Label}"
+					Margin="10, 0, 10, 0"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					PreviewKeyDown="LabelKeyDown">
 
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Button
-								x:Name="ActivityButton"
-								Style="{StaticResource NoButtonHover}"
-								Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}"
-								MouseEnter="OnActivityHover"
-								MouseLeave="OnActivityHoverLeave">
-
-								<Button.Background>
-									<MultiBinding Converter="{StaticResource ActivityBackgroundConverter}">
-										<Binding />
-										<Binding Path="Color" />
-										<Binding ElementName="Control" Path="SelectedActivity" />
-									</MultiBinding>
-								</Button.Background>
-
-								<Button.BorderBrush>
-									<MultiBinding Converter="{StaticResource BorderBrushConverter}">
-										<Binding Path="IsActive" />
-										<Binding Path="NeedsSuspension" />
-										<Binding Path="HasUnattendedInterruptions" />
-										<Binding Path="IsOpen" />
-									</MultiBinding>
-								</Button.BorderBrush>
-
-								<Image
-									Cursor="Hand"
-									Source="{Binding Path=Icon}" />
-							</Button>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+					<TextBox.Template>
+						<ControlTemplate TargetType="{x:Type TextBox}">
+							<ScrollViewer x:Name="PART_ContentHost" />
+						</ControlTemplate>
+					</TextBox.Template>
+				</TextBox>
 
 			</StackPanel>
 
-			<Image
-				Cursor="Hand"
-				Source="{Binding Overview.HomeActivity.Icon}"
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}, Path=Overview.HomeActivity}"
-				Width="30" Height="30"
-				Margin="25, 0, 0, 0" />
+			<!-- Shown when the activity is being suspended. -->
+			<StackPanel
+				Orientation="Horizontal"
+				DockPanel.Dock="Right"
+				Visibility="{Binding Overview.ActivityMode,
+				Converter={converters:EnumHasFlagConverter Flag={x:Static overview:Mode.Suspending}, IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
-		</StackPanel>
+				<TextBlock
+					VerticalAlignment="Center"
+					Text="Suspending activity ... Please close all remaining open windows."
+					Margin="0, 0, 10, 0" />
+				<!-- TODO: Once CommandBinding is extended to support rebinding the command if the path changes, the DataContext binding of the Force Suspend Button can be removed. -->
+				<Button
+					DataContext="{Binding Overview.CurrentActivityViewModel}"
+					Height="26"
+					Padding="10, 0, 10, 0"
+					FontSize="15"
+					Content="Force Suspend"
+					Command="{wtc:CommandBinding {x:Static binding:Commands.ForceSuspend}}" />
+			</StackPanel>
 
-	</DockPanel>
+			<!-- Shows the open activites between which can be switched. -->
+			<StackPanel
+				Height="35"
+				Orientation="Horizontal"
+				DockPanel.Dock="Right"
+				HorizontalAlignment="Right"
+				Visibility="{Binding Overview.ActivityMode,
+				Converter={converters:EnumHasFlagConverter Flag={x:Static overview:Mode.Suspending}, IfTrue={x:Static Visibility.Collapsed}, IfFalse={x:Static Visibility.Visible}}}">
+
+				<StackPanel
+					Orientation="Horizontal">
+
+					<TextBlock
+						Text="{Binding SelectedActivity.Label}"
+						Margin="0, 0, 20, 0"
+						VerticalAlignment="Center" />
+
+					<ItemsControl
+						x:Name="ItemsControlActivities"
+						ItemsSource="{Binding OpenPlusCurrentActivities}">
+
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel
+									Orientation="Horizontal"
+									Visibility="{Binding
+									OpenPlusCurrentActivities.Count,
+									Converter={converters:SingleConditionConverter Expression='[0] > 1', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Hidden}}}" />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button
+									x:Name="ActivityButton"
+									Style="{StaticResource NoButtonHover}"
+									Command="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}}"
+									MouseEnter="OnActivityHover"
+									MouseLeave="OnActivityHoverLeave">
+
+									<Button.Background>
+										<MultiBinding Converter="{StaticResource ActivityBackgroundConverter}">
+											<Binding />
+											<Binding Path="Color" />
+											<Binding ElementName="Control" Path="SelectedActivity" />
+										</MultiBinding>
+									</Button.Background>
+
+									<Button.BorderBrush>
+										<MultiBinding Converter="{StaticResource BorderBrushConverter}">
+											<Binding Path="IsActive" />
+											<Binding Path="NeedsSuspension" />
+											<Binding Path="HasUnattendedInterruptions" />
+											<Binding Path="IsOpen" />
+										</MultiBinding>
+									</Button.BorderBrush>
+
+									<Image
+										Cursor="Hand"
+										Source="{Binding Path=Icon}" />
+								</Button>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal">
+					<common:NotificationButton
+						Cursor="Hand"
+						MinHeight="37"
+						Margin="0, 0, 10, 0"
+						ButtonImage="Images/Bell.png"
+						UnreadNotificationsCount="{Binding OpenPlusCurrentActivities[0].UnreadNotificationsCount}"
+						OpenNotificationsCommand="{wtc:CommandBinding {x:Static barBinding:Commands.ShowNotifications}}"
+						ButtonStyle="{StaticResource NoButtonHover}"/>
+
+					<Image
+						Cursor="Hand"
+						Source="{Binding Overview.HomeActivity.Icon}"
+						behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static binding:Commands.SelectActivity}, Path=Overview.HomeActivity}"
+						Width="30" Height="30" />
+				</StackPanel>
+			</StackPanel>
+
+		</DockPanel>
 	</Border>
 </Window>

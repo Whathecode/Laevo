@@ -543,6 +543,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\ActivityBar\Images\Bell.png" />
+    <Resource Include="View\Activity\Icons\Bell.png" />
     <Resource Include="View\ActivityOverview\Images\Bell.png" />
     <Resource Include="View\Common\Images\Unshare.png" />
     <Resource Include="View\Common\Images\Share.png" />
@@ -774,9 +776,7 @@
       <Name>Breakpoints</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="View\ActivityBar\Images\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(SolutionName)" == "Laevo With Project References" if "$(ConfigurationName)" == "Release" ruby "$(SolutionDir)UpdateLibraryDlls.rb" '$(ProjectDir)'</PostBuildEvent>
