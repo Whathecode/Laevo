@@ -21,7 +21,9 @@
 		OpenInterval,
 		AccessUsers,
 		ClaimedOwnership,
-		OwnedUsers
+		OwnedUsers,
+		Notifications,
+		UnreadNotificationsCount
 	}
 
 	public enum Commands

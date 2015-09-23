@@ -16,6 +16,7 @@ using ABC.Workspaces.Library;
 using Laevo.Data.View;
 using Laevo.View.Activity;
 using Laevo.ViewModel.ActivityOverview;
+using Laevo.ViewModel.Notification;
 using Laevo.ViewModel.User;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
@@ -296,6 +297,11 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.OwnedUsers )]
 		public ReadOnlyObservableCollection<UserViewModel> OwnedUsers { get; private set; }
 
+		[NotifyProperty( Binding.Properties.Notifications )]
+		public ObservableCollection<NotificationViewModel> Notifications { get; private set; }
+
+		[NotifyProperty( Binding.Properties.UnreadNotificationsCount )]
+		public int UnreadNotificationsCount { get; private set; }
 
 		static ActivityViewModel()
 		{
@@ -453,6 +459,13 @@ namespace Laevo.ViewModel.Activity
 			
 			// Initialize command manually, wtc command binding not working.
 			RemoveAccess = new RemoveAccessCommand(this);
+
+			Notifications = new ObservableCollection<NotificationViewModel>();
+			Notifications.CollectionChanged += ( sender, args ) =>
+			{
+				UnreadNotificationsCount = Notifications.Count;
+			};
+			Notifications.Add( new NotificationViewModel( 0 ) );
 		}
 
 

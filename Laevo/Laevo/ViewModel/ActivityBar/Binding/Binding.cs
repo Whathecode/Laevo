@@ -8,5 +8,8 @@ namespace Laevo.ViewModel.ActivityBar.Binding
 		Overview
 	}
 
-	public enum Commands { }
+	public enum Commands
+	{
+		ShowNotifications
+	}
 }
