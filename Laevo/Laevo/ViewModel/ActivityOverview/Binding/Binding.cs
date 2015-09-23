@@ -27,6 +27,6 @@
 		OpenHome,
 		OpenUserProfile,
 		OpenTimeLineSharing,
-		OpenNotifications
+		ShowNotifications
 	}
 }
