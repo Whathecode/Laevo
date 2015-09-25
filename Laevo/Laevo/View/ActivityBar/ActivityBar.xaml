@@ -218,7 +218,7 @@
 						MinHeight="37"
 						Margin="0, 0, 10, 0"
 						ButtonImage="Images/Bell.png"
-						UnreadNotificationsCount="{Binding OpenPlusCurrentActivities[0].UnreadNotificationsCount}"
+						NotificationsCount="{Binding OpenPlusCurrentActivities[0].Notifications.Count}"
 						OpenNotificationsCommand="{wtc:CommandBinding {x:Static barBinding:Commands.ShowNotifications}}"
 						ButtonStyle="{StaticResource NoButtonHover}"/>
 

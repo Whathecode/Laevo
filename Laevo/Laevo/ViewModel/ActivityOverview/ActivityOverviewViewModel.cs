@@ -145,9 +145,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		[NotifyProperty( Binding.Properties.Notifications )]
 		public ObservableCollection<NotificationViewModel> Notifications { get; private set; }
 
-		[NotifyProperty( Binding.Properties.UnreadNotificationsCount )]
-		public int UnreadNotificationsCount { get; private set; }
-
 
 		public bool IsDisabled
 		{
@@ -163,7 +160,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			_dataRepository = dataRepository;
 
 			Notifications = new ObservableCollection<NotificationViewModel>();
-			Notifications.CollectionChanged += ( sender, args ) => { UnreadNotificationsCount = Notifications.Count; };
 
 			// Set up home activity.
 			if ( _dataRepository.Home != null )
@@ -224,8 +220,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			_notificationList = new NotificationList
 			{
 				Notifications = Notifications,
-				ShowActivated = true,
-				WindowStartupLocation = WindowStartupLocation.Manual,
 				PopupImage = new BitmapImage( notificationListImageUri )
 			};
 		}
@@ -406,15 +400,32 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.DroppedOwnershipEvent -= OnDroppedOwnership;
 		}
 
-		public NotificationViewModel CreateNotificationViewModel( NotificationPopup notificationPopup, int index, object sender )
+		public void ShowNotification( NotificationViewModel notificationViewModel )
 		{
-			var notificationViewModel = new NotificationViewModel( index );
+			var notificationPopup = new NotificationPopup
+			{
+				DataContext = notificationViewModel
+			};
+			_notificationPopups.Add( notificationPopup );
+			HookNotificationPopup( notificationViewModel, notificationPopup );
+			notificationPopup.Show();
+		}
+
+		void HookNotificationPopup( NotificationViewModel notificationViewModel, NotificationPopup notificationPopup )
+		{
+			notificationViewModel.Index = _notificationPopups.Count;
+			notificationViewModel.PopupHiding += ( o, eventArgs ) =>
+			{
+				_notificationPopups.Remove( notificationPopup );
+				notificationPopup.Close();
+			};
+		}
+
+		public void HookNotification( NotificationViewModel notificationViewModel )
+		{
 			notificationViewModel.NewActivityCreating += ( o, eventArgs ) =>
 			{
 				var senderNotification = (NotificationViewModel)o;
-
-				_notificationPopups.Remove( notificationPopup );
-				notificationPopup.Close();
 
 				var activity = CreateNewActivity();
 				activity.Label = senderNotification.Summary;
@@ -430,9 +441,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				var senderNotification = (NotificationViewModel)o;
 
-				_notificationPopups.Remove( notificationPopup );
-				notificationPopup.Close();
-
 				var parent = HomeActivity;
 				var task = _model.CreateNewTask( parent.Activity );
 				task.Name = senderNotification.Summary;
@@ -442,19 +450,27 @@ namespace Laevo.ViewModel.ActivityOverview
 					ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
 					Label = senderNotification.Summary
 				};
+				AddActivity( newTask );
 				newTask.EditActivity();
 			};
-			notificationViewModel.NotificationHiding += ( o, eventArgs ) =>
-			{
-				_notificationPopups.Remove( notificationPopup );
-				notificationPopup.Close();
-			};
+
 			notificationViewModel.NotificationRemoving += ( o, args ) =>
 			{
-				_notificationPopups.Remove( notificationPopup );
-				notificationPopup.Close();
+				var senderNotification = (NotificationViewModel)o;
+				
+				// Remove notification from the overview.
+				Notifications.Remove( senderNotification );
+
+				// Remove notification from all the activities.
+				Activities.ForEach( activity => activity.Notifications.Remove( senderNotification ) );
+				// And from Home activity.
+				HomeActivity.Notifications.Remove( senderNotification );
 			};
-			return notificationViewModel;
+		}
+
+		void AssignNotificationToActivity( ActivityViewModel activityViewModel, NotificationViewModel notificationViewModel )
+		{
+			activityViewModel.Notifications.Add( notificationViewModel );
 		}
 
 		void HookActivityToOverview( ActivityViewModel activity )

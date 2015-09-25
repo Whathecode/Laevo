@@ -10,6 +10,9 @@
 	xmlns:notification="clr-namespace:Laevo.ViewModel.Notification"
 	xmlns:notification1="clr-namespace:Laevo.View.Notification"
 	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
+	xmlns:commandFactory="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
+	xmlns:b="clr-namespace:Laevo.ViewModel.Notification.Binding"
 	Foreground="White"
 	PopupImage="{Binding Image}"
 	Loaded="OnLoaded"
@@ -17,19 +20,34 @@
 	MouseEnter="OnMouseEnter"
 	MaxWidth="400"
 	Width="400"
-	MinWidth="400" 
+	MinWidth="400"
 	MinHeight="200"
 	MaxHeight="200"
 	Height="200">
 
+	<common:LaevoPopup.Resources>
+		<Style
+			x:Key="DissmissButton"
+			TargetType="Image"
+			BasedOn="{StaticResource CommandButton}">
+			<Setter Property="Source" Value="../Activity/ActionIcons/close.png" />
+			<Setter Property="RenderTransform" Value="{StaticResource ResizeActionIcon}" />
+		</Style>
+	</common:LaevoPopup.Resources>
+
 	<Grid>
+		<Canvas HorizontalAlignment="Right" VerticalAlignment="Top">
+			<Image
+				behaviors:MouseBehavior.LeftClickCommand="{commandFactory:CommandBinding {x:Static b:Commands.Dissmiss}}"
+				Style="{StaticResource DissmissButton}" Canvas.Top="-30" Width="35" Height="35" />
+		</Canvas>
 		<StackPanel Orientation="Vertical">
 			<TextBlock Text="{Binding Interrupter}" Margin="0, 0, 0, 10" />
 			<TextBlock
 				TextWrapping="Wrap"
 				MaxWidth="{Binding ElementName=ButtonsContainer, Path=ActualWidth}"
-				Text="{Binding Summary}" 
-				FontSize="12"/>
+				Text="{Binding Summary}"
+				FontSize="12" />
 		</StackPanel>
 		<Canvas Name="ButtonsCanvas">
 			<!-- Notification buttons. -->

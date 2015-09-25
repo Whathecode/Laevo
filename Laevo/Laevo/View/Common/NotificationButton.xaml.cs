@@ -10,8 +10,8 @@ namespace Laevo.View.Common
 	/// </summary>
 	public partial class NotificationButton
 	{
-		public static readonly DependencyProperty UnreadNotificationsCountProperty = DependencyProperty.Register(
-			"UnreadNotificationsCount", typeof( string ),
+		public static readonly DependencyProperty NotificationsCountProperty = DependencyProperty.Register(
+			"NotificationsCount", typeof( int ),
 			typeof( NotificationButton ) );
 
 		public static readonly DependencyProperty ButtonImageProperty = DependencyProperty.Register(
@@ -26,10 +26,10 @@ namespace Laevo.View.Common
 			"ButtonStyle", typeof( Style ),
 			typeof( NotificationButton ) );
 
-		public string UnreadNotificationsCount
+		public int NotificationsCount
 		{
-			get { return GetValue( UnreadNotificationsCountProperty ).ToString(); }
-			set { SetValue( UnreadNotificationsCountProperty, value ); }
+			get { return (int)GetValue( NotificationsCountProperty ); }
+			set { SetValue( NotificationsCountProperty, value ); }
 		}
 
 		public ImageSource ButtonImage

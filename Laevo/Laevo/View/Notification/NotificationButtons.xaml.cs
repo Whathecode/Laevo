@@ -1,8 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Input;
-
-
-namespace Laevo.View.Notification
+﻿namespace Laevo.View.Notification
 {
 	/// <summary>
 	/// Interaction logic for NotificationButtons.xaml
@@ -12,11 +8,6 @@ namespace Laevo.View.Notification
 		public NotificationButtons()
 		{
 			InitializeComponent();
-		}
-
-		void SetFocus( object sender, MouseButtonEventArgs e )
-		{
-			( (UIElement)e.Source ).Focus();
 		}
 	}
 }

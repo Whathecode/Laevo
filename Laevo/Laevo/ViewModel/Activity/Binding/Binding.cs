@@ -22,8 +22,7 @@
 		AccessUsers,
 		ClaimedOwnership,
 		OwnedUsers,
-		Notifications,
-		UnreadNotificationsCount
+		Notifications
 	}
 
 	public enum Commands

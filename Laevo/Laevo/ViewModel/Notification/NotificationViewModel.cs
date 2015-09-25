@@ -23,7 +23,10 @@ namespace Laevo.ViewModel.Notification
 
 		public event EventHandler<EventArgs> NewTaskCreating;
 
-		public event EventHandler<EventArgs> NotificationHiding;
+		/// <summary>
+		/// Event triggered when a notification pop-up panel needs to be closed.
+		/// </summary>
+		public event EventHandler<EventArgs> PopupHiding;
 
 		public event EventHandler<EventArgs> NotificationRemoving;
 
@@ -38,15 +41,15 @@ namespace Laevo.ViewModel.Notification
 		public string Interrupter { get; private set; }
 
 		[NotifyProperty( Binding.Properties.Summary )]
-		public string Summary { get; private set; }
+		public string Summary { get; set; }
 
 		[NotifyProperty( Binding.Properties.Index )]
-		public int Index { get; private set; }
+		public int Index { get; set; }
 
 		[NotifyProperty( Binding.Properties.IsRead )]
 		public bool IsRead { get; private set; }
 
-		public NotificationViewModel( int index )
+		public NotificationViewModel()
 		{
 			// Initialize notification view model with the dummy data. 
 			Interrupter = "Dominik Grondziowski";
@@ -55,31 +58,35 @@ namespace Laevo.ViewModel.Notification
 			          " Some Interruption summary. Some Interruption summary";
 			var uriSource = new Uri( @"/Laevo;component/View/Common/Images/Alert.png", UriKind.Relative );
 			Image = new BitmapImage( uriSource );
-			Index = index;
 		}
 
 		[CommandExecute( Commands.NewActivity )]
 		public void NewActivity()
 		{
+			NotificationRemoving( this, new EventArgs() );
 			NewActivityCreating( this, new EventArgs() );
+			PopupHiding( this, new EventArgs() );
 		}
 
 		[CommandExecute( Commands.NewTask )]
 		public void NewTask()
 		{
+			NotificationRemoving( this, new EventArgs() );
 			NewTaskCreating( this, new EventArgs() );
+			PopupHiding( this, new EventArgs() );
 		}
 
 		[CommandExecute( Commands.Dissmiss )]
 		public void Dissmiss()
 		{
-			NotificationHiding( this, new EventArgs() );
+			PopupHiding( this, new EventArgs() );
 		}
 
 		[CommandExecute( Commands.Remove )]
 		public void Remove()
 		{
 			NotificationRemoving( this, new EventArgs() );
+			PopupHiding( this, new EventArgs() );
 		}
 	}
 }

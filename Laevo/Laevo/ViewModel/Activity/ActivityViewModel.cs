@@ -300,8 +300,6 @@ namespace Laevo.ViewModel.Activity
 		[NotifyProperty( Binding.Properties.Notifications )]
 		public ObservableCollection<NotificationViewModel> Notifications { get; private set; }
 
-		[NotifyProperty( Binding.Properties.UnreadNotificationsCount )]
-		public int UnreadNotificationsCount { get; private set; }
 
 		static ActivityViewModel()
 		{
@@ -461,11 +459,6 @@ namespace Laevo.ViewModel.Activity
 			RemoveAccess = new RemoveAccessCommand(this);
 
 			Notifications = new ObservableCollection<NotificationViewModel>();
-			Notifications.CollectionChanged += ( sender, args ) =>
-			{
-				UnreadNotificationsCount = Notifications.Count;
-			};
-			Notifications.Add( new NotificationViewModel( 0 ) );
 		}
 
 

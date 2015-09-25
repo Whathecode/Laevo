@@ -30,5 +30,17 @@ namespace Laevo.View.Common
 		{
 			Hide();
 		}
+
+		void OnLoaded( object sender, RoutedEventArgs e )
+		{
+			Notifications.CollectionChanged += ( o, args ) =>
+			{
+				if ( Notifications != null && Notifications.Count == 0 )
+				{
+					if ( IsVisible )
+						Hide();
+				}
+			};
+		}
 	}
 }

@@ -15,8 +15,7 @@
 		CurrentActivityViewModel,
 		TimeLineRenderScale,
 		EnableAttentionLines,
-		Notifications,
-		UnreadNotificationsCount
+		Notifications
 	}
 
 	public enum Commands
