@@ -10,11 +10,12 @@
 	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	mc:Ignorable="d"
 	Title="NotificationsList"
-	Width="500"
+	MinWidth="500"
 	MaxWidth="500"
 	Topmost="False" 
 	DataContext="{Binding RelativeSource={RelativeSource Self}}"
-	Deactivated="OnDeactivated">
+	Deactivated="OnDeactivated"
+	Loaded="OnLoaded">
 
 	<ItemsControl
 		ItemsSource="{Binding Notifications}">
@@ -63,7 +64,7 @@
 								</StackPanel>
 
 								<!--Notification buttons.-->
-								<Canvas HorizontalAlignment="Right" Width="135">
+								<Canvas HorizontalAlignment="Right" Width="100">
 									<notification:NotificationButtons
 										DataContext="{Binding}"
 										x:Name="Buttons">

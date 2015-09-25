@@ -121,7 +121,7 @@
 			<common:NotificationButton 
 				Margin="5, 0, 5, 0" 
 				ButtonImage="Images/Bell.png" 
-				UnreadNotificationsCount="{Binding ElementName=Control, Path=DataContext.UnreadNotificationsCount}"
+				NotificationsCount="{Binding ElementName=Control, Path=DataContext.Notifications.Count}"
 				OpenNotificationsCommand="{pf:CommandBinding {x:Static binding:Commands.ShowNotifications}}"
 				ButtonStyle="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
 		</StackPanel>

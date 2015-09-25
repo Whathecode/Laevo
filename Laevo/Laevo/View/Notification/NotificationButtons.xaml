@@ -4,7 +4,6 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
 	xmlns:behaviors="clr-namespace:Whathecode.System.Xaml.Behaviors;assembly=Whathecode.PresentationFramework"
 	xmlns:wtc="clr-namespace:Whathecode.System.Windows.Input.CommandFactory;assembly=Whathecode.PresentationFramework"
 	xmlns:b="clr-namespace:Laevo.ViewModel.Notification.Binding"
@@ -16,19 +15,6 @@
 		Orientation="Horizontal">
 
 		<StackPanel.Resources>
-			<ScaleTransform
-				x:Key="ResizeActionIcon"
-				ScaleX="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Image}}, Path=IsMouseOver, Converter={data:FromBooleanConverter IfTrue=1, IfFalse=0.75}}"
-				ScaleY="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Image}}, Path=IsMouseOver, Converter={data:FromBooleanConverter IfTrue=1, IfFalse=0.75}}" />
-
-			<Style
-				x:Key="CommandButton"
-				TargetType="Image">
-				<Setter Property="Focusable" Value="True" />
-				<Setter Property="Cursor" Value="Hand" />
-				<EventSetter Event="PreviewMouseDown" Handler="SetFocus" />
-				<Setter Property="Margin" Value="3, 0, 0, 0" />
-			</Style>
 			<Style
 				x:Key="NewActivityButton"
 				TargetType="Image"
@@ -50,13 +36,6 @@
 				<Setter Property="Source" Value="../Activity/ActionIcons/delete.png" />
 				<Setter Property="RenderTransform" Value="{StaticResource ResizeActionIcon}" />
 			</Style>
-			<Style
-				x:Key="DissmissButton"
-				TargetType="Image"
-				BasedOn="{StaticResource CommandButton}">
-				<Setter Property="Source" Value="../Activity/ActionIcons/close.png" />
-				<Setter Property="RenderTransform" Value="{StaticResource ResizeActionIcon}" />
-			</Style>
 		</StackPanel.Resources>
 
 		<!-- Buttons. -->
@@ -70,9 +49,7 @@
 			<Image
 				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Remove}}"
 				Style="{StaticResource RemoveButton}" />
-			<Image
-				behaviors:MouseBehavior.LeftClickCommand="{wtc:CommandBinding {x:Static b:Commands.Dissmiss}}"
-				Style="{StaticResource DissmissButton}" />
+
 		</StackPanel>
 	</StackPanel>
 </UserControl>

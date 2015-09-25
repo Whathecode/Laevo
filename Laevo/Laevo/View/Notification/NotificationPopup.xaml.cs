@@ -46,7 +46,7 @@ namespace Laevo.View.Notification
 
 			// Hack, since it is impossible to bind to the "To" and "From" properties logic has to be handled here.
 			// DataContext index is used for queuing the notifications in a column. 
-			Top = _workingAreaHeight - ActualHeight -  ( dataContext.Index - 1 ) * ActualHeight;
+			Top = _workingAreaHeight - ActualHeight -  ( dataContext.Index - 1  ) * ActualHeight;
 			Left = _workingAreaWidth - Width;
 
 			ShowNotification();

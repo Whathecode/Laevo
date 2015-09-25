@@ -5,6 +5,8 @@
 	xmlns:converters="clr-namespace:Laevo.View.Activity.Converters"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:converters1="clr-namespace:Laevo.View.Common.Converters"
 	mc:Ignorable="d">
 
 	<!-- Common brushes. -->
@@ -88,4 +90,17 @@
 		<Setter Property="Padding" Value="10, 0, 10, 0" />
 	</Style>
 
+	<ScaleTransform
+		x:Key="ResizeActionIcon"
+		ScaleX="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Image}}, Path=IsMouseOver, Converter={data:FromBooleanConverter IfTrue=1, IfFalse=0.75}}"
+		ScaleY="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Image}}, Path=IsMouseOver, Converter={data:FromBooleanConverter IfTrue=1, IfFalse=0.75}}" />
+
+	<Style
+		x:Key="CommandButton"
+		TargetType="Image">
+		<Setter Property="Focusable" Value="True" />
+		<Setter Property="Cursor" Value="Hand" />
+		<Setter Property="Margin" Value="3, 0, 0, 0" />
+	</Style>
+	
 </ResourceDictionary>

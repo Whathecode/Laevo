@@ -76,8 +76,6 @@ namespace Laevo.ViewModel.ActivityBar
 			_notificationList = new NotificationList
 			{
 				Notifications = OpenPlusCurrentActivities[ 0 ].Notifications,
-				ShowActivated = true,
-				WindowStartupLocation = WindowStartupLocation.Manual,
 				PopupImage = new BitmapImage( notificationListImageUri )
 			};
 		}

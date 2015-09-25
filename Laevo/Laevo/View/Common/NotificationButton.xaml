@@ -5,33 +5,41 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:common="clr-namespace:Laevo.View.Common"
+	xmlns:converters="clr-namespace:Laevo.View.Common.Converters"
 	mc:Ignorable="d">
 
 	<UserControl.Resources>
+		<converters:NumberToVisibilityConverter x:Key="NotificationCounterConverter" />
+		<converters:ToStringConverter x:Key="ToStringConverter" />
 		<Style TargetType="common:NotificationButton">
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="common:NotificationButton">
 
 						<StackPanel MinWidth="47">
+
 							<Canvas
 								VerticalAlignment="Top"
 								Left="40"
-								ZIndex="1">
+								ZIndex="1" 
+								Visibility="{TemplateBinding NotificationsCount, Converter={StaticResource NotificationCounterConverter}}">
+
 								<Border
 									CornerRadius="999"
 									Width="20"
 									Height="20"
 									BorderThickness="1"
 									BorderBrush="White"
-									Canvas.Left="25">
+									Canvas.Left="25"
+									Background="Red">
 									<TextBlock
-										Foreground="White"
+										FontFamily="Arial"
 										FontWeight="Bold"
 										FontSize="12"
-										Text="{TemplateBinding UnreadNotificationsCount}"
+										Text="{TemplateBinding NotificationsCount, Converter={StaticResource ToStringConverter}}"
 										HorizontalAlignment="Center"
-										VerticalAlignment="Center" />
+										VerticalAlignment="Center"
+										TextAlignment="Center" />
 								</Border>
 							</Canvas>
 
@@ -42,7 +50,7 @@
 								<Image Source="{TemplateBinding ButtonImage}" />
 							</Button>
 						</StackPanel>
-						
+
 					</ControlTemplate>
 				</Setter.Value>
 			</Setter>
