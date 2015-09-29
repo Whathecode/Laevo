@@ -51,6 +51,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,7 +62,7 @@
   <ItemGroup>
     <Compile Include="Aggregator\BreakpointManagerAggregator.cs" />
     <Compile Include="Common\Breakpoint.cs" />
-    <Compile Include="Common\BreakpointEventArgs.cs" />
+    <Compile Include="Common\BreakpointInterruptionEventArgs.cs" />
     <Compile Include="Common\BreakpointType.cs" />
     <Compile Include="Common\DelegateSource.cs" />
     <Compile Include="Common\ManagerType.cs" />
@@ -75,14 +76,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\ABC\ABC\ABC\ABC.csproj">
+      <Project>{D53F1095-6DC0-4950-982F-3322AAE74A50}</Project>
+      <Name>ABC</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj">
       <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
       <Name>Whathecode.System</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

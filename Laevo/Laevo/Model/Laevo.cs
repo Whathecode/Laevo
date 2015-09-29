@@ -11,6 +11,8 @@ using ABC.Workspaces;
 using ABC.Workspaces.Library;
 using ABC.Workspaces.Windows;
 using ABC.Workspaces.Windows.Settings;
+using Breakpoints.Aggregator;
+using Breakpoints.Common;
 using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
@@ -19,7 +21,6 @@ using NLog;
 using Whathecode.System;
 using Whathecode.System.Extensions;
 using Whathecode.System.Management;
-using Whathecode.System.Windows.Threading;
 
 
 namespace Laevo.Model
@@ -92,6 +93,9 @@ namespace Laevo.Model
 		readonly List<Activity> _visibleActivities = new List<Activity>();
 
 
+		public BreakpointManagerAggregator Aggregator { get; private set; }
+
+
 		public Laevo( string dataFolder, IModelRepository dataRepository, InterruptionAggregator interruptionTrigger,
 			AbstractPersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
 		{
@@ -159,20 +163,15 @@ namespace Laevo.Model
 			ChangeVisibleTimeLine( HomeActivity );
 			HomeActivity.View();
 
+			Aggregator = new BreakpointManagerAggregator();
+
 			// Set up interruption handlers.
 			_interruptionTrigger.InterruptionReceived += ( sender, interruption ) =>
 			{
-				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
-				var newActivity = _dataRepository.CreateNewActivity( interruption.Name, HomeActivity );
-				newActivity.MakeToDo();
-				newActivity.AddInterruption( interruption );
-				DispatcherHelper.SafeDispatch( _dispatcher, () =>
-				{
-					HandleActivity( newActivity );
-					InterruptionAdded( newActivity );
-					// TODO: This event should probably be removed and some other mechanism should be used.
-				} );
+
+				// TODO: Assign properly the breakpoint level, for now all are coarse.
+				Aggregator.RegisterInterruption( interruption, BreakpointType.Coarse );
 			};
 
 			// Start tracking processes.
@@ -190,6 +189,13 @@ namespace Laevo.Model
 			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
 		}
 
+		public class TestInterruption : AbstractInterruption
+		{
+			public TestInterruption( string name )
+				: base( name ) {}
+
+			protected override void OnInterruptionOpened() {}
+		}
 
 		public const int SnapToMinutes = 15;
 
