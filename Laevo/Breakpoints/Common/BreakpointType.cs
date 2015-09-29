@@ -7,6 +7,7 @@ namespace Breakpoints.Common
 	{
 		Coarse = 1,
 		Medium = 2,
-		Fine = 4
+		Fine = 4,
+		None = 7
 	}
 }

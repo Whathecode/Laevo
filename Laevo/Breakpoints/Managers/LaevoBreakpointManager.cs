@@ -1,26 +1,20 @@
 ﻿using System;
-using Breakpoints.Common;
 
 
 namespace Breakpoints.Managers
 {
 	public class LaevoBreakpointManager : AbstarctBreakpointManager
 	{
-		readonly ManagerType _type;
+		readonly Guid _guid;
 
-		public LaevoBreakpointManager()
+		public LaevoBreakpointManager( Guid guid )
 		{
-			_type = ManagerType.Laevo;
+			_guid = guid;
 		}
 
-		public override bool PredictBreakpoint()
+		public override Guid Guid
 		{
-			throw new NotImplementedException();
-		}
-
-		public override ManagerType BreakpintType
-		{
-			get { return _type; }
+			get { return _guid; }
 		}
 	}
 }
