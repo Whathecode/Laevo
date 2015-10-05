@@ -399,6 +399,9 @@
     <Compile Include="Data\View\IViewRepository.cs" />
     <Compile Include="Data\PersistenceException.cs" />
     <Compile Include="GlobalAspects.cs" />
+    <Compile Include="Interruptions\InterruptionActivityCompare.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="LaevoController.cs" />
     <Compile Include="Logging\FullContextLayoutRenderer.cs" />
     <Compile Include="Logging\LogData.cs" />
