@@ -9,7 +9,7 @@ namespace Laevo.ViewModel.Notification.Binding
 		Summary,
 		Interrupter,
 		Index,
-		IsRead
+		ImportanceLevel
 	}
 
 	public enum Commands

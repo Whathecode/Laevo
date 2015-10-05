@@ -438,6 +438,7 @@
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveViewModel.cs" />
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveWindow.cs" />
     <Compile Include="ViewModel\Notification\Binding\Binding.cs" />
+    <Compile Include="ViewModel\Notification\ImportanceLevel.cs" />
     <Compile Include="ViewModel\Notification\NotificationEventArgs.cs" />
     <Compile Include="ViewModel\Notification\NotificationViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />

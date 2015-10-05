@@ -46,8 +46,8 @@ namespace Laevo.ViewModel.Notification
 		[NotifyProperty( Binding.Properties.Index )]
 		public int Index { get; set; }
 
-		[NotifyProperty( Binding.Properties.IsRead )]
-		public bool IsRead { get; private set; }
+		[NotifyProperty( Binding.Properties.ImportanceLevel )]
+		public ImportanceLevel ImportanceLevel { get; set; }
 
 		public NotificationViewModel()
 		{
