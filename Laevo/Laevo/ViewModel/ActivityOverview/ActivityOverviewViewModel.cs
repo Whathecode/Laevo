@@ -75,9 +75,14 @@ namespace Laevo.ViewModel.ActivityOverview
 		public event Action NoCurrentActiveActivityEvent;
 
 		/// <summary>
-		///   Event which is triggered when pop-up window is shown;
+		///   Event which is triggered when pop-up window is shown.
 		/// </summary>
 		public event Action ShowingPopupEvent;
+
+		/// <summary>
+		///   Event which is triggered when pop-up window is being closed.
+		/// </summary>
+		public event Action ClosedPopupEvent;
 
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
@@ -162,6 +167,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly NotificationList _notificationList;
 		readonly Dictionary<ActivityViewModel, LaevoBreakpointManager> _activityBreakpointManagers = new Dictionary<ActivityViewModel, LaevoBreakpointManager>();
 
+		int _isImportant;
+
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
@@ -183,11 +190,16 @@ namespace Laevo.ViewModel.ActivityOverview
 				{
 					Summary = args.Interruption.Name
 				};
+				_isImportant++;
 				HookNotification( notificationViewModel );
-				Notifications.Add( notificationViewModel );
+				Dispatcher.CurrentDispatcher.BeginInvoke( new Action( () =>
+				{
+					Notifications.Add( notificationViewModel );
 
-				// TODO: Decide if show a notification pop-up accordingly to the interruption importance (for now show for all).
-				ShowNotification( notificationViewModel );
+					// TODO: Decide if show a notification pop-up accordingly to the interruption importance (for now show for all).
+					ShowNotification( notificationViewModel );
+				} ) );
+
 
 				// TODO: Properly assign a notification to a specific activity if any (for now all go to the home activity).
 				HomeActivity.Notifications.Add( notificationViewModel );
@@ -198,7 +210,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_model.Aggregator.AddManager( overviewLaevoBreakpointManager );
 			// Medium events.
 			overviewLaevoBreakpointManager.RegisterBreakpoint( "ActivatedActivityEvent", this, BreakpointType.Medium );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "ShowingPopupEvent", this, BreakpointType.Medium );
+			overviewLaevoBreakpointManager.RegisterBreakpoint( "ClosedPopupEvent", this, BreakpointType.Medium );
 			overviewLaevoBreakpointManager.RegisterBreakpoint( "ActivityCreatedEvent", this, BreakpointType.Medium );
 			// Coarse events.
 			overviewLaevoBreakpointManager.RegisterBreakpoint( "RemovedActivityEvent", this, BreakpointType.Coarse );
@@ -360,6 +372,10 @@ namespace Laevo.ViewModel.ActivityOverview
 				IsUnnamed = true
 			};
 			AddActivity( newTask );
+
+			ActivityCreatedEvent( newTask );
+
+			_model.Aggregator.RegisterInterruption( new Model.Laevo.TestInterruption( "test name" ), BreakpointType.Fine );
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -391,6 +407,8 @@ namespace Laevo.ViewModel.ActivityOverview
 		[CommandExecute( Commands.ShowNotifications )]
 		public void ShowNotifications()
 		{
+			_notificationPopups.ForEach( notificationPopup => { notificationPopup.Close(); } );
+			Dispatcher.CurrentDispatcher.BeginInvoke( new Action( () => _notificationPopups.Clear() ) );
 			_notificationList.Show();
 		}
 
@@ -690,6 +708,7 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		public void ShowPopup( LaevoPopup popup )
 		{
+			popup.Closed += ( sender, args ) => { ClosedPopupEvent(); };
 			ShowingPopupEvent();
 			ActivityMode |= Mode.Inactive;
 			popup.ShowDialog();
