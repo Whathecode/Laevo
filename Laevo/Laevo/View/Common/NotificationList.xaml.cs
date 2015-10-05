@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Forms;
 using Laevo.ViewModel.Notification;
 
 
@@ -21,9 +22,12 @@ namespace Laevo.View.Common
 			set { SetValue( NotificationsProperty, value ); }
 		}
 
+		readonly double _workingAreaHeight = Screen.PrimaryScreen.WorkingArea.Height;
+
 		public NotificationList()
 		{
 			InitializeComponent();
+			WindowStartupLocation = WindowStartupLocation.Manual;
 		}
 
 		void OnDeactivated( object sender, EventArgs e )
@@ -33,6 +37,8 @@ namespace Laevo.View.Common
 
 		void OnLoaded( object sender, RoutedEventArgs e )
 		{
+			MaxHeight = _workingAreaHeight / 3;
+
 			Notifications.CollectionChanged += ( o, args ) =>
 			{
 				if ( Notifications != null && Notifications.Count == 0 )

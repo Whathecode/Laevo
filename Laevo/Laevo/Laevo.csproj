@@ -482,6 +482,7 @@
     <Compile Include="View\Activity\Converters\DisconnectedConverter.cs" />
     <Compile Include="View\Common\Common.cs" />
     <Compile Include="View\Common\Converters\NumberToVisibilityConverter.cs" />
+    <Compile Include="View\Common\Converters\ReverseListConverter.cs" />
     <Compile Include="View\Common\Converters\ToStringConverter.cs" />
     <Compile Include="View\Common\LaevoPopup.cs" />
     <Compile Include="View\Common\NotificationButton.xaml.cs">

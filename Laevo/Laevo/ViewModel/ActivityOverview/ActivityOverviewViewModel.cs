@@ -167,8 +167,6 @@ namespace Laevo.ViewModel.ActivityOverview
 		readonly NotificationList _notificationList;
 		readonly Dictionary<ActivityViewModel, LaevoBreakpointManager> _activityBreakpointManagers = new Dictionary<ActivityViewModel, LaevoBreakpointManager>();
 
-		int _isImportant;
-
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
@@ -190,7 +188,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				{
 					Summary = args.Interruption.Name
 				};
-				_isImportant++;
 				HookNotification( notificationViewModel );
 				Dispatcher.CurrentDispatcher.BeginInvoke( new Action( () =>
 				{

@@ -8,83 +8,221 @@
 	xmlns:common="clr-namespace:Laevo.View.Common"
 	xmlns:notification="clr-namespace:Laevo.View.Notification"
 	xmlns:data="clr-namespace:Whathecode.System.Windows.Data;assembly=Whathecode.PresentationFramework"
+	xmlns:converters="clr-namespace:Laevo.View.Common.Converters"
 	mc:Ignorable="d"
 	Title="NotificationsList"
 	MinWidth="500"
 	MaxWidth="500"
-	Topmost="False" 
+	Topmost="False"
 	DataContext="{Binding RelativeSource={RelativeSource Self}}"
 	Deactivated="OnDeactivated"
 	Loaded="OnLoaded">
 
-	<ItemsControl
-		ItemsSource="{Binding Notifications}">
-		<ItemsControl.ItemsPanel>
-			<ItemsPanelTemplate>
-				<StackPanel />
-			</ItemsPanelTemplate>
-		</ItemsControl.ItemsPanel>
+	<common:LaevoPopup.Resources>
+		<converters:ReverseListConverter x:Key="ReverseListConverter"/>
+		<Style x:Key="ScrollBarTrackThumb"
+        TargetType="{x:Type Thumb}">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Thumb}">
+						<Grid x:Name="Grid">
+							<Rectangle HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Width="Auto"
+                                Height="Auto"
+                                Fill="Transparent" />
+							<Border x:Name="CornerScrollBarRectangle"
+                            CornerRadius="5"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Width="Auto"
+                            Height="Auto"
+                            Margin="0,1,0,1"
+                            Background="{TemplateBinding Background}" />
+						</Grid>
+						<ControlTemplate.Triggers>
+							<Trigger Property="Tag"
+                                Value="Horizontal">
+								<Setter TargetName="CornerScrollBarRectangle"
+                                Property="Width"
+                                Value="Auto" />
+								<Setter TargetName="CornerScrollBarRectangle"
+                                Property="Height"
+                                Value="6" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style TargetType="{x:Type ScrollBar}">
+			<Setter Property="Stylus.IsFlicksEnabled"
+            Value="false" />
+			<Setter Property="Foreground"
+            Value="DarkGray" />
+			<Setter Property="Background"
+            Value="Transparent" />
+			<Setter Property="Width"
+            Value="7" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ScrollBar}">
+						<Grid x:Name="GridRoot"
+                        Width="7"
+                        Background="{TemplateBinding Background}">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="0.00001*" />
+							</Grid.RowDefinitions>
+							<Track x:Name="PART_Track"
+                            Grid.Row="0"
+                            IsDirectionReversed="true"
+                            Focusable="false">
+								<Track.Thumb>
+									<Thumb x:Name="Thumb"
+                                    Background="{TemplateBinding Foreground}"
+                                    Style="{DynamicResource ScrollBarTrackThumb}" />
+								</Track.Thumb>
+								<Track.IncreaseRepeatButton>
+									<RepeatButton x:Name="PageUp"
+                                            Command="ScrollBar.PageDownCommand"
+                                            Opacity="0"
+                                            Focusable="false" />
+								</Track.IncreaseRepeatButton>
+								<Track.DecreaseRepeatButton>
+									<RepeatButton x:Name="PageDown"
+                                            Command="ScrollBar.PageUpCommand"
+                                            Opacity="0"
+                                            Focusable="false" />
+								</Track.DecreaseRepeatButton>
+							</Track>
+						</Grid>
+						<ControlTemplate.Triggers>
+							<Trigger SourceName="Thumb"
+                                Property="IsMouseOver"
+                                Value="true">
+								<Setter Value="{DynamicResource ButtonSelectBrush}"
+                                TargetName="Thumb"
+                                Property="Background" />
+							</Trigger>
+							<Trigger SourceName="Thumb"
+                                Property="IsDragging"
+                                Value="true">
+								<Setter Value="{DynamicResource DarkBrush}"
+                                TargetName="Thumb"
+                                Property="Background" />
+							</Trigger>
 
-		<ItemsControl.ItemTemplate>
-			<DataTemplate>
-				<Border
-					BorderThickness="1"
-					CornerRadius="1"
-					Margin="0,0,0,2">
+							<Trigger Property="IsEnabled"
+                                Value="false">
+								<Setter TargetName="Thumb"
+                                Property="Visibility"
+                                Value="Collapsed" />
+							</Trigger>
+							<Trigger Property="Orientation"
+                                Value="Horizontal">
+								<Setter TargetName="GridRoot"
+                                Property="LayoutTransform">
+									<Setter.Value>
+										<RotateTransform Angle="-90" />
+									</Setter.Value>
+								</Setter>
+								<Setter TargetName="PART_Track"
+                                Property="LayoutTransform">
+									<Setter.Value>
+										<RotateTransform Angle="-90" />
+									</Setter.Value>
+								</Setter>
+								<Setter Property="Width"
+                                Value="Auto" />
+								<Setter Property="Height"
+                                Value="8" />
+								<Setter TargetName="Thumb"
+                                Property="Tag"
+                                Value="Horizontal" />
+								<Setter TargetName="PageDown"
+                                Property="Command"
+                                Value="ScrollBar.PageLeftCommand" />
+								<Setter TargetName="PageUp"
+                                Property="Command"
+                                Value="ScrollBar.PageRightCommand" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</common:LaevoPopup.Resources>
+	
+	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" >
 
-					<Border.BorderBrush>
-						<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-							<GradientStop Offset="0" Color="Gray" />
-							<GradientStop Offset="1" Color="Transparent" />
-						</LinearGradientBrush>
-					</Border.BorderBrush>
+		<ItemsControl ItemsSource="{Binding Notifications, Converter={StaticResource ReverseListConverter}}" >
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel />
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
 
-					<MenuItem Name="MenuItem" Margin="5">
-						<MenuItem.Icon>
-							<Image
-								Margin="0, 0, 5, 0"
-								Source="{Binding Image}"
-								Width="32" Height="32"
-								HorizontalAlignment="Center"
-								VerticalAlignment="Center" />
-						</MenuItem.Icon>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Border
+						BorderThickness="1"
+						CornerRadius="1"
+						Margin="0,0,0,2">
 
-						<MenuItem.Header>
+						<Border.BorderBrush>
+							<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
+								<GradientStop Offset="0" Color="Gray" />
+								<GradientStop Offset="1" Color="Transparent" />
+							</LinearGradientBrush>
+						</Border.BorderBrush>
 
-							<Grid Margin="0, 0, -55, 0">
-								<StackPanel HorizontalAlignment="Stretch">
-									<AccessText
-										Margin="0, 0, 0, 20"
-										Text="{Binding Interrupter}" />
-									<TextBlock
-										TextWrapping="Wrap"
-										MaxWidth="{Binding ElementName=ItemsControlActivities, Path=ActualWidth}"
-										Text="{Binding Summary}"
-										FontSize="13" />
-								</StackPanel>
+						<MenuItem Name="MenuItem" Margin="5">
+							<MenuItem.Icon>
+								<Image
+									Margin="0, 0, 5, 0"
+									Source="{Binding Image}"
+									Width="32" Height="32"
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center" />
+							</MenuItem.Icon>
 
-								<!--Notification buttons.-->
-								<Canvas HorizontalAlignment="Right" Width="100">
-									<notification:NotificationButtons
-										DataContext="{Binding}"
-										x:Name="Buttons">
-										<notification:NotificationButtons.Visibility>
-											<MultiBinding
-												Converter="{data:ConditionConverter Expression='[0] || [1]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
-												<Binding ElementName="MenuItem" Path="IsMouseOver" />
-												<Binding ElementName="Buttons" Path="IsMouseOver" />
-											</MultiBinding>
-										</notification:NotificationButtons.Visibility>
-									</notification:NotificationButtons>
-								</Canvas>
-							</Grid>
+							<MenuItem.Header>
 
-						</MenuItem.Header>
+								<Grid Margin="0, 0, -55, 0">
+									<StackPanel HorizontalAlignment="Stretch">
+										<AccessText
+											Margin="0, 0, 0, 20"
+											Text="{Binding Interrupter}" />
+										<TextBlock
+											TextWrapping="Wrap"
+											MaxWidth="{Binding ElementName=ItemsControlActivities, Path=ActualWidth}"
+											Text="{Binding Summary}"
+											FontSize="13" />
+									</StackPanel>
 
-					</MenuItem>
-				</Border>
-			</DataTemplate>
-		</ItemsControl.ItemTemplate>
+									<!--Notification buttons.-->
+									<Canvas HorizontalAlignment="Right" Width="100">
+										<notification:NotificationButtons
+											DataContext="{Binding}"
+											x:Name="Buttons">
+											<notification:NotificationButtons.Visibility>
+												<MultiBinding
+													Converter="{data:ConditionConverter Expression='[0] || [1]', IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}">
+													<Binding ElementName="MenuItem" Path="IsMouseOver" />
+													<Binding ElementName="Buttons" Path="IsMouseOver" />
+												</MultiBinding>
+											</notification:NotificationButtons.Visibility>
+										</notification:NotificationButtons>
+									</Canvas>
+								</Grid>
 
-	</ItemsControl>
+							</MenuItem.Header>
+
+						</MenuItem>
+					</Border>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+
+		</ItemsControl>
+	</ScrollViewer>
 </common:LaevoPopup>
