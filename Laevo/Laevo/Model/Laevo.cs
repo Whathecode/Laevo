@@ -11,8 +11,6 @@ using ABC.Workspaces;
 using ABC.Workspaces.Library;
 using ABC.Workspaces.Windows;
 using ABC.Workspaces.Windows.Settings;
-using Breakpoints.Aggregator;
-using Breakpoints.Common;
 using Laevo.Data.Model;
 using Laevo.Logging;
 using Laevo.Model.AttentionShifts;
@@ -46,7 +44,6 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly InterruptionAggregator _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
 
 		public IUsersPeer UsersPeer { get; private set; }
@@ -62,7 +59,6 @@ namespace Laevo.Model
 
 		public event Action<Activity> ActivityRemoved;
 		public event Action<Activity> InvitedToActivity;
-		public event Action<Activity> InterruptionAdded;
 
 		public ReadOnlyCollection<AbstractAttentionShift> AttentionShifts
 		{
@@ -92,18 +88,16 @@ namespace Laevo.Model
 		bool _isHierarchyView; // TODO: Should this be managed here? This is currently also duplicated elsewhere.
 		readonly List<Activity> _visibleActivities = new List<Activity>();
 
+		public NotificationManager.NotificationManager NotificationManager { get; private set; }
 
-		public BreakpointManagerAggregator Aggregator { get; private set; }
 
-
-		public Laevo( string dataFolder, IModelRepository dataRepository, InterruptionAggregator interruptionTrigger,
+		public Laevo( string dataFolder, IModelRepository dataRepository, NotificationManager.NotificationManager notificationManager,
 			AbstractPersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
 		{
 			Log.Info( "Startup." );
 
 			_dispatcher = Dispatcher.CurrentDispatcher;
 
-			_interruptionTrigger = interruptionTrigger;
 			_dataRepository = dataRepository;
 			UsersPeer = peerFactory.UsersPeer;
 
@@ -163,16 +157,7 @@ namespace Laevo.Model
 			ChangeVisibleTimeLine( HomeActivity );
 			HomeActivity.View();
 
-			Aggregator = new BreakpointManagerAggregator();
-
-			// Set up interruption handlers.
-			_interruptionTrigger.InterruptionReceived += ( sender, interruption ) =>
-			{
-				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
-
-				// TODO: Assign properly the breakpoint level, for now all are coarse.
-				Aggregator.RegisterInterruption( interruption, BreakpointType.Coarse );
-			};
+			NotificationManager = notificationManager;
 
 			// Start tracking processes.
 			_processTracker.Start();
@@ -189,14 +174,6 @@ namespace Laevo.Model
 			_dataRepository.AddAttentionShift( new ApplicationAttentionShift( ApplicationAttentionShift.Application.Startup ) );
 		}
 
-		public class TestInterruption : AbstractInterruption
-		{
-			public TestInterruption( string name )
-				: base( name ) {}
-
-			protected override void OnInterruptionOpened() {}
-		}
-
 		public const int SnapToMinutes = 15;
 
 		public static DateTime GetNearestTime( DateTime near )
@@ -207,7 +184,7 @@ namespace Laevo.Model
 		public void Update( DateTime now )
 		{
 			_visibleActivities.ForEach( a => a.Update( now ) );
-			_interruptionTrigger.Update( now );
+			NotificationManager.UpdateAggregators( now );
 		}
 
 		/// <summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Breakpoints.Common
+namespace Breakpoints.Breakpoint
 {
 	public class Breakpoint
 	{

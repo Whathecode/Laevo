@@ -47,6 +47,7 @@ namespace Laevo.ViewModel.Main
 
 		SettingsPopup _settingsPopup;
 
+
 		public MainViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			model.WindowClipboard.UnresponsiveWindowDetected += ( windows, desktop ) =>
@@ -65,7 +66,7 @@ namespace Laevo.ViewModel.Main
 			_dispatcher = Dispatcher.CurrentDispatcher;
 			_model.LogonScreenExited += () => _dispatcher.Invoke( ResetGui );
 
-			_model.InterruptionAdded += a => { UnattendedInterruptions++; };
+			_model.NotificationManager.NotificationTriggered += ( sender, args ) => UnattendedInterruptions++;
 			_model.ActivityRemoved += a => UpdateUnattendedInterruptions();
 
 			EnsureActivityOverview();
@@ -153,6 +154,7 @@ namespace Laevo.ViewModel.Main
 			_activityBar.Hide();
 			_activityOverview.Show();
 			_activityOverview.Activate();
+			_activityOverviewViewModel.EnsureNotificaiton();
 		}
 
 		[CommandCanExecute( Commands.ShowActivityOverview )]

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using ABC.Interruptions;
 using Laevo.ViewModel.Notification;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Timer = System.Timers.Timer;
@@ -55,10 +56,11 @@ namespace Laevo.View.Notification
 				{
 					// Hide partially.
 					PerformAnimation( LeftProperty, _workingAreaWidth - ActualWidth, _workingAreaWidth - _hide * ActualWidth,
-						TimeSpan.FromSeconds( 1 ),
-						_stacked ? null : _stackAnimation );
-
+						TimeSpan.FromSeconds( 1 ) );
 					_state = NotificationState.Hidden;
+
+					// Hide after show, left for later.
+					//PerformAnimation( OpacityProperty, 1, 0, TimeSpan.FromSeconds( 0.5 ), Close );
 				} ) );
 				_hideTimer.Stop();
 			};
@@ -68,7 +70,22 @@ namespace Laevo.View.Notification
 			// Value indicating how big portion a notification pop-up is shown during the hidden-hovered state.
 			_hover = 0.3;
 
-			_stackAnimation = () => PerformAnimation( TopProperty, Top, Top + ( _popupRowIndex - 1 ) * ActualHeight * 0.8, TimeSpan.FromSeconds( 1 ),
+			lock ( this )
+			{
+				_stackAnimation = () => PerformAnimation( TopProperty, Top, Top - ( _popupRowIndex - 1 ) * ActualHeight * 0.2, TimeSpan.FromSeconds( 1 ),
+					() => _stacked = true );
+			}
+		}
+
+		public void MoveUp()
+		{
+			PerformAnimation( TopProperty, Top, Top - ActualHeight * 0.2, TimeSpan.FromSeconds( 1 ),
+				() => _stacked = true );
+		}
+
+		public void MoveDown()
+		{
+			PerformAnimation( TopProperty, Top, Top + ActualHeight * 0.2, TimeSpan.FromSeconds( 1 ),
 				() => _stacked = true );
 		}
 
@@ -83,7 +100,7 @@ namespace Laevo.View.Notification
 			Storyboard.SetTarget( animation, Control );
 			Storyboard.SetTargetProperty( animation, new PropertyPath( animationProperty ) );
 
-			_storyboard.Stop();
+			//_storyboard.Stop();
 			_storyboard = new Storyboard();
 			_storyboard.Children.Add( animation );
 			if ( postAction != null )
@@ -101,7 +118,7 @@ namespace Laevo.View.Notification
 			_popupRowIndex = dataContext.Index;
 
 			// Hack, since it is impossible to bind to the "To" and "From" properties, setting the initial position of the pop-up handled here.
-			Top = _workingAreaHeight - ActualHeight - ( _popupRowIndex - 1 ) * ActualHeight;
+			Top = _workingAreaHeight - ActualHeight;
 			Left = _workingAreaWidth - Width;
 
 			if ( _importanceLevel == ImportanceLevel.High )
@@ -109,8 +126,8 @@ namespace Laevo.View.Notification
 				_state = NotificationState.Shown;
 
 				// Full show and delayed hide.
-				PerformAnimation( OpacityProperty, 0, 1, TimeSpan.FromSeconds( 1 ) );
-				HideDelayed( 5000 );
+				PerformAnimation( OpacityProperty, 0, 1, TimeSpan.FromSeconds( 0.5 ), _stackAnimation );
+				HideDelayed( 10000 );
 			}
 			else if ( _importanceLevel == ImportanceLevel.Low )
 			{
@@ -149,7 +166,7 @@ namespace Laevo.View.Notification
 			}
 			else if ( _state == NotificationState.Shown )
 			{
-				HideDelayed( 5000 );
+				HideDelayed( 10000 );
 			}
 		}
 

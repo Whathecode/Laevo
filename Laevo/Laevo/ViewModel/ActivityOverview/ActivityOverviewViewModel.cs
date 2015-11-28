@@ -6,8 +6,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Breakpoints.Common;
-using Breakpoints.Managers;
+using Breakpoints.Breakpoint;
 using Laevo.Data;
 using Laevo.Data.View;
 using Laevo.View.Activity;
@@ -17,6 +16,8 @@ using Laevo.View.User;
 using Laevo.ViewModel.Activity;
 using Laevo.ViewModel.ActivityOverview.Binding;
 using Laevo.ViewModel.Notification;
+using LaevoBreakpoints;
+using NotificationManager;
 using Whathecode.System.Arithmetic.Range;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
 using Whathecode.System.Extensions;
@@ -165,57 +166,18 @@ namespace Laevo.ViewModel.ActivityOverview
 
 		readonly List<NotificationPopup> _notificationPopups = new List<NotificationPopup>();
 		readonly NotificationList _notificationList;
-		readonly Dictionary<ActivityViewModel, LaevoBreakpointManager> _activityBreakpointManagers = new Dictionary<ActivityViewModel, LaevoBreakpointManager>();
+
+		readonly Dictionary<ActivityViewModel, LaevoBreakpointManager<Model.Activity>> _activityBreakpointManagers
+			= new Dictionary<ActivityViewModel, LaevoBreakpointManager<Model.Activity>>();
+
+		readonly LaevoBreakpointManager<ActivityOverviewViewModel> _overviewBreakpointManager;
 
 		public ActivityOverviewViewModel( Model.Laevo model, IViewRepository dataRepository )
 		{
 			_model = model;
 			_dataRepository = dataRepository;
 
-			// Set-up all notifications list.
-			Notifications = new ObservableCollection<NotificationViewModel>();
-			var notificationListImageUri = new Uri( @"/Laevo;component/View/ActivityOverview/Images/Bell.png", UriKind.Relative );
-			_notificationList = new NotificationList
-			{
-				Notifications = Notifications,
-				PopupImage = new BitmapImage( notificationListImageUri )
-			};
-
-			// Hook interruption breakpoint aggregator.
-			_model.Aggregator.InterruptionBreakpointOccured += ( sender, args ) =>
-			{
-				var notificationViewModel = new NotificationViewModel
-				{
-					Summary = args.Interruption.Name
-				};
-				HookNotification( notificationViewModel );
-				Dispatcher.CurrentDispatcher.BeginInvoke( new Action( () =>
-				{
-					Notifications.Add( notificationViewModel );
-
-					// TODO: Decide if show a notification pop-up accordingly to the interruption importance (for now show for all).
-					ShowNotification( notificationViewModel );
-				} ) );
-
-
-				// TODO: Properly assign a notification to a specific activity if any (for now all go to the home activity).
-				HomeActivity.Notifications.Add( notificationViewModel );
-				HomeActivity.Activity.AddInterruption( args.Interruption );
-			};
-
-			var overviewLaevoBreakpointManager = new LaevoBreakpointManager( Guid.NewGuid() );
-			_model.Aggregator.AddManager( overviewLaevoBreakpointManager );
-			// Medium events.
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "ActivatedActivityEvent", this, BreakpointType.Medium );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "ClosedPopupEvent", this, BreakpointType.Medium );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "ActivityCreatedEvent", this, BreakpointType.Medium );
-			// Coarse events.
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "RemovedActivityEvent", this, BreakpointType.Coarse );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "SelectedActivityEvent", this, BreakpointType.Coarse );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "StoppedActivityEvent", this, BreakpointType.Coarse );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "SuspendingActivityEvent", this, BreakpointType.Coarse );
-			overviewLaevoBreakpointManager.RegisterBreakpoint( "NoCurrentActiveActivityEvent", this, BreakpointType.Coarse );
-
+			
 			// Set up home activity.
 			if ( _dataRepository.Home != null )
 			{
@@ -242,18 +204,71 @@ namespace Laevo.ViewModel.ActivityOverview
 			Tasks = _dataRepository.Tasks;
 			Activities.Union( Tasks ).ForEach( HookActivityToOverview );
 
-			// Listen for new interruption tasks being added.
-			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
-			_model.InterruptionAdded += task =>
+			// Set-up all notifications list.
+			Notifications = new ObservableCollection<NotificationViewModel>();
+			var notificationListImageUri = new Uri( @"/Laevo;component/View/ActivityOverview/Images/Bell.png", UriKind.Relative );
+			_notificationList = new NotificationList
 			{
-				var taskViewModel = new ActivityViewModel( task, _model.WorkspaceManager, _dataRepository )
-				{
-					// TODO: This is hardcoded for this release where only gmail is supported, but allow the plugin to choose the layout.
-					Color = ActivityViewModel.PresetColors[ 5 ],
-					Icon = ActivityViewModel.PresetIcons.First( b => b.UriSource.AbsolutePath.Contains( "mail_read.png" ) )
-				};
-				AddActivity( taskViewModel, HomeActivity );
+				Notifications = Notifications,
+				PopupImage = new BitmapImage( notificationListImageUri )
 			};
+
+			_model.NotificationManager.NotificationTriggered += ( sender, args ) =>
+			{
+				args.Notification.ForEach( notification =>
+				{
+					var notificationViewModel = new NotificationViewModel( notification );
+					HookNotification( notificationViewModel );
+					Notifications.Add( notificationViewModel );
+
+					// Assign the notification to a specific activity.
+					foreach ( var activity in Activities )
+					{
+						var userNames = new List<string>();
+						activity.AccessUsers.Concat( activity.OwnedUsers ).ForEach( user => userNames.Add( user.Name ) );
+						if ( RealationDetector.CheckIfRelted( notification, activity.Activity.Name, userNames ) )
+						{
+							activity.Notifications.Add( notificationViewModel );
+							break;
+						}
+					}
+				} );
+			};
+
+			// Hook interruption breakpoint aggregator.
+			_model.NotificationManager.NotificationBreakpointTriggered += ( sender, args ) =>
+			{
+				Dispatcher.CurrentDispatcher.BeginInvoke( new Action( () =>
+				{
+					args.Notification.ForEach( notification =>
+					{
+						var notificationViewModel = Notifications.FirstOrDefault( exisitngNotification => exisitngNotification.Notification == notification );
+
+						// TODO: Decide if show a notification pop-up accordingly to the interruption importance (for now show for all).
+
+						if ( notificationViewModel != null )
+							ShowNotification( notificationViewModel );
+					} );
+				} ) );
+
+
+				// TODO: Add every notification to the home activity?
+				//HomeActivity.Notifications.Add( notificationViewModel );
+				//HomeActivity.Activity.AddInterruption( args.Notification );
+			};
+
+			// Set-up overview breakpoints.
+			_overviewBreakpointManager = new LaevoBreakpointManager<ActivityOverviewViewModel>( Guid.NewGuid(), this );
+			_model.NotificationManager.AddManager( _overviewBreakpointManager );
+			// Medium events.
+			_overviewBreakpointManager.RegisterBreakpoint( "ActivatedActivityEvent", BreakpointType.Medium );
+			_overviewBreakpointManager.RegisterBreakpoint( "ClosedPopupEvent", BreakpointType.Medium );
+			// Coarse events.
+			_overviewBreakpointManager.RegisterBreakpoint( "RemovedActivityEvent", BreakpointType.Coarse );
+			_overviewBreakpointManager.RegisterBreakpoint( "SelectedActivityEvent", BreakpointType.Coarse );
+			_overviewBreakpointManager.RegisterBreakpoint( "StoppedActivityEvent", BreakpointType.Coarse );
+			_overviewBreakpointManager.RegisterBreakpoint( "SuspendingActivityEvent", BreakpointType.Coarse );
+
 
 			// Listen for invited activities being added.
 			// TODO: This probably needs to be removed as it is a bit messy. A better communication from the model to the viewmodel needs to be devised.
@@ -270,7 +285,6 @@ namespace Laevo.ViewModel.ActivityOverview
 
 			_updateTimer.Start();
 		}
-
 
 		void UnloadActivities()
 		{
@@ -371,8 +385,6 @@ namespace Laevo.ViewModel.ActivityOverview
 			AddActivity( newTask );
 
 			ActivityCreatedEvent( newTask );
-
-			_model.Aggregator.RegisterInterruption( new Model.Laevo.TestInterruption( "test name" ), BreakpointType.Fine );
 		}
 
 		[CommandExecute( Commands.NewActivity )]
@@ -447,9 +459,20 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				DataContext = notificationViewModel
 			};
+
 			_notificationPopups.Add( notificationPopup );
 			HookNotificationPopup( notificationViewModel, notificationPopup );
+
 			notificationPopup.Show();
+		}
+
+		public void EnsureNotificaiton()
+		{
+			_notificationPopups.ForEach( popup =>
+			{
+				popup.Topmost = false;
+				popup.Topmost = true;
+			} );
 		}
 
 		void HookNotificationPopup( NotificationViewModel notificationViewModel, NotificationPopup notificationPopup )
@@ -457,6 +480,12 @@ namespace Laevo.ViewModel.ActivityOverview
 			notificationViewModel.Index = _notificationPopups.Count;
 			notificationViewModel.PopupHiding += ( o, eventArgs ) =>
 			{
+				var notificationPopupIndex = _notificationPopups.IndexOf( notificationPopup );
+
+				for ( var i = notificationPopupIndex + 1; i < _notificationPopups.Count; i++ )
+				{
+					_notificationPopups[ i ].MoveDown();
+				}
 				_notificationPopups.Remove( notificationPopup );
 				notificationPopup.Close();
 			};
@@ -469,8 +498,9 @@ namespace Laevo.ViewModel.ActivityOverview
 				var senderNotification = (NotificationViewModel)o;
 
 				var activity = CreateNewActivity();
-				activity.Label = senderNotification.Summary;
-				activity.Activity.Name = senderNotification.Summary;
+				activity.Activity.AddInterruption( senderNotification.Notification );
+				activity.Label = senderNotification.Summary.Substring( 0, 15 ) + "...";
+				activity.Activity.Name = senderNotification.Summary.Substring( 0, 15 ) + "...";
 
 				activity.OpenActivity();
 				PositionActivityAtCurrentOffset( activity );
@@ -484,13 +514,14 @@ namespace Laevo.ViewModel.ActivityOverview
 
 				var parent = HomeActivity;
 				var task = _model.CreateNewTask( parent.Activity );
-				task.Name = senderNotification.Summary;
+				task.Name = senderNotification.Summary.Substring( 0, 15 ) + "...";
 
 				var newTask = new ActivityViewModel( task, _model.WorkspaceManager, _dataRepository )
 				{
 					ShowActiveTimeSpans = _model.Settings.EnableAttentionLines,
-					Label = senderNotification.Summary
+					Label = senderNotification.Summary.Substring( 0, 15 ) + "..."
 				};
+				newTask.Activity.AddInterruption( senderNotification.Notification );
 				AddActivity( newTask );
 				newTask.EditActivity();
 			};
@@ -521,7 +552,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ClaimedOwnershipEvent -= OnClaimedOwnership;
 			activity.DroppedOwnershipEvent -= OnDroppedOwnership;
 
-			UnhookFromBreakpointManager( activity );
+			ClearActivityBreakpoints( activity );
 		}
 
 		void HookActivityToOverview( ActivityViewModel activity )
@@ -541,38 +572,34 @@ namespace Laevo.ViewModel.ActivityOverview
 			activity.ClaimedOwnershipEvent += OnClaimedOwnership;
 			activity.DroppedOwnershipEvent += OnDroppedOwnership;
 
-			HookToBreakpointManager( activity );
+			SetupActivityBreakpoints( activity );
 		}
 
-		void UnhookFromBreakpointManager( ActivityViewModel activityViewModel )
+		void ClearActivityBreakpoints( ActivityViewModel activityViewModel )
 		{
-			LaevoBreakpointManager activityLaevoBreakpointManager;
-			_activityBreakpointManagers.TryGetValue( activityViewModel, out activityLaevoBreakpointManager );
-			if ( activityLaevoBreakpointManager == null )
+			LaevoBreakpointManager<Model.Activity> activityBreakpointManager;
+			_activityBreakpointManagers.TryGetValue( activityViewModel, out activityBreakpointManager );
+			if ( activityBreakpointManager == null )
 				return;
 
-			activityLaevoBreakpointManager.UnregisterBreakpoint( "DeactivatedEvent", activityViewModel.Activity, BreakpointType.Medium );
-			activityLaevoBreakpointManager.UnregisterBreakpoint( "ToDoChangedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.UnregisterBreakpoint( "AccessAddedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.UnregisterBreakpoint( "AccessRemovedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.UnregisterBreakpoint( "OwnershipAddedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.UnregisterBreakpoint( "OpenedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-
+			_model.NotificationManager.RemoveManager( activityBreakpointManager );
 			_activityBreakpointManagers.Remove( activityViewModel );
 		}
 
-		void HookToBreakpointManager( ActivityViewModel activityViewModel )
+		void SetupActivityBreakpoints( ActivityViewModel activityViewModel )
 		{
-			var activityLaevoBreakpointManager = new LaevoBreakpointManager( Guid.NewGuid() );
-			_activityBreakpointManagers.Add( activityViewModel, activityLaevoBreakpointManager );
-			_model.Aggregator.AddManager( activityLaevoBreakpointManager );
+			var activityBreakpointManager = new LaevoBreakpointManager<Model.Activity>( Guid.NewGuid(), activityViewModel.Activity );
+			_activityBreakpointManagers.Add( activityViewModel, activityBreakpointManager );
+			_model.NotificationManager.AddManager( activityBreakpointManager );
 
-			activityLaevoBreakpointManager.RegisterBreakpoint( "DeactivatedEvent", activityViewModel.Activity, BreakpointType.Medium );
-			activityLaevoBreakpointManager.RegisterBreakpoint( "ToDoChangedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.RegisterBreakpoint( "AccessAddedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.RegisterBreakpoint( "AccessRemovedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.RegisterBreakpoint( "OwnershipAddedEvent", activityViewModel.Activity, BreakpointType.Coarse );
-			activityLaevoBreakpointManager.RegisterBreakpoint( "OpenedEvent", activityViewModel.Activity, BreakpointType.Coarse );
+			// Medium.
+			activityBreakpointManager.RegisterBreakpoint( "DeactivatedEvent", BreakpointType.Medium );
+			// Coarse.
+			activityBreakpointManager.RegisterBreakpoint( "ToDoChangedEvent", BreakpointType.Coarse );
+			activityBreakpointManager.RegisterBreakpoint( "AccessAddedEvent", BreakpointType.Coarse );
+			activityBreakpointManager.RegisterBreakpoint( "AccessRemovedEvent", BreakpointType.Coarse );
+			activityBreakpointManager.RegisterBreakpoint( "OwnershipAddedEvent", BreakpointType.Coarse );
+			activityBreakpointManager.RegisterBreakpoint( "OpenedEvent", BreakpointType.Coarse );
 		}
 
 		void OnActivityActivating( ActivityViewModel viewModel )
@@ -666,7 +693,10 @@ namespace Laevo.ViewModel.ActivityOverview
 			{
 				DataContext = new ShareViewModel( _model, activityViewModel ?? CurrentActivityViewModel, _dataRepository )
 			};
-			share.Closed += ( s, a ) => VisibleActivity.Persist();
+			//share.Closed += ( s, a ) =>
+			//{
+			//	VisibleActivity.Persist();
+			//};
 
 			ShowPopup( share );
 		}
@@ -681,9 +711,6 @@ namespace Laevo.ViewModel.ActivityOverview
 				activity.ShowActiveTimeSpans = newIsEnabled;
 			}
 		}
-
-		// ReSharper restore UnusedMember.Local
-		// ReSharper restore UnusedParameter.Local
 
 		void UpdateData( DateTime updateTime )
 		{
@@ -799,6 +826,7 @@ namespace Laevo.ViewModel.ActivityOverview
 			_updateTimer.AutoReset = false;
 			_updateTimer.Stop();
 			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
+			_model.NotificationManager.RemoveManager( _overviewBreakpointManager );
 		}
 	}
 }

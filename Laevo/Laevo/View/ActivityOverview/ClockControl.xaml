@@ -4,29 +4,27 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	mc:Ignorable="d" 
-	d:DesignHeight="94" d:DesignWidth="200"
+	mc:Ignorable="d"
 	x:Name="Control">
-	
-	<StackPanel Orientation="Vertical">
-		
+
+	<StackPanel Orientation="Horizontal">
 		<TextBlock
-			HorizontalAlignment="Right"
-			FontSize="60"
-			Foreground="White">
-			<TextBlock.Text>
-				<Binding ElementName="Control" Path="Time" StringFormat="H:mm" />
-			</TextBlock.Text>
-		</TextBlock>
-		<TextBlock
-			HorizontalAlignment="Right"
-			FontSize="20"
+			Margin="10, 0, 0, 0"
+			FontSize="23"
 			Foreground="Yellow">
 			<TextBlock.Text>
 				<Binding ElementName="Control" Path="Time" StringFormat="D" />
 			</TextBlock.Text>
 		</TextBlock>
+		<TextBlock
+			FontSize="23"
+						Margin="10, 0, 0, 0"
+			Foreground="White">
+			<TextBlock.Text>
+				<Binding ElementName="Control" Path="Time" StringFormat="H:mm" />
+			</TextBlock.Text>
+		</TextBlock>
 
 	</StackPanel>
-	
+
 </UserControl>
