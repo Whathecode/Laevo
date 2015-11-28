@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ABC.Interruptions;
 using Laevo.ViewModel.Notification.Binding;
 using Whathecode.System.ComponentModel.NotifyPropertyFactory.Attributes;
+using Whathecode.System.Extensions;
 using Whathecode.System.Windows.Aspects.ViewModel;
 using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 
@@ -19,8 +22,14 @@ namespace Laevo.ViewModel.Notification
 	[ViewModel( typeof( Binding.Properties ), typeof( Commands ) )]
 	public class NotificationViewModel
 	{
+		/// <summary>
+		/// Event triggered when the user deiced to create a new activity based on the notification.
+		/// </summary>
 		public event EventHandler<EventArgs> NewActivityCreating;
 
+		/// <summary>
+		/// Event triggered when the user decided to create a new task based on the notification.
+		/// </summary>
 		public event EventHandler<EventArgs> NewTaskCreating;
 
 		/// <summary>
@@ -28,6 +37,9 @@ namespace Laevo.ViewModel.Notification
 		/// </summary>
 		public event EventHandler<EventArgs> PopupHiding;
 
+		/// <summary>
+		/// Event triggered when a notification pop-up is removed.
+		/// </summary>
 		public event EventHandler<EventArgs> NotificationRemoving;
 
 
@@ -49,14 +61,17 @@ namespace Laevo.ViewModel.Notification
 		[NotifyProperty( Binding.Properties.ImportanceLevel )]
 		public ImportanceLevel ImportanceLevel { get; set; }
 
-		public NotificationViewModel()
+		public AbstractInterruption Notification { get; private set; }
+
+		public NotificationViewModel( AbstractInterruption notification )
 		{
-			// Initialize notification view model with the dummy data. 
-			Interrupter = "Dominik Grondziowski";
+			ImportanceLevel = notification.Importance;
+			Interrupter = notification.Collaborators.IsNullOrEmpty() ? "Empty" : notification.Collaborators.First();
+			Summary = notification.Content;
+			Notification = notification;
+
 			Animation = AnimationType.Fade;
-			Summary = "Some Interruption summary. Some Interruption summary. Some Interruption summary Some Interruption summary." +
-			          " Some Interruption summary. Some Interruption summary";
-			var uriSource = new Uri( @"/Laevo;component/View/Common/Images/Alert.png", UriKind.Relative );
+			var uriSource = new Uri( @"/Laevo;component/View/Notification/Images/Gmail.png", UriKind.Relative );
 			Image = new BitmapImage( uriSource );
 		}
 

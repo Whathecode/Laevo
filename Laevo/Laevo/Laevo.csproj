@@ -399,9 +399,6 @@
     <Compile Include="Data\View\IViewRepository.cs" />
     <Compile Include="Data\PersistenceException.cs" />
     <Compile Include="GlobalAspects.cs" />
-    <Compile Include="Interruptions\InterruptionActivityCompare.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="LaevoController.cs" />
     <Compile Include="Logging\FullContextLayoutRenderer.cs" />
     <Compile Include="Logging\LogData.cs" />
@@ -441,7 +438,6 @@
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveViewModel.cs" />
     <Compile Include="ViewModel\Main\Unresponsive\UnresponsiveWindow.cs" />
     <Compile Include="ViewModel\Notification\Binding\Binding.cs" />
-    <Compile Include="ViewModel\Notification\ImportanceLevel.cs" />
     <Compile Include="ViewModel\Notification\NotificationEventArgs.cs" />
     <Compile Include="ViewModel\Notification\NotificationViewModel.cs" />
     <Compile Include="ViewModel\Settings\Binding\Binding.cs" />
@@ -550,6 +546,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="View\Notification\Images\FbMessenger.png" />
+    <Resource Include="View\Notification\Images\Gmail.png" />
     <Resource Include="View\ActivityBar\Images\Bell.png" />
     <Resource Include="View\Activity\Icons\Bell.png" />
     <Resource Include="View\ActivityOverview\Images\Bell.png" />
@@ -781,6 +779,14 @@
     <ProjectReference Include="..\Breakpoints\Breakpoints.csproj">
       <Project>{0bdad109-6e4f-4f41-8fc6-79ceb0861fc5}</Project>
       <Name>Breakpoints</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LaevoBreakpoints\LaevoBreakpoints.csproj">
+      <Project>{3be2af6b-742d-4687-9cce-6a30e4299eb9}</Project>
+      <Name>LaevoBreakpoints</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NotificationManager\NotificationManager.csproj">
+      <Project>{513faa98-8595-40f8-8e88-5d333d42d3df}</Project>
+      <Name>NotificationManager</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

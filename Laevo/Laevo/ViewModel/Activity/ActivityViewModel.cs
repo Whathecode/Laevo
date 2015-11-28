@@ -371,10 +371,11 @@ namespace Laevo.ViewModel.Activity
 			// Update work intervals properties. They are ordered by date of occurrence.
 			for ( var i = 0; i < WorkIntervals.Count; i++ )
 			{
-				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals[ i ].HeightPercentage;
-				WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals[ i ].OffsetPercentage;
-				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ActiveTimeSpans;
-				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals[ i ].ShowActiveTimeSpans;
+				// TODO: Fix proper work interval serialization, now first representation is taken.
+				WorkIntervals[ i ].HeightPercentage = storedViewModel.WorkIntervals.First().HeightPercentage;
+				WorkIntervals[ i ].OffsetPercentage = storedViewModel.WorkIntervals.First().OffsetPercentage;
+				WorkIntervals[ i ].ActiveTimeSpans = storedViewModel.WorkIntervals.First().ActiveTimeSpans;
+				WorkIntervals[ i ].ShowActiveTimeSpans = storedViewModel.WorkIntervals.First().ShowActiveTimeSpans;
 			}
 		}
 
@@ -388,7 +389,9 @@ namespace Laevo.ViewModel.Activity
 			// Set Windows Shell Library folder.
 			var library = _workspace.GetInnerWorkspace<Library>();
 			List<string> paths = library.Paths.ToList();
-			if ( !paths.Contains( Activity.SpecificFolder.LocalPath ) )
+
+			// TODO: Fix problem with activity path. In some cases it stays null what crashes the app.
+			if ( Activity.SpecificFolder != null && !paths.Contains( Activity.SpecificFolder.LocalPath ) )
 			{
 				paths.Add( Activity.SpecificFolder.LocalPath );
 			}
@@ -454,9 +457,9 @@ namespace Laevo.ViewModel.Activity
 					DroppedOwnershipEvent( this );
 				}
 			};
-			
+
 			// Initialize command manually, wtc command binding not working.
-			RemoveAccess = new RemoveAccessCommand(this);
+			RemoveAccess = new RemoveAccessCommand( this );
 
 			Notifications = new ObservableCollection<NotificationViewModel>();
 		}
@@ -763,13 +766,16 @@ namespace Laevo.ViewModel.Activity
 		}
 
 		public RemoveAccessCommand RemoveAccess { private set; get; }
+
 		public class RemoveAccessCommand : ICommand
 		{
 			readonly ActivityViewModel _activityViewModel;
+
 			public RemoveAccessCommand( ActivityViewModel activityViewModel )
 			{
 				_activityViewModel = activityViewModel;
 			}
+
 			public bool CanExecute( object parameter )
 			{
 				return true;
@@ -778,7 +784,7 @@ namespace Laevo.ViewModel.Activity
 			public void Execute( object parameter )
 			{
 				var mouseCommandArgs = (MouseBehavior.MouseCommandArgs)parameter;
-				_activityViewModel.Activity.RemoveAccess( ((UserViewModel)mouseCommandArgs.Parameter).User );
+				_activityViewModel.Activity.RemoveAccess( ( (UserViewModel)mouseCommandArgs.Parameter ).User );
 			}
 
 			public event EventHandler CanExecuteChanged;
@@ -789,7 +795,6 @@ namespace Laevo.ViewModel.Activity
 		{
 			_overview.OpenTimeLineSharing( this );
 			Activity.RemoveOwnership( new Model.User() );
-			
 		}
 
 		/// <summary>

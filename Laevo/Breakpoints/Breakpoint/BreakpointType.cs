@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace Breakpoints.Common
+
+namespace Breakpoints.Breakpoint
 {
 	[Flags]
 	public enum BreakpointType

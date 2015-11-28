@@ -2,18 +2,16 @@
 using System.IO;
 using System.Linq;
 using ABC.Interruptions;
-using Laevo.Model;
-using Whathecode.System.Extensions;
 
 
-namespace Laevo.Interruptions
+namespace NotificationManager
 {
-	class InterruptionActivityCompare
+	public class RealationDetector
 	{
 		/// <summary>
 		/// When the similarity level is above this value, an activity and interruption are considered to be related.
 		/// </summary>
-		public const int SimilarityLevel = 51;
+		public const int Threshold = 51;
 
 		static double Compare( List<string> fitstList, ICollection<string> secondList )
 		{
@@ -32,27 +30,29 @@ namespace Laevo.Interruptions
 		/// <summary>
 		/// Compares an interruption with an activity, checks for any potential relation.
 		/// </summary>
-		/// <param name="interruption">Interruption to compare.</param>
-		/// <param name="activity">Activity to compare.</param>
 		/// <returns>True if interruption and activity are potentially similar, false otherwise.</returns>
-		public static bool CheckIfRelted( AbstractInterruption interruption, Activity activity )
+		public static bool CheckIfRelted( AbstractInterruption interruption, string activityName, List<string> participantNames = null, string activityFolderPath = null )
 		{
 			var interruptionNameWords = interruption.Name.Split( ' ' ).Select( word => word.ToLower().Trim() ).ToList();
-			var activityNameWords = activity.Name.Split( ' ' ).Select( word => word.ToLower().Trim() ).ToList();
+			var activityNameWords = activityName.Split( ' ' ).Select( word => word.ToLower().Trim() ).ToList();
 
 			var simlarity = Compare( interruptionNameWords, activityNameWords );
-			if ( simlarity < SimilarityLevel )
+			if ( simlarity < Threshold )
 			{
-				var userNames = new List<string>();
-				activity.AccessUsers.Concat( activity.OwnedUsers ).ForEach( user => userNames.Add( user.Name ) );
-				simlarity = Compare( interruption.Collaborators, userNames );
+				if (participantNames != null &&  participantNames.Count != 0)
+				{
+					simlarity = Compare( interruption.Collaborators, participantNames );
+				}
 			}
-			if ( simlarity < SimilarityLevel )
+			if ( simlarity < Threshold )
 			{
-				var filesInActivityLibrary = Directory.GetFiles( activity.SpecificFolder.AbsolutePath );
-				simlarity = Compare( interruption.Files, filesInActivityLibrary );
+				if ( !string.IsNullOrEmpty( activityFolderPath ) )
+				{
+					var filesInActivityLibrary = Directory.GetFiles( activityFolderPath );
+					simlarity = Compare( interruption.Files, filesInActivityLibrary );
+				}
 			}
-			return !( simlarity < SimilarityLevel );
+			return simlarity > Threshold;
 		}
 	}
 }

@@ -26,7 +26,9 @@
 	MinWidth="400"
 	MinHeight="200"
 	MaxHeight="200"
-	Height="200">
+	Height="200"
+	Topmost="True" 
+	ShowActivated="True">
 
 	<common:LaevoPopup.Resources>
 		<Style

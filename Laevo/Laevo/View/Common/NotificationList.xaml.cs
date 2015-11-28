@@ -27,7 +27,6 @@ namespace Laevo.View.Common
 		public NotificationList()
 		{
 			InitializeComponent();
-			WindowStartupLocation = WindowStartupLocation.Manual;
 		}
 
 		void OnDeactivated( object sender, EventArgs e )

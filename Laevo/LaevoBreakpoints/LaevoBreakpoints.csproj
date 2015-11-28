@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0BDAD109-6E4F-4F41-8FC6-79CEB0861FC5}</ProjectGuid>
+    <ProjectGuid>{3BE2AF6B-742D-4687-9CCE-6A30E4299EB9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Breakpoints</RootNamespace>
-    <AssemblyName>Breakpoints</AssemblyName>
+    <RootNamespace>LaevoBreakpoints</RootNamespace>
+    <AssemblyName>LaevoBreakpoints</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -38,21 +38,16 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LinFu.Delegates, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Libraries\LinFu.Delegates\LinFu.Delegates.dll</HintPath>
-    </Reference>
-    <Reference Include="PostSharp, Version=4.1.23.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <HintPath>..\packages\PostSharp.4.1.23\lib\net35-client\PostSharp.dll</HintPath>
+    <Reference Include="PostSharp, Version=4.1.30.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+      <HintPath>..\packages\PostSharp.4.1.30\lib\net35-client\PostSharp.dll</HintPath>
+      <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp.Patterns.Diagnostics, Version=4.1.23.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
-      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.4.1.23\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
+    <Reference Include="PostSharp.Patterns.Diagnostics, Version=4.1.30.0, Culture=neutral, PublicKeyToken=e7f631e6ce13f078, processorArchitecture=MSIL">
+      <HintPath>..\packages\PostSharp.Patterns.Diagnostics.4.1.30\lib\net40\PostSharp.Patterns.Diagnostics.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Activities" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,18 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aggregator\AbstractBreakpointAggregator.cs" />
-    <Compile Include="Aggregator\BreakpointAggregator.cs" />
-    <Compile Include="Breakpoint\Breakpoint.cs" />
-    <Compile Include="Breakpoint\BreakpointType.cs" />
-    <Compile Include="Common\DelegateSource.cs" />
-    <Compile Include="Common\NotificationEventArgs.cs" />
-    <Compile Include="Managers\AbstarctBreakpointManager.cs" />
+    <Compile Include="LaevoBreakpointManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Breakpoints.psproj" />
+    <None Include="LaevoBreakpoints.psproj" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -80,36 +69,15 @@
       <Project>{D53F1095-6DC0-4950-982F-3322AAE74A50}</Project>
       <Name>ABC</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.Interop\Whathecode.Interop.csproj">
-      <Project>{93706064-ef4a-4f46-abb8-d93e4c0d2732}</Project>
-      <Name>Whathecode.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework.Aspects\Whathecode.PresentationFramework.Aspects.csproj">
-      <Project>{b51bf379-1ef4-4f1c-a5e8-3123e34298dd}</Project>
-      <Name>Whathecode.PresentationFramework.Aspects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.PresentationFramework\Whathecode.PresentationFramework.csproj">
-      <Project>{9c755f97-8302-4415-ac95-fabfcdce14b2}</Project>
-      <Name>Whathecode.PresentationFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.System.Aspects\Whathecode.System.Aspects.csproj">
-      <Project>{ede62a57-c6ba-4604-a727-7bc0476a5ee4}</Project>
-      <Name>Whathecode.System.Aspects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.System.Management\Whathecode.System.Management.csproj">
-      <Project>{68e68cfb-7a0b-4527-b44e-61a6870b9376}</Project>
-      <Name>Whathecode.System.Management</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Framework-Class-Library-Extension\Whathecode.System\Whathecode.System.csproj">
-      <Project>{6FF11324-46A9-4AE3-A802-4CFD47C59BA6}</Project>
+      <Project>{6ff11324-46a9-4ae3-a802-4cfd47c59ba6}</Project>
       <Name>Whathecode.System</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\TimeLine\Whathecode.TimeLine\Whathecode.TimeLine.csproj">
-      <Project>{08c7537e-7831-42d9-97c4-0256a3f477dd}</Project>
-      <Name>Whathecode.TimeLine</Name>
+    <ProjectReference Include="..\Breakpoints\Breakpoints.csproj">
+      <Project>{0bdad109-6e4f-4f41-8fc6-79ceb0861fc5}</Project>
+      <Name>Breakpoints</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -118,10 +86,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
-  <Import Project="..\packages\PostSharp.4.1.23\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.4.1.23\tools\PostSharp.targets')" />
+  <Import Project="..\packages\PostSharp.4.1.30\tools\PostSharp.targets" Condition="Exists('..\packages\PostSharp.4.1.30\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('..\packages\PostSharp.4.1.23\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('..\packages\PostSharp.4.1.23\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="!Exists('..\packages\PostSharp.4.1.30\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('..\packages\PostSharp.4.1.30\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

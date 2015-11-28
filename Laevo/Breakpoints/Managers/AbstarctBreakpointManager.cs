@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
+using ABC.Plugins;
+using Breakpoints.Breakpoint;
 using Breakpoints.Common;
 using LinFu.Delegates;
+using Whathecode.System.Extensions;
 
 
 namespace Breakpoints.Managers
@@ -18,53 +22,65 @@ namespace Breakpoints.Managers
 		/// <summary>
 		/// Event which is triggered when a fine breakpoint occurred.
 		/// </summary>
-		public event EventHandler<BreakpointInterruptionEventArgs> FineBreakpointOccured;
+		public event EventHandler<NotificationEventArgs> FineBreakpointOccured;
 
 		/// <summary>
 		/// Event which is triggered when a medium breakpoint occurred.
 		/// </summary>
-		public event EventHandler<BreakpointInterruptionEventArgs> MediumBreakpointOccured;
+		public event EventHandler<NotificationEventArgs> MediumBreakpointOccured;
 
 		/// <summary>
 		/// Event which is triggered when a Coarse breakpoint occurred.
 		/// </summary>
-		public event EventHandler<BreakpointInterruptionEventArgs> CoarseBreakpointOccured;
+		public event EventHandler<NotificationEventArgs> CoarseBreakpointOccured;
 
 		public ReadOnlyCollection<string> SubscribedEventsNames
 		{
 			get { return _subscribedEvents.Keys.ToList().AsReadOnly(); }
 		}
 
-		readonly Dictionary<string, MulticastDelegate> _subscribedEvents = new Dictionary<string, MulticastDelegate>();
-
-		public ReadOnlyCollection<Breakpoint> OccuredBreakpointsReadOnly
+		public ReadOnlyCollection<Breakpoint.Breakpoint> OccuredBreakpointsReadOnly
 		{
 			get { return OccuredBreakpoints.AsReadOnly(); }
 		}
 
-		protected readonly List<Breakpoint> OccuredBreakpoints = new List<Breakpoint>();
+		public AssemblyInfo AssemblyInfo { get; private set; }
+
+		protected readonly List<Breakpoint.Breakpoint> OccuredBreakpoints = new List<Breakpoint.Breakpoint>();
+		readonly Dictionary<string, MulticastDelegate> _subscribedEvents = new Dictionary<string, MulticastDelegate>();
+		protected readonly object Source;
+
+		protected AbstarctBreakpointManager( object source, Assembly assembly )
+		{
+			Source = source;
+			AssemblyInfo = new AssemblyInfo( assembly );
+			if ( Guid.Empty == AssemblyInfo.Guid || String.IsNullOrEmpty( AssemblyInfo.TargetProcessName ) )
+			{
+				throw new ArgumentException( "Plug-in GUID and target process name have to be provided in assembly info." );
+			}
+		}
 
 		protected object OnCoarseBreakpoint( object[] args )
 		{
-			var breakpoint = new Breakpoint( DateTime.Now, BreakpointType.Coarse );
+			var breakpoint = new Breakpoint.Breakpoint( DateTime.Now, BreakpointType.Coarse );
 			OccuredBreakpoints.Add( breakpoint );
-			CoarseBreakpointOccured( this, new BreakpointInterruptionEventArgs( breakpoint ) );
+			if ( CoarseBreakpointOccured != null ) CoarseBreakpointOccured( this, new NotificationEventArgs( breakpoint ) );
 			return null;
 		}
 
 		protected object OnMediumBreakpoint( object[] args )
 		{
-			var breakpoint = new Breakpoint( DateTime.Now, BreakpointType.Medium );
+			var breakpoint = new Breakpoint.Breakpoint( DateTime.Now, BreakpointType.Medium );
 			OccuredBreakpoints.Add( breakpoint );
-			MediumBreakpointOccured( this, new BreakpointInterruptionEventArgs( breakpoint ) );
+			if ( MediumBreakpointOccured != null ) MediumBreakpointOccured( this, new NotificationEventArgs( breakpoint ) );
 			return null;
 		}
 
 		protected object OnFineBreakpoint( object[] args )
 		{
-			var breakpoint = new Breakpoint( DateTime.Now, BreakpointType.Fine );
+			var breakpoint = new Breakpoint.Breakpoint( DateTime.Now, BreakpointType.Fine );
 			OccuredBreakpoints.Add( breakpoint );
-			FineBreakpointOccured( this, new BreakpointInterruptionEventArgs( breakpoint ) );
+			if ( FineBreakpointOccured != null ) FineBreakpointOccured( this, new NotificationEventArgs( breakpoint ) );
 			return null;
 		}
 
@@ -93,16 +109,15 @@ namespace Breakpoints.Managers
 		/// Registers a new breakpoint.
 		/// </summary>
 		/// <param name="eventName">Key identifier for event.</param>
-		/// <param name="source">Source of an event.</param>
 		/// <param name="breakpointType">Desired breakpoint type.</param>
 		/// <returns>True if event have not been registered, false otherwise.</returns>
-		public bool RegisterBreakpoint( string eventName, object source, BreakpointType breakpointType )
+		public bool RegisterBreakpoint( string eventName, BreakpointType breakpointType )
 		{
 			if ( _subscribedEvents.ContainsKey( eventName ) )
 				return false;
 
 			var deletegteToAssign = GetDelegate( breakpointType );
-			_subscribedEvents.Add( eventName , EventBinder.BindToEvent( eventName, source, deletegteToAssign ));
+			_subscribedEvents.Add( eventName, EventBinder.BindToEvent( eventName, Source, deletegteToAssign ) );
 			return true;
 		}
 
@@ -110,19 +125,27 @@ namespace Breakpoints.Managers
 		/// Unregisters a new breakpoint.
 		/// </summary>
 		/// <param name="eventName">Key identifier for event.</param>
-		/// <param name="source">Source of an event.</param>
-		/// <param name="breakpointType">Desired breakpoint type.</param>
 		/// <returns>True if event have not been registered, false otherwise.</returns>
-		public bool UnregisterBreakpoint( string eventName, object source, BreakpointType breakpointType )
+		public bool UnregisterBreakpoint( string eventName )
 		{
 			if ( !_subscribedEvents.ContainsKey( eventName ) )
 				return false;
 
 			MulticastDelegate multicastDelegate;
 			_subscribedEvents.TryGetValue( eventName, out multicastDelegate );
-			EventBinder.UnbindFromEvent( eventName, source, multicastDelegate );
+			EventBinder.UnbindFromEvent( eventName, Source, multicastDelegate );
 			_subscribedEvents.Remove( eventName );
 			return true;
 		}
+
+		public void UnregisterAllBreakpoints()
+		{
+			SubscribedEventsNames.ForEach( eventName => UnregisterBreakpoint( eventName ) );
+		}
+
+		/// <summary>
+		///   Returns the types of interruptions this class triggers.
+		/// </summary>
+		public abstract List<Type> GetBreakpointManagerTypes();
 	}
 }

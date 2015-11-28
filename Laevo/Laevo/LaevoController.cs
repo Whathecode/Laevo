@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Windows;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
 using Laevo.Data;
@@ -24,6 +23,7 @@ namespace Laevo
 
 		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
+		static readonly string BreakpointPluginLibrary = Path.Combine( ProgramLocalDataFolder, "Breakpoints" );
 
 		readonly AbstractPersistenceProvider _persistenceProvider;
 
@@ -38,13 +38,14 @@ namespace Laevo
 			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
 			var peerFactory = new MockPeerFactory();
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );
+			var notificationManager = new NotificationManager.NotificationManager( InterruptionsPluginLibrary, BreakpointPluginLibrary );
 
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
 			_model = new Model.Laevo(
 				ProgramLocalDataFolder,
 				dataRepository,
-				interruptionAggregator,
+				notificationManager,
 				_persistenceProvider,
 				peerFactory );
 
@@ -67,7 +68,7 @@ namespace Laevo
 				}
 				catch ( PersistenceException pe )
 				{
-					View.MessageBox.Show( pe.Message, "Saving data failed", MessageBoxButton.OK );
+					//View.MessageBox.Show( pe.Message, "Saving data failed", MessageBoxButton.OK );
 				}
 			};
 			dispatcherTimer.Interval = new TimeSpan( 0, 5, 0 );
