@@ -418,6 +418,7 @@ namespace Laevo.ViewModel.ActivityOverview
 		{
 			_notificationPopups.ForEach( notificationPopup => { notificationPopup.Close(); } );
 			Dispatcher.CurrentDispatcher.BeginInvoke( new Action( () => _notificationPopups.Clear() ) );
+			_model.NotificationManager.ClearBreakpointNotifications();
 			_notificationList.Show();
 		}
 

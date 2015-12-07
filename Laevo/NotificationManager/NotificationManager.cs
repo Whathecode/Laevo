@@ -39,9 +39,9 @@ namespace NotificationManager
 		/// </summary>
 		readonly Dictionary<BreakpointType, TimeSpan> _breakpointsTimeLimits = new Dictionary<BreakpointType, TimeSpan>
 		{
-			{ BreakpointType.Fine, TimeSpan.FromMinutes( 1 ) },
-			{ BreakpointType.Medium, TimeSpan.FromMinutes( 2.5 ) },
-			{ BreakpointType.Coarse, TimeSpan.FromMinutes( 5 ) }
+			{ BreakpointType.Fine, TimeSpan.FromMinutes( 10 ) },
+			{ BreakpointType.Medium, TimeSpan.FromMinutes( 45 ) },
+			{ BreakpointType.Coarse, TimeSpan.FromHours( 2 ) }
 		};
 
 		static readonly Queue<AbstractInterruption> FineNotifications = new Queue<AbstractInterruption>();
@@ -200,6 +200,15 @@ namespace NotificationManager
 			};
 			_notificationTimers.Add( notification, breakpointLauncherTimer );
 			breakpointLauncherTimer.Start();
+		}
+
+		public void ClearBreakpointNotifications()
+		{
+			FineNotifications.Clear();
+			MediumNotifications.Clear();
+			CoarseNotifications.Clear();
+			_notificationTimers.Values.ToList().ForEach( timer => timer.Stop() );
+			_notificationTimers.Clear();
 		}
 	}
 }
