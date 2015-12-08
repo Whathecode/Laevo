@@ -13,146 +13,141 @@
 	xmlns:vm="clr-namespace:Laevo.ViewModel.Activity"
 	d:DataContext="{d:DesignInstance Type=vm:ActivityViewModel}"
 	Title="ActivityMenu"
-	WindowStyle="None"
-	Topmost="True"
-	ShowInTaskbar="False"
-	Foreground="White"
-	FontFamily="Segoe UI Light"
-	FontSize="15"
-	SizeToContent="WidthAndHeight"
-	MinHeight="100"
 	activityBar:GlassEffect.IsEnabled="False"
 	activityBar:DisableResize.IsDisabled="False"
-	ResizeMode="NoResize"
-	BorderThickness="1">
-
-	<Window.Background>
-		<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-			<GradientStop Color="#606c88" Offset="0" />
-			<GradientStop Color="#282944" Offset="1" />
-		</LinearGradientBrush>
-	</Window.Background>
-
-	<Window.BorderBrush>
-		<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
-			<GradientStop Offset="0" Color="Transparent" />
-			<GradientStop Offset="1" Color="White" />
-		</LinearGradientBrush>
-	</Window.BorderBrush>
+	Style="{StaticResource ActivityBar}"
+	SizeToContent="WidthAndHeight">
 
 	<Window.Resources>
-		<Style TargetType="{x:Type Image}">
-			<Setter Property="Width" Value="25" />
-			<Setter Property="Height" Value="25" />
-		</Style>
 
-		<ControlTemplate x:Key="StatesButtonTemplate" TargetType="{x:Type Button}">
-			<ControlTemplate.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="../Common/Style.xaml"></ResourceDictionary>
+			</ResourceDictionary.MergedDictionaries>
 
-				<Storyboard x:Key="Timeline1">
-					<DoubleAnimationUsingKeyFrames
+			<Style TargetType="{x:Type Image}">
+				<Setter Property="Width" Value="25" />
+				<Setter Property="Height" Value="25" />
+			</Style>
+
+			<LinearGradientBrush x:Key="BorderBrush" StartPoint="0, 0" EndPoint="1, 0">
+				<GradientStop Offset="0" Color="White" />
+				<GradientStop Offset="1" Color="Transparent" />
+			</LinearGradientBrush>
+
+			<ControlTemplate x:Key="StatesButtonTemplate" TargetType="{x:Type Button}">
+				<ControlTemplate.Resources>
+
+					<Storyboard x:Key="Timeline1">
+						<DoubleAnimationUsingKeyFrames
 						BeginTime="00:00:00"
 						Storyboard.TargetName="glow"
 						Storyboard.TargetProperty="(UIElement.Opacity)">
-						<SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="1" />
-					</DoubleAnimationUsingKeyFrames>
-				</Storyboard>
+							<SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="1" />
+						</DoubleAnimationUsingKeyFrames>
+					</Storyboard>
 
-				<Storyboard x:Key="Timeline2">
-					<DoubleAnimationUsingKeyFrames
+					<Storyboard x:Key="Timeline2">
+						<DoubleAnimationUsingKeyFrames
 						BeginTime="00:00:00"
 						Storyboard.TargetName="glow"
 						Storyboard.TargetProperty="(UIElement.Opacity)">
-						<SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0" />
-					</DoubleAnimationUsingKeyFrames>
-				</Storyboard>
+							<SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0" />
+						</DoubleAnimationUsingKeyFrames>
+					</Storyboard>
 
-			</ControlTemplate.Resources>
+				</ControlTemplate.Resources>
 
-			<Border
+				<Border
 				x:Name="border"
 				Background="Transparent"
 				BorderBrush="Black"
 				BorderThickness="0.5"
 				CornerRadius="1">
-				<Grid>
+					<Grid>
 
-					<Border
+						<Border
 						Opacity="0"
 						HorizontalAlignment="Stretch"
 						x:Name="glow"
 						Width="Auto"
 						CornerRadius="1">
-						<Border.Background>
-							<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0.0">
-								<GradientStop Color="White" Offset="-0.2" />
-								<GradientStop Color="Transparent" Offset="0.5" />
-								<GradientStop Color="White" Offset="1.5" />
-							</LinearGradientBrush>
-						</Border.Background>
-					</Border>
+							<Border.Background>
+								<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0.0">
+									<GradientStop Color="White" Offset="-0.2" />
+									<GradientStop Color="Transparent" Offset="0.5" />
+									<GradientStop Color="White" Offset="1.5" />
+								</LinearGradientBrush>
+							</Border.Background>
+						</Border>
 
-					<ContentPresenter
+						<ContentPresenter
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"
 						Width="Auto" />
 
-					<Border
+						<Border
 						HorizontalAlignment="Stretch"
 						Margin="0,0,0,0"
 						x:Name="shine"
 						Width="Auto"
 						CornerRadius="1,1,0,0">
-						<Border.Background>
-							<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-								<GradientStop Color="White" Offset="-0.5" />
-								<GradientStop Color="Transparent" Offset="0.5" />
-								<GradientStop Color="White" Offset="2" />
-							</LinearGradientBrush>
-						</Border.Background>
-					</Border>
+							<Border.Background>
+								<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+									<GradientStop Color="White" Offset="-0.5" />
+									<GradientStop Color="Transparent" Offset="0.5" />
+									<GradientStop Color="White" Offset="2" />
+								</LinearGradientBrush>
+							</Border.Background>
+						</Border>
 
-				</Grid>
-			</Border>
-			<ControlTemplate.Triggers>
+					</Grid>
+				</Border>
+				<ControlTemplate.Triggers>
 
-				<Trigger Property="IsPressed" Value="True">
-					<Setter
+					<Trigger Property="IsPressed" Value="True">
+						<Setter
 						Property="Opacity"
 						TargetName="shine"
 						Value="0.4" />
-					<Setter
+						<Setter
 						Property="Background"
 						TargetName="border"
 						Value="Transparent" />
-					<Setter
+						<Setter
 						Property="Visibility"
 						TargetName="glow"
 						Value="Hidden" />
-				</Trigger>
+					</Trigger>
 
-				<Trigger Property="IsMouseOver" Value="True">
-					<Trigger.EnterActions>
-						<BeginStoryboard Storyboard="{StaticResource Timeline1}" />
-					</Trigger.EnterActions>
-					<Trigger.ExitActions>
-						<BeginStoryboard x:Name="Timeline2_BeginStoryboard" Storyboard="{StaticResource Timeline2}" />
-					</Trigger.ExitActions>
-				</Trigger>
+					<Trigger Property="IsMouseOver" Value="True">
+						<Trigger.EnterActions>
+							<BeginStoryboard Storyboard="{StaticResource Timeline1}" />
+						</Trigger.EnterActions>
+						<Trigger.ExitActions>
+							<BeginStoryboard x:Name="Timeline2_BeginStoryboard" Storyboard="{StaticResource Timeline2}" />
+						</Trigger.ExitActions>
+					</Trigger>
 
-			</ControlTemplate.Triggers>
-		</ControlTemplate>
+				</ControlTemplate.Triggers>
+			</ControlTemplate>
 
+		</ResourceDictionary>
 	</Window.Resources>
 	
+	<Border
+		BorderThickness="1" 
+		CornerRadius="3" 
+		BorderBrush="{StaticResource BorderBrush}"
+		Background="{StaticResource LaevoBackgorundBrush}">
+
 		<StackPanel Orientation="Horizontal">
 
-			<!-- Edit activity and open library. -->
 			<Border
 				Background="White"
-				CornerRadius="0"
-				BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
-				BorderThickness="0"
+				CornerRadius="3"
+				BorderBrush="{StaticResource BorderBrush}"
+				BorderThickness="1"
 				HorizontalAlignment="Left">
 
 				<StackPanel
@@ -185,7 +180,7 @@
 				</StackPanel>
 			</Border>
 
-			<!-- Open/Stop/Suspend options. -->
+			 <!--Open/Stop/Suspend options.--> 
 			<StackPanel
 				ClipToBounds="True"
 				Orientation="Vertical"
@@ -196,7 +191,7 @@
 					Orientation="Horizontal"
 					Visibility="{Binding IsEditable, Converter={data:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 
-					<!-- Suspend. -->
+					 <!--Suspend.--> 
 					<Button
 						HorizontalAlignment="Left"
 						Margin="0,0,1,0"
@@ -207,7 +202,7 @@
 						Foreground="#FFFFFFFF"
 						Template="{DynamicResource StatesButtonTemplate}" />
 
-					<!-- Extended hidden options in context menu. -->
+					 <!--Extended hidden options in context menu.--> 
 					<Button
 						Name="OtherStatesButton"
 						HorizontalAlignment="Left"
@@ -229,7 +224,7 @@
 
 						<Button.ContextMenu>
 							<ContextMenu>
-								<!-- Stop and open. -->
+								 Stop and open. 
 								<MenuItem
 									Header="Stop"
 									Command="{commandFactory:CommandBinding {x:Static binding:Commands.StopActivity}}"
@@ -246,4 +241,5 @@
 
 			</StackPanel>
 		</StackPanel>
+	</Border>
 </Window>

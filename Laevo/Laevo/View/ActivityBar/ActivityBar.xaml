@@ -16,28 +16,20 @@
 	xmlns:overview="clr-namespace:Laevo.ViewModel.ActivityOverview"
 	d:DataContext="{d:DesignInstance Type=activityBarViewModel:ActivityBarViewModel}"
 	Title="ActivityInfoBox"
-	WindowStyle="None"
-	Topmost="True"
-	ShowInTaskbar="False"
-	ShowActivated="False"
-	Foreground="White"
-	FontFamily="Segoe UI Light"
-	FontSize="18"
 	Height="55"
-	ResizeMode="NoResize"
 	activityBar:GlassEffect.IsEnabled="False"
 	activityBar:DisableResize.IsDisabled="False"
-	BorderThickness="0"
-	>
-
-
+	Style="{StaticResource ActivityBar}"
+	Foreground="White">
 
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="GlassButton.xaml" />
+				<ResourceDictionary Source="../Common/Style.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-			
+
+
 			<activityBar:ActivityBackgroundConverter x:Key="ActivityBackgroundConverter" />
 			<activityConverters:BorderBrushConverter x:Key="BorderBrushConverter" />
 
@@ -68,7 +60,9 @@
 
 	</Window.Resources>
 
-	<Border CornerRadius="3" BorderThickness="1">
+	<Border 
+		CornerRadius="3" 
+		BorderThickness="1">
 	
 	<Border.BorderBrush>
 		<LinearGradientBrush StartPoint="0, 0" EndPoint="1, 0">
