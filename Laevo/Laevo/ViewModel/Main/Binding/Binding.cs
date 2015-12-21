@@ -20,5 +20,6 @@
 		ShowActivityBar,
 		HideActivityBar,
 		ActivateSelectedActivity,
+		RunPluginManager
 	}
 }
