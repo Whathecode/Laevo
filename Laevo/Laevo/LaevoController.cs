@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using ABC.Applications.Persistence;
 using ABC.Interruptions;
+using ABC.Workspaces.Windows.Settings;
 using Laevo.Data;
 using Laevo.Data.Model;
 using Laevo.Data.View;
@@ -19,11 +20,13 @@ namespace Laevo
 	/// </summary>
 	class LaevoController : AbstractDisposable
 	{
-		static readonly string ProgramLocalDataFolder
+		public static readonly string ProgramLocalDataFolder
 			= Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData ), "Laevo" );
 
 		static readonly string InterruptionsPluginLibrary = Path.Combine( ProgramLocalDataFolder, "InterruptionHandlers" );
 		static readonly string PersistencePluginLibrary = Path.Combine( ProgramLocalDataFolder, "ApplicationPersistence" );
+		static readonly string VdmSettingsLibrary = Path.Combine( ProgramLocalDataFolder, "VdmSettings" );
+		public static readonly string PluginManagerPath = Path.Combine( ProgramLocalDataFolder, "PluginManager" );
 
 		readonly AbstractPersistenceProvider _persistenceProvider;
 
@@ -33,19 +36,26 @@ namespace Laevo
 
 		public LaevoController()
 		{
-			// Create Services.
+			// Create folders if they do not exist. 
+			Directory.CreateDirectory( InterruptionsPluginLibrary );
+			Directory.CreateDirectory( PersistencePluginLibrary );
+			Directory.CreateDirectory( VdmSettingsLibrary );
+			Directory.CreateDirectory( PluginManagerPath );
+
+			// Create extension services.
 			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
 			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
+			var vdmSettings = new LoadedSettings( VdmSettingsLibrary );
+
 			var peerFactory = new MockPeerFactory();
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );
 
 			// Create Model.
 			IModelRepository dataRepository = repositoryFactory.CreateModelRepository();
-			_model = new Model.Laevo(
-				ProgramLocalDataFolder,
-				dataRepository,
+			_model = new Model.Laevo( dataRepository,
 				interruptionAggregator,
 				_persistenceProvider,
+				vdmSettings,
 				peerFactory );
 
 			// Create ViewModel.
@@ -76,7 +86,7 @@ namespace Laevo
 
 		public void Exit()
 		{
-			_viewModel.Exit();			
+			_viewModel.Exit();
 		}
 
 		public void ExitDesktopManager()
