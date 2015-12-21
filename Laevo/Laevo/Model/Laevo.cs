@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
-using System.IO;
 using System.Linq;
 using System.Windows.Threading;
 using ABC.Applications.Persistence;
@@ -45,12 +44,10 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly InterruptionAggregator _interruptionTrigger;
+		readonly AbstractInterruptionAggregator _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
 
 		public IUsersPeer UsersPeer { get; private set; }
-
-		public static string ProgramLocalDataFolder { get; private set; }
 
 		public IWindowOperations WindowClipboard { get; private set; }
 
@@ -92,8 +89,8 @@ namespace Laevo.Model
 		readonly List<Activity> _visibleActivities = new List<Activity>();
 
 
-		public Laevo( string dataFolder, IModelRepository dataRepository, InterruptionAggregator interruptionTrigger,
-			AbstractPersistenceProvider persistenceProvider, AbstractPeerFactory peerFactory )
+		public Laevo( IModelRepository dataRepository, AbstractInterruptionAggregator interruptionTrigger,
+			AbstractPersistenceProvider persistenceProvider, ISettings vdmSettings, AbstractPeerFactory peerFactory )
 		{
 			Log.Info( "Startup." );
 
@@ -119,29 +116,7 @@ namespace Laevo.Model
 				// TODO: Similar to interruption events, this event should probably be removed and some other mechanism should be used.
 			};
 
-			ProgramLocalDataFolder = dataFolder;
-
 			// Initialize desktop manager.
-			string vdmSettingsPath = Path.Combine( dataFolder, "VdmSettings" );
-			if ( !Directory.Exists( vdmSettingsPath ) )
-			{
-				Directory.CreateDirectory( vdmSettingsPath );
-			}
-			var vdmSettings = new LoadedSettings();
-			foreach ( string file in Directory.EnumerateFiles( vdmSettingsPath ) )
-			{
-				try
-				{
-					using ( var stream = new FileStream( file, FileMode.Open ) )
-					{
-						vdmSettings.AddSettingsFile( stream );
-					}
-				}
-				catch ( InvalidOperationException )
-				{
-					// Simply ignore invalid files.
-				}
-			}
 			var vdmManager = new VirtualDesktopManager( vdmSettings, persistenceProvider );
 			WindowClipboard = vdmManager; // Only expose window clipboard, WorkspaceManager is used to expose workspaces.
 			Log.Debug( "Desktop manager initialized." );
