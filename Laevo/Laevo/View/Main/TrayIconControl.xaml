@@ -38,6 +38,9 @@
 					Command="{view:TrayCommandBinding {x:Static b:Commands.Help}}" />
 				<Separator />
 				<MenuItem
+					Header="Plug-in Manager"
+					Command="{view:TrayCommandBinding {x:Static b:Commands.RunPluginManager}}" />
+				<MenuItem
 					Header="Settings"
 					Command="{view:TrayCommandBinding {x:Static b:Commands.OpenSettings}}" />
 				<MenuItem

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -113,6 +114,33 @@ namespace Laevo.ViewModel.Main
 			Persist();
 
 			Application.Current.Shutdown();
+		}
+
+		[CommandExecute( Commands.RunPluginManager )]
+		public void RunPluginManager()
+		{
+#if DEBUG
+			const string pluginManagerPath = @"..\..\..\..\..\ABC\ABC\ABC.PluginManager\bin\Debug\PluginManager.exe";
+#else
+			const string pluginManagerPath = Path.Combine( LaevoController.PluginManagerPath, "PluginManager.exe" );
+#endif
+			try
+			{
+				// Empty spaces are parsed as an argument separation, add double quotes to escape it.
+				Process.Start(
+					"\"" + pluginManagerPath + "\"",
+					"\"" +
+					LaevoController.ProgramLocalDataFolder +
+					"\" \"" +
+					System.Reflection.Assembly.GetExecutingAssembly().Location +
+					"\"" );
+
+				Exit();
+			}
+			catch ( Exception exception )
+			{
+				MessageBox.Show( exception.Message );
+			}
 		}
 
 		[CommandCanExecute( Commands.OpenSettings )]
