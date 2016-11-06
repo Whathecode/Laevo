@@ -40,7 +40,7 @@ namespace Laevo.Data.Model
 		static readonly DataContractSerializer SettingsSerializer = new DataContractSerializer( typeof( Settings ) );
 
 
-		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionAggregator interruptionAggregator, AbstractPeerFactory peerFactory )
+		public DataContractSerializedModelRepository( string programDataFolder, AbstractInterruptionTrigger interruptionAggregator, AbstractPeerFactory peerFactory )
 			: base( peerFactory )
 		{
 			// Set up file paths.
