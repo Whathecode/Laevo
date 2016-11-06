@@ -20,7 +20,7 @@ using Whathecode.System.Windows.Input.CommandFactory.Attributes;
 using Application = System.Windows.Application;
 using Commands = Laevo.ViewModel.Main.Binding.Commands;
 using UnresponsiveWindowPopup = Laevo.View.Main.Unresponsive.UnresponsiveWindowPopup;
-
+using System.IO;
 
 namespace Laevo.ViewModel.Main
 {
@@ -30,6 +30,7 @@ namespace Laevo.ViewModel.Main
 		readonly Model.Laevo _model;
 		readonly IViewRepository _dataRepository;
 
+		object _overviewLock = new object();
 		ActivityOverviewWindow _activityOverview;
 		ActivityOverviewViewModel _activityOverviewViewModel;
 
@@ -83,14 +84,23 @@ namespace Laevo.ViewModel.Main
 		/// </summary>
 		void ResetGui()
 		{
-			if ( _activityOverview != null )
+			bool showOverview = false;
+			lock ( _overviewLock )
 			{
-				_activityOverview.Close();
-				_activityOverview = null;
-				if ( _activityOverviewViewModel.ActivityMode.HasFlag( Mode.Select ) )
+				if ( _activityOverview != null )
 				{
-					ShowActivityOverview();
+					_activityOverview.Close();
+					_activityOverview = null;
+					if ( _activityOverviewViewModel.ActivityMode.HasFlag( Mode.Select ) )
+					{
+						showOverview = true;
+					}
 				}
+			}
+			// TODO: This is moved after the lock to prevent a deadlock.
+			if ( showOverview )
+			{
+				ShowActivityOverview();
 			}
 
 			GuiReset();
@@ -122,7 +132,7 @@ namespace Laevo.ViewModel.Main
 #if DEBUG
 			const string pluginManagerPath = @"..\..\..\..\..\ABC\ABC\ABC.PluginManager\bin\Debug\PluginManager.exe";
 #else
-			const string pluginManagerPath = Path.Combine( LaevoController.PluginManagerPath, "PluginManager.exe" );
+			string pluginManagerPath = Path.Combine( LaevoController.PluginManagerPath, "PluginManager.exe" );
 #endif
 			try
 			{
@@ -179,8 +189,11 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 			_activityBar.Hide();
-			_activityOverview.Show();
-			_activityOverview.Activate();
+			lock ( _overviewLock )
+			{
+				_activityOverview.Show();
+				_activityOverview.Activate();
+			}
 		}
 
 		[CommandCanExecute( Commands.ShowActivityOverview )]
@@ -211,7 +224,10 @@ namespace Laevo.ViewModel.Main
 		[CommandExecute( Commands.HideActivityOverview )]
 		public void HideActivityOverview()
 		{
-			_activityOverview.Hide();
+			lock ( _overviewLock )
+			{
+				_activityOverview.Hide();
+			}
 		}
 
 		[CommandExecute( Commands.SwitchActivityOverview )]
@@ -219,13 +235,16 @@ namespace Laevo.ViewModel.Main
 		{
 			EnsureActivityOverview();
 
-			if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
+			lock ( _overviewLock )
 			{
-				ShowActivityOverview();
-			}
-			else
-			{
-				HideActivityOverview();
+				if ( _activityOverview.Visibility.EqualsAny( Visibility.Collapsed, Visibility.Hidden ) )
+				{
+					ShowActivityOverview();
+				}
+				else
+				{
+					HideActivityOverview();
+				}
 			}
 		}
 
@@ -305,29 +324,32 @@ namespace Laevo.ViewModel.Main
 		/// </summary>
 		void EnsureActivityOverview()
 		{
-			if ( _activityOverview != null )
+			lock ( _overviewLock )
 			{
-				return;
-			}
-
-			if ( _activityOverviewViewModel == null )
-			{
-				_activityOverviewViewModel = new ActivityOverviewViewModel( _model, _dataRepository )
+				if ( _activityOverview != null )
 				{
-					TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale,
-					EnableAttentionLines = _model.Settings.EnableAttentionLines
-				};
+					return;
+				}
 
-				_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
-				_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
-				_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
-				_activityOverviewViewModel.ShowingPopupEvent += () => _activityBar.Hide();
+				if ( _activityOverviewViewModel == null )
+				{
+					_activityOverviewViewModel = new ActivityOverviewViewModel( _model, _dataRepository )
+					{
+						TimeLineRenderScale = _model.Settings.TimeLineRenderAtScale,
+						EnableAttentionLines = _model.Settings.EnableAttentionLines
+					};
+
+					_activityOverviewViewModel.ActivatedActivityEvent += OnActivatedActivityEvent;
+					_activityOverviewViewModel.SuspendingActivityEvent += OnSuspendingActivityEvent;
+					_activityOverviewViewModel.NoCurrentActiveActivityEvent += OnNoCurrentActiveActivityEvent;
+					_activityOverviewViewModel.ShowingPopupEvent += () => _activityBar.Hide();
+				}
+				_activityOverview = new ActivityOverviewWindow
+				{
+					DataContext = _activityOverviewViewModel
+				};
+				_activityOverview.Closed += ( s, a ) => ResetGui();
 			}
-			_activityOverview = new ActivityOverviewWindow
-			{
-				DataContext = _activityOverviewViewModel
-			};
-			_activityOverview.Closed += ( s, a ) => ResetGui();
 		}
 
 		void OnActivatedActivityEvent( ActivityViewModel oldActivity, ActivityViewModel newActivity )
