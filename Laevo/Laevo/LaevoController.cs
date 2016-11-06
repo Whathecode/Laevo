@@ -43,9 +43,9 @@ namespace Laevo
 			Directory.CreateDirectory( PluginManagerPath );
 
 			// Create extension services.
-			var interruptionAggregator = new InterruptionAggregator( InterruptionsPluginLibrary );
-			_persistenceProvider = new PersistenceProvider( PersistencePluginLibrary );
-			var vdmSettings = new LoadedSettings( VdmSettingsLibrary );
+			var interruptionAggregator = new FolderInterruptionTrigger( InterruptionsPluginLibrary );
+			_persistenceProvider = new FolderPersistenceProvider( PersistencePluginLibrary );
+			var vdmSettings = new LoadedSettings();
 
 			var peerFactory = new MockPeerFactory();
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );

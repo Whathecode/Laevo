@@ -44,7 +44,7 @@ namespace Laevo.Model
 		/// </summary>
 		public event Action LogonScreenExited;
 
-		readonly AbstractInterruptionAggregator _interruptionTrigger;
+		readonly AbstractInterruptionTrigger _interruptionTrigger;
 		readonly IModelRepository _dataRepository;
 
 		public IUsersPeer UsersPeer { get; private set; }
@@ -89,7 +89,7 @@ namespace Laevo.Model
 		readonly List<Activity> _visibleActivities = new List<Activity>();
 
 
-		public Laevo( IModelRepository dataRepository, AbstractInterruptionAggregator interruptionTrigger,
+		public Laevo( IModelRepository dataRepository, AbstractInterruptionTrigger interruptionTrigger,
 			AbstractPersistenceProvider persistenceProvider, ISettings vdmSettings, AbstractPeerFactory peerFactory )
 		{
 			Log.Info( "Startup." );
@@ -135,7 +135,7 @@ namespace Laevo.Model
 			HomeActivity.View();
 
 			// Set up interruption handlers.
-			_interruptionTrigger.InterruptionReceived += ( sender, interruption ) =>
+			_interruptionTrigger.InterruptionReceived += interruption =>
 			{
 				// TODO: For now all interruptions lead to new activities, but later they might be added to existing activities.
 				Log.InfoWithData( "Incoming interruption.", new LogData( "Type", interruption.GetType() ) );
