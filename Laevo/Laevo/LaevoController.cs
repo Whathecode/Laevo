@@ -11,7 +11,8 @@ using Laevo.Peer.Mock;
 using Laevo.View.Main;
 using Laevo.ViewModel.Main;
 using Whathecode.System;
-
+using Whathecode.System.Windows;
+using Whathecode.System.Extensions;
 
 namespace Laevo
 {
@@ -45,7 +46,13 @@ namespace Laevo
 			// Create extension services.
 			var interruptionAggregator = new FolderInterruptionTrigger( InterruptionsPluginLibrary );
 			_persistenceProvider = new FolderPersistenceProvider( PersistencePluginLibrary );
-			var vdmSettings = new LoadedSettings();
+			var vdmSettings = new LoadedSettings( false, true, w =>
+			{
+				string className = new WindowInfo( w.Handle ).GetClassName();
+				// TODO: Windows 10 universal apps seem to handle windows differently.
+				//       Ignore them for now.
+				return !className.EqualsAny( "ApplicationFrameWindow", "Windows.UI.Core.CoreWindow" );
+			} );
 
 			var peerFactory = new MockPeerFactory();
 			var repositoryFactory = new DataContractDataFactory( ProgramLocalDataFolder, interruptionAggregator, _persistenceProvider, peerFactory );
