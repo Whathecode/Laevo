@@ -627,7 +627,11 @@ namespace Laevo.ViewModel.ActivityOverview
 			// Make sure timer does not dispatch another task.
 			_updateTimer.AutoReset = false;
 			_updateTimer.Stop();
-			Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
+			// TODO: This crashes here sometimes because 'Activities' is null, but how can this be?
+			if ( Activities == null )
+			{
+				Activities.Concat( Tasks ).Distinct().ForEach( a => a.Dispose() );
+			}
 		}
 	}
 }
