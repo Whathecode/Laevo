@@ -197,14 +197,14 @@
 						Header="_New Activity"
 						Command="{pf:CommandBinding {x:Static binding:Commands.NewActivity}}">
 						<MenuItem.Icon>
-							<Image Source="Images\NewActivity.png" Width="20" Height="20" />
+							<Image Source="Images\NewActivity.png" Width="Auto" />
 						</MenuItem.Icon>
 					</MenuItem>
 					<MenuItem
 						Header="_Plan Activity Here"
 						Command="{pf:CommandBinding {x:Static binding:Commands.PlanActivity}}">
 						<MenuItem.Icon>
-							<Image Source="Images\PlanActivity.png" Width="20" Height="20" />
+							<Image Source="Images\PlanActivity.png" Width="Auto" />
 						</MenuItem.Icon>
 					</MenuItem>
 				</ContextMenu>

@@ -166,14 +166,18 @@
 						Command="{commandFactory:CommandBinding {x:Static binding:Commands.EditActivity}}"
 						Visibility="{Binding IsEditable, Converter={data:FromBooleanConverter IfTrue={x:Static Visibility.Visible}, IfFalse={x:Static Visibility.Collapsed}}}">
 						<MenuItem.Icon>
-							<Image Source="../Activity/ActionIcons/edit.png" />
+							<Image
+                                Width="Auto"
+                                Source="../Activity/ActionIcons/edit.png" />
 						</MenuItem.Icon>
 					</MenuItem>
 					<MenuItem
 						Header="Open Activity Library"
 						Command="{commandFactory:CommandBinding {x:Static binding:Commands.OpenActivityLibrary}}">
 						<MenuItem.Icon>
-							<Image Source="../Activity/Icons/Library.png" />
+							<Image
+                                Width="Auto"
+                                Source="../Activity/Icons/Library.png" />
 						</MenuItem.Icon>
 					</MenuItem>
 
