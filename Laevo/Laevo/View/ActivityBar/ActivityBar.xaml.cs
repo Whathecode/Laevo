@@ -59,6 +59,7 @@ namespace Laevo.View.ActivityBar
 		public ActivityBar()
 		{
 			InitializeComponent();
+			ShowActivated = false;
 
 			// Set up two way binding for the necessary properties to the viewmodel.
 			Type thisType = typeof( ActivityBar );
